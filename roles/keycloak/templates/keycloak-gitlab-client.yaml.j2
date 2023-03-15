@@ -1,0 +1,23 @@
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: gitlab-client
+  labels:
+    app: sso
+  namespace: keycloak-system
+spec:
+  client:
+    clientId: gitlab-client
+#    secret: 530169ec-83e6-430e-84d7-22c937dc789c
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ GITLAB_DOMAIN }}/users/auth/openid_connect/callback
+    webOrigins:
+      - https://{{ GITLAB_DOMAIN }}
+    defaultClientScopes:
+      - profile
+      - email
+  realmSelector:
+    matchLabels:
+      app: sso

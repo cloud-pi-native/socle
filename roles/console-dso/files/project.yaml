@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: console-pi-native
+  namespace: argo-system
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - name: '*'
+    namespace: console-pi-system
+    server: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  roles:
+  - description: admin-RO
+    groups:
+    - /admin
+    - admin
+    - ArgoCDAdmins
+    - /ArgoCDAdmins
+    name: admin-RO
+    policies:
+    - p, proj:console-pi-native:admin, applications, get, console-pi-native/*, allow
+  - description: admin-RW
+    groups:
+    - /admin
+    - admin
+    - ArgoCDAdmins
+    - /ArgoCDAdmins
+    name: admin-RW
+    policies:
+    - p, proj:console-pi-native:admin, applications, *, console-pi-native/*, *
+  sourceRepos:
+  - https://github.com/dnum-mi/dso-console.git

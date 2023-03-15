@@ -1,0 +1,110 @@
+- name: get argo client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: keycloak-system
+    name: keycloak-client-secret-argo-client
+  register: argocd_secret
+  failed_when: argocd_secret.resources | length == 0
+
+- name: crb argo
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        creationTimestamp: null
+        name: system:openshift:scc:privileged
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:openshift:scc:privileged
+      subjects:
+        - kind: ServiceAccount
+          namespace: argo-system
+          name: argo-argo-cd-argocd-repo-server
+        - kind: ServiceAccount
+          namespace: argo-system
+          name: argo-argo-cd-argocd-server
+        - kind: ServiceAccount
+          namespace: argo-system
+          name: argo-redis
+
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: argo
+    chart_ref: bitnami/argo-cd
+    release_namespace: argo-system
+    create_namespace: true
+    values:
+      openshift:
+        enabled: false
+      config:
+        secret:
+          argocdServerAdminPassword: "{{ ARGOCD_ADMIN_PASSWORD }}"
+      dex:
+        enabled: true
+      server:
+        config:
+          clusterResources: "true"
+          url: "https://{{ ARGOCD_DOMAIN }}"
+          oidc.config: |
+            issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
+            requestedScopes: ["openid", "groups"]
+            name: Keycloak
+            clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
+            clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+          users.anonymous.enabled: "false"
+          admin.enabled: "false"
+          resource.exclusions: |
+            - apiGroups:
+              - tekton.dev
+              clusters:
+              - '*'
+              kinds:
+              - TaskRun
+              - PipelineRun
+        extraEnvVars:
+          - name: HTTP_PROXY
+            value: "{{ HTTP_PROXY }}"
+          - name: HTTPS_PROXY
+            value: "{{ HTTPS_PROXY }}"
+          - name: NO_PROXY
+            value: "{{ NO_PROXY }},argo-argo-cd-repo-server"
+      repoServer:
+        extraEnvVars:
+          - name: HTTP_PROXY
+            value: "{{ HTTP_PROXY }}"
+          - name: HTTPS_PROXY
+            value: "{{ HTTPS_PROXY }}"
+          - name: NO_PROXY
+            value: "{{ NO_PROXY }}"
+      extraDeploy:
+        - apiVersion: v1
+          data:
+            policy.csv: |
+              p, role:admin, *, *, */*, allow
+              p, role:nada, *, *, */*, deny
+              g, system:cluster-admins, role:admin
+              g, cluster-admins, role:admin
+              g, /ArgoCDAdmins, role:admin
+              g, ArgoCDAdmins, role:admin
+            scopes: '[groups]'
+            policy.default: role:nada
+            admin.enabled: "false"
+          kind: ConfigMap
+          metadata:
+            labels:
+              app.kubernetes.io/managed-by: openshift-gitops
+              app.kubernetes.io/name: argocd-rbac-cm
+              app.kubernetes.io/part-of: argocd
+            name: argocd-rbac-cm
+            namespace: argo-system
+
+- name: Install routes
+  kubernetes.core.k8s:
+    template: gitops-route.yaml.j2

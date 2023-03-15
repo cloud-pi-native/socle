@@ -1,0 +1,41 @@
+- name: Check cert-manager deployment
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    namespace: cert-manager
+    name: cert-manager-webhook
+  register: cert_manager_webhook
+
+- name: Download cert-manager
+  ansible.builtin.uri:
+    url: "https://github.com/cert-manager/cert-manager/releases/download/{{ CERTMANAGER_VERSION }}/cert-manager.yaml"
+    return_content: true
+  register: cert_manifest
+
+- name: Edit manifest
+  set_fact:
+    manifest: "{{ cert_manifest.content | from_yaml_all | custom_cert_manager(envs) }}"
+  vars:
+    envs:
+      - name: http_proxy
+        value: "{{ HTTP_PROXY }}"
+      - name: https_proxy
+        value: "{{ HTTPS_PROXY }}"
+      - name: no_proxy
+        value: "{{ NO_PROXY }}"
+
+- name: Apply cert-manager
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ manifest }}"
+
+# - name: Wait for cert-manager-webhook to be ok
+#   kubernetes.core.k8s_info:
+#     kind: Deployment
+#     namespace: cert-manager
+#     name: cert-manager-webhook
+#     wait: yes
+#     wait_sleep: 10
+#     wait_timeout: 600
+#     wait_condition:
+#       type: ContainersReady
+#       status: "True"

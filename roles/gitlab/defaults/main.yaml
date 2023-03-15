@@ -1,0 +1,4 @@
+VAULT_AUTH_PATH: "jwt"
+VAULT_AUTH_ROLE: "default-ci"
+MVN_CONFIG_FILE: "{{ lookup('file', '{{ playbook_dir }}/roles/gitlab/mvn_conf_file') }}"
+NPM_FILE: "{{ lookup('file', '{{ playbook_dir }}/roles/gitlab/npm_file') }}"

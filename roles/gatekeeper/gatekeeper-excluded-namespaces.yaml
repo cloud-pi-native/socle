@@ -1,0 +1,28 @@
+apiVersion: config.gatekeeper.sh/v1alpha1
+kind: Config
+metadata:
+  name: config
+  namespace: openshift-gatekeeper-system
+spec:
+  match:
+    - excludedNamespaces:
+        - hive
+        - kube-system
+        - kube-public
+        - openshift-kube-apiserver
+        - openshift-monitoring
+        - open-cluster-management-agent
+        - open-cluster-management
+        - open-cluster-management-agent-addon
+        - openshift-sdn
+        - openshift-machine-config-operator
+        - openshift-machine-api
+        - openshift-ingress-operator
+        - openshift-ingress
+        - sdn-controller
+        - openshift-cluster-csi-drivers
+        - openshift-kube-controller-manager-operator
+        - openshift-kube-controller-manager
+        - cert-manager
+      processes:
+        - "*"

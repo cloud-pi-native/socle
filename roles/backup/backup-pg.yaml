@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-backup
+  namespace: keycloak-system
+spec:
+  selector:
+    matchLabels:
+      app: backup
+  template:
+    metadata:
+      labels:
+        app: backup
+    spec:
+      initContainers:
+        - name: dump
+          image: postgres:12.1-alpine
+          volumeMounts:
+            - name: data
+              mountPath: /backup
+          args:
+            - pg_dump
+            - "-Fc"
+            - "-f"
+            - "/backup/backup_keycloak.pgdump"
+            - "-v"
+            - "-h"
+            - "keycloak-postgresql"
+            - "-U"
+            - "keycloak"
+            - "-d"
+            - "root"
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-db-secret
+                  key: POSTGRES_PASSWORD
+      containers:
+        - name: save
+          image: mesosphere/aws-cli
+          volumeMounts:
+            - name: data
+              mountPath: /backup
+            - name: config-volume
+              mountPath: /backup-script
+          env:
+            - name: BUCKET_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: dso-backup-bucket
+                  key: BUCKET_HOST
+            - name: BUCKET_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: dso-backup-bucket
+                  key: BUCKET_PORT
+            - name: BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: dso-backup-bucket
+                  key: BUCKET_NAME
+            - name: BUCKET_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: dso-backup-bucket
+                  key: BUCKET_REGION
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: dso-backup-bucket
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dso-backup-bucket
+                  key: AWS_SECRET_ACCESS_KEY
+                  #          command: ["aws", "--no-verify-ssl", "s3", "cp", "/backup/backup_keycloak.pgdump", "s3://$(BUCKET_NAME)/backup_keycloak.pgdump", "--endpoint-url", "https://$(BUCKET_HOST)"]
+          command: ["/backup-script/backup-s3.sh"]
+#          args:
+#            - sleep
+#            - 100000
+            #- aws
+            #- s3
+            #- cp
+            #- "/backup/redash-postgres.pgdump"
+            #- "s3://redash-postgres-backups/redash-postgres.pgdump"
+            #envFrom:
+            #- secretRef:
+             # Must contain AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION
+             #name: s3-backup-credentials
+      volumes:
+        - name: config-volume
+          configMap:
+            name: backup-s3.sh
+            defaultMode: 0777
+        - name: data
+          emptyDir: {}

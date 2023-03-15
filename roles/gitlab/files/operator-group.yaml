@@ -1,0 +1,13 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: gitlab-system
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: gitlab-system-opgroup
+  namespace: gitlab-system
+spec:
+  targetNamespaces:
+    - gitlab-system

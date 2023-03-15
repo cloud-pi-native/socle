@@ -1,0 +1,120 @@
+- name: Create nexus Namespace
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        creationTimestamp: null
+        name: nexus-system
+
+- name: Create nexus Service Account
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: nexus-sa
+        namespace: nexus-system
+
+- name: Deploy nexus
+  kubernetes.core.k8s:
+    template: nexus.yml.j2
+    state: present
+
+- name: Create issuer
+  kubernetes.core.k8s:
+    template: issuer.yml.j2
+
+- name: find nexus admin password in inventory
+  kubernetes.core.k8s_info:
+    namespace: openshift-infra
+    kind: ConfigMap
+    name: ansible-inventory
+  register: ansible_inventory
+
+- name: Cache admin password
+  set_fact:
+    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
+  register: set_nx_pass
+  when: ansible_inventory.resources | length > 0 and ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined
+
+- name: Find password in container
+  when: set_nx_pass.skipped is defined and set_nx_pass.skipped
+  block:
+    - name: wait nexus to initialize
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: nexus-system
+        name: nexus
+      register: endpoint
+      until: endpoint.resources[0].subsets is defined and endpoint.resources[0].subsets | selectattr('addresses')
+      retries: 30
+      delay: 5
+
+    - name: get nexus pod's name
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: nexus-system
+        name: nexus
+      register: nx_ep
+
+    - name: set nx_pod
+      set_fact:
+        nx_pod: "{{ nx_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
+
+    - name: récupération du compte admin
+      kubernetes.core.k8s_exec:
+        pod: "{{ nx_pod }}"
+        namespace: nexus-system
+        command: cat /nexus-data/admin.password
+      register: admin_account
+      until: admin_account.stdout is defined and admin_account.stdout
+      retries: 10
+      delay: 12
+
+    - name: Set nexus password from cat
+      set_fact:
+        nexus_admin_password: "{{ admin_account.stdout }}"
+
+    - name: Generate random password
+      set_fact:
+        new_pass: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters') }}"
+
+    - name: Change nexus password
+      uri:
+        force_basic_auth: true
+        url: "https://{{ NEXUS_DOMAIN }}/service/rest/v1/security/users/admin/change-password"
+        method: PUT
+        user: admin
+        password: "{{ nexus_admin_password }}"
+        body: "{{ new_pass }}"
+        body_format: raw
+        headers:
+          Content-Type: text/plain
+        status_code: [204, 503]
+      until: update_nexus_pass.status == 204
+      register: update_nexus_pass
+
+    - name: update inventory
+      kubernetes.core.k8s:
+        kind: ConfigMap
+        name: ansible-inventory
+        namespace: openshift-infra
+        state: patched
+        definition:
+          data:
+            NEXUS_ADMIN_PASSWORD: "{{ new_pass }}"
+
+# TODO check tout ça
+# - name: Disable Anonymous access
+#   uri:
+#     url: "https://{{ NEXUS_DOMAIN }}/service/rest/v1/security/anonymous"
+#     method: PUT
+#     user: admin
+#     password:
+#     body:
+#       enabled: false
+#       userId: "anonymous"
+#       realmName: "NexusAuthorizingRealm"
+#     body_format: json
+#     status_code: [200]

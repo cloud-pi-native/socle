@@ -1,0 +1,17 @@
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-system-letsencrypt-issuer
+  namespace: vault-system
+spec:
+  acme:
+    email: {{ CERTMANAGER_EMAIL }}
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: vault-system-issuer-account-key
+    solvers:
+    - http01:
+        ingress:
+          name: ingressvault-http-solver

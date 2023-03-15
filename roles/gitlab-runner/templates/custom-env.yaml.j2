@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+{% if HTTP_PROXY is defined %}
+  HTTP_PROXY: "{{ HTTP_PROXY }}"
+  HTTPS_PROXY: "{{ HTTPS_PROXY }}"
+  NO_PROXY: "{{ NO_PROXY }}"
+{% endif %}
+kind: ConfigMap
+metadata:
+  name: custom-env
+  namespace: gitlab-system

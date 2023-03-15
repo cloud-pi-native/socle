@@ -1,0 +1,24 @@
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: sonar-client
+  labels:
+    app: sso
+  namespace: keycloak-system
+spec:
+  client:
+    clientId: sonar-client
+#    secret: 3c6ec656-defe-4fa3-be05-a24460ec97eb
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ SONAR_DOMAIN }}/auth/callback
+    webOrigins:
+      - https://{{ SONAR_DOMAIN }}
+    defaultClientScopes:
+      - profile
+      - email
+      - groups
+  realmSelector:
+    matchLabels:
+      app: sso

@@ -1,0 +1,103 @@
+- name: Install operator group ans subscription
+  kubernetes.core.k8s:
+    src: "{{ item }}"
+  with_items:
+    - operator-group.yaml
+    - operator-subscription.yaml
+    - realm.yaml
+
+- name: Launch keycloak instance
+  kubernetes.core.k8s:
+    template: keycloak.j2
+
+- name: Wait Keycloak instance
+  block:
+    - name: Wait Keycloak
+      kubernetes.core.k8s_info:
+        kind: keycloak
+        namespace: keycloak-system
+        name: dso-keycloak
+        api_version: keycloak.org/v1alpha1
+      register: keycloak_instance
+      failed_when: >
+        (keycloak_instance.resources[0].status.phase is defined and keycloak_instance.resources[0].status.phase == 'failing') or keycloak_instance.attempts > 28
+      until: >
+        (keycloak_instance.resources[0].status.phase is defined and keycloak_instance.resources[0].status.phase == 'reconciling') or
+         KEYCLOAK_NO_CHECK is defined
+      retries: 30
+      delay: 10
+  rescue:
+    - name: Failed start keycloak disclaimer
+      debug:
+        msg: |
+          KEYCLOAK didn't start in 5 minutes please check is status
+          "kubectl get keycloak dso-keycloak -o yaml"
+          Re-run playbook when 'status.phase' is 'reconciling' or run with "-e KEYCLOAK_NO_CHECK=" at your own risk
+
+- name: find keycloak admin password
+  kubernetes.core.k8s_info:
+    namespace: keycloak-system
+    kind: Secret
+    name: "{{ keycloak_instance.resources[0].status.credentialSecret }}"
+  register: kc_admin
+  until: kc_admin.resources | length > 0
+  retries: 10
+  delay: 5
+
+- name: update inventory
+  kubernetes.core.k8s:
+    kind: ConfigMap
+    name: ansible-inventory
+    namespace: openshift-infra
+    state: patched
+    definition:
+      data:
+        KC_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
+        KC_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
+
+- name: generate admin password
+  set_fact:
+    admin_user_password: "{{ ansible_inventory.resources[0].data.KC_PASSWORD }}"
+  when: ansible_inventory.resources[0].data.KC_PASSWORD is defined
+
+- name: find dso admin password
+  kubernetes.core.k8s_info:
+    namespace: keycloak-system
+    kind: Secret
+    name: dso-admin-user-secret
+  register: dso_admin
+
+- name: create dso admin secret
+  when: dso_admin.resources | length == 0
+  block:
+    - name: Generate admin password
+      set_fact:
+        admin_user_password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits') }}"
+
+    - name: Create dso secret
+      kubernetes.core.k8s:
+        definition:
+          kind: Secret
+          metadata:
+            namespace: keycloak-system
+            name: dso-admin-user-secret
+          data:
+            ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"
+          type: Opaque
+
+    - name: Create dso user
+      kubernetes.core.k8s:
+        template: keycloak-create-admin-user.yaml.j2
+
+- name: Create clients and alternative route
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - keycloak-gitlab-client.yaml.j2
+    - keycloak-console-frontend-client.yaml.j2
+    - keycloak-console-backend-client.yaml.j2
+    - keycloak-argo-client.yaml.j2
+    - keycloak-portail-client.yaml.j2
+    - keycloak-sonar-client.yaml.j2
+    - keycloak-harbor-client.yaml.j2
+    - keycloak-route.yaml.j2

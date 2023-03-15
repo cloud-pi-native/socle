@@ -1,0 +1,19 @@
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: prometheus-internal
+  namespace: openshift-infra
+spec:
+  datasources:
+    - access: proxy
+      #jsonData:
+      #  tlsSkipVerify: true  
+      basicAuth: true
+      basicAuthPassword: mysupersecretpasswd
+      basicAuthUser: grafana-user
+      #isDefault: true
+      editable: true
+      name: prometheus-internal
+      type: prometheus
+      url: 'https://prometheus-k8s.openshift-monitoring.svc:9091'
+  name: prometheus-internal

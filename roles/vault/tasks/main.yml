@@ -1,0 +1,241 @@
+- name: Create Vault namespace
+  kubernetes.core.k8s:
+    state: present
+    kind: namespace
+    name: vault-system
+    api_version: v1
+
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: hashicorp
+    repo_url: https://helm.releases.hashicorp.com
+
+- name: set values
+  set_fact:
+    values:
+      global:
+        openshift: true
+      server:
+        route:
+          enabled: false
+        extraEnvironmentVars:
+          HTTP_PROXY: "{{ HTTP_PROXY }}"
+          HTTPS_PROXY: "{{ HTTPS_PROXY }}"
+          NO_PROXY: "{{ NO_PROXY }}"
+        ha:
+          enabled: false
+        standalone:
+          enabled: true
+        auditStorage:
+          enable: true
+        dataStorage:
+          enable: true
+          size: 23Gi
+
+- name: set extraEnv
+  when: HTTP_PROXY is defined or HTTPS_PROXY is defined or NO_PROXY is defined
+  set_fact:
+    values: "{{ values | combine({'server': {'extraEnvironmentVars': {'HTTP_PROXY': HTTP_PROXY, 'HTTPS_PROXY': HTTPS_PROXY, 'NO_PROXY': NO_PROXY }}}, recursive=True) }}"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: vault
+    chart_ref: hashicorp/vault
+    release_namespace: vault-system
+    create_namespace: true
+    values: "{{ values }}"
+
+- name: Create route and certs
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - httpsolver.j2
+    - vault-cluster-issuer.j2
+    - vault-ingress.j2
+
+- name: Wait vault container
+  kubernetes.core.k8s:
+    kind: Pod
+    name: vault-0
+    namespace: vault-system
+    wait: true
+    wait_sleep: 10
+    wait_timeout: 600
+    wait_condition:
+      reason:
+      type: Initialized
+      status: "True"
+
+- name: find vault keys
+  kubernetes.core.k8s_info:
+    namespace: openshift-infra
+    kind: Secret
+    name: vault-keys
+  register: vault_keys
+
+- name: init vault
+  kubernetes.core.k8s_exec:
+    container: vault
+    pod: vault-0
+    namespace: vault-system
+    command: vault operator init -key-shares=3 -key-threshold=2
+  when: vault_keys.resources | length == 0
+  register: init
+  until: "init is not failed"
+  retries: 1
+  delay: 10
+
+- name: store vault keys
+  kubernetes.core.k8s:
+    definition:
+      kind: Secret
+      metadata:
+        name: vault-keys
+        namespace: openshift-infra
+      data:
+        key1: "{{ init.stdout_lines[0] | regex_replace('^Unseal Key 1: (.*)$', '\\1', multiline=True) | b64encode }}"
+        key2: "{{ init.stdout_lines[1] | regex_replace('^Unseal Key 2: (.*)$', '\\1', multiline=True) | b64encode }}"
+        key3: "{{ init.stdout_lines[2] | regex_replace('^Unseal Key 3: (.*)$', '\\1', multiline=True) | b64encode }}"
+        root_token: "{{ init.stdout_lines[4] | regex_replace('^Initial Root Token: (.*)$', '\\1', multiline=True) | b64encode }}"
+  when: vault_keys.resources | length == 0
+
+- name: find vault keys
+  kubernetes.core.k8s_info:
+    namespace: openshift-infra
+    kind: Secret
+    name: vault-keys
+  register: vault_keys
+
+- name: update inventory
+  kubernetes.core.k8s:
+    kind: ConfigMap
+    name: ansible-inventory
+    namespace: openshift-infra
+    state: patched
+    definition:
+      data:
+        VAULT_TOKEN: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
+
+- set_fact:
+    root_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
+
+- name: Get vaulth health
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/health"
+    status_code: [200, 503]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+  register: vault_health
+
+- set_fact: 
+    num: "1"
+
+- name: Unseal vault
+  when: vault_health.status == 503
+  include_tasks:
+    file: roles/vault/tasks/unseal.yml
+
+- name: "Config: get auth method"
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
+    status_code: [200, 400]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+  register: jwt_state
+  retries: 5
+
+- name: "Config: set auth method"
+  when: jwt_state.status == 400
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
+    method: POST
+    status_code: [204]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+    body:
+      type: jwt
+      description: Login for Gitlab-ci
+    body_format: json
+
+- name: "Config: add role default-ci"
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/auth/jwt/role/default-ci"
+    method: POST
+    status_code: [204]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+      Content-Type: application/json
+    body: 
+      role_type: jwt
+      policies:
+      - default-ci
+      token_explicit_max_ttl: 60
+      bound_claims_type: glob
+      user_claim: user_email
+      bound_claims:
+        iss: gitlab-op.{{ ROOT_DOMAIN }}
+      claim_mappings:
+        namespace_path: namespace_path
+        project_path: project_path
+        project_id: project_id
+        ref: ref
+    body_format: json
+
+- name: "Config: set jwt config"
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/auth/jwt/config"
+    method: POST
+    status_code: [204]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+    body: 
+      oidc_discovery_url: "https://gitlab-op{{ ROOT_DOMAIN }}"
+      default_role: default-ci
+    body_format: json
+
+- name: "Config: get accessor jwt config"
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
+    status_code: [200]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+  register: get_accessor
+
+- name: "Config: create policy"
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/policy/default-ci"
+    method: POST
+    status_code: [204]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+    body: 
+      policy: |
+        path "forge-dso/+/{{ '{{' }}identity.entity.aliases.{{ get_accessor.json.accessor }}.metadata.namespace_path{{ '}}' }}/*" {
+          capabilities = ["list","read"]
+        }
+        path "forge-dso/+/{{ '{{' }}identity.entity.aliases.{{ get_accessor.json.accessor }}.metadata.namespace_path{{ '}}' }}" {
+          capabilities = ["list","read"]
+        }
+    body_format: json
+
+- name: "Config: get kv engines"
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/mounts/forge-dso"
+    status_code: [200, 400]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+  register: get_engines
+
+- name: "Config: create kv engine"
+  when: get_engines.status == 400
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/mounts/forge-dso"
+    method: POST
+    status_code: [204]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+    body: 
+      type: kv
+      options:
+        version: 2
+    body_format: json

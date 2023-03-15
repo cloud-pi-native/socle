@@ -1,0 +1,17 @@
+kind: Route
+metadata:
+  labels:
+    app: keycloak
+  name: keycloak-alternative
+  namespace: keycloak-system
+spec:
+  host: {{ KEYCLOAK_DOMAIN }}
+  port:
+    targetPort: keycloak
+  tls:
+    termination: passthrough
+  to:
+    kind: Service
+    name: keycloak
+    weight: 100
+  wildcardPolicy: None

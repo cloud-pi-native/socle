@@ -1,0 +1,19 @@
+- set_fact: 
+    num: "{{ num | int +1 }}"
+
+- name: Unseal Vault
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/unseal"
+    method: POST
+    status_code: [200]
+    headers:
+      'X-Vault-Token': "{{ root_token }}"
+    body:
+      key: "{{ vault_keys.resources[0].data['key'+ (num)] | b64decode }}"
+    body_format: json
+  register: unseal_res
+
+- name: rerun unseal if necessary
+  include_tasks:
+    file: roles/vault/tasks/unseal.yml
+  when: (unseal_res.json.progress != unseal_res.json.t) and (num | int < unseal_res.json.n)

@@ -1,0 +1,20 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-gitops-operator-subscription
+  namespace: gitops-system
+spec:
+  channel: latest
+  installPlanApproval: Automatic
+  name: openshift-gitops-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  #startingCSV: openshift-gitops-operator.v1.7.2-5
+  config:
+    env:
+    # Disable Login by DEX
+    - name: DISABLE_DEX
+      value: 'true'
+    # Disallow ArgoCD to create and instance automatically
+    - name: DISABLE_DEFAULT_ARGOCD_INSTANCE
+      value: 'true'

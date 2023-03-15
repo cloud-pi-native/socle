@@ -1,0 +1,219 @@
+#!/bin/bash
+# création du token
+# git@gitlab-toolbox-745c77546d-n4mm6:/$ echo 'PersonalAccessToken.create!(user_id: 1, name: "ANSIBLE-DSO", scopes: [:api, :read_repository, :write_repository]).token' |  gitlab-rails console
+
+- name: Install gitlab subscription
+  kubernetes.core.k8s:
+    src: "{{ item }}"
+  with_items:
+    - operator-group.yaml
+    - operator-subscription.yaml
+
+- name: Wait Gitlab CRD exist
+  kubernetes.core.k8s_info:
+    api_version: apps.gitlab.com/v1beta1
+    kind: GitLab
+    namespace: gitlab-system
+  register: gitlab_kind
+  until: gitlab_kind.api_found
+
+- name: get Gitlab client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: keycloak-system
+    name: keycloak-client-secret-gitlab-client
+  register: gitlab_secret
+  failed_when: gitlab_secret.resources | length == 0
+
+- name: Define provider secret content
+  set_fact:
+    provider: |
+      name: openid_connect
+      label: Keycloak
+      args:
+        name: openid_connect
+        scope:
+          - openid
+          - profile
+          - email
+        response_type: code
+        issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
+        client_auth_method: query
+        discovery: true
+        uid_field: email
+        client_options:
+          identifier: {{ gitlab_secret.resources[0].data.CLIENT_ID | b64decode }}
+          secret: {{ gitlab_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+          redirect_uri: https://{{ GITLAB_DOMAIN }}/users/auth/openid_connect/callback
+
+- name: create keycloak secret
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      data:
+        provider: "{{ provider | b64encode }}"
+      kind: Secret
+      metadata:
+        name: openid-connect
+        namespace: gitlab-system
+
+- name: Install gitlab instance
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - gitlab-instance.yaml.j2
+
+- name: Wait gitlab instance to be 'Running'
+  kubernetes.core.k8s_info:
+    api_version: apps.gitlab.com/v1beta1
+    kind: GitLab
+    namespace: gitlab-system
+    name: gitlab
+  register: gitlab_instance
+  until: gitlab_instance.resources[0].status.phase == 'Running'
+  retries: 45
+  delay: 20
+
+- name: find gitlab token in inventory
+  kubernetes.core.k8s_info:
+    namespace: openshift-infra
+    kind: ConfigMap
+    name: ansible-inventory
+  register: ansible_inventory
+
+- name: Get gitlab token
+  set_fact:
+    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
+  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined
+  register: set_token_inv
+
+- name: Test Gitlab token
+  when: set_token_inv.skipped is not defined
+  uri:
+    url: "https://{{ GITLAB_DOMAIN }}/api/v4/admin/ci/variables"
+    headers:
+      'PRIVATE-TOKEN': "{{ gitlab_token }}"
+  register: test_token
+  ignore_errors: true
+
+- name: Initialize gitlab token
+  when: (set_token_inv.skipped is defined and set_token_inv.skipped) or (test_token.status != 200)
+  block:
+    - name: get toolbox pod name
+      kubernetes.core.k8s_info:
+        kind: pod
+        label_selectors:
+          - app = toolbox
+        namespace: gitlab-system
+      register: toolbox_pods
+
+    - name: Set toolbox pod name
+      set_fact:
+        tb_pod: "{{ toolbox_pods.resources[0].metadata.name }}"
+
+    - name: Create Token
+      kubernetes.core.k8s_exec:
+        pod: "{{ tb_pod }}"
+        namespace: gitlab-system
+        command: >
+          bash -c "echo 'PersonalAccessToken.create!(user_id: 1, name: \"ANSIBLE-DSO\", scopes: [:api, :read_repository, :write_repository]).token' |  gitlab-rails console"
+      register: token
+
+    - name: Set new gitlab token
+      set_fact:
+        gitlab_token: "{{ token.stdout_lines[-1][1:-1] }}"
+      when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined
+
+    - name: update inventory
+      kubernetes.core.k8s:
+        kind: ConfigMap
+        name: ansible-inventory
+        namespace: openshift-infra
+        state: patched
+        definition:
+          data:
+            GITLAB_TOKEN: "{{ gitlab_token }}"
+
+- name: Get settings
+  uri:
+    url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
+    headers:
+      'PRIVATE-TOKEN': "{{ gitlab_token }}"
+  register: get_settings
+  ignore_errors: true
+
+- name: Deactivate sign-up
+  uri:
+    url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
+    method: PUT
+    headers:
+      'PRIVATE-TOKEN': "{{ gitlab_token }}"
+    body:
+      signup_enabled: false
+    body_format: form-urlencoded
+  when: get_settings.json.signup_enabled
+  changed_when: true
+
+- name: "Create first level forge-mi directory"
+  community.general.gitlab_group:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: false
+    name: "forge-mi"
+    subgroup_creation_level: "owner"
+    project_creation_level: "developer"
+    state: present
+
+- name: "Create first level forge-mi directory"
+  community.general.gitlab_group:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: false
+    parent: "forge-mi"
+    name: "projects"
+    subgroup_creation_level: "owner"
+    project_creation_level: "developer"
+    state: present
+
+- name: "Set or update some CI/CD variables"
+  community.general.gitlab_group_variable:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: false
+    group: "forge-mi/projects"
+    purge: false
+    variables:
+      - name: "NEXUS_HOST_URL"
+        value: "https://{{ NEXUS_DOMAIN }}"
+      - name: "NEXUS_HOSTNAME"
+        value: "{{ NEXUS_DOMAIN }}"
+      - name: "SONAR_HOST_URL"
+        value: "https://{{ SONAR_DOMAIN }}"
+      - name: "VAULT_AUTH_PATH"
+        value: "{{ VAULT_AUTH_PATH }}"
+      - name: "VAULT_AUTH_ROLE"
+        value: "{{ VAULT_AUTH_ROLE }}"
+      - name: "VAULT_SERVER_URL"
+        value: "https://{{ VAULT_DOMAIN }}"
+      - name: "MVN_CONFIG_FILE"
+        variable_type: "file"
+        value: "{{ MVN_CONFIG_FILE }}"
+      - name: "NPM_FILE"
+        variable_type: "file"
+        value: "{{ NPM_FILE }}"
+      - name: "HTTP_PROXY"
+        value: "{{ HTTP_PROXY }}"
+      - name: "HTTPS_PROXY"
+        value: "{{ HTTPS_PROXY }}"
+      - name: "NO_PROXY"
+        value: "{{ NO_PROXY }}"
+      - name: "PROXY_HOST"
+        value: "{{ PROXY_HOST }}"
+      - name: "PROXY_PORT"
+        value: "{{ PROXY_PORT }}"
+      - name: "http_proxy"
+        value: "{{ HTTP_PROXY }}"
+      - name: "https_proxy"
+        value: "{{ HTTPS_PROXY }}"
+      - name: "no_proxy"
+        value: "{{ NO_PROXY }}"

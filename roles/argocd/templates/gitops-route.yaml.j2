@@ -1,0 +1,17 @@
+kind: Route
+metadata:
+  labels:
+    app: argocd
+  name: argo-alternative
+  namespace: argo-system
+spec:
+  host: {{ ARGOCD_DOMAIN }}
+  port:
+    targetPort: 8080
+  tls:
+    termination: passthrough
+  to:
+    kind: Service
+    name: argo-argo-cd-server
+    weight: 100
+  wildcardPolicy: None

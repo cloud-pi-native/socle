@@ -1,0 +1,16 @@
+kind: KeycloakRealm
+apiVersion: keycloak.org/v1alpha1
+metadata:
+  name: dso-realm
+  labels:
+    app: sso
+  namespace: keycloak-system
+spec:
+  realm:
+    id: dso
+    realm: dso
+    enabled: true
+    displayName: Dso Realm
+  instanceSelector:
+    matchLabels:
+      app: sso

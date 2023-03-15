@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dso-backup
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: dso-backup-bucket
+  namespace: dso-backup
+  finalizers:
+    - objectbucket.io/finalizer
+  labels:
+    bucket-provisioner: openshift-storage.ceph.rook.io-bucket
+spec:
+  generateBucketName: backup-dso
+  storageClassName: ocs-storagecluster-ceph-rgw

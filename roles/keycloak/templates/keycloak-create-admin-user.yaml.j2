@@ -1,0 +1,22 @@
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakUser
+metadata:
+  name: admin-gitlab
+  labels:
+    app: sso
+  namespace: keycloak-system
+spec:
+  realmSelector:
+    matchLabels:
+      app: sso
+  user:
+    credentials:
+      - temporary: false
+        type: password
+        value:  {{ ADMIN_USER_PASSWORD | b64encode }}
+    username: admin@example.com
+    firstName: Admin
+    lastName: Admin
+    email: admin@example.com
+    enabled: true
+    emailVerified: true

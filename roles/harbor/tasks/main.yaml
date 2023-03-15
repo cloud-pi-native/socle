@@ -1,0 +1,178 @@
+- name: Create harbor Namespace
+  kubernetes.core.k8s:
+    definition:
+      kind: Namespace
+      metadata:
+        name: harbor-system
+        labels:
+          app: kubed
+
+- name: Create service account
+  kubernetes.core.k8s:
+    definition:
+      kind: ServiceAccount
+      metadata:
+        name: harbor-sa
+        namespace: harbor-system
+
+- name: crb harbor
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        creationTimestamp: null
+        name: system:openshift:scc:privileged-harbor
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:openshift:scc:privileged
+      subjects:
+        - kind: ServiceAccount
+          namespace: harbor-system
+          name: harbor-sa
+
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: harbor
+    repo_url: https://helm.goharbor.io
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: harbor
+    chart_ref: harbor/harbor
+    release_namespace: harbor-system
+    create_namespace: true
+    values:
+      expose:
+        ingress:
+          hosts:
+            core: harbor{{ ROOT_DOMAIN }}
+            notary: notary{{ ROOT_DOMAIN }}
+        tls:
+          secretName: ingress-kubed-tls
+      externalURL: https://harbor{{ ROOT_DOMAIN }}
+      persistence:
+        enabled: true
+        resourcePolicy: keep
+      harborAdminPassword: "{{ HARBOR_ADMIN_PASSWORD }}"
+      nginx:
+        serviceAccountName: harbor-sa
+      portal:
+        serviceAccountName: harbor-sa
+      core:
+        serviceAccountName: harbor-sa
+      jobservice:
+        serviceAccountName: harbor-sa
+      registry:
+        serviceAccountName: harbor-sa
+      chartmuseum:
+        serviceAccountName: harbor-sa
+      trivy:
+        serviceAccountName: harbor-sa
+      notary.server:
+        serviceAccountName: harbor-sa
+      database:
+        internal:
+          serviceAccountName: harbor-sa
+      redis:
+        internal:
+          serviceAccountName: harbor-sa
+
+- name: update inventory
+  kubernetes.core.k8s:
+    kind: ConfigMap
+    name: ansible-inventory
+    namespace: openshift-infra
+    state: patched
+    definition:
+      data:
+        HARBOR_PASSWORD: "{{ HARBOR_ADMIN_PASSWORD }}"
+
+- name: get harbor config
+  uri:
+    url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
+    password: "{{ HARBOR_ADMIN_PASSWORD }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200, 503]
+  until: get_harbor_config.status != 503
+  register: get_harbor_config
+  retries: 15
+
+- name: get harbor client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: keycloak-system
+    name: keycloak-client-secret-harbor-client
+  register: harbor_secret
+  failed_when: harbor_secret.resources | length == 0
+
+- name: Set Harbor config
+  set_fact:
+    harbor_config:
+      "auth_mode": "oidc_auth"
+      "notification_enable": true
+      "oidc_admin_group": "admin"
+      "oidc_auto_onboard": true
+      "oidc_client_id": "{{ harbor_secret.resources[0].data.CLIENT_ID | b64decode }}"
+      "oidc_endpoint": "https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso"
+      "oidc_extra_redirect_parms": "{}"
+      "oidc_group_filter": ""
+      "oidc_groups_claim": "groups"
+      "oidc_name": "keycloak"
+      "oidc_scope": "openid"
+      "oidc_user_claim": "email"
+      "oidc_verify_cert": true
+      "project_creation_restriction": "adminonly"
+      "quota_per_project_enable": true
+      "read_only": false
+      "robot_name_prefix": "robot$"
+      "robot_token_duration": 30
+      "self_registration": false
+
+- name: assert element
+  assert:
+    that:
+      - harbor_config[item] == get_harbor_config.json[item].value
+  with_items:
+    - "{{ harbor_config | list }}"
+  ignore_errors: true
+  register: check_config
+
+- name: PUT harbor config
+  uri:
+    method: PUT
+    url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
+    password: "{{ HARBOR_ADMIN_PASSWORD }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    body: "{{ harbor_config | combine({ 'oidc_client_secret': harbor_secret.resources[0].data.CLIENT_SECRET | b64decode }) }}"
+  when: check_config.failed is defined and check_config.failed
+  changed_when: true
+
+- name: Get harbor cert
+  kubernetes.core.k8s_info:
+    namespace: harbor-system
+    name: harbor-ingress
+    kind: Secret
+  register: harbor_crt
+  until: harbor_crt.resources | length > 0
+  retries: 5
+
+- name: create configmap CA
+  kubernetes.core.k8s:
+    state: present 
+    template: ca-cm.yaml
+
+- name: patch openshift config trustedCA
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: config.openshift.io/v1
+      kind: Image
+      metadata:
+        name: cluster
+      spec:
+        additionalTrustedCA: registry-cas

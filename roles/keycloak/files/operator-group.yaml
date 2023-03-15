@@ -1,0 +1,13 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: keycloak-system
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: keycloak-system-opgroup
+  namespace: keycloak-system
+spec:
+  targetNamespaces:
+    - keycloak-system

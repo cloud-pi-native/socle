@@ -1,0 +1,24 @@
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: harbor-client
+  labels:
+    app: sso
+  namespace: keycloak-system
+spec:
+  client:
+    clientId: harbor-client
+#    secret: 4474aa7f-e392-4481-9c47-5891c8970ac8
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ HARBOR_DOMAIN }}/c/oidc/callback
+    webOrigins:
+      - https://{{ HARBOR_DOMAIN }}
+    defaultClientScopes:
+      - profile
+      - email
+      - groups
+  realmSelector:
+    matchLabels:
+      app: sso

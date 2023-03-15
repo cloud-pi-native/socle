@@ -1,0 +1,50 @@
+apiVersion: apps.gitlab.com/v1beta1
+kind: GitLab
+metadata:
+  name: gitlab
+  namespace: gitlab-system
+spec:
+  chart:
+    values:
+      certmanager:
+        install: true
+      global:
+        certificates:
+          customCAs:
+            - configMap: openshift-service-ca.crt
+        hosts:
+          domain: {{ ROOT_DOMAIN }}
+          gitlab:
+            name: gitlab-op{{ ROOT_DOMAIN }}
+          registry:
+            name: gitlab-registry{{ ROOT_DOMAIN }}
+          minio:
+            name: gitlab-minio{{ ROOT_DOMAIN }}
+          smartcard:
+            name: gitlab-smartcard{{ ROOT_DOMAIN }}
+          kas:
+            name: gitlab-kas{{ ROOT_DOMAIN }}
+          pages:
+            name: gitlab-pages{{ ROOT_DOMAIN }}
+        ingress:
+          configureCertmanager: true
+          class: none
+        extraEnv:
+          HTTP_PROXY: {{ HTTP_PROXY }}
+          HTTPS_PROXY: {{ HTTPS_PROXY }}
+          NO_PROXY: {{ NO_PROXY }}
+        appConfig:
+          ldap:
+            preventSignin: true
+          omniauth:
+            enabled: true
+            syncProfileAttributes: ["email"]
+            allowSingleSignOn: ["openid_connect"]
+            blockAutoCreatedUsers: false
+            autoSignInWithProvider: "openid_connect"
+            autoLinkLdapUser: false
+            autoLinkSamlUser: false
+            autoLinkUser: ["openid_connect"]
+            providers:
+              - secret: openid-connect
+    version: {{ GITLAB_VERSION }}

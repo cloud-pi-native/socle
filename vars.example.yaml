@@ -1,0 +1,48 @@
+# PROXY
+# set HTTP_PROXY blank to deactivate globally
+USE_PROXY: true
+PROXY_HOST: "x.x.x.x"
+PROXY_PORT: "xxxx"
+HTTP_PROXY: http://{{ PROXY_HOST }}:{{ PROXY_PORT }}/
+HTTPS_PROXY: http://{{ PROXY_HOST }}:{{ PROXY_PORT }}/
+NO_PROXY: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain # change to your network environment
+
+# DOMAIN
+ROOT_DOMAIN: .mycompany.com
+
+# CONSOLE 
+# deployed by Argo
+CONSOLE_DOMAIN: console{{ ROOT_DOMAIN }}
+CONSOLE_VERSION: "2"
+CONSOLE_TARGET_REF: develop
+CONSOLE_DB_PASSWORD: WowAPassword
+
+# SONARQUBE
+SONAR_DOMAIN: sonar-system{{ ROOT_DOMAIN }}
+
+# VAULT
+VAULT_DOMAIN: vault-ui{{ ROOT_DOMAIN }}
+
+# NEXUS
+NEXUS_DOMAIN: nexus-system{{ ROOT_DOMAIN }}
+
+# HARBOR
+HARBOR_DOMAIN: harbor{{ ROOT_DOMAIN }}
+HARBOR_ADMIN_PASSWORD: MySuperPassword
+
+# GITLAB
+GITLAB_VERSION: "6.7.8"
+GITLAB_DOMAIN: gitlab-op{{ ROOT_DOMAIN }}
+
+# ARGOCD
+ARGOCD_DOMAIN: argo-system{{ ROOT_DOMAIN }}
+ARGOCD_ADMIN_PASSWORD: AnotherSuperPassword
+
+# KEYCLOAK # dont change it
+KEYCLOAK_DOMAIN: keycloak-keycloak-system{{ ROOT_DOMAIN }}
+
+# CERT
+CERTMANAGER_EMAIL: yourpersonal@email.com
+CERTMANAGER_VERSION: v1.11.0
+ADDITIONAL_CA: # not implemented
+  - my.company.inc: |

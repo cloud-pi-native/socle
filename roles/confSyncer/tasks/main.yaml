@@ -1,0 +1,11 @@
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: appscode
+    repo_url: https://charts.appscode.com/stable/
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: kubed
+    chart_ref: appscode/kubed
+    release_namespace: openshift-infra
+    create_namespace: true

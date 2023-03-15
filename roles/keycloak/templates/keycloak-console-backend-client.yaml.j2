@@ -1,0 +1,25 @@
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: console-backend-client
+  labels:
+    app: sso
+  namespace: keycloak-system
+spec:
+  client:
+    clientId: console-backend
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ CONSOLE_DOMAIN }}/*
+      - https://{{ CONSOLE_DOMAIN }}/
+    webOrigins:
+      - https://{{ CONSOLE_DOMAIN }}
+    defaultClientScopes:
+      - profile
+      - email
+      - groups
+      - roles
+  realmSelector:
+    matchLabels:
+      app: sso

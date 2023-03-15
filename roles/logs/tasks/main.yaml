@@ -1,0 +1,6 @@
+- name: install log stack
+  kubernetes.core.k8s:
+    src: "{{ item }}"
+  with_items: 
+    - operator-subscription.yaml
+    - cluster-logging.yaml

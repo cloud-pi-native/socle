@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration:
+  name: console-pi-native
+  namespace: argo-system
+spec:
+  destination:
+    namespace: console-pi-system
+    server: https://kubernetes.default.svc
+  project: console-pi-native
+  sources: 
+    - path: helm
+      repoURL: https://github.com/dnum-mi/dso-console.git
+      targetRevision: {{ CONSOLE_TARGET_REF }}
+      releaseName: console-pi
+      helm:
+        parameters:
+          - name: containers.ansible.container.playbooks.repoBranch
+            value: feat/project-management
+          - name: containers.client.container.env.ARGOCD_URL
+            value: https://{{ ARGOCD_DOMAIN }}
+          - name: containers.client.container.env.GITLAB_URL
+            value: https://{{ GITLAB_DOMAIN }}
+          - name: containers.client.container.env.HARBOR_URL
+            value: https://{{ HARBOR_DOMAIN }}
+          - name: containers.client.container.env.NEXUS_URL
+            value: https://{{ NEXUS_DOMAIN }}
+          - name: containers.client.container.env.SONARQUBE_URL
+            value: https://{{ SONAR_DOMAIN }}
+          - name: containers.client.container.env.VAULT_URL
+            value: https://{{ VAULT_DOMAIN }}
+          - name: containers.client.route.host
+            value: {{ CONSOLE_DOMAIN }}
+          - name: containers.postgres.container.db
+            value: dso-console-db
+          - name: containers.postgres.container.user
+            value: dso
+          - name: containers.postgres.container.pass
+            value: {{ CONSOLE_DB_PASSWORD }}
+          - name: keycloak.client_id_backend
+            value: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
+          - name: keycloak.client_secret_backend
+            value: {{ console_backend_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+          - name: keycloak.client_id_frontend
+            value: {{ console_frontend_secret.resources[0].data.CLIENT_ID | b64decode }}
+          - name: keycloak.redirect_uri
+            value: https://{{ CONSOLE_DOMAIN }}
+          - name: keycloak.session_secret
+            value: {{ session_secret }}
+          - name: keycloak.domain
+            value: "{{ KEYCLOAK_DOMAIN }}/auth"
+          - name: keycloak.realm
+            value: dso
+          - name: keycloak.admin
+            value: admin
+          - name: keycloak.admin_password
+            value: admin
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+
+
+
+
+
+

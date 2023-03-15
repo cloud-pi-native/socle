@@ -66,14 +66,14 @@ Les "Unseal Keys" du composant Vault sont accessibles par la commande suivante :
 
 ```kubectl get secrets vault-keys -n openshift-infra -o yaml```
 
-Vous pouvez conservez ces valeurs ailleurs, par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden, mais il est important de **ne pas les modifier ou les supprimer** sous peine de voir Vault être réinitialisé.
+Vous pouvez conserver ces valeurs ailleurs, par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden, mais il est important de **ne pas les modifier ou les supprimer** sous peine de voir Vault être réinitialisé.
 
 #### Autres Composants
-Les identifiants (mots de passes, tokens, clés) des autres outils sont stockés dans un ConfigMap accessible via la commande suivante :
+Les identifiants (mots de passe, tokens, clés) des autres outils sont stockés dans un ConfigMap accessible via la commande suivante :
 
 ```kubectl get cm ansible-inventory -n openshift-infra -o yaml```
 
-De la même manière que pour Vault, ces informations définissent le comportement d'ansible en cas de nouvelle éxécution (regénération de token, réinitialisation de l'outil, **potentielle perte de données**).
+De la même manière que pour Vault, ces informations définissent le comportement d'ansible en cas de nouvelle exécution (regénération de token, réinitialisation de l'outil, **potentielle perte de données**).
 
 ### Debug
 #### Réinstallation

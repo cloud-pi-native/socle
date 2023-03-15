@@ -1,4 +1,4 @@
-# Documentation d'installation de la plateforme DSO
+# Installation de la plateforme DSO
 
 ## Sommaire
 - [Introduction](#introduction)
@@ -15,7 +15,7 @@
 
 ## Introduction
 
-L'installation de la forge DSO se fait via Ansible. Chaque élément sera donc installé de manière automatisée. Certains peuvent prendre un peu de temps (par exemple keycloak).
+L'installation de la forge DSO (DevSecOps) se fait via Ansible. Chaque élément sera donc installé de manière automatisée. Certains peuvent prendre un peu de temps (par exemple keycloak).
 
 ## Prérequis
 

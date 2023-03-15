@@ -19,7 +19,7 @@ L'installation de la forge DSO (DevSecOps) se fait via Ansible. Chaque élément
 
 ## Prérequis
 
-Cette installation s'effectue dans un cluster Openshift opérationnel et correctement démarré.
+Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.
 
 Elle nécessite l'utilisation de [ce dépôt](https://github.com/dnum-mi/dso-socle) qui devra donc être cloné sur votre environnement de déploiement.
 

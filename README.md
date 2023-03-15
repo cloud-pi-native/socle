@@ -43,7 +43,7 @@ Elle nécessitera d'avoir installé au préalable les éléments suivants :
 
 ## Configuration
 
-Une fois le dépôt infra-socle cloné, copiez le fichier `vars.example.yaml` vers `vars.yaml` puis adaptez les variables de ce dernier selon les caractéristiques propres à votre environnement.
+Une fois le dépôt dso-socle cloné, copiez le fichier `vars.example.yaml` vers `vars.yaml` puis adaptez les variables de ce dernier selon les caractéristiques propres à votre environnement.
 
 Note : Pour l'instant il est nécessaire de renseigner les variables PROXY.
 
@@ -59,7 +59,7 @@ Patientez …
 ### Récupération des secrets
 Au moment de leur initialisation, certains outils stockent des secrets qui ne sont en principe plus disponibles ultérieurement.
 
-**Attention !** Pour garantir l'[idempotence](https://fr.wikipedia.org/wiki/Idempotence) ces secrets sont stockés dans plusieurs ressources du cluster. Supprimer ces ressources **indique à ansible qu'il doit réinitialiser les composants**.
+**Attention !** Pour garantir l'[idempotence](https://fr.wikipedia.org/wiki/Idempotence), ces secrets sont stockés dans plusieurs ressources du cluster. Supprimer ces ressources **indique à ansible qu'il doit réinitialiser les composants**.
 
 #### Vault
 Les "Unseal Keys" du composant Vault sont accessibles par la commande suivante :
@@ -79,18 +79,18 @@ De la même manière que pour Vault, ces informations définissent le comporteme
 #### Réinstallation
 Si vous rencontrez des problèmes lors de l'éxécution du playbook, vous voudrez certainement relancer l'installation d'un ou plusieurs composants plutôt que d'avoir à tout réinstaller.
 
-Pour cela, vous pouvez utiliser les tags associés au rôle dans le fichier `install.yaml`. Voici par exemple comment réinstallser uniquement les composants keycloak et console, via les tags correspondants :
+Pour cela, vous pouvez utiliser les tags associés au rôle dans le fichier `install.yaml`. Voici par exemple comment réinstaller uniquement les composants keycloak et console, via les tags correspondants :
 
 ```ansible-playbook install.yaml -t keycloak,console```
 
 #### Keycloak
-L'opérateur keycloak peut-être assez capricieux, son état souhaité est `status.phase == 'reconciling'`.
+L'opérateur keycloak peut-être assez capricieux. Son état souhaité est `status.phase == 'reconciling'`.
 
 En cas d'échec lors de l'installation, vous vérifierez ce qu'il en est avec la commande :
 
 ```kubectl get keycloak dso-keycloak -n keycloak-system -o yaml```
 
-Il se peut que Keycloak reste bloqué en status `Initializing` mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook comme ceci :
+Il se peut que Keycloak reste bloqué en status "initializing" mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook comme ceci :
 
 ```ansible-playbook install.yaml -e KEYCLOAK_NO_CHECK=```
 

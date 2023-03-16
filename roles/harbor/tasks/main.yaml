@@ -175,4 +175,5 @@
       metadata:
         name: cluster
       spec:
-        additionalTrustedCA: registry-cas
+        additionalTrustedCA:
+          name: registry-cas

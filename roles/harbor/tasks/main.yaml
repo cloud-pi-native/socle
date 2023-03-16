@@ -70,8 +70,11 @@
         serviceAccountName: harbor-sa
       trivy:
         serviceAccountName: harbor-sa
-      notary.server:
-        serviceAccountName: harbor-sa
+      notary:
+        server:
+          serviceAccountName: harbor-sa
+        signer:
+          serviceAccountName: harbor-sa
       database:
         internal:
           serviceAccountName: harbor-sa

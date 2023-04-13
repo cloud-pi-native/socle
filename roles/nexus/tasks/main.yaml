@@ -94,6 +94,8 @@
         status_code: [204, 503]
       until: update_nexus_pass.status == 204
       register: update_nexus_pass
+      retries: 10
+      delay: 12
 
     - name: update inventory
       kubernetes.core.k8s:

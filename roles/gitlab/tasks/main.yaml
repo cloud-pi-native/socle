@@ -82,7 +82,7 @@
 - name: Get gitlab token
   set_fact:
     gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
-  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined
+  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN != ""
   register: set_token_inv
 
 - name: Test Gitlab token

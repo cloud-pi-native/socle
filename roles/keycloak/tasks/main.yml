@@ -1,4 +1,4 @@
-- name: Install operator group ans subscription
+- name: Install operator group and subscription
   kubernetes.core.k8s:
     src: "{{ item }}"
   with_items:

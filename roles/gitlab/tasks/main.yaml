@@ -1,6 +1,4 @@
 #!/bin/bash
-# création du token
-# git@gitlab-toolbox-745c77546d-n4mm6:/$ echo 'PersonalAccessToken.create!(user_id: 1, name: "ANSIBLE-DSO", scopes: [:api, :read_repository, :write_repository]).token' |  gitlab-rails console
 
 - name: Install gitlab subscription
   kubernetes.core.k8s:

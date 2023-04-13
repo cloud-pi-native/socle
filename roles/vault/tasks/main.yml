@@ -18,10 +18,6 @@
       server:
         route:
           enabled: false
-        extraEnvironmentVars:
-          HTTP_PROXY: "{{ HTTP_PROXY }}"
-          HTTPS_PROXY: "{{ HTTPS_PROXY }}"
-          NO_PROXY: "{{ NO_PROXY }}"
         ha:
           enabled: false
         standalone:
@@ -31,6 +27,10 @@
         dataStorage:
           enable: true
           size: 23Gi
+        extraEnvironmentVars:
+          HTTP_PROXY: "{{ HTTP_PROXY }}"
+          HTTPS_PROXY: "{{ HTTPS_PROXY }}"
+          NO_PROXY: "{{ NO_PROXY }}"
 
 - name: set extraEnv
   when: HTTP_PROXY is defined or HTTPS_PROXY is defined or NO_PROXY is defined
@@ -127,7 +127,8 @@
       'X-Vault-Token': "{{ root_token }}"
   register: vault_health
 
-- set_fact: 
+- name: Set fact to unseal vault
+  set_fact:
     num: "1"
 
 - name: Unseal vault
@@ -188,7 +189,7 @@
     status_code: [204]
     headers:
       'X-Vault-Token': "{{ root_token }}"
-    body: 
+    body:
       oidc_discovery_url: "https://gitlab-op{{ ROOT_DOMAIN }}"
       default_role: default-ci
     body_format: json
@@ -208,7 +209,7 @@
     status_code: [204]
     headers:
       'X-Vault-Token': "{{ root_token }}"
-    body: 
+    body:
       policy: |
         path "forge-dso/+/{{ '{{' }}identity.entity.aliases.{{ get_accessor.json.accessor }}.metadata.namespace_path{{ '}}' }}/*" {
           capabilities = ["list","read"]
@@ -234,7 +235,7 @@
     status_code: [204]
     headers:
       'X-Vault-Token': "{{ root_token }}"
-    body: 
+    body:
       type: kv
       options:
         version: 2

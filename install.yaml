@@ -9,39 +9,50 @@
     - name: ansible-inventory
       tags:
         - always
+
     - name: cert-manager
       tags:
         - cert-manager
-    - name: vault
-      tags:
-        - vault
+
     - name: confSyncer
       tags:
         - confSyncer
         - kubed
-    - name: sonarqube
-      tags:
-        - sonarqube
+
     - name: keycloak
       tags:
         - keycloak
+
+    - name: nexus
+      tags:
+        - nexus
+
+    - name: sonarqube
+      tags:
+        - sonarqube
+
+    - name: gitlab
+      tags:
+        - gitlab
+
+    - name: gitlab-runner
+      tags:
+        - gitlab-runner
+
+    - name: vault
+      tags:
+        - vault
+
     - name: argocd
       tags:
         - gitops
         - argocd
+
     - name: harbor
       tags:
         - harbor
         - registry
-    - name: nexus
-      tags:
-        - nexus
-    - name: gitlab
-      tags:
-        - gitlab
-    - name: gitlab-runner
-      tags:
-        - gitlab-runner
+
     - name: console-dso
       tags:
         - console

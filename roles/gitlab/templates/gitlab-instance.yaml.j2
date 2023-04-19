@@ -2,7 +2,7 @@ apiVersion: apps.gitlab.com/v1beta1
 kind: GitLab
 metadata:
   name: gitlab
-  namespace: gitlab-system
+  namespace: {{ GITLAB_NAMESPACE }}
 spec:
   chart:
     values:
@@ -12,6 +12,9 @@ spec:
         certificates:
           customCAs:
             - configMap: openshift-service-ca.crt
+{% if CA_ENABLED == 'True' %}
+            - configMap: {{ CA_NAME }}
+{% endif %}
         hosts:
           domain: {{ ROOT_DOMAIN }}
           gitlab:
@@ -27,12 +30,18 @@ spec:
           pages:
             name: gitlab-pages{{ ROOT_DOMAIN }}
         ingress:
-          configureCertmanager: true
-          class: none
+          annotations:
+            route.openshift.io/termination: edge
+          class: openshift-default
+          configureCertmanager: false
+          tls:
+            enabled: false
         extraEnv:
+{% if USE_PROXY %}
           HTTP_PROXY: {{ HTTP_PROXY }}
           HTTPS_PROXY: {{ HTTPS_PROXY }}
           NO_PROXY: {{ NO_PROXY }}
+{% endif %}
         appConfig:
           ldap:
             preventSignin: true

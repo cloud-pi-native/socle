@@ -4,8 +4,7 @@ args:
   name: openid_connect
   scope:
     - openid
-    - profile
-    - email
+    - generic
   response_type: code
   issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
   client_auth_method: query

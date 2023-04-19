@@ -25,6 +25,15 @@ Elle nécessite l'utilisation de [ce dépôt](https://github.com/dnum-mi/dso-soc
 
 Elle nécessitera d'avoir installé au préalable les éléments suivants :
 
+- Modules python :
+  - pyyaml
+  - kubernetes
+  - python-gitlab
+
+Exemple d'installation du module python-gitlab pour l'utilisateur courant :
+
+```python3 -m pip install --user python-gitlab```
+
 - [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) (pour disposer de la commande ansible-playbook).
   
   - Ainsi que les collections suivantes :
@@ -88,7 +97,7 @@ L'opérateur keycloak peut-être assez capricieux. Son état souhaité est `stat
 
 En cas d'échec lors de l'installation, vous vérifierez ce qu'il en est avec la commande :
 
-```kubectl get keycloak dso-keycloak -n keycloak-system -o yaml```
+```kubectl get keycloak dso-keycloak -n {{ KEYCLOAK.NAMESPACE }} -o yaml```
 
 Il se peut que Keycloak reste bloqué en status "initializing" mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook comme ceci :
 

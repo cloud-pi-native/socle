@@ -5,7 +5,7 @@
       kind: Namespace
       metadata:
         creationTimestamp: null
-        name: nexus-system
+        name: "{{ NEXUS_NAMESPACE }}"
 
 - name: Create nexus Service Account
   kubernetes.core.k8s:
@@ -14,22 +14,19 @@
       kind: ServiceAccount
       metadata:
         name: nexus-sa
-        namespace: nexus-system
+        namespace: "{{ NEXUS_NAMESPACE }}"
 
 - name: Deploy nexus
   kubernetes.core.k8s:
     template: nexus.yml.j2
     state: present
 
-- name: Create issuer
-  kubernetes.core.k8s:
-    template: issuer.yml.j2
 
 - name: find nexus admin password in inventory
   kubernetes.core.k8s_info:
-    namespace: openshift-infra
+    namespace: "{{ CONSOLE_NAMESPACE }}"
     kind: ConfigMap
-    name: ansible-inventory
+    name: dso-config
   register: ansible_inventory
 
 - name: Cache admin password
@@ -44,7 +41,7 @@
     - name: wait nexus to initialize
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: nexus-system
+        namespace: "{{ NEXUS_NAMESPACE }}"
         name: nexus
       register: endpoint
       until: endpoint.resources[0].subsets is defined and endpoint.resources[0].subsets | selectattr('addresses')
@@ -54,7 +51,7 @@
     - name: get nexus pod's name
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: nexus-system
+        namespace: "{{ NEXUS_NAMESPACE }}"
         name: nexus
       register: nx_ep
 
@@ -65,7 +62,7 @@
     - name: récupération du compte admin
       kubernetes.core.k8s_exec:
         pod: "{{ nx_pod }}"
-        namespace: nexus-system
+        namespace: "{{ NEXUS_NAMESPACE }}"
         command: cat /nexus-data/admin.password
       register: admin_account
       until: admin_account.stdout is defined and admin_account.stdout
@@ -100,8 +97,8 @@
     - name: update inventory
       kubernetes.core.k8s:
         kind: ConfigMap
-        name: ansible-inventory
-        namespace: openshift-infra
+        name: dso-config
+        namespace: "{{ CONSOLE_NAMESPACE }}"
         state: patched
         definition:
           data:

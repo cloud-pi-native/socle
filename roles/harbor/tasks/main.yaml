@@ -3,7 +3,7 @@
     definition:
       kind: Namespace
       metadata:
-        name: harbor-system
+        name: "{{ HARBOR_NAMESPACE }}"
         labels:
           app: kubed
 
@@ -13,7 +13,7 @@
       kind: ServiceAccount
       metadata:
         name: harbor-sa
-        namespace: harbor-system
+        namespace: "{{ HARBOR_NAMESPACE }}"
 
 - name: crb harbor
   kubernetes.core.k8s:
@@ -29,7 +29,7 @@
         name: system:openshift:scc:privileged
       subjects:
         - kind: ServiceAccount
-          namespace: harbor-system
+          namespace: "{{ HARBOR_NAMESPACE }}"
           name: harbor-sa
 
 - name: Add helm repo
@@ -41,16 +41,24 @@
   kubernetes.core.helm:
     name: harbor
     chart_ref: harbor/harbor
-    release_namespace: harbor-system
+    release_namespace: "{{ HARBOR_NAMESPACE }}"
     create_namespace: true
     values:
       expose:
+        type: ingress
+        tls:
+          enabled: false
         ingress:
           hosts:
             core: harbor{{ ROOT_DOMAIN }}
             notary: notary{{ ROOT_DOMAIN }}
-        tls:
-          secretName: ingress-kubed-tls
+          notary:
+            annotations:
+              route.openshift.io/termination: edge
+          harbor:
+            annotations:
+              route.openshift.io/termination: edge
+
       externalURL: https://harbor{{ ROOT_DOMAIN }}
       persistence:
         enabled: true
@@ -85,12 +93,12 @@
 - name: update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
-    name: ansible-inventory
-    namespace: openshift-infra
+    name: dso-config
+    namespace: "{{ CONSOLE_NAMESPACE }}"
     state: patched
     definition:
       data:
-        HARBOR_PASSWORD: "{{ HARBOR_ADMIN_PASSWORD }}"
+        HARBOR_ADMIN_PASSWORD: "{{ HARBOR_ADMIN_PASSWORD }}"
 
 - name: get harbor config
   uri:
@@ -107,7 +115,7 @@
 - name: get harbor client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     name: keycloak-client-secret-harbor-client
   register: harbor_secret
   failed_when: harbor_secret.resources | length == 0
@@ -127,7 +135,7 @@
       "oidc_name": "keycloak"
       "oidc_scope": "openid"
       "oidc_user_claim": "email"
-      "oidc_verify_cert": true
+      "oidc_verify_cert": "{{ not CA_ENABLED }}"
       "project_creation_restriction": "adminonly"
       "quota_per_project_enable": true
       "read_only": false
@@ -139,6 +147,7 @@
   assert:
     that:
       - harbor_config[item] == get_harbor_config.json[item].value
+    quiet: true
   with_items:
     - "{{ harbor_config | list }}"
   ignore_errors: true
@@ -155,28 +164,3 @@
     body: "{{ harbor_config | combine({ 'oidc_client_secret': harbor_secret.resources[0].data.CLIENT_SECRET | b64decode }) }}"
   when: check_config.failed is defined and check_config.failed
   changed_when: true
-
-- name: Get harbor cert
-  kubernetes.core.k8s_info:
-    namespace: harbor-system
-    name: harbor-ingress
-    kind: Secret
-  register: harbor_crt
-  until: harbor_crt.resources | length > 0
-  retries: 5
-
-- name: create configmap CA
-  kubernetes.core.k8s:
-    state: present 
-    template: ca-cm.yaml
-
-- name: patch openshift config trustedCA
-  kubernetes.core.k8s:
-    definition:
-      apiVersion: config.openshift.io/v1
-      kind: Image
-      metadata:
-        name: cluster
-      spec:
-        additionalTrustedCA:
-          name: registry-cas

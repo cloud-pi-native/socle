@@ -7,6 +7,11 @@
         - always
   roles:
     - name: ansible-inventory
+
+    - name: cluster-ca
+      tags:
+        - always
+
       tags:
         - always
 

@@ -1,7 +1,7 @@
 - name: get argo client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     name: keycloak-client-secret-argo-client
   register: argocd_secret
   failed_when: argocd_secret.resources | length == 0
@@ -34,6 +34,28 @@
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
 
+- name: Set OIDC config
+  set_fact:
+    oidc_config: |
+      issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
+      requestedScopes: ["openid", "generic"]
+      name: Keycloak
+      clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
+      clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+  when: not CA_ENABLED
+
+- name: Set OIDC config with CA
+  set_fact:
+    oidc_config: |
+      issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
+      requestedScopes: ["openid", "generic"]
+      name: Keycloak
+      clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
+      clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+      rootCA: |
+        {{ ca_pem | indent(width=2, first=False) }}
+  when: CA_ENABLED
+
 - name: Deploy helm
   kubernetes.core.helm:
     name: argo
@@ -53,11 +75,7 @@
           clusterResources: "true"
           url: "https://{{ ARGOCD_DOMAIN }}"
           oidc.config: |
-            issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
-            requestedScopes: ["openid", "groups"]
-            name: Keycloak
-            clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
-            clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+            {{ oidc_config }}
           users.anonymous.enabled: "false"
           admin.enabled: "false"
           resource.exclusions: |
@@ -93,7 +111,7 @@
               g, cluster-admins, role:admin
               g, /ArgoCDAdmins, role:admin
               g, ArgoCDAdmins, role:admin
-            scopes: '[groups]'
+            scopes: "[groups]"
             policy.default: role:nada
             admin.enabled: "false"
           kind: ConfigMap
@@ -104,6 +122,28 @@
               app.kubernetes.io/part-of: argocd
             name: argocd-rbac-cm
             namespace: argo-system
+
+- name: find gitlab token in inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ CONSOLE_NAMESPACE }}"
+    kind: ConfigMap
+    name: dso-config
+  register: ansible_inventory
+
+- name: Create global gitlab secret
+  kubernetes.core.k8s:
+    definition:
+      data:
+        password: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64encode }}"
+        url: "{{ ('https://' + GITLAB_DOMAIN + '/forge-mi/projects') | b64encode }}"
+        username: "{{ 'root' | b64encode }}"
+      kind: Secret
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repo-creds
+        name: gitlab
+        namespace: argo-system
+      type: Opaque
 
 - name: Install routes
   kubernetes.core.k8s:

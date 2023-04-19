@@ -4,7 +4,7 @@ metadata:
   name: harbor-client
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   client:
     clientId: harbor-client
@@ -16,9 +16,8 @@ spec:
     webOrigins:
       - https://{{ HARBOR_DOMAIN }}
     defaultClientScopes:
-      - profile
-      - email
-      - groups
+    - generic
+
   realmSelector:
     matchLabels:
       app: sso

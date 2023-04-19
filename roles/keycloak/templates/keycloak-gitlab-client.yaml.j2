@@ -4,7 +4,7 @@ metadata:
   name: gitlab-client
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   client:
     clientId: gitlab-client
@@ -16,8 +16,8 @@ spec:
     webOrigins:
       - https://{{ GITLAB_DOMAIN }}
     defaultClientScopes:
-      - profile
-      - email
+    - generic
+
   realmSelector:
     matchLabels:
       app: sso

@@ -4,7 +4,7 @@ metadata:
   name: admin-gitlab
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   realmSelector:
     matchLabels:
@@ -13,7 +13,7 @@ spec:
     credentials:
       - temporary: false
         type: password
-        value:  {{ ADMIN_USER_PASSWORD | b64encode }}
+        value:  {{ admin_user_password | b64encode }}
     username: admin@example.com
     firstName: Admin
     lastName: Admin

@@ -1,10 +1,10 @@
 - name: Install operator group and subscription
   kubernetes.core.k8s:
-    src: "{{ item }}"
+    template: "{{ item }}"
   with_items:
-    - operator-group.yaml
-    - operator-subscription.yaml
-    - realm.yaml
+    - operator-group.yaml.j2
+    - operator-subscription.yaml.j2
+    - realm.yaml.j2
 
 - name: Launch keycloak instance
   kubernetes.core.k8s:
@@ -15,7 +15,7 @@
     - name: Wait Keycloak
       kubernetes.core.k8s_info:
         kind: keycloak
-        namespace: keycloak-system
+        namespace: "{{ KEYCLOAK_NAMESPACE }}"
         name: dso-keycloak
         api_version: keycloak.org/v1alpha1
       register: keycloak_instance
@@ -30,13 +30,13 @@
     - name: Failed start keycloak disclaimer
       debug:
         msg: |
-          KEYCLOAK didn't start in 5 minutes please check is status
+          KEYCLOAK didn't start in 5 minutes please check its status
           "kubectl get keycloak dso-keycloak -o yaml"
           Re-run playbook when 'status.phase' is 'reconciling' or run with "-e KEYCLOAK_NO_CHECK=" at your own risk
 
 - name: find keycloak admin password
   kubernetes.core.k8s_info:
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     kind: Secret
     name: "{{ keycloak_instance.resources[0].status.credentialSecret }}"
   register: kc_admin
@@ -47,13 +47,13 @@
 - name: update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
-    name: ansible-inventory
-    namespace: openshift-infra
+    name: dso-config
+    namespace: "{{ CONSOLE_NAMESPACE }}"
     state: patched
     definition:
       data:
-        KC_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
-        KC_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
+        KEYCLOAK_ADMIN_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
+        KEYCLOAK_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
 
 - name: generate admin password
   set_fact:
@@ -62,7 +62,7 @@
 
 - name: find dso admin password
   kubernetes.core.k8s_info:
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     kind: Secret
     name: dso-admin-user-secret
   register: dso_admin
@@ -79,7 +79,7 @@
         definition:
           kind: Secret
           metadata:
-            namespace: keycloak-system
+            namespace: "{{ KEYCLOAK_NAMESPACE }}"
             name: dso-admin-user-secret
           data:
             ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"

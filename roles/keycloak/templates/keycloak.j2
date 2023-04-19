@@ -4,7 +4,7 @@ metadata:
   name: dso-keycloak
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   externalAccess:
     enabled: true
@@ -15,7 +15,7 @@ spec:
   keycloakDeploymentSpec:
     experimental:
       env:
-{% if HTTP_PROXY is defined %}
+{% if USE_PROXY is defined %}
         - name: HTTP_PROXY
           value: {{ HTTP_PROXY }}
         - name: HTTPS_PROXY

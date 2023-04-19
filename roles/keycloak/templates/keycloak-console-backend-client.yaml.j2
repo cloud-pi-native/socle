@@ -4,7 +4,7 @@ metadata:
   name: console-backend-client
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   client:
     clientId: console-backend
@@ -16,10 +16,8 @@ spec:
     webOrigins:
       - https://{{ CONSOLE_DOMAIN }}
     defaultClientScopes:
-      - profile
-      - email
-      - groups
-      - roles
+    - generic
+
   realmSelector:
     matchLabels:
       app: sso

@@ -4,7 +4,7 @@ metadata:
   name: sonar-client
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   client:
     clientId: sonar-client
@@ -16,9 +16,8 @@ spec:
     webOrigins:
       - https://{{ SONAR_DOMAIN }}
     defaultClientScopes:
-      - profile
-      - email
-      - groups
+    - generic
+
   realmSelector:
     matchLabels:
       app: sso

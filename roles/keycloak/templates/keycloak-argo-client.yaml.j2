@@ -4,7 +4,7 @@ metadata:
   name: argo-client
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   client:
     clientId: argo-client
@@ -17,9 +17,7 @@ spec:
     webOrigins:
       - https://{{ ARGOCD_DOMAIN }}
     defaultClientScopes:
-      - profile
-      - email
-      - groups
+      - generic
   realmSelector:
     matchLabels:
       app: sso

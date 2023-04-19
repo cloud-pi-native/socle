@@ -1,17 +1,18 @@
 - hosts: localhost
+  gather_facts: false
   pre_tasks:
     - name: Load vars
       ansible.builtin.include_vars:
         file: vars.yaml
       tags:
         - always
-  roles:
-    - name: ansible-inventory
 
+  roles:
     - name: cluster-ca
       tags:
         - always
 
+    - name: console-dso-config
       tags:
         - always
 

@@ -9,7 +9,7 @@ spec:
     kind: '*'
   destinations:
   - name: '*'
-    namespace: console-pi-system
+    namespace: "{{ CONSOLE_NAMESPACE }}"
     server: '*'
   namespaceResourceWhitelist:
   - group: '*'

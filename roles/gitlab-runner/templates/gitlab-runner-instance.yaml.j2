@@ -2,7 +2,7 @@ apiVersion: apps.gitlab.com/v1beta2
 kind: Runner
 metadata:
   name: gitlab-runner
-  namespace: gitlab-system
+  namespace: {{ GITLAB_NAMESPACE }}
 spec:
   gitlabUrl: https://{{ GITLAB_DOMAIN }}/
   runUntagged: true
@@ -11,4 +11,4 @@ spec:
   tags: openshift
   env: custom-env
   #config: custom-config-toml
-
+  ca: custom-tls-ca

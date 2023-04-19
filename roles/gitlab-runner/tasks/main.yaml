@@ -1,7 +1,7 @@
 - name: Get Gitlab namespace
   kubernetes.core.k8s_info:
     kind: Namespace
-    name: gitlab-system
+    name: "{{ GITLAB_NAMESPACE }}"
   register: gitlab_ns
 
 - name: Fail if Gitlab namespace is not present
@@ -11,10 +11,10 @@
 
 - name: Install gitlab-runner subscription and role
   kubernetes.core.k8s:
-    src: "{{ item }}"
+    template: "{{ item }}"
   with_items:
-    - operator-subscription.yaml
-    - gitlab-runner-auth.yaml
+    - operator-subscription.yaml.j2
+    - gitlab-runner-auth.yaml.j2
 
 - name: Wait Gitlab Runner exists
   kubernetes.core.k8s_info:
@@ -27,7 +27,7 @@
 - name: Add custom env
   kubernetes.core.k8s:
     template: custom-env.yaml.j2
- 
+
 - name: Install gitlab instance
   kubernetes.core.k8s:
     template: gitlab-runner-instance.yaml.j2

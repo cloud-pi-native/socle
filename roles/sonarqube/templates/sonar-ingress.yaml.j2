@@ -2,14 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sonar-ingress
-  namespace: sonar-system
+  namespace: {{ SONAR_NAMESPACE }}
   annotations:
-    cert-manager.io/cluster-issuer: sonar-system-letsencrypt-issuer
+    route.openshift.io/termination: edge
 spec:
-  tls:
-    - hosts:
-        - {{ SONAR_DOMAIN }}
-      secretName: sonar-system-issuer-account-key
   rules:
     - host: {{ SONAR_DOMAIN }}
       http:

@@ -19,6 +19,7 @@
     - name: cert-manager
       tags:
         - cert-manager
+        - always
 
     - name: confSyncer
       tags:

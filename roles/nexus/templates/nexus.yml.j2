@@ -30,7 +30,8 @@ spec:
     spec:
       containers:
         - name: nexus
-          image: sonatype/nexus3:3.47.1 # Sets Image
+#          image: sonatype/nexus3:3.47.1 # Sets Image
+          image: sonatype/nexus3
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 8081  # Exposes container port

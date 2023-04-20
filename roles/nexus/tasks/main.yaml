@@ -66,7 +66,7 @@
         command: cat /nexus-data/admin.password
       register: admin_account
       until: admin_account.stdout is defined and admin_account.stdout
-      retries: 10
+      retries: 15
       delay: 12
 
     - name: Set nexus password from cat

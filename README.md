@@ -50,6 +50,8 @@ Exemple d'installation du module python-gitlab pour l'utilisateur courant :
 
 - La commande [yq](https://github.com/mikefarah/yq/#install) (pour debug).
 
+- L'outil d'encryption [age](https://github.com/FiloSottile/age), qui fournit les commandes `age` et `age-keygen`.
+
 ## Configuration
 
 Une fois le dépôt dso-socle cloné, copiez le fichier `vars.example.yaml` vers `vars.yaml` puis adaptez les variables de ce dernier selon les caractéristiques propres à votre environnement.

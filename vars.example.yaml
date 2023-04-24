@@ -64,3 +64,6 @@ KEYCLOAK_DOMAIN: keycloak-keycloak-system{{ ROOT_DOMAIN }}
 # CERT
 CERTMANAGER_EMAIL: yourpersonal@email.com
 CERTMANAGER_VERSION: v1.11.0
+
+# SOPS
+SOPS_NAMESPACE: sops-system

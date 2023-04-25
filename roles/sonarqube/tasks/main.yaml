@@ -37,6 +37,14 @@
     - postgres-deployment.yaml.j2
     - postgres-service.yaml.j2
     - sonar-pv-claim.yaml.j2
+
+- name: Install issuer
+  kubernetes.core.k8s:
+    template: sonar-cluster-issuer.yaml.j2
+
+- kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
     - sonar-deployment.yaml.j2
     - sonar-service.yaml.j2
 

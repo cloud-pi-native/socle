@@ -15,7 +15,7 @@ spec:
   keycloakDeploymentSpec:
     experimental:
       env:
-{% if USE_PROXY is defined %}
+{% if USE_PROXY %}
         - name: HTTP_PROXY
           value: {{ HTTP_PROXY }}
         - name: HTTPS_PROXY

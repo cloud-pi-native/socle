@@ -30,8 +30,7 @@
         name: openid_connect
         scope:
           - openid
-          - profile
-          - email
+          - generic
         response_type: code
         issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
         client_auth_method: query
@@ -53,8 +52,6 @@
         name: openid-connect
         namespace: "{{ GITLAB_NAMESPACE }}"
 
-- debug: var=USE_PROXY
-- debug: var=CA_ENABLED
 - name: Install gitlab instance
   kubernetes.core.k8s:
     template: gitlab-instance.yaml.j2
@@ -80,7 +77,7 @@
 - name: Get gitlab token
   set_fact:
     gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
-  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length == 0
+  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
   register: set_token_inv
 
 - name: Test Gitlab token
@@ -199,6 +196,16 @@
       - name: "NPM_FILE"
         variable_type: "file"
         value: "{{ npm_file }}"
+
+- name: "Set or update some CI/CD variables"
+  community.general.gitlab_group_variable:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: false
+    group: "forge-mi/projects"
+    purge: false
+    state: "{{ USE_PROXY | ternary('present', 'absent')}}"
+    variables:
       - name: "HTTP_PROXY"
         value: "{{ HTTP_PROXY }}"
       - name: "HTTPS_PROXY"

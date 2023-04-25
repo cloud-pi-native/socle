@@ -22,11 +22,12 @@
         value: "{{ HTTPS_PROXY }}"
       - name: no_proxy
         value: "{{ NO_PROXY }}"
+  when: USE_PROXY
 
 - name: Apply cert-manager
   kubernetes.core.k8s:
     state: present
-    definition: "{{ manifest }}"
+    definition: "{{ manifest | default(cert_manifest.content | from_yaml_all) }}"
 
 # - name: Wait for cert-manager-webhook to be ok
 #   kubernetes.core.k8s_info:

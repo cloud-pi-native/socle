@@ -8,7 +8,6 @@ CA_NAME: kube-root-ca.crt
 CA_KEY: "ca.crt"
 
 # PROXY
-# set HTTP_PROXY blank to deactivate globally
 USE_PROXY: true
 PROXY_HOST: "x.x.x.x"
 PROXY_PORT: "xxxx"

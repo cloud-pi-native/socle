@@ -44,25 +44,9 @@
       clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
   when: not CA_ENABLED
 
-- name: Set OIDC config with CA
+- name: Set extra env vars
   set_fact:
-    oidc_config: |
-      issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
-      requestedScopes: ["openid", "generic"]
-      name: Keycloak
-      clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
-      clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
-      rootCA: |
-        {{ ca_pem | indent(width=2, first=False) }}
-  when: CA_ENABLED
-
-- name: Deploy helm
-  kubernetes.core.helm:
-    name: argo
-    chart_ref: bitnami/argo-cd
-    release_namespace: argo-system
-    create_namespace: true
-    values:
+    helm_values: |
       openshift:
         enabled: false
       config:
@@ -75,7 +59,15 @@
           clusterResources: "true"
           url: "https://{{ ARGOCD_DOMAIN }}"
           oidc.config: |
-            {{ oidc_config }}
+            issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
+            requestedScopes: ["openid", "generic"]
+            name: Keycloak
+            clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
+            clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+          {% if CA_ENABLED %}
+            rootCA: |
+              {{ ca_pem | indent(width=2, first=False) }}
+          {% endif %}
           users.anonymous.enabled: "false"
           admin.enabled: "false"
           resource.exclusions: |
@@ -87,20 +79,24 @@
               - TaskRun
               - PipelineRun
         extraEnvVars:
+        {% if USE_PROXY %}
           - name: HTTP_PROXY
             value: "{{ HTTP_PROXY }}"
           - name: HTTPS_PROXY
             value: "{{ HTTPS_PROXY }}"
           - name: NO_PROXY
             value: "{{ NO_PROXY }},argo-argo-cd-repo-server"
+        {% endif %}
       repoServer:
         extraEnvVars:
+        {% if USE_PROXY %}
           - name: HTTP_PROXY
             value: "{{ HTTP_PROXY }}"
           - name: HTTPS_PROXY
             value: "{{ HTTPS_PROXY }}"
           - name: NO_PROXY
             value: "{{ NO_PROXY }}"
+        {% endif %}
       extraDeploy:
         - apiVersion: v1
           data:
@@ -122,6 +118,14 @@
               app.kubernetes.io/part-of: argocd
             name: argocd-rbac-cm
             namespace: argo-system
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: argo
+    chart_ref: bitnami/argo-cd
+    release_namespace: argo-system
+    create_namespace: true
+    values: "{{ helm_values | from_yaml }}"
 
 - name: find gitlab token in inventory
   kubernetes.core.k8s_info:

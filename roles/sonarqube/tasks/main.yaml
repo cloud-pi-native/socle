@@ -29,7 +29,7 @@
             POSTGRES_ADMIN_USER: "{{ postgres_admin_user | b64encode }}"
             POSTGRES_ADMIN_PASSWORD: "{{ postgres_admin_password | b64encode }}"
 
-- name: Install postgres
+- name: Install sonar
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
@@ -37,20 +37,9 @@
     - postgres-deployment.yaml.j2
     - postgres-service.yaml.j2
     - sonar-pv-claim.yaml.j2
-
-- name: Install issuer
-  kubernetes.core.k8s:
-    template: sonar-cluster-issuer.yaml.j2
-
-- kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_items:
     - sonar-deployment.yaml.j2
     - sonar-service.yaml.j2
-
-- name: Install ingress
-  kubernetes.core.k8s:
-    template: sonar-ingress.yaml.j2
+    - sonar-ingress.yaml.j2
 
 - name: find sonar admin password
   kubernetes.core.k8s_info:

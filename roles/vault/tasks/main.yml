@@ -31,10 +31,6 @@
         dataStorage:
           enable: true
           size: 23Gi
-        extraEnvironmentVars:
-          HTTP_PROXY: "{{ HTTP_PROXY }}"
-          HTTPS_PROXY: "{{ HTTPS_PROXY }}"
-          NO_PROXY: "{{ NO_PROXY }}"
 
 - name: set proxy_fact
   set_fact:

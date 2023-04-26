@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: argo-system-letsencrypt-issuer
+spec:
+  acme:
+    email: {{ CERTMANAGER_EMAIL }}
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: argo-system-issuer-account-key
+    solvers:
+    - http01:
+        ingress:
+          name: ingressargo-http-solver

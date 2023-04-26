@@ -1,7 +1,7 @@
 - name: get argo client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     name: keycloak-client-secret-argo-client
   register: argocd_secret
   failed_when: argocd_secret.resources | length == 0
@@ -34,13 +34,19 @@
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
 
-- name: Deploy helm
-  kubernetes.core.helm:
-    name: argo
-    chart_ref: bitnami/argo-cd
-    release_namespace: argo-system
-    create_namespace: true
-    values:
+- name: Set OIDC config
+  set_fact:
+    oidc_config: |
+      issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
+      requestedScopes: ["openid", "generic"]
+      name: Keycloak
+      clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
+      clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+  when: not CA_ENABLED
+
+- name: Set extra env vars
+  set_fact:
+    helm_values: |
       openshift:
         enabled: false
       config:
@@ -51,13 +57,17 @@
       server:
         config:
           clusterResources: "true"
-          url: "https://{{ ARGOCD_DOMAIN }}"
+          url: "https://{{ ARGOCD_DOMAIN }}/"
           oidc.config: |
             issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
-            requestedScopes: ["openid", "groups"]
+            requestedScopes: ["openid", "generic"]
             name: Keycloak
             clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
             clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+      {% if CA_ENABLED %}
+            rootCA: |
+              {{ ca_pem | indent(width=2, first=False) }}
+      {% endif %}
           users.anonymous.enabled: "false"
           admin.enabled: "false"
           resource.exclusions: |
@@ -69,20 +79,24 @@
               - TaskRun
               - PipelineRun
         extraEnvVars:
+      {% if USE_PROXY %}
           - name: HTTP_PROXY
             value: "{{ HTTP_PROXY }}"
           - name: HTTPS_PROXY
             value: "{{ HTTPS_PROXY }}"
           - name: NO_PROXY
             value: "{{ NO_PROXY }},argo-argo-cd-repo-server"
+      {% endif %}
       repoServer:
         extraEnvVars:
+      {% if USE_PROXY %}
           - name: HTTP_PROXY
             value: "{{ HTTP_PROXY }}"
           - name: HTTPS_PROXY
             value: "{{ HTTPS_PROXY }}"
           - name: NO_PROXY
             value: "{{ NO_PROXY }}"
+      {% endif %}
       extraDeploy:
         - apiVersion: v1
           data:
@@ -93,18 +107,48 @@
               g, cluster-admins, role:admin
               g, /ArgoCDAdmins, role:admin
               g, ArgoCDAdmins, role:admin
-            scopes: '[groups]'
+            scopes: "[groups]"
             policy.default: role:nada
             admin.enabled: "false"
           kind: ConfigMap
           metadata:
-            labels:
-              app.kubernetes.io/managed-by: openshift-gitops
-              app.kubernetes.io/name: argocd-rbac-cm
-              app.kubernetes.io/part-of: argocd
             name: argocd-rbac-cm
             namespace: argo-system
 
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: argo
+    chart_ref: bitnami/argo-cd
+    release_namespace: argo-system
+    create_namespace: true
+    values: "{{ helm_values | from_yaml }}"
+
+- name: find gitlab token in inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ CONSOLE_NAMESPACE }}"
+    kind: ConfigMap
+    name: dso-config
+  register: ansible_inventory
+
+- name: Create global gitlab secret
+  kubernetes.core.k8s:
+    definition:
+      data:
+        password: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64encode }}"
+        url: "{{ ('https://' + GITLAB_DOMAIN + '/forge-mi/projects') | b64encode }}"
+        username: "{{ 'root' | b64encode }}"
+      kind: Secret
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repo-creds
+        name: gitlab
+        namespace: argo-system
+      type: Opaque
+
 - name: Install routes
   kubernetes.core.k8s:
-    template: gitops-route.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - httpsolver.j2
+    - cluster-issuer.j2
+    - ingress.yaml.j2

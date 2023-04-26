@@ -4,7 +4,7 @@ metadata:
   name: portail-client
   labels:
     app: sso
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   client:
     clientId: portail-client
@@ -14,8 +14,8 @@ spec:
     webOrigins:
       - "*"
     defaultClientScopes:
-      - profile
-      - email
+    - generic
+
   realmSelector:
     matchLabels:
       app: sso

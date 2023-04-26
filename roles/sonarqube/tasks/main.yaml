@@ -1,13 +1,13 @@
-- name: create sonar-system namespace
+- name: create "{{ SONAR_NAMESPACE }}" namespace
   kubernetes.core.k8s:
     kind: Namespace
-    name: sonar-system
+    name: "{{ SONAR_NAMESPACE }}"
 
 - name: get dso-postgres-secret
   kubernetes.core.k8s_info:
     kind: Secret
     name: dso-postgres-secret
-    namespace: sonar-system
+    namespace: "{{ SONAR_NAMESPACE }}"
   register: dso_postgres_secret
 
 - name: create dso-postgres-secret values
@@ -24,42 +24,29 @@
           kind: Secret
           metadata:
             name: dso-postgres-secret
-            namespace: sonar-system
+            namespace: "{{ SONAR_NAMESPACE }}"
           data:
             POSTGRES_ADMIN_USER: "{{ postgres_admin_user | b64encode }}"
             POSTGRES_ADMIN_PASSWORD: "{{ postgres_admin_password | b64encode }}"
 
-- name: Install postgres
-  kubernetes.core.k8s:
-    src: "{{ item }}"
-  with_items:
-    - postgres-pv-claim.yaml
-    - postgres-deployment.yaml
-    - postgres-service.yaml
-    - sonar-pv-claim.yaml
-
-- name: Install issuer
-  kubernetes.core.k8s:
-    template: sonar-cluster-issuer.yaml.j2
-
 - name: Install sonar
   kubernetes.core.k8s:
-    src: "{{ item }}"
+    template: "{{ item }}"
   with_items:
-    - sonar-deployment.yaml
-    - sonar-service.yaml
-
-- name: Install ingress
-  kubernetes.core.k8s:
-    template: sonar-ingress.yaml.j2
+    - postgres-pv-claim.yaml.j2
+    - postgres-deployment.yaml.j2
+    - postgres-service.yaml.j2
+    - sonar-pv-claim.yaml.j2
+    - sonar-deployment.yaml.j2
+    - sonar-service.yaml.j2
+    - sonar-ingress.yaml.j2
 
 - name: find sonar admin password
   kubernetes.core.k8s_info:
-    namespace: openshift-infra
+    namespace: "{{ CONSOLE_NAMESPACE }}"
     kind: ConfigMap
-    name: ansible-inventory
+    name: dso-config
   register: ansible_inventory
-
 
 - name: reset admin password
   when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is undefined
@@ -70,7 +57,7 @@
     - name: wait sonar to initialize
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: sonar-system
+        namespace: "{{ SONAR_NAMESPACE }}"
         name: sonar
       register: endpoint
       until: endpoint.resources[0].subsets is defined and endpoint.resources[0].subsets | selectattr('addresses')
@@ -80,7 +67,7 @@
     - name: wait sonar to initialize
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: sonar-system
+        namespace: "{{ SONAR_NAMESPACE }}"
         name: postgres
       register: pg_ep
 
@@ -91,11 +78,14 @@
     - name: récupération du compte admin
       kubernetes.core.k8s_exec:
         pod: "{{ pg_pod }}"
-        namespace: sonar-system
+        namespace: "{{ SONAR_NAMESPACE }}"
         command: psql -d sonardb -U dso_admin -c "{{ query }}" -t
       vars:
         query: select row_to_json(row) from (SELECT * FROM  users WHERE login = 'admin') row;
       register: admin_account
+      until: "admin_account is not failed"
+      retries: 5
+      delay: 5
 
     - name: Generate random password
       set_fact:
@@ -110,7 +100,7 @@
     - name: Ajout d'un token admin
       kubernetes.core.k8s_exec:
         pod: "{{ pg_pod }}"
-        namespace: sonar-system
+        namespace: "{{ SONAR_NAMESPACE }}"
         command: psql -d sonardb -U dso_admin -c "{{ query }}" -t
       vars:
         query: >
@@ -122,8 +112,8 @@
     - name: update inventory
       kubernetes.core.k8s:
         kind: ConfigMap
-        name: ansible-inventory
-        namespace: openshift-infra
+        name: dso-config
+        namespace: "{{ CONSOLE_NAMESPACE }}"
         state: patched
         definition:
           data:

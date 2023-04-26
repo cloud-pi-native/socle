@@ -1,0 +1,27 @@
+- name: Get vaulth health
+  uri:
+    url: "https://{{ VAULT_DOMAIN }}/v1/sys/health"
+    status_code: [200, 503, 501]
+  register: vault_health
+  retries: 5
+  until: (vault_health.status != 503) or (vault_health.status == 503 and vault_health.json)
+
+- name: set vault_status to OK
+  set_fact:
+    vault_status: OK
+  when: vault_health.status == 200
+
+- name: set vault_status to "not init"
+  set_fact:
+    vault_status: not init
+  when: vault_health.status == 501
+
+- name: set vault_status to unavailable
+  set_fact:
+    vault_status: unavailable
+  when: vault_health.status == 503
+
+- name: set vault_status to sealed
+  set_fact:
+    vault_status: sealed
+  when: vault_health.status == 503 and vault_health.json is defined and vault_health.json.sealed

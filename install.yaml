@@ -1,18 +1,24 @@
 - hosts: localhost
-  pre_tasks:
-    - name: Load vars
-      ansible.builtin.include_vars:
-        file: vars.yaml
+  gather_facts: false
+
+  roles:
+    - name: socle-config
       tags:
         - always
-  roles:
-    - name: ansible-inventory
+
+    - name: cluster-ca
+      when: CA_ENABLED
+      tags:
+        - always
+
+    - name: console-dso-config
       tags:
         - always
 
     - name: cert-manager
       tags:
         - cert-manager
+        - always
 
     - name: confSyncer
       tags:
@@ -43,6 +49,10 @@
       tags:
         - vault
 
+    - name: sops
+      tags:
+        - sops
+
     - name: argocd
       tags:
         - gitops
@@ -57,3 +67,11 @@
       tags:
         - console
         - console-dso
+
+  post_tasks:
+    - name: Remove local vars
+      ansible.builtin.file:
+        state: absent
+        path: vars.yaml
+      tags:
+        - always

@@ -1,0 +1,71 @@
+- name: Create SOPS namespace
+  kubernetes.core.k8s:
+    state: present
+    kind: namespace
+    name: "{{ SOPS_NAMESPACE }}"
+    api_version: v1
+
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: sops
+    repo_url: https://isindir.github.io/sops-secrets-operator
+
+- name: Check if age secret already exists
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: sops-age-key-file
+    namespace: "{{ SOPS_NAMESPACE }}"
+  register: age_secret
+
+- name: Generate age keys
+  ansible.builtin.shell:
+    cmd: age-keygen
+  register: age_keys
+  when: age_secret.resources | length == 0
+
+- name: Create secret sops-age-key-file
+  kubernetes.core.k8s:
+    definition:
+      data:
+        keys: "{{ age_keys.stdout | b64encode }}"
+      kind: Secret
+      metadata:
+        name: sops-age-key-file
+        namespace: "{{ SOPS_NAMESPACE }}"
+      type: Opaque
+  when: age_secret.resources | length == 0
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: sops
+    chart_ref: sops/sops-secrets-operator
+    release_namespace: "{{ SOPS_NAMESPACE }}"
+    create_namespace: true
+    values:
+      extraEnv:
+        - name: SOPS_AGE_KEY_FILE
+          value: /etc/sops-age-key-file/key
+      secretsAsFiles:
+        - mountPath: /etc/sops-age-key-file/
+          name: sops-age-key-file
+          secretName: sops-age-key-file
+
+- name: Get age secret
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: sops-age-key-file
+    namespace: "{{ SOPS_NAMESPACE }}"
+  register: age_secret
+
+- name: Retrieve age public key
+  ansible.builtin.set_fact:
+    age_pubkey: "{{ age_secret.resources[0].data['keys'] | b64decode | regex_search('public key: (.+)', '\\1', multiline=True) | first }}"
+
+- name: Display age public key message
+  ansible.builtin.debug:
+    msg:
+      - "Clé publique age : {{ age_pubkey }} "
+      - "À conserver et fournir à vos utilisateurs."
+      - "Elle leur servira à chiffrer leurs secrets."

@@ -1,24 +1,22 @@
-#!/bin/bash
-
 - name: Install gitlab subscription
   kubernetes.core.k8s:
-    src: "{{ item }}"
+    template: "{{ item }}"
   with_items:
-    - operator-group.yaml
-    - operator-subscription.yaml
+    - operator-group.yaml.j2
+    - operator-subscription.yaml.j2
 
 - name: Wait Gitlab CRD exist
   kubernetes.core.k8s_info:
     api_version: apps.gitlab.com/v1beta1
     kind: GitLab
-    namespace: gitlab-system
+    namespace: "{{ GITLAB_NAMESPACE }}"
   register: gitlab_kind
   until: gitlab_kind.api_found
 
 - name: get Gitlab client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     name: keycloak-client-secret-gitlab-client
   register: gitlab_secret
   failed_when: gitlab_secret.resources | length == 0
@@ -32,8 +30,7 @@
         name: openid_connect
         scope:
           - openid
-          - profile
-          - email
+          - generic
         response_type: code
         issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
         client_auth_method: query
@@ -53,36 +50,34 @@
       kind: Secret
       metadata:
         name: openid-connect
-        namespace: gitlab-system
+        namespace: "{{ GITLAB_NAMESPACE }}"
 
 - name: Install gitlab instance
   kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_items:
-    - gitlab-instance.yaml.j2
+    template: gitlab-instance.yaml.j2
 
 - name: Wait gitlab instance to be 'Running'
   kubernetes.core.k8s_info:
     api_version: apps.gitlab.com/v1beta1
     kind: GitLab
-    namespace: gitlab-system
+    namespace: "{{ GITLAB_NAMESPACE }}"
     name: gitlab
   register: gitlab_instance
-  until: gitlab_instance.resources[0].status.phase == 'Running'
+  until: gitlab_instance.resources[0] is defined and gitlab_instance.resources[0].status is defined and gitlab_instance.resources[0].status.phase == 'Running'
   retries: 45
   delay: 20
 
 - name: find gitlab token in inventory
   kubernetes.core.k8s_info:
-    namespace: openshift-infra
+    namespace: "{{ CONSOLE_NAMESPACE }}"
     kind: ConfigMap
-    name: ansible-inventory
+    name: dso-config
   register: ansible_inventory
 
 - name: Get gitlab token
   set_fact:
     gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
-  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN != ""
+  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
   register: set_token_inv
 
 - name: Test Gitlab token
@@ -90,7 +85,7 @@
   uri:
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/admin/ci/variables"
     headers:
-      'PRIVATE-TOKEN': "{{ gitlab_token }}"
+      "PRIVATE-TOKEN": "{{ gitlab_token }}"
   register: test_token
   ignore_errors: true
 
@@ -102,7 +97,7 @@
         kind: pod
         label_selectors:
           - app = toolbox
-        namespace: gitlab-system
+        namespace: "{{ GITLAB_NAMESPACE }}"
       register: toolbox_pods
 
     - name: Set toolbox pod name
@@ -112,21 +107,23 @@
     - name: Create Token
       kubernetes.core.k8s_exec:
         pod: "{{ tb_pod }}"
-        namespace: gitlab-system
+        namespace: "{{ GITLAB_NAMESPACE }}"
         command: >
-          bash -c "echo 'PersonalAccessToken.create!(user_id: 1, name: \"ANSIBLE-DSO\", scopes: [:api, :read_repository, :write_repository]).token' |  gitlab-rails console"
+          bash -c "echo 'PersonalAccessToken.create!(user_id: 1
+          , name: \"ANSIBLE-DSO\"
+          , scopes: [:api, :read_repository, :write_repository]).token' | gitlab-rails console"
       register: token
 
     - name: Set new gitlab token
       set_fact:
-        gitlab_token: "{{ token.stdout_lines[-1][1:-1] }}"
-      when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined
+        gitlab_token: "{{ token.stdout_lines[-2][1:-1] }}"
+    #      when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined
 
     - name: update inventory
       kubernetes.core.k8s:
         kind: ConfigMap
-        name: ansible-inventory
-        namespace: openshift-infra
+        name: dso-config
+        namespace: "{{ CONSOLE_NAMESPACE }}"
         state: patched
         definition:
           data:
@@ -136,7 +133,7 @@
   uri:
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     headers:
-      'PRIVATE-TOKEN': "{{ gitlab_token }}"
+      "PRIVATE-TOKEN": "{{ gitlab_token }}"
   register: get_settings
   ignore_errors: true
 
@@ -145,7 +142,7 @@
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     method: PUT
     headers:
-      'PRIVATE-TOKEN': "{{ gitlab_token }}"
+      "PRIVATE-TOKEN": "{{ gitlab_token }}"
     body:
       signup_enabled: false
     body_format: form-urlencoded
@@ -188,17 +185,27 @@
       - name: "SONAR_HOST_URL"
         value: "https://{{ SONAR_DOMAIN }}"
       - name: "VAULT_AUTH_PATH"
-        value: "{{ VAULT_AUTH_PATH }}"
+        value: "{{ vault_auth_path }}"
       - name: "VAULT_AUTH_ROLE"
-        value: "{{ VAULT_AUTH_ROLE }}"
+        value: "{{ vault_auth_role }}"
       - name: "VAULT_SERVER_URL"
         value: "https://{{ VAULT_DOMAIN }}"
       - name: "MVN_CONFIG_FILE"
         variable_type: "file"
-        value: "{{ MVN_CONFIG_FILE }}"
+        value: "{{ mvn_config_file }}"
       - name: "NPM_FILE"
         variable_type: "file"
-        value: "{{ NPM_FILE }}"
+        value: "{{ npm_file }}"
+
+- name: "Set or update some CI/CD variables"
+  community.general.gitlab_group_variable:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: false
+    group: "forge-mi/projects"
+    purge: false
+    state: "{{ USE_PROXY | ternary('present', 'absent') }}"
+    variables:
       - name: "HTTP_PROXY"
         value: "{{ HTTP_PROXY }}"
       - name: "HTTPS_PROXY"

@@ -2,7 +2,7 @@
   kubernetes.core.k8s:
     state: present
     kind: namespace
-    name: vault-system
+    name: "{{ VAULT_NAMESPACE }}"
     api_version: v1
 
 - name: Add helm repo
@@ -27,21 +27,27 @@
         dataStorage:
           enable: true
           size: 23Gi
+
+- name: set proxy_fact
+  set_fact:
+    proxy_fact:
+      server:
         extraEnvironmentVars:
           HTTP_PROXY: "{{ HTTP_PROXY }}"
           HTTPS_PROXY: "{{ HTTPS_PROXY }}"
           NO_PROXY: "{{ NO_PROXY }}"
+  when: USE_PROXY
 
 - name: set extraEnv
-  when: HTTP_PROXY is defined or HTTPS_PROXY is defined or NO_PROXY is defined
+  when: USE_PROXY
   set_fact:
-    values: "{{ values | combine({'server': {'extraEnvironmentVars': {'HTTP_PROXY': HTTP_PROXY, 'HTTPS_PROXY': HTTPS_PROXY, 'NO_PROXY': NO_PROXY }}}, recursive=True) }}"
+    values: "{{ values | combine(proxy_fact, recursive=True) }}"
 
 - name: Deploy helm
   kubernetes.core.helm:
     name: vault
     chart_ref: hashicorp/vault
-    release_namespace: vault-system
+    release_namespace: "{{ VAULT_NAMESPACE }}"
     create_namespace: true
     values: "{{ values }}"
 
@@ -57,7 +63,7 @@
   kubernetes.core.k8s:
     kind: Pod
     name: vault-0
-    namespace: vault-system
+    namespace: "{{ VAULT_NAMESPACE }}"
     wait: true
     wait_sleep: 10
     wait_timeout: 600
@@ -68,18 +74,30 @@
 
 - name: find vault keys
   kubernetes.core.k8s_info:
-    namespace: openshift-infra
+    namespace: "{{ VAULT_NAMESPACE }}"
     kind: Secret
     name: vault-keys
   register: vault_keys
+
+- include_tasks:
+    file: check.yml
+
+- name: Check if vault is coherent
+  assert:
+    that:
+      - ((vault_status in ['sealed', 'OK']) and (vault_keys.resources | length > 0)) or ((vault_status == 'not init') and (vault_keys.resources | length == 0))
+    fail_msg:
+      - "Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-keys dans {{ VAULT_NAMESPACE }}"
+      - "Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation"
+      - "Soit le vault est initialisé mais vous n'avez pas de secret vault-keys dans {{ VAULT_NAMESPACE }}, et c'est inquiétant !"
 
 - name: init vault
   kubernetes.core.k8s_exec:
     container: vault
     pod: vault-0
-    namespace: vault-system
+    namespace: "{{ VAULT_NAMESPACE }}"
     command: vault operator init -key-shares=3 -key-threshold=2
-  when: vault_keys.resources | length == 0
+  when: vault_status == 'not init'
   register: init
   until: "init is not failed"
   retries: 1
@@ -91,7 +109,7 @@
       kind: Secret
       metadata:
         name: vault-keys
-        namespace: openshift-infra
+        namespace: "{{ VAULT_NAMESPACE }}"
       data:
         key1: "{{ init.stdout_lines[0] | regex_replace('^Unseal Key 1: (.*)$', '\\1', multiline=True) | b64encode }}"
         key2: "{{ init.stdout_lines[1] | regex_replace('^Unseal Key 2: (.*)$', '\\1', multiline=True) | b64encode }}"
@@ -101,7 +119,7 @@
 
 - name: find vault keys
   kubernetes.core.k8s_info:
-    namespace: openshift-infra
+    namespace: "{{ VAULT_NAMESPACE }}"
     kind: Secret
     name: vault-keys
   register: vault_keys
@@ -109,39 +127,35 @@
 - name: update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
-    name: ansible-inventory
-    namespace: openshift-infra
+    name: dso-config
+    namespace: "{{ CONSOLE_NAMESPACE }}"
     state: patched
     definition:
       data:
         VAULT_TOKEN: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
 
-- set_fact:
+- name: set fact root_token
+  set_fact:
     root_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
 
-- name: Get vaulth health
-  uri:
-    url: "https://{{ VAULT_DOMAIN }}/v1/sys/health"
-    status_code: [200, 503]
-    headers:
-      'X-Vault-Token': "{{ root_token }}"
-  register: vault_health
+- include_tasks:
+    file: check.yml
 
 - name: Set fact to unseal vault
   set_fact:
     num: "1"
 
 - name: Unseal vault
-  when: vault_health.status == 503
+  when: vault_status == 'sealed'
   include_tasks:
-    file: roles/vault/tasks/unseal.yml
+    file: unseal.yml
 
 - name: "Config: get auth method"
   uri:
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     status_code: [200, 400]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
   register: jwt_state
   retries: 5
 
@@ -152,7 +166,7 @@
     method: POST
     status_code: [204]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
     body:
       type: jwt
       description: Login for Gitlab-ci
@@ -164,12 +178,12 @@
     method: POST
     status_code: [204]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
       Content-Type: application/json
-    body: 
+    body:
       role_type: jwt
       policies:
-      - default-ci
+        - default-ci
       token_explicit_max_ttl: 60
       bound_claims_type: glob
       user_claim: user_email
@@ -188,9 +202,11 @@
     method: POST
     status_code: [204]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
     body:
       oidc_discovery_url: "https://gitlab-op{{ ROOT_DOMAIN }}"
+      #      oidc_discovery_ca_pem: "{{ ca_pem }}"
+      oidc_discovery_ca_pem: "{{ CA_ENABLED | ternary(ca_pem,'') }}"
       default_role: default-ci
     body_format: json
 
@@ -199,7 +215,7 @@
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     status_code: [200]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
   register: get_accessor
 
 - name: "Config: create policy"
@@ -208,7 +224,7 @@
     method: POST
     status_code: [204]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
     body:
       policy: |
         path "forge-dso/+/{{ '{{' }}identity.entity.aliases.{{ get_accessor.json.accessor }}.metadata.namespace_path{{ '}}' }}/*" {
@@ -224,7 +240,7 @@
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/mounts/forge-dso"
     status_code: [200, 400]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
   register: get_engines
 
 - name: "Config: create kv engine"
@@ -234,7 +250,7 @@
     method: POST
     status_code: [204]
     headers:
-      'X-Vault-Token': "{{ root_token }}"
+      "X-Vault-Token": "{{ root_token }}"
     body:
       type: kv
       options:

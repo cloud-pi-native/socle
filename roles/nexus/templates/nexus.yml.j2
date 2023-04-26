@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim # Create PVC
 metadata:
-  namespace: nexus-system
+  namespace: {{ NEXUS_NAMESPACE }}
   name: nexus-data-claim # Sets name of PV
 spec:
   accessModes:
@@ -14,7 +14,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: nexus-system
+  namespace: {{ NEXUS_NAMESPACE }}
   name: nexus  # Sets Deployment name
 spec:
   replicas: 1
@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: nexus
-          image: sonatype/nexus3:3.47.1 # Sets Image
+          image: sonatype/nexus3
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 8081  # Exposes container port
@@ -49,7 +49,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: nexus-system
+  namespace: {{ NEXUS_NAMESPACE }}
   name: nexus # Sets service name
   labels:
     app: nexus # Labels and Selectors
@@ -65,8 +65,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-nexus-system-http-solver
-  namespace: nexus-system
+  name: ingress-{{ NEXUS_NAMESPACE }}-http-solver
+  namespace: {{ NEXUS_NAMESPACE }}
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
@@ -78,14 +78,14 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nexus-ingress
-  namespace: nexus-system
+  namespace: {{ NEXUS_NAMESPACE }}
   annotations:
     cert-manager.io/cluster-issuer: nexus-system-letsencrypt-issuer
 spec:
   tls:
-    - hosts:
-        - {{ NEXUS_DOMAIN }}
-      secretName: nexus-system-issuer-account-key
+  - hosts:
+      - {{ NEXUS_DOMAIN }}
+    secretName: nexus-system-issuer-account-key
   rules:
     - host: {{ NEXUS_DOMAIN }}
       http:

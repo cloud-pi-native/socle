@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: postgres-dso
+  name: sonar-postgres-dso
+  namespace: sonar-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: postgres-dso
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        # network/dnc-net: "true"
+        service: postgres-dso
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_PASSWORD
+              value: "OR64-#Yr!)"
+            - name: POSTGRES_USER
+              value: dso_admin
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+            - name: POSTGRES_DB
+              value: sonardb
+          image: postgres@sha256:390b0cdc715e189d0245d9f149912738e86535f02e011b6209500fccdda37440
+          name: postgres-dso
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-sonar
+      restartPolicy: Always
+      volumes:
+        - name: postgres-sonar
+          persistentVolumeClaim:
+            claimName: postgres-sonar-data-claim

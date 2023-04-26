@@ -1,12 +1,11 @@
-
 - name: Apply project
   kubernetes.core.k8s:
-    src: project.yaml
+    template: project.j2
 
 - name: get console client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     name: keycloak-client-secret-console-frontend-client
   register: console_frontend_secret
   failed_when: console_frontend_secret.resources | length == 0
@@ -14,7 +13,7 @@
 - name: get console client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: keycloak-system
+    namespace: "{{ KEYCLOAK_NAMESPACE }}"
     name: keycloak-client-secret-console-backend-client
   register: console_backend_secret
   failed_when: console_backend_secret.resources | length == 0

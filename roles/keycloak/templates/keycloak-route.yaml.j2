@@ -3,7 +3,7 @@ metadata:
   labels:
     app: keycloak
   name: keycloak-alternative
-  namespace: keycloak-system
+  namespace: {{ KEYCLOAK_NAMESPACE }}
 spec:
   host: {{ KEYCLOAK_DOMAIN }}
   port:

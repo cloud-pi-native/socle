@@ -83,7 +83,7 @@
       vars:
         query: select row_to_json(row) from (SELECT * FROM  users WHERE login = 'admin') row;
       register: admin_account
-      until: "admin_account is not failed" 
+      until: "admin_account is not failed"
       retries: 5
       delay: 5
 

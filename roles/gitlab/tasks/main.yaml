@@ -204,7 +204,7 @@
     validate_certs: false
     group: "forge-mi/projects"
     purge: false
-    state: "{{ USE_PROXY | ternary('present', 'absent')}}"
+    state: "{{ USE_PROXY | ternary('present', 'absent') }}"
     variables:
       - name: "HTTP_PROXY"
         value: "{{ HTTP_PROXY }}"

@@ -28,7 +28,7 @@
   kubernetes.core.k8s:
     definition:
       data:
-        keys : "{{ age_keys.stdout | b64encode }}"
+        keys: "{{ age_keys.stdout | b64encode }}"
       kind: Secret
       metadata:
         name: sops-age-key-file
@@ -44,12 +44,12 @@
     create_namespace: true
     values:
       extraEnv:
-      - name: SOPS_AGE_KEY_FILE
-        value: /etc/sops-age-key-file/key
+        - name: SOPS_AGE_KEY_FILE
+          value: /etc/sops-age-key-file/key
       secretsAsFiles:
-      - mountPath: /etc/sops-age-key-file/
-        name: sops-age-key-file
-        secretName: sops-age-key-file
+        - mountPath: /etc/sops-age-key-file/
+          name: sops-age-key-file
+          secretName: sops-age-key-file
 
 - name: Get age secret
   kubernetes.core.k8s_info:

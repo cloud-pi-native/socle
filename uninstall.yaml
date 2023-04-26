@@ -1,0 +1,76 @@
+- hosts: localhost
+  gather_facts: false
+
+  roles:
+    - name: socle-config
+      tags:
+        - always
+
+  post_tasks:
+    - name: Suppression des namespaces
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ item }}"
+      with_items:
+        - "{{ CONSOLE_NAMESPACE }}"
+        - "{{ SOPS_NAMESPACE }}"
+        - "{{ SONAR_NAMESPACE }}"
+        - "{{ VAULT_NAMESPACE }}"
+        - "{{ NEXUS_NAMESPACE }}"
+        - "{{ HARBOR_NAMESPACE }}"
+        - "{{ ARGOCD_NAMESPACE }}"
+
+    - name: Récupérations des clients Keycloak
+      kubernetes.core.k8s_info:
+        api_version: keycloak.org/v1alpha1
+        kind: KeycloakClient
+        namespace: "{{ KEYCLOAK_NAMESPACE }}"
+      register: keycloak_clients
+
+    - name: Suppression des clients Keycloak
+      kubernetes.core.k8s:
+        state: absent
+        api_version: keycloak.org/v1alpha1
+        kind: KeycloakClient
+        name: "{{ item.metadata.name }}"
+        namespace: "{{ KEYCLOAK_NAMESPACE }}"
+      with_items: "{{ keycloak_clients.resources }}"
+
+    - name: Suppression des ressources Keycloak
+      kubernetes.core.k8s:
+        state: absent
+        api_version: keycloak.org/v1alpha1
+        kind: "{{ item.kind }}"
+        name: "{{ item.name }}"
+        namespace: "{{ KEYCLOAK_NAMESPACE }}"
+      with_items:
+        - kind: KeycloakRealm
+          name: dso-realm
+        - kind: KeycloakUser
+          name: admin-gitlab
+
+    - name: Suppression du gitlab runner
+      kubernetes.core.k8s:
+        state: absent
+        api_version: apps.gitlab.com/v1beta2
+        kind: Runner
+        name: gitlab-runner
+        namespace: "{{ GITLAB_NAMESPACE }}"
+
+    - name: Suppression des namespaces restants
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ item }}"
+      with_items:
+        - "{{ KEYCLOAK_NAMESPACE }}"
+        - "{{ GITLAB_NAMESPACE }}"
+        - cluster-infra
+
+    - name: Remove local vars
+      ansible.builtin.file:
+        state: absent
+        path: vars.yaml
+      tags:
+        - always

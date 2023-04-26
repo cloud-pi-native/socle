@@ -1,14 +1,13 @@
 - hosts: localhost
   gather_facts: false
-  pre_tasks:
-    - name: Load vars
-      ansible.builtin.include_vars:
-        file: vars.yaml
+
+  roles:
+    - name: socle-config
       tags:
         - always
 
-  roles:
     - name: cluster-ca
+      when: CA_ENABLED
       tags:
         - always
 
@@ -68,3 +67,11 @@
       tags:
         - console
         - console-dso
+
+  post_tasks:
+    - name: Remove local vars
+      ansible.builtin.file:
+        present: false
+        path: vars.yaml
+      tags:
+        - always

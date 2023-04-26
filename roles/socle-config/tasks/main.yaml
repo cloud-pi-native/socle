@@ -1,0 +1,58 @@
+- name: Create cluster-infra
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: cluster-infra
+
+- name: Get socle config in cluster
+  kubernetes.core.k8s_info:
+    kind: ConfigMap
+    namespace: cluster-infra
+    name: socle-config
+  register: socle_config
+
+- name: Load default config
+  ansible.builtin.set_fact:
+    default_config_block: "{{ lookup('ansible.builtin.file', 'socle-config.yaml') }}"
+
+- name: Initialize config and exit
+  when: socle_config.resources | length == 0
+  block:
+    - name: Create socle config example
+      kubernetes.core.k8s:
+        definition:
+          kind: ConfigMap
+          metadata:
+            namespace: cluster-infra
+            name: socle-config
+          data:
+            vars: "{{ default_config_block }}"
+
+    - name: Disclaimer
+      debug:
+        msg:
+          - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster."
+          - "Veuillez modifier le ConfigMap dso-console dans le namespace cluster-infra"
+          - "Puis relancer l'installation"
+
+    - name: Exit playbook
+      meta: end_play
+
+- name: save vars locally and temporally
+  copy:
+    dest: vars.yaml
+    content: "{{ socle_config.resources[0].data.vars | from_yaml | to_nice_yaml }}"
+    mode: 0400
+
+- name: Load vars
+  ansible.builtin.include_vars:
+    file: vars.yaml
+  tags:
+    - always
+
+- name: Check config model
+  assert:
+    that:
+      - vars[item.key] is defined
+    fail_msg: "La configMap dans le cluster n'inclut pas toutes les clés du modèle d'exemple veuillez le mettre à jour pour ajouter {{ item.key }}"
+    quiet: true
+  with_dict: "{{ default_config_block | from_yaml }}"

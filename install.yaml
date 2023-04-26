@@ -71,7 +71,7 @@
   post_tasks:
     - name: Remove local vars
       ansible.builtin.file:
-        present: false
+        state: absent
         path: vars.yaml
       tags:
         - always

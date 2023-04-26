@@ -4,8 +4,12 @@ metadata:
   name: vault-ingress
   namespace: vault-system
   annotations:
-    route.openshift.io/termination: edge
+    cert-manager.io/cluster-issuer: vault-system-letsencrypt-issuer
 spec:
+  tls:
+    - hosts:
+        - {{ VAULT_DOMAIN }}
+      secretName: vault-system-issuer-account-key
   rules:
     - host: {{ VAULT_DOMAIN }}
       http:

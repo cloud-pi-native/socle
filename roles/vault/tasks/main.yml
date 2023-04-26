@@ -17,13 +17,9 @@
         openshift: true
       server:
         route:
-          enabled: true
-          host: "{{ VAULT_RAFT_ROUTE }}"
+          enabled: false
         ha:
-          enabled: true
-          replicas: 1
-          raft:
-            enabled: true
+          enabled: false
         standalone:
           enabled: true
         auditStorage:
@@ -59,6 +55,8 @@
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
+    - httpsolver.j2
+    - vault-cluster-issuer.j2
     - vault-ingress.j2
 
 - name: Wait vault container

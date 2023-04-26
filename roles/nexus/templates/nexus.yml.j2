@@ -30,7 +30,6 @@ spec:
     spec:
       containers:
         - name: nexus
-#          image: sonatype/nexus3:3.47.1 # Sets Image
           image: sonatype/nexus3
           imagePullPolicy: "IfNotPresent"
           ports:
@@ -81,8 +80,12 @@ metadata:
   name: nexus-ingress
   namespace: {{ NEXUS_NAMESPACE }}
   annotations:
-    route.openshift.io/termination: edge
+    cert-manager.io/cluster-issuer: nexus-system-letsencrypt-issuer
 spec:
+  tls:
+  - hosts:
+      - {{ NEXUS_DOMAIN }}
+    secretName: nexus-system-issuer-account-key
   rules:
     - host: {{ NEXUS_DOMAIN }}
       http:

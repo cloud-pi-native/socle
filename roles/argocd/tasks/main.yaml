@@ -57,17 +57,17 @@
       server:
         config:
           clusterResources: "true"
-          url: "https://{{ ARGOCD_DOMAIN }}"
+          url: "https://{{ ARGOCD_DOMAIN }}/"
           oidc.config: |
             issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
             requestedScopes: ["openid", "generic"]
             name: Keycloak
             clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
             clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
-          {% if CA_ENABLED %}
+      {% if CA_ENABLED %}
             rootCA: |
               {{ ca_pem | indent(width=2, first=False) }}
-          {% endif %}
+      {% endif %}
           users.anonymous.enabled: "false"
           admin.enabled: "false"
           resource.exclusions: |
@@ -79,24 +79,24 @@
               - TaskRun
               - PipelineRun
         extraEnvVars:
-        {% if USE_PROXY %}
+      {% if USE_PROXY %}
           - name: HTTP_PROXY
             value: "{{ HTTP_PROXY }}"
           - name: HTTPS_PROXY
             value: "{{ HTTPS_PROXY }}"
           - name: NO_PROXY
             value: "{{ NO_PROXY }},argo-argo-cd-repo-server"
-        {% endif %}
+      {% endif %}
       repoServer:
         extraEnvVars:
-        {% if USE_PROXY %}
+      {% if USE_PROXY %}
           - name: HTTP_PROXY
             value: "{{ HTTP_PROXY }}"
           - name: HTTPS_PROXY
             value: "{{ HTTPS_PROXY }}"
           - name: NO_PROXY
             value: "{{ NO_PROXY }}"
-        {% endif %}
+      {% endif %}
       extraDeploy:
         - apiVersion: v1
           data:
@@ -112,10 +112,6 @@
             admin.enabled: "false"
           kind: ConfigMap
           metadata:
-            labels:
-              app.kubernetes.io/managed-by: openshift-gitops
-              app.kubernetes.io/name: argocd-rbac-cm
-              app.kubernetes.io/part-of: argocd
             name: argocd-rbac-cm
             namespace: argo-system
 
@@ -151,4 +147,8 @@
 
 - name: Install routes
   kubernetes.core.k8s:
-    template: gitops-route.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - httpsolver.j2
+    - cluster-issuer.j2
+    - ingress.yaml.j2

@@ -55,9 +55,7 @@
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
-    - httpsolver.j2
-    - vault-cluster-issuer.j2
-    - vault-ingress.j2
+    - ingress.yaml.j2
 
 - name: Wait vault container
   kubernetes.core.k8s:

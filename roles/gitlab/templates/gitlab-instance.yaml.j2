@@ -8,6 +8,19 @@ spec:
     values:
       certmanager:
         install: true
+      gitlab:
+        webservice:
+          ingress:
+            tls:
+              secretName: gitlab-webservice
+      registry:
+        ingress:
+          tls:
+            secretName: gitlab-registry
+      minio:
+        ingress:
+          tls:
+            secretName: gitlab-minio
       global:
         certificates:
           customCAs:
@@ -31,8 +44,7 @@ spec:
             name: gitlab-pages{{ ROOT_DOMAIN }}
         ingress:
           annotations:
-            route.openshift.io/termination: edge
-          class: openshift-default
+           cert-manager.io/cluster-issuer: letsencrypt-issuer
           configureCertmanager: false
           tls:
             enabled: false

@@ -55,6 +55,7 @@
       dex:
         enabled: true
       server:
+        insecure: true
         config:
           clusterResources: "true"
           url: "https://{{ ARGOCD_DOMAIN }}/"
@@ -149,6 +150,4 @@
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
-    - httpsolver.j2
-    - cluster-issuer.j2
     - ingress.yaml.j2

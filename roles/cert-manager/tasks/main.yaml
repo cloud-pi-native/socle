@@ -29,14 +29,9 @@
     state: present
     definition: "{{ manifest | default(cert_manifest.content | from_yaml_all) }}"
 
-# - name: Wait for cert-manager-webhook to be ok
-#   kubernetes.core.k8s_info:
-#     kind: Deployment
-#     namespace: cert-manager
-#     name: cert-manager-webhook
-#     wait: yes
-#     wait_sleep: 10
-#     wait_timeout: 600
-#     wait_condition:
-#       type: ContainersReady
-#       status: "True"
+- name: Create ClusterIssuer
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ item }}"
+  with_items:
+    - cluster-issuer.j2

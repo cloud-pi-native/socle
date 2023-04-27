@@ -4,12 +4,12 @@ metadata:
   name: argo-ingress
   namespace: argo-system
   annotations:
-    cert-manager.io/cluster-issuer: argo-system-letsencrypt-issuer
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
 spec:
   tls:
   - hosts:
     - {{ ARGOCD_DOMAIN }}
-    secretName: argo-system-issuer-account-key
+    secretName: argo-issuer-account-key
   rules:
     - host: {{ ARGOCD_DOMAIN }}
       http:

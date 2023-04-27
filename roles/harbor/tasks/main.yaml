@@ -47,17 +47,17 @@
       expose:
         type: ingress
         tls:
-          enabled: false
+          enabled: true
         ingress:
           hosts:
             core: harbor{{ ROOT_DOMAIN }}
             notary: notary{{ ROOT_DOMAIN }}
           notary:
             annotations:
-              route.openshift.io/termination: edge
+              cert-manager.io/cluster-issuer: letsencrypt-issuer
           harbor:
             annotations:
-              route.openshift.io/termination: edge
+              cert-manager.io/cluster-issuer: letsencrypt-issuer
 
       externalURL: https://harbor{{ ROOT_DOMAIN }}
       persistence:

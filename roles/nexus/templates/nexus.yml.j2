@@ -65,22 +65,10 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-{{ NEXUS_NAMESPACE }}-http-solver
-  namespace: {{ NEXUS_NAMESPACE }}
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-spec:
-  rules:
-    - host: solver{{ ROOT_DOMAIN }}
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
   name: nexus-ingress
   namespace: {{ NEXUS_NAMESPACE }}
   annotations:
-    cert-manager.io/cluster-issuer: nexus-system-letsencrypt-issuer
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
 spec:
   tls:
   - hosts:

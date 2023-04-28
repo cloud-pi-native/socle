@@ -32,7 +32,9 @@
         msg:
           - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster."
           - "Veuillez modifier le ConfigMap dso-console dans le namespace cluster-infra"
-          - "Puis relancer l'installation"
+          - "via la commande suivante :"
+          - "kubectl edit cm -n cluster-infra socle-config "
+          - "Puis relancer l'installation."
 
     - name: Exit playbook
       meta: end_play

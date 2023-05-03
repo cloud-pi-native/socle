@@ -44,7 +44,13 @@ spec:
             name: gitlab-pages{{ ROOT_DOMAIN }}
         ingress:
           annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-issuer
+{% for key, val in INGRESS.ANNOTATIONS.items() %}
+            {{ key }}: {{ val }}
+{% endfor %}
+          labels:
+{% for key, val in INGRESS.LABELS.items() %}
+            {{ key }}: {{ val }}
+{% endfor %}
           class: none
           configureCertmanager: false
           tls:

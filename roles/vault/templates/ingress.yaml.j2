@@ -4,7 +4,7 @@ metadata:
   name: vault-ingress
   namespace: vault-system
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
+    cert-manager.io/cluster-issuer: {{ LETSENCRYPT_ENABLED | ternary('letsencrypt-issuer', '') }}
 spec:
   tls:
     - hosts:

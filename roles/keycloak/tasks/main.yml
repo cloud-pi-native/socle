@@ -100,4 +100,4 @@
     - keycloak-portail-client.yaml.j2
     - keycloak-sonar-client.yaml.j2
     - keycloak-harbor-client.yaml.j2
-    - keycloak-route.yaml.j2
+    - keycloak-ingress.yaml.j2

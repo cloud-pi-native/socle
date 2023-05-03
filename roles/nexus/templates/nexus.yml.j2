@@ -68,7 +68,13 @@ metadata:
   name: nexus-ingress
   namespace: {{ NEXUS_NAMESPACE }}
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
+{% for key, val in INGRESS.ANNOTATIONS.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+{% for key, val in INGRESS.LABELS.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
 spec:
   tls:
   - hosts:

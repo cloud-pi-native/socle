@@ -9,6 +9,18 @@
     CA_NAME: kube-root-ca.crt
     CA_KEY: "ca.crt"
 
+    # CERT
+    # CERTMANAGER_EMAIL: yourpersonal@email.com
+    CERTMANAGER_VERSION: v1.11.0
+    # LETSENCRYPT_ENABLED: false # or true
+    # CA_NS: openshift-ingress
+    # CA_SECRET_NAME: router-certs-default
+
+    # GLOBAL INGRESS
+    INGRESS:
+      ANNOTATIONS: {} # map<string>: string
+      LABELS: {} # map<string>: string
+
     # PROXY
     USE_PROXY: false
     PROXY_HOST: "x.x.x.x"
@@ -61,10 +73,6 @@
     KEYCLOAK_NAMESPACE: keycloak-system
     # Cannot be changed
     KEYCLOAK_DOMAIN: keycloak-keycloak-system{{ ROOT_DOMAIN }}
-
-    # CERT
-    CERTMANAGER_EMAIL: yourpersonal@email.com
-    CERTMANAGER_VERSION: v1.11.0
 
     # SOPS
     SOPS_NAMESPACE: sops-system

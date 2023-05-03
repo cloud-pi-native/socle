@@ -4,7 +4,9 @@ metadata:
   name: argo-ingress
   namespace: argo-system
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
+{% for key, val in INGRESS.ANNOTATIONS.items() %}
+  {{ key }}: {{ val }}
+{% endfor %}
 spec:
   tls:
   - hosts:

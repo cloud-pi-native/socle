@@ -1,29 +1,30 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sonar-ingress
-  namespace: sonar-system
+  name: keycloak-alternative
+  namespace: {{ KEYCLOAK_NAMESPACE }}
   annotations:
 {% for key, val in INGRESS.ANNOTATIONS.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
+    app: keycloak
 {% for key, val in INGRESS.LABELS.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
   tls:
-    - hosts:
-        - {{ SONAR_DOMAIN }}
-      secretName: sonar-system-issuer-account-key
+  - hosts:
+    - {{ KEYCLOAK_DOMAIN }}
+    secretName: keycloak-issuer-account-key
   rules:
-    - host: {{ SONAR_DOMAIN }}
+    - host: {{ KEYCLOAK_DOMAIN }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: sonar
+                name: keycloak
                 port:
-                  number: 9000
+                  name: keycloak

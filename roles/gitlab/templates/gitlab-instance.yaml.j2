@@ -44,10 +44,11 @@ spec:
             name: gitlab-pages{{ ROOT_DOMAIN }}
         ingress:
           annotations:
-           cert-manager.io/cluster-issuer: letsencrypt-issuer
+            cert-manager.io/cluster-issuer: letsencrypt-issuer
+          class: none
           configureCertmanager: false
           tls:
-            enabled: false
+            enabled: true
         extraEnv:
 {% if USE_PROXY %}
           HTTP_PROXY: {{ HTTP_PROXY }}

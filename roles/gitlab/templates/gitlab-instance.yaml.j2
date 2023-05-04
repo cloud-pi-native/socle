@@ -44,11 +44,11 @@ spec:
             name: gitlab-pages{{ ROOT_DOMAIN }}
         ingress:
           annotations:
-{% for key, val in INGRESS.ANNOTATIONS.items() %}
+{% for key, val in ingress.annotations.items() %}
             {{ key }}: {{ val }}
 {% endfor %}
           labels:
-{% for key, val in INGRESS.LABELS.items() %}
+{% for key, val in ingress.labels.items() %}
             {{ key }}: {{ val }}
 {% endfor %}
           class: none

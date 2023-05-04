@@ -4,12 +4,12 @@ metadata:
   name: keycloak-alternative
   namespace: {{ KEYCLOAK_NAMESPACE }}
   annotations:
-{% for key, val in INGRESS.ANNOTATIONS.items() %}
+{% for key, val in ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
     app: keycloak
-{% for key, val in INGRESS.LABELS.items() %}
+{% for key, val in ingress.labels.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
 spec:

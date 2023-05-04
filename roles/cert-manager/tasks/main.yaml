@@ -50,18 +50,14 @@
 #         tls.crt: "{{ cluster_ca_secret.resources[0].data['tls.crt'] }}"
 #         tls.key: "{{ cluster_ca_secret.resources[0].data['tls.key'] }}"
 
-# - name: Create Let's Encrypt ClusterIssuer
-#   kubernetes.core.k8s:
-#     state: present
-#     template: "{{ item }}"
-#   with_items:
-#     - cluster-issuer-letsencrypt.j2
-#   when: LETSENCRYPT_ENABLED
+- name: Create Let's Encrypt ClusterIssuer
+  kubernetes.core.k8s:
+    state: present
+    template: cluster-issuer-acme.j2
+  when: ingress.tls.type == 'acme'
 
-# - name: Create CA ClusterIssuer
-#   kubernetes.core.k8s:
-#     state: present
-#     template: "{{ item }}"
-#   with_items:
-#     - cluster-issuer-ca.j2
-#   when: CA_ENABLED
+- name: Create CA ClusterIssuer
+  kubernetes.core.k8s:
+    state: present
+    template: cluster-issuer-ca.j2
+  when: ingress.tls.type == 'ca'

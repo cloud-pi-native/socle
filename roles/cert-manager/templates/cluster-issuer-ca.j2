@@ -5,4 +5,4 @@ metadata:
   name: ca-issuer
 spec:
   ca:
-    secretName: {{ CA_SECRET_NAME }}
+    secretName: {{ ingress.tls.ca.secretName }}

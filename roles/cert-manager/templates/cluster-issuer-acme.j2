@@ -2,13 +2,13 @@
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-issuer
+  name: acme-issuer
 spec:
   acme:
-    email: {{ CERTMANAGER_EMAIL }}
+    email: {{ ingress.tls.acme.email }}
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: letsencrypt-issuer-account-key
+      name: acme-issuer-account-key
     solvers:
     - http01:
         ingress: {}

@@ -18,9 +18,10 @@
 
 - name: Deploy nexus
   kubernetes.core.k8s:
-    template: nexus.yml.j2
-    state: present
-
+    template: "{{ item }}"
+  with_items: 
+  - nexus.yml.j2
+  - ingress.yml.j2
 
 - name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:
@@ -30,7 +31,7 @@
   register: ansible_inventory
 
 - name: Cache admin password
-  ansible.builtin.ansible.builtin.set_fact:
+  ansible.builtin.set_fact:
     nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
   register: set_nx_pass
   when: ansible_inventory.resources | length > 0 and ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined

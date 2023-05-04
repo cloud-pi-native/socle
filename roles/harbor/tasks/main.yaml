@@ -54,10 +54,10 @@
             notary: notary{{ ROOT_DOMAIN }}
           notary:
             annotations:
-              cert-manager.io/cluster-issuer: "{{ LETSENCRYPT_ENABLED | ternary('letsencrypt-issuer', '') }}"
+# TODO
           harbor:
             annotations:
-              cert-manager.io/cluster-issuer: "{{ LETSENCRYPT_ENABLED | ternary('letsencrypt-issuer', '') }}"
+# TODO
 
       externalURL: https://harbor{{ ROOT_DOMAIN }}
       persistence:

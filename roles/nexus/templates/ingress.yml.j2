@@ -1,29 +1,32 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sonar-ingress
-  namespace: sonar-system
+  name: nexus-alternative
+  namespace: {{ NEXUS_NAMESPACE }}
   annotations:
 {% for key, val in ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
+    app: nexus
 {% for key, val in ingress.labels.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
+{% if not ingress.tls.type == 'none' %}
   tls:
-    - hosts:
-        - {{ SONAR_DOMAIN }}
-      secretName: sonar-system-issuer-account-key
+  - hosts:
+    - {{ NEXUS_DOMAIN }}
+    secretName: nexus-issuer-account-key
+{% endif %}
   rules:
-    - host: {{ SONAR_DOMAIN }}
+    - host: {{ NEXUS_DOMAIN }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: sonar
+                name: nexus
                 port:
-                  number: 9000
+                  name: http

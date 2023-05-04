@@ -28,13 +28,13 @@
       delay: 10
   rescue:
     - name: Failed start keycloak disclaimer
-      debug:
+      ansible.builtin.debug:
         msg: |
           KEYCLOAK didn't start in 5 minutes please check its status
           "kubectl get keycloak dso-keycloak -o yaml"
           Re-run playbook when 'status.phase' is 'reconciling' or run with "-e KEYCLOAK_NO_CHECK=" at your own risk
 
-- name: find keycloak admin password
+- name: Find keycloak admin password
   kubernetes.core.k8s_info:
     namespace: "{{ KEYCLOAK_NAMESPACE }}"
     kind: Secret
@@ -44,7 +44,7 @@
   retries: 10
   delay: 5
 
-- name: update inventory
+- name: Update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
@@ -55,23 +55,23 @@
         KEYCLOAK_ADMIN_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
         KEYCLOAK_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
 
-- name: generate admin password
-  set_fact:
+- name: Generate admin password
+  ansible.builtin.set_fact:
     admin_user_password: "{{ ansible_inventory.resources[0].data.KC_PASSWORD }}"
   when: ansible_inventory.resources[0].data.KC_PASSWORD is defined
 
-- name: find dso admin password
+- name: Find dso admin password
   kubernetes.core.k8s_info:
     namespace: "{{ KEYCLOAK_NAMESPACE }}"
     kind: Secret
     name: dso-admin-user-secret
   register: dso_admin
 
-- name: create dso admin secret
+- name: Create dso admin secret
   when: dso_admin.resources | length == 0
   block:
     - name: Generate admin password
-      set_fact:
+      ansible.builtin.set_fact:
         admin_user_password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits') }}"
 
     - name: Create dso secret

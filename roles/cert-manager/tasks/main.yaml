@@ -12,7 +12,7 @@
   register: cert_manifest
 
 - name: Edit manifest
-  set_fact:
+  ansible.builtin.set_fact:
     manifest: "{{ cert_manifest.content | from_yaml_all | custom_cert_manager(envs) }}"
   vars:
     envs:

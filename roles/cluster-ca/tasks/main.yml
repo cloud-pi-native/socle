@@ -9,14 +9,14 @@
   register: ca_cert
 
 - name: Set ca fact (cm)
-  set_fact:
+  ansible.builtin.set_fact:
     ca_pem: "{{ ca_cert.resources[0].data[CA_KEY] }}"
   when: CA_ENABLED
   tags:
     - always
 
 - name: Set ca fact (secret)
-  set_fact:
+  ansible.builtin.set_fact:
     ca_pem: "{{ ca_cert.resources[0].data[CA_KEY] | b64decode }}"
   when: CA_ENABLED and CA_KIND == 'Secret'
   tags:

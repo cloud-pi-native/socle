@@ -39,7 +39,7 @@
     - name: Exit playbook
       meta: end_play
 
-- name: save vars locally and temporally
+- name: Save vars locally and temporally
   copy:
     dest: vars.yaml
     content: "{{ socle_config.resources[0].data.vars | from_yaml | to_nice_yaml }}"

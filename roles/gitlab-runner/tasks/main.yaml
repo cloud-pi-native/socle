@@ -5,7 +5,7 @@
   register: gitlab_ns
 
 - name: Fail if Gitlab namespace is not present
-  fail:
+  ansible.builtin.fail:
     msg: "Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant"
   when: gitlab_ns | length == 0
 

@@ -5,8 +5,8 @@
     kind: Namespace
     state: present
 
-- name: create dso configmap
-  k8s:
+- name: Create dso configmap
+  kubernetes.core.k8s:
     definition:
       kind: ConfigMap
       metadata:

@@ -1,4 +1,6 @@
-- hosts: localhost
+# code: language=ansible
+- name: Installation du socle DSO
+  hosts: localhost
   gather_facts: false
 
   roles:

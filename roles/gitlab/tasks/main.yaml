@@ -13,7 +13,7 @@
   register: gitlab_kind
   until: gitlab_kind.api_found
 
-- name: get Gitlab client secret
+- name: Get Gitlab client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ KEYCLOAK_NAMESPACE }}"
@@ -22,7 +22,7 @@
   failed_when: gitlab_secret.resources | length == 0
 
 - name: Define provider secret content
-  set_fact:
+  ansible.builtin.set_fact:
     provider: |
       name: openid_connect
       label: Keycloak
@@ -41,7 +41,7 @@
           secret: {{ gitlab_secret.resources[0].data.CLIENT_SECRET | b64decode }}
           redirect_uri: https://{{ GITLAB_DOMAIN }}/users/auth/openid_connect/callback
 
-- name: create keycloak secret
+- name: Create keycloak secret
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
@@ -67,7 +67,7 @@
   retries: 45
   delay: 20
 
-- name: find gitlab token in inventory
+- name: Find gitlab token in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ CONSOLE_NAMESPACE }}"
     kind: ConfigMap
@@ -75,14 +75,14 @@
   register: ansible_inventory
 
 - name: Get gitlab token
-  set_fact:
+  ansible.builtin.set_fact:
     gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
   when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
   register: set_token_inv
 
 - name: Test Gitlab token
   when: set_token_inv.skipped is not defined
-  uri:
+  ansible.builtin.uri:
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/admin/ci/variables"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -92,7 +92,7 @@
 - name: Initialize gitlab token
   when: (set_token_inv.skipped is defined and set_token_inv.skipped) or (test_token.status != 200)
   block:
-    - name: get toolbox pod name
+    - name: Get toolbox pod name
       kubernetes.core.k8s_info:
         kind: pod
         label_selectors:
@@ -101,7 +101,7 @@
       register: toolbox_pods
 
     - name: Set toolbox pod name
-      set_fact:
+      ansible.builtin.set_fact:
         tb_pod: "{{ toolbox_pods.resources[0].metadata.name }}"
 
     - name: Create Token
@@ -115,11 +115,11 @@
       register: token
 
     - name: Set new gitlab token
-      set_fact:
+      ansible.builtin.set_fact:
         gitlab_token: "{{ token.stdout_lines[-2][1:-1] }}"
     #      when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined
 
-    - name: update inventory
+    - name: Update inventory
       kubernetes.core.k8s:
         kind: ConfigMap
         name: dso-config
@@ -130,7 +130,7 @@
             GITLAB_TOKEN: "{{ gitlab_token }}"
 
 - name: Get settings
-  uri:
+  ansible.builtin.uri:
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -138,7 +138,7 @@
   ignore_errors: true
 
 - name: Deactivate sign-up
-  uri:
+  ansible.builtin.uri:
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     method: PUT
     headers:

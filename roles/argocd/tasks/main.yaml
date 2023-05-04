@@ -1,4 +1,4 @@
-- name: get argo client secret
+- name: Get argo client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ KEYCLOAK_NAMESPACE }}"
@@ -6,7 +6,7 @@
   register: argocd_secret
   failed_when: argocd_secret.resources | length == 0
 
-- name: crb argo
+- name: Argo crb
   kubernetes.core.k8s:
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
@@ -35,7 +35,7 @@
     repo_url: https://charts.bitnami.com/bitnami
 
 - name: Set OIDC config
-  set_fact:
+  ansible.builtin.set_fact:
     oidc_config: |
       issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
       requestedScopes: ["openid", "generic"]
@@ -45,7 +45,7 @@
   when: not CA_ENABLED
 
 - name: Set extra env vars
-  set_fact:
+  ansible.builtin.set_fact:
     helm_values: |
       openshift:
         enabled: false
@@ -124,7 +124,7 @@
     create_namespace: true
     values: "{{ helm_values | from_yaml }}"
 
-- name: find gitlab token in inventory
+- name: Find gitlab token in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ CONSOLE_NAMESPACE }}"
     kind: ConfigMap

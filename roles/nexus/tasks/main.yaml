@@ -19,9 +19,9 @@
 - name: Deploy nexus
   kubernetes.core.k8s:
     template: "{{ item }}"
-  with_items: 
-  - nexus.yml.j2
-  - ingress.yml.j2
+  with_items:
+    - nexus.yml.j2
+    - ingress.yml.j2
 
 - name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:

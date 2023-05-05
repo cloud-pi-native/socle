@@ -83,6 +83,7 @@
 - name: Test Gitlab token
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/admin/ci/variables"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -131,6 +132,7 @@
 
 - name: Get settings
   ansible.builtin.uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -139,6 +141,7 @@
 
 - name: Deactivate sign-up
   ansible.builtin.uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     method: PUT
     headers:
@@ -153,7 +156,7 @@
   community.general.gitlab_group:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: false
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     name: "forge-mi"
     subgroup_creation_level: "owner"
     project_creation_level: "developer"
@@ -163,7 +166,7 @@
   community.general.gitlab_group:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: false
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     parent: "forge-mi"
     name: "projects"
     subgroup_creation_level: "owner"
@@ -174,7 +177,7 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: false
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     group: "forge-mi/projects"
     purge: false
     variables:
@@ -201,7 +204,7 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: false
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     group: "forge-mi/projects"
     purge: false
     state: "{{ USE_PROXY | ternary('present', 'absent') }}"

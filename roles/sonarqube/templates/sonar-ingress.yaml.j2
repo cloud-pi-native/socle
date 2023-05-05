@@ -12,10 +12,12 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
+{% if not ingress.tls.type == 'none' %}
   tls:
     - hosts:
         - {{ SONAR_DOMAIN }}
       secretName: sonar-system-issuer-account-key
+{% endif %}
   rules:
     - host: {{ SONAR_DOMAIN }}
       http:

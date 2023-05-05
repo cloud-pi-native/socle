@@ -51,6 +51,10 @@
   tags:
     - always
 
+- name: Set GITLAB_DOMAIN fact
+  set_fact:
+    GITLAB_DOMAIN: "{{ GITLAB_DOMAIN | default('gitlab' + ROOT_DOMAIN) }}"
+
 - name: Check config model
   assert:
     that:

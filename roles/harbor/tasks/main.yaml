@@ -37,13 +37,9 @@
     name: harbor
     repo_url: https://helm.goharbor.io
 
-- name: Deploy helm
-  kubernetes.core.helm:
-    name: harbor
-    chart_ref: harbor/harbor
-    release_namespace: "{{ HARBOR_NAMESPACE }}"
-    create_namespace: true
-    values:
+- name: Set harbor helm values
+  ansible.builtin.set_fact:
+    helm_values: |
       expose:
         type: ingress
         tls:
@@ -54,11 +50,22 @@
             notary: notary{{ ROOT_DOMAIN }}
           notary:
             annotations:
-# TODO
+      {% for key, val in ingress.annotations.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
+            labels:
+      {% for key, val in ingress.labels.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
           harbor:
             annotations:
-# TODO
-
+      {% for key, val in ingress.annotations.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
+            labels:
+      {% for key, val in ingress.labels.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
       externalURL: https://harbor{{ ROOT_DOMAIN }}
       persistence:
         enabled: true
@@ -90,6 +97,14 @@
         internal:
           serviceAccountName: harbor-sa
 
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: harbor
+    chart_ref: harbor/harbor
+    release_namespace: "{{ HARBOR_NAMESPACE }}"
+    create_namespace: true
+    values: "{{ helm_values | from_yaml }}"
+
 - name: Update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
@@ -102,6 +117,7 @@
 
 - name: Get harbor config
   ansible.builtin.uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
     password: "{{ HARBOR_ADMIN_PASSWORD }}"
     user: admin
@@ -135,7 +151,7 @@
       "oidc_name": "keycloak"
       "oidc_scope": "openid"
       "oidc_user_claim": "email"
-      "oidc_verify_cert": "{{ not CA_ENABLED }}"
+      "oidc_verify_cert": "{{ additionals_ca | length == 0 }}"
       "project_creation_restriction": "adminonly"
       "quota_per_project_enable": true
       "read_only": false
@@ -155,6 +171,7 @@
 
 - name: PUT harbor config
   ansible.builtin.uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     method: PUT
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
     password: "{{ HARBOR_ADMIN_PASSWORD }}"

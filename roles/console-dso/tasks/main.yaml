@@ -30,6 +30,18 @@
     session_secret: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
   when: console_app.resources | length == 0
 
+- name: set bundle-ca cm
+  kubernetes.core.k8s:
+    name: bundle
+    namespace: "{{ CONSOLE_NAMESPACE }}"
+    kind: ConfigMap
+    api_version: v1
+    definition:
+      data:
+        ca.pem: |
+          {{ ca_pem }}
+  when: additionals_ca | length != 0
+
 - name: Apply app
   kubernetes.core.k8s:
     template: app.yaml.j2

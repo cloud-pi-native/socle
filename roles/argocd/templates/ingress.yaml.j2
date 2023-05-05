@@ -5,7 +5,11 @@ metadata:
   namespace: argo-system
   annotations:
 {% for key, val in ingress.annotations.items() %}
-  {{ key }}: {{ val }}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+{% for key, val in ingress.labels.items() %}
+    {{ key }}: {{ val }}
 {% endfor %}
 spec:
   tls:

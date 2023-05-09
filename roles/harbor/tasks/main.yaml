@@ -42,6 +42,7 @@
     helm_values: |
       expose:
         type: ingress
+        certSource: secret
         tls:
           enabled: true
         ingress:

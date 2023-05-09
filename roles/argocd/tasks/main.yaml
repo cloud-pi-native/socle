@@ -60,7 +60,7 @@
               {{ ca_pem | indent(width=8, first=False) }}
       {% endif %}
           users.anonymous.enabled: "false"
-          admin.enabled: "true" # TODO variabilize
+          admin.enabled: "false" # TODO variabilize
           resource.exclusions: |
             - apiGroups:
               - tekton.dev

@@ -21,7 +21,7 @@
 - name: Get old app.yaml
   kubernetes.core.k8s_info:
     kind: Application
-    namespace: argo-system
+    namespace: "{{ ARGOCD_NAMESPACE }}"
     name: console-pi-native
   register: console_app
 

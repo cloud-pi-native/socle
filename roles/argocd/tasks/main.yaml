@@ -20,13 +20,13 @@
         name: system:openshift:scc:privileged
       subjects:
         - kind: ServiceAccount
-          namespace: argo-system
+          namespace: "{{ ARGOCD_NAMESPACE }}"
           name: argo-argo-cd-argocd-repo-server
         - kind: ServiceAccount
-          namespace: argo-system
+          namespace: "{{ ARGOCD_NAMESPACE }}"
           name: argo-argo-cd-argocd-server
         - kind: ServiceAccount
-          namespace: argo-system
+          namespace: "{{ ARGOCD_NAMESPACE }}"
           name: argo-redis
 
 - name: Add helm repo
@@ -104,13 +104,13 @@
           kind: ConfigMap
           metadata:
             name: argocd-rbac-cm
-            namespace: argo-system
+            namespace: {{ ARGOCD_NAMESPACE }}
 
 - name: Deploy helm
   kubernetes.core.helm:
     name: argo
     chart_ref: bitnami/argo-cd
-    release_namespace: argo-system
+    release_namespace: "{{ ARGOCD_NAMESPACE }}"
     create_namespace: true
     values: "{{ helm_values | from_yaml }}"
 
@@ -133,7 +133,7 @@
         labels:
           argocd.argoproj.io/secret-type: repo-creds
         name: gitlab
-        namespace: argo-system
+        namespace: "{{ ARGOCD_NAMESPACE }}"
       type: Opaque
 
 - name: Install routes

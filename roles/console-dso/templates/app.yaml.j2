@@ -4,10 +4,10 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration:
   name: console-pi-native
-  namespace: argo-system
+  namespace: {{ ARGOCD_NAMESPACE }}
 spec:
   destination:
-    namespace: console-pi-system
+    namespace: {{ CONSOLE_NAMESPACE }}
     server: https://kubernetes.default.svc
   project: console-pi-native
   source: 

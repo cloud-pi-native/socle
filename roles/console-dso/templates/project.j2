@@ -2,14 +2,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: console-pi-native
-  namespace: argo-system
+  namespace: {{ ARGOCD_NAMESPACE }}
 spec:
   clusterResourceWhitelist:
   - group: '*'
     kind: '*'
   destinations:
   - name: '*'
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: {{ CONSOLE_NAMESPACE }}
     server: '*'
   namespaceResourceWhitelist:
   - group: '*'

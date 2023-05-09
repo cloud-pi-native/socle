@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sonar-ingress
-  namespace: sonar-system
+  namespace: {{ SONAR_NAMESPACE }}
   annotations:
 {% for key, val in ingress.annotations.items() %}
     {{ key }}: {{ val }}
@@ -16,7 +16,7 @@ spec:
   tls:
     - hosts:
         - {{ SONAR_DOMAIN }}
-      secretName: sonar-system-issuer-account-key
+      secretName: {{ SONAR_NAMESPACE }}-issuer-account-key
 {% endif %}
   rules:
     - host: {{ SONAR_DOMAIN }}

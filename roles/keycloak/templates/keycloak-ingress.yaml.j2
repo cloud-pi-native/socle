@@ -7,6 +7,7 @@ metadata:
 {% for key, val in ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
+    route.openshift.io/termination: reencrypt
   labels:
     app: keycloak
 {% for key, val in ingress.labels.items() %}

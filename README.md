@@ -1,17 +1,19 @@
 # Installation de la plateforme DSO
 
 ## Sommaire
-- [Introduction](#introduction)
-- [Prérequis](#prérequis)
-- [Configuration](#configuration)
-- [Installation](#installation)
-  - [Lancement](#lancement)
-  - [Récupération des secrets](#récupération-des-secrets)
-    - [Vault](#vault)
-    - [Autres Composants](#autres-composants)
-  - [Debug](#debug)
-    - [Réinstallation](#réinstallation)
-    - [Keycloak](#keycloak)
+- [Installation de la plateforme DSO](#installation-de-la-plateforme-dso)
+  - [Sommaire](#sommaire)
+  - [Introduction](#introduction)
+  - [Prérequis](#prérequis)
+  - [Configuration](#configuration)
+  - [Installation](#installation)
+    - [Lancement](#lancement)
+    - [Récupération des secrets](#récupération-des-secrets)
+      - [Vault](#vault)
+      - [Autres Composants](#autres-composants)
+    - [Debug](#debug)
+      - [Réinstallation](#réinstallation)
+      - [Keycloak](#keycloak)
 
 ## Introduction
 
@@ -73,9 +75,9 @@ Au moment de leur initialisation, certains outils stockent des secrets qui ne so
 **Attention !** Pour garantir l'[idempotence](https://fr.wikipedia.org/wiki/Idempotence), ces secrets sont stockés dans plusieurs ressources du cluster. Supprimer ces ressources **indique à ansible qu'il doit réinitialiser les composants**.
 
 #### Vault
-Les "Unseal Keys" du composant Vault sont accessibles par la commande suivante :
+Les "Unseal Keys" et le "root token" du composant Vault sont accessibles par la commande suivante :
 
-```kubectl get secrets vault-keys -n openshift-infra -o yaml```
+```kubectl get secrets vault-keys -n vault-system -o yaml | yq .data```
 
 Vous pouvez conserver ces valeurs ailleurs, par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden, mais il est important de **ne pas les modifier ou les supprimer** sous peine de voir Vault être réinitialisé.
 

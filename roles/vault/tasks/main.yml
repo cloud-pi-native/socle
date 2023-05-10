@@ -189,7 +189,7 @@
       bound_claims_type: glob
       user_claim: user_email
       bound_claims:
-        iss: gitlab-op{{ ROOT_DOMAIN }}
+        iss: "{{ GITLAB_DOMAIN }}"
       claim_mappings:
         namespace_path: namespace_path
         project_path: project_path

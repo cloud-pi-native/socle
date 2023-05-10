@@ -4,10 +4,10 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration:
   name: console-pi-native
-  namespace: argo-system
+  namespace: {{ ARGOCD_NAMESPACE }}
 spec:
   destination:
-    namespace: console-pi-system
+    namespace: {{ CONSOLE_NAMESPACE }}
     server: https://kubernetes.default.svc
   project: console-pi-native
   source: 
@@ -17,7 +17,7 @@ spec:
     releaseName: console-pi
     helm:
       parameters:
-        - name: client.route.host
+        - name: client.ingress.hosts[0]
           value: {{ CONSOLE_DOMAIN }}
         - name: postgres.container.db
           value: dso-console-db
@@ -39,10 +39,28 @@ spec:
           value: "{{ KEYCLOAK_DOMAIN }}/auth"
         - name: keycloak.realm
           value: dso
-        - name: server.extra_CA_NAME
-          value: {{ CA_ENABLED | ternary(CA_NAME,'') }}
-        - name: server.extra_CA_KEY
-          value: {{ CA_ENABLED | ternary(CA_KEY,'') }}
+{% if additionals_ca | length %}
+        - name: server.extra_ca.name
+          value: bundle
+        - name: server.extra_ca.key
+          value: ca.pem
+{% endif %}
+{% for key, val in ingress.annotations.items() %}
+        - name: server.ingress.annotations.{{ key | regex_escape }}
+          value: {{ val }}
+{% endfor %}
+{% for key, val in ingress.labels.items() %}
+        - name: server.ingress.labels.{{ key | regex_escape }}
+          value: {{ val }}
+{% endfor %}
+{% for key, val in ingress.annotations.items() %}
+        - name: client.ingress.annotations.{{ key | regex_escape }}
+          value: {{ val }}
+{% endfor %}
+{% for key, val in ingress.labels.items() %}
+        - name: client.ingress.labels.{{ key | regex_escape }}
+          value: {{ val }}
+{% endfor %}
   syncPolicy:
     automated: {}
     syncOptions:

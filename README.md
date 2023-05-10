@@ -1,17 +1,19 @@
 # Installation de la plateforme DSO
 
 ## Sommaire
-- [Introduction](#introduction)
-- [Prérequis](#prérequis)
-- [Configuration](#configuration)
-- [Installation](#installation)
-  - [Lancement](#lancement)
-  - [Récupération des secrets](#récupération-des-secrets)
-    - [Vault](#vault)
-    - [Autres Composants](#autres-composants)
-  - [Debug](#debug)
-    - [Réinstallation](#réinstallation)
-    - [Keycloak](#keycloak)
+- [Installation de la plateforme DSO](#installation-de-la-plateforme-dso)
+  - [Sommaire](#sommaire)
+  - [Introduction](#introduction)
+  - [Prérequis](#prérequis)
+  - [Configuration](#configuration)
+  - [Installation](#installation)
+    - [Lancement](#lancement)
+    - [Récupération des secrets](#récupération-des-secrets)
+      - [Vault](#vault)
+      - [Autres Composants](#autres-composants)
+    - [Debug](#debug)
+      - [Réinstallation](#réinstallation)
+      - [Keycloak](#keycloak)
 
 ## Introduction
 
@@ -73,16 +75,26 @@ Au moment de leur initialisation, certains outils stockent des secrets qui ne so
 **Attention !** Pour garantir l'[idempotence](https://fr.wikipedia.org/wiki/Idempotence), ces secrets sont stockés dans plusieurs ressources du cluster. Supprimer ces ressources **indique à ansible qu'il doit réinitialiser les composants**.
 
 #### Vault
-Les "Unseal Keys" du composant Vault sont accessibles par la commande suivante :
+Les "Unseal Keys" et le "root token" du composant Vault sont accessibles par la commande suivante :
 
-```kubectl get secrets vault-keys -n openshift-infra -o yaml```
+```kubectl get secrets vault-keys -n vault-system -o yaml | yq .data```
 
-Vous pouvez conserver ces valeurs ailleurs, par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden, mais il est important de **ne pas les modifier ou les supprimer** sous peine de voir Vault être réinitialisé.
+Ces éléments sont encodés en base64.
+
+Il est possible de décoder chaque valeur une par une, via la commande suivante :
+
+```echo "valeur_ici" | base64 -d```
+
+Pour obtenir tous les éléments décodés en une seule fois, on pourra utiliser la commande suivante :
+
+```SAVEIFS=$IFS && IFS=$(echo -en "\n\b") && for i in $(kubectl get secrets vault-keys -n vault-system -o yaml | yq .data); do echo -n "$i" | cut -z -d " " -f 1 ; echo -n " " ; echo -n "$i" | cut -d " " -f 2 | base64 -d ; echo ; done && IFS=$SAVEIFS```
+
+Vous pouvez conserver les valeurs ainsi obtenues ailleurs, par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden, mais il est important de **ne pas les modifier ou les supprimer** sous peine de voir Vault être réinitialisé.
 
 #### Autres Composants
 Les identifiants (mots de passe, tokens, clés) des autres outils sont stockés dans un ConfigMap accessible via la commande suivante :
 
-```kubectl get cm ansible-inventory -n openshift-infra -o yaml```
+```kubectl get cm dso-config -n console-pi-system -o yaml | yq ".data"```
 
 De la même manière que pour Vault, ces informations définissent le comportement d'ansible en cas de nouvelle exécution (regénération de token, réinitialisation de l'outil, **potentielle perte de données**).
 

@@ -2,7 +2,7 @@
   kubernetes.core.k8s:
     template: project.j2
 
-- name: get console client secret
+- name: Get console client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ KEYCLOAK_NAMESPACE }}"
@@ -10,7 +10,7 @@
   register: console_frontend_secret
   failed_when: console_frontend_secret.resources | length == 0
 
-- name: get console client secret
+- name: Get console client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ KEYCLOAK_NAMESPACE }}"
@@ -18,17 +18,29 @@
   register: console_backend_secret
   failed_when: console_backend_secret.resources | length == 0
 
-- name: get old app.yaml
+- name: Get old app.yaml
   kubernetes.core.k8s_info:
     kind: Application
-    namespace: argo-system
+    namespace: "{{ ARGOCD_NAMESPACE }}"
     name: console-pi-native
   register: console_app
 
-- name: generate new values (first deployment)
-  set_fact:
+- name: Generate new values (first deployment)
+  ansible.builtin.set_fact:
     session_secret: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
   when: console_app.resources | length == 0
+
+- name: set bundle-ca cm
+  kubernetes.core.k8s:
+    name: bundle
+    namespace: "{{ CONSOLE_NAMESPACE }}"
+    kind: ConfigMap
+    api_version: v1
+    definition:
+      data:
+        ca.pem: |
+          {{ ca_pem }}
+  when: additionals_ca | length != 0
 
 - name: Apply app
   kubernetes.core.k8s:

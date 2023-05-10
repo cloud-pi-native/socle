@@ -18,11 +18,12 @@
 
 - name: Deploy nexus
   kubernetes.core.k8s:
-    template: nexus.yml.j2
-    state: present
+    template: "{{ item }}"
+  with_items:
+    - nexus.yml.j2
+    - ingress.yml.j2
 
-
-- name: find nexus admin password in inventory
+- name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ CONSOLE_NAMESPACE }}"
     kind: ConfigMap
@@ -30,7 +31,7 @@
   register: ansible_inventory
 
 - name: Cache admin password
-  set_fact:
+  ansible.builtin.set_fact:
     nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
   register: set_nx_pass
   when: ansible_inventory.resources | length > 0 and ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined
@@ -38,7 +39,7 @@
 - name: Find password in container
   when: set_nx_pass.skipped is defined and set_nx_pass.skipped
   block:
-    - name: wait nexus to initialize
+    - name: Wait nexus to initialize
       kubernetes.core.k8s_info:
         kind: Endpoints
         namespace: "{{ NEXUS_NAMESPACE }}"
@@ -48,18 +49,18 @@
       retries: 30
       delay: 5
 
-    - name: get nexus pod's name
+    - name: Get nexus pod's name
       kubernetes.core.k8s_info:
         kind: Endpoints
         namespace: "{{ NEXUS_NAMESPACE }}"
         name: nexus
       register: nx_ep
 
-    - name: set nx_pod
-      set_fact:
+    - name: Set nx_pod
+      ansible.builtin.set_fact:
         nx_pod: "{{ nx_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
 
-    - name: récupération du compte admin
+    - name: Récupération du compte admin
       kubernetes.core.k8s_exec:
         pod: "{{ nx_pod }}"
         namespace: "{{ NEXUS_NAMESPACE }}"
@@ -70,15 +71,15 @@
       delay: 12
 
     - name: Set nexus password from cat
-      set_fact:
+      ansible.builtin.set_fact:
         nexus_admin_password: "{{ admin_account.stdout }}"
 
     - name: Generate random password
-      set_fact:
+      ansible.builtin.set_fact:
         new_pass: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters') }}"
 
     - name: Change nexus password
-      uri:
+      ansible.builtin.uri:
         force_basic_auth: true
         url: "https://{{ NEXUS_DOMAIN }}/service/rest/v1/security/users/admin/change-password"
         method: PUT
@@ -94,7 +95,7 @@
       retries: 10
       delay: 12
 
-    - name: update inventory
+    - name: Update inventory
       kubernetes.core.k8s:
         kind: ConfigMap
         name: dso-config

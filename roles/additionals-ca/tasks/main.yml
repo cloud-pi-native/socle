@@ -1,0 +1,16 @@
+- name: Set empty ca fact
+  ansible.builtin.set_fact:
+    ca_pem_array: []
+
+- name: Get a ca resource
+  include_tasks:
+    file: get-ca.yaml
+  with_items: "{{ additionals_ca }}"
+  vars:
+    kind: "{{ item.kind }}"
+    name: "{{ item.name }}"
+    key: "{{ item.key | default('') }}"
+
+- name: Set empty ca fact
+  ansible.builtin.set_fact:
+    ca_pem: "{{ ca_pem_array | join('\n') }}"

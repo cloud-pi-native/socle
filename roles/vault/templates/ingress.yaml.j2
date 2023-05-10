@@ -2,14 +2,23 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: vault-ingress
-  namespace: vault-system
+  namespace: {{ VAULT_NAMESPACE }}
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
+{% for key, val in ingress.annotations.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+    app: nexus
+{% for key, val in ingress.labels.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
 spec:
+{% if not ingress.tls.type == 'none' %}
   tls:
     - hosts:
         - {{ VAULT_DOMAIN }}
-      secretName: vault-system-issuer-account-key
+      secretName: vault-issuer-account-key
+{% endif %}
   rules:
     - host: {{ VAULT_DOMAIN }}
       http:

@@ -1,29 +1,31 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: argo-ingress
-  namespace: {{ ARGOCD_NAMESPACE }}
+  name: keycloak-alternative
+  namespace: {{ KEYCLOAK_NAMESPACE }}
   annotations:
 {% for key, val in ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
+    route.openshift.io/termination: reencrypt
   labels:
+    app: keycloak
 {% for key, val in ingress.labels.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
   tls:
   - hosts:
-    - {{ ARGOCD_DOMAIN }}
-    secretName: argo-issuer-account-key
+    - {{ KEYCLOAK_DOMAIN }}
+    secretName: keycloak-issuer-account-key
   rules:
-    - host: {{ ARGOCD_DOMAIN }}
+    - host: {{ KEYCLOAK_DOMAIN }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: argo-argo-cd-server
+                name: keycloak
                 port:
-                  number: 80
+                  name: keycloak

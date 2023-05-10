@@ -32,12 +32,14 @@
         msg:
           - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster."
           - "Veuillez modifier le ConfigMap dso-console dans le namespace cluster-infra"
-          - "Puis relancer l'installation"
+          - "via la commande suivante :"
+          - "kubectl edit cm -n cluster-infra socle-config "
+          - "Puis relancer l'installation."
 
     - name: Exit playbook
       meta: end_play
 
-- name: save vars locally and temporally
+- name: Save vars locally and temporally
   copy:
     dest: vars.yaml
     content: "{{ socle_config.resources[0].data.vars | from_yaml | to_nice_yaml }}"
@@ -48,6 +50,10 @@
     file: vars.yaml
   tags:
     - always
+
+- name: Set GITLAB_DOMAIN fact
+  set_fact:
+    GITLAB_DOMAIN: "{{ GITLAB_DOMAIN | default('gitlab' + ROOT_DOMAIN) }}"
 
 - name: Check config model
   assert:

@@ -4,7 +4,7 @@ metadata:
   labels:
     service: postgres-dso
   name: sonar-postgres-dso
-  namespace: sonar-system
+  namespace: {{ SONAR_NAMESPACE }}
 spec:
   replicas: 1
   selector:

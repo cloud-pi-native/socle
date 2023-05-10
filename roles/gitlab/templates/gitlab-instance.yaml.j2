@@ -25,26 +25,29 @@ spec:
         certificates:
           customCAs:
             - configMap: openshift-service-ca.crt
-{% if CA_ENABLED == 'True' %}
-            - configMap: {{ CA_NAME }}
+{% for item in additionals_ca %}
+{% if item.kind == 'ConfigMap' %}
+            - configMap: {{ item.name }}
 {% endif %}
+{% if item.kind == 'Secret' %}
+            - secret: {{ item.name }}
+{% endif %}
+{% endfor %}
         hosts:
-          domain: {{ ROOT_DOMAIN }}
+          domain: {{ ROOT_DOMAIN[1:] }}
+{% if GITLAB_DOMAIN %}
           gitlab:
-            name: gitlab-op{{ ROOT_DOMAIN }}
-          registry:
-            name: gitlab-registry{{ ROOT_DOMAIN }}
-          minio:
-            name: gitlab-minio{{ ROOT_DOMAIN }}
-          smartcard:
-            name: gitlab-smartcard{{ ROOT_DOMAIN }}
-          kas:
-            name: gitlab-kas{{ ROOT_DOMAIN }}
-          pages:
-            name: gitlab-pages{{ ROOT_DOMAIN }}
+            name: {{ GITLAB_DOMAIN }}
+{% endif %}
         ingress:
           annotations:
-            cert-manager.io/cluster-issuer: letsencrypt-issuer
+{% for key, val in ingress.annotations.items() %}
+            {{ key }}: {{ val }}
+{% endfor %}
+          labels:
+{% for key, val in ingress.labels.items() %}
+            {{ key }}: {{ val }}
+{% endfor %}
           class: none
           configureCertmanager: false
           tls:

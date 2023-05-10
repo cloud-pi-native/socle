@@ -61,27 +61,3 @@ spec:
       protocol: TCP
   selector:
     app: nexus
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nexus-ingress
-  namespace: {{ NEXUS_NAMESPACE }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
-spec:
-  tls:
-  - hosts:
-      - {{ NEXUS_DOMAIN }}
-    secretName: nexus-system-issuer-account-key
-  rules:
-    - host: {{ NEXUS_DOMAIN }}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: nexus
-                port:
-                  number: 8081

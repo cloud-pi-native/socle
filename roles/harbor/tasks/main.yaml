@@ -15,7 +15,7 @@
         name: harbor-sa
         namespace: "{{ HARBOR_NAMESPACE }}"
 
-- name: crb harbor
+- name: Harbor crb
   kubernetes.core.k8s:
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
@@ -37,15 +37,12 @@
     name: harbor
     repo_url: https://helm.goharbor.io
 
-- name: Deploy helm
-  kubernetes.core.helm:
-    name: harbor
-    chart_ref: harbor/harbor
-    release_namespace: "{{ HARBOR_NAMESPACE }}"
-    create_namespace: true
-    values:
+- name: Set harbor helm values
+  ansible.builtin.set_fact:
+    helm_values: |
       expose:
         type: ingress
+        certSource: secret
         tls:
           enabled: true
         ingress:
@@ -54,11 +51,22 @@
             notary: notary{{ ROOT_DOMAIN }}
           notary:
             annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-issuer
+      {% for key, val in ingress.annotations.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
+            labels:
+      {% for key, val in ingress.labels.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
           harbor:
             annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-issuer
-
+      {% for key, val in ingress.annotations.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
+            labels:
+      {% for key, val in ingress.labels.items() %}
+              {{ key }}: {{ val }}
+      {% endfor %}
       externalURL: https://harbor{{ ROOT_DOMAIN }}
       persistence:
         enabled: true
@@ -90,7 +98,15 @@
         internal:
           serviceAccountName: harbor-sa
 
-- name: update inventory
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: harbor
+    chart_ref: harbor/harbor
+    release_namespace: "{{ HARBOR_NAMESPACE }}"
+    create_namespace: true
+    values: "{{ helm_values | from_yaml }}"
+
+- name: Update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
@@ -100,8 +116,9 @@
       data:
         HARBOR_ADMIN_PASSWORD: "{{ HARBOR_ADMIN_PASSWORD }}"
 
-- name: get harbor config
-  uri:
+- name: Get harbor config
+  ansible.builtin.uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
     password: "{{ HARBOR_ADMIN_PASSWORD }}"
     user: admin
@@ -112,7 +129,7 @@
   register: get_harbor_config
   retries: 15
 
-- name: get harbor client secret
+- name: Get harbor client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ KEYCLOAK_NAMESPACE }}"
@@ -121,7 +138,7 @@
   failed_when: harbor_secret.resources | length == 0
 
 - name: Set Harbor config
-  set_fact:
+  ansible.builtin.set_fact:
     harbor_config:
       "auth_mode": "oidc_auth"
       "notification_enable": true
@@ -135,7 +152,7 @@
       "oidc_name": "keycloak"
       "oidc_scope": "openid"
       "oidc_user_claim": "email"
-      "oidc_verify_cert": "{{ not CA_ENABLED }}"
+      "oidc_verify_cert": "{{ additionals_ca | length == 0 }}"
       "project_creation_restriction": "adminonly"
       "quota_per_project_enable": true
       "read_only": false
@@ -143,8 +160,8 @@
       "robot_token_duration": 30
       "self_registration": false
 
-- name: assert element
-  assert:
+- name: Assert element
+  ansible.builtin.assert:
     that:
       - harbor_config[item] == get_harbor_config.json[item].value
     quiet: true
@@ -154,13 +171,14 @@
   register: check_config
 
 - name: PUT harbor config
-  uri:
+  ansible.builtin.uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
     method: PUT
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
     password: "{{ HARBOR_ADMIN_PASSWORD }}"
     user: admin
     force_basic_auth: true
     body_format: json
-    body: "{{ harbor_config | combine({ 'oidc_client_secret': harbor_secret.resources[0].data.CLIENT_SECRET | b64decode }) }}"
+    body: "{{ harbor_config | combine({'oidc_client_secret': harbor_secret.resources[0].data.CLIENT_SECRET | b64decode}) }}"
   when: check_config.failed is defined and check_config.failed
   changed_when: true

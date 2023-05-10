@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim # Create PVC
 metadata:
-  namespace: sonar-system
+  namespace: {{ SONAR_NAMESPACE }}
   name: postgres-sonar-data-claim # Sets name of PV
 spec:
   accessModes:

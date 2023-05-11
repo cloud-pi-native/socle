@@ -52,6 +52,11 @@ NO_PROXY: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.
 # DOMAIN
 ROOT_DOMAIN: .mycompany.com
 
+# ARGOCD
+ARGOCD_NAMESPACE: argo-system
+ARGOCD_DOMAIN: argo-system{{ ROOT_DOMAIN }}
+ARGOCD_ADMIN_PASSWORD: AnotherSuperPassword
+
 # CERT-MANAGER
 CERTMANAGER_VERSION: v1.11.0
 
@@ -59,25 +64,8 @@ CERTMANAGER_VERSION: v1.11.0
 # deployed by Argo
 CONSOLE_NAMESPACE: console-pi-system
 CONSOLE_DOMAIN: console{{ ROOT_DOMAIN }}
-CONSOLE_RELEASE: "3.2.3"
+CONSOLE_RELEASE: "3.3.0"
 CONSOLE_DB_PASSWORD: WowAPassword
-
-# SONARQUBE
-SONAR_NAMESPACE: sonar-system
-SONAR_DOMAIN: sonar{{ ROOT_DOMAIN }}
-
-# VAULT
-VAULT_NAMESPACE: vault-system
-VAULT_DOMAIN: vault{{ ROOT_DOMAIN }}
-
-# NEXUS
-NEXUS_NAMESPACE: nexus-system
-NEXUS_DOMAIN: nexus{{ ROOT_DOMAIN }}
-
-# HARBOR
-HARBOR_NAMESPACE: harbor-system
-HARBOR_DOMAIN: harbor{{ ROOT_DOMAIN }}
-HARBOR_ADMIN_PASSWORD: MySuperPassword
 
 # GITLAB
 GITLAB_NAMESPACE: gitlab-system
@@ -87,15 +75,27 @@ GITLAB_VERSION: "6.10.3"
 # This variable force host for gitlab property (webservice)
 GITLAB_DOMAIN: gitlab{{ ROOT_DOMAIN }}
 
-# ARGOCD
-ARGOCD_NAMESPACE: argo-system
-ARGOCD_DOMAIN: argo-system{{ ROOT_DOMAIN }}
-ARGOCD_ADMIN_PASSWORD: AnotherSuperPassword
+# HARBOR
+HARBOR_NAMESPACE: harbor-system
+HARBOR_DOMAIN: harbor{{ ROOT_DOMAIN }}
+HARBOR_ADMIN_PASSWORD: MySuperPassword
 
 # KEYCLOAK
 KEYCLOAK_NAMESPACE: keycloak-system
 # Cannot be changed
 KEYCLOAK_DOMAIN: keycloak{{ ROOT_DOMAIN }}
 
+# NEXUS
+NEXUS_NAMESPACE: nexus-system
+NEXUS_DOMAIN: nexus{{ ROOT_DOMAIN }}
+
+# SONARQUBE
+SONAR_NAMESPACE: sonar-system
+SONAR_DOMAIN: sonar{{ ROOT_DOMAIN }}
+
 # SOPS
 SOPS_NAMESPACE: sops-system
+
+# VAULT
+VAULT_NAMESPACE: vault-system
+VAULT_DOMAIN: vault{{ ROOT_DOMAIN }}

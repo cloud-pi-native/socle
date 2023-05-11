@@ -12,10 +12,16 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
+{% if not ingress.tls.type == 'none' %}
   tls:
   - hosts:
     - {{ ARGOCD_DOMAIN }}
-    secretName: argo-issuer-account-key
+{% if ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: argocd-tls-secret
+{% endif %}
+{% endif %}
   rules:
     - host: {{ ARGOCD_DOMAIN }}
       http:

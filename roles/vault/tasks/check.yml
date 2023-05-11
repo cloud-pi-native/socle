@@ -5,7 +5,6 @@
     status_code: [200, 503, 501]
   register: vault_health
   retries: 5
-  until: (vault_health.status != 503) or (vault_health.status == 503 and vault_health.json)
 
 - name: set vault_status to OK
   set_fact:

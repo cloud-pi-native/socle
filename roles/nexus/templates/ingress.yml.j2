@@ -17,7 +17,11 @@ spec:
   tls:
   - hosts:
     - {{ NEXUS_DOMAIN }}
-    secretName: nexus-issuer-account-key
+{% if ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: nexus-tls-secret
+{% endif %}
 {% endif %}
   rules:
     - host: {{ NEXUS_DOMAIN }}

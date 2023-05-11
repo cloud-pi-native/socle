@@ -4,8 +4,6 @@
       kind: Namespace
       metadata:
         name: "{{ HARBOR_NAMESPACE }}"
-        labels:
-          app: kubed
 
 - name: Create service account
   kubernetes.core.k8s:
@@ -42,9 +40,17 @@
     helm_values: |
       expose:
         type: ingress
-        certSource: secret
         tls:
           enabled: true
+      {% if ingress.tls.type == 'tlsSecret' %}
+          certSource: secret
+          secret:
+            secretName: {{ ingress.tls.tlsSecret.name }}
+            notarySecretName: {{ ingress.tls.tlsSecret.name }}
+      {% else %}
+          certSource: null
+          secret: {}
+      {% endif %}
         ingress:
           hosts:
             core: harbor{{ ROOT_DOMAIN }}
@@ -103,7 +109,6 @@
     name: harbor
     chart_ref: harbor/harbor
     release_namespace: "{{ HARBOR_NAMESPACE }}"
-    create_namespace: true
     values: "{{ helm_values | from_yaml }}"
 
 - name: Update inventory

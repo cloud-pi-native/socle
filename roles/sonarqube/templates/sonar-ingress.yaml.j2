@@ -16,7 +16,11 @@ spec:
   tls:
     - hosts:
         - {{ SONAR_DOMAIN }}
-      secretName: {{ SONAR_NAMESPACE }}-issuer-account-key
+{% if ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ ingress.tls.tlsSecret.name }}
+{% else %}
+      secretName: sonar-tls-secret
+{% endif %}
 {% endif %}
   rules:
     - host: {{ SONAR_DOMAIN }}

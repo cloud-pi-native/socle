@@ -42,9 +42,14 @@
     helm_values: |
       expose:
         type: ingress
-        certSource: secret
         tls:
           enabled: true
+      {% if ingress.tls.type == 'tlsSecret' %}
+          certSource: secret
+          secret:
+            secretName: {{ ingress.tls.tlsSecret.name }}
+            notarySecretName: {{ ingress.tls.tlsSecret.name }}
+      {% endif %}
         ingress:
           hosts:
             core: harbor{{ ROOT_DOMAIN }}
@@ -97,6 +102,8 @@
       redis:
         internal:
           serviceAccountName: harbor-sa
+- debug: 
+    var: helm_values | from_yaml
 
 - name: Deploy helm
   kubernetes.core.helm:

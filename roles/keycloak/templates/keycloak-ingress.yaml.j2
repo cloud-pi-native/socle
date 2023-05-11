@@ -14,10 +14,16 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
+{% if not ingress.tls.type == 'none' %}
   tls:
   - hosts:
     - {{ KEYCLOAK_DOMAIN }}
-    secretName: keycloak-issuer-account-key
+{% if ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: keycloak-tls-secret
+{% endif %}
+{% endif %}
   rules:
     - host: {{ KEYCLOAK_DOMAIN }}
       http:

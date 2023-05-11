@@ -17,7 +17,11 @@ spec:
   tls:
     - hosts:
         - {{ VAULT_DOMAIN }}
-      secretName: vault-issuer-account-key
+{% if ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ ingress.tls.tlsSecret.name }}
+{% else %}
+      secretName: vault-tls-secret
+{% endif %}
 {% endif %}
   rules:
     - host: {{ VAULT_DOMAIN }}

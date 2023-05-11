@@ -18,8 +18,9 @@ ingress:
   tls:
     # type supported:
     # - none, tls will be disabled
-    # - acme, cert
-    # - ca, will use a secret you set in cert-manager namespace to build a PKI
+    # - acme, cert-manager handle http01 challenge
+    # - ca, cert-manger will use a secret you set in cert-manager namespace to build a PKI
+    # - tlsSecret, use a wildcard/multi-host TLS key pair for ingresses, cert-manager not involved 
     type: none
     # https://cert-manager.io/docs/configuration/acme/http01/
     acme:
@@ -27,6 +28,16 @@ ingress:
     # https://cert-manager.io/docs/configuration/ca/
     ca:
       secretName: a-secret-available # in cert-manager namespace
+    # https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
+    tlsSecret:
+      # name of the tls secret 
+      name: wildcard-tls
+      # method supported: 
+      # in-namespace: you are in charge to replicate the secret in tools' namespaces
+      # (NOT IMPLEMENTED YET) unique: secret is provisionned in a namespace and we will replicate it in tools' namespace, 'sourceNamespace' is required
+      method: in-namespace
+      sourceNamespace: default
+
   annotations: {} # map<string>: string
   labels: {} # map<string>: string
 
@@ -53,17 +64,15 @@ CONSOLE_DB_PASSWORD: WowAPassword
 
 # SONARQUBE
 SONAR_NAMESPACE: sonar-system
-SONAR_DOMAIN: sonar-system{{ ROOT_DOMAIN }}
+SONAR_DOMAIN: sonar{{ ROOT_DOMAIN }}
 
 # VAULT
 VAULT_NAMESPACE: vault-system
-# Cannot be changed
-VAULT_DOMAIN: vault-ui{{ ROOT_DOMAIN }}
-VAULT_RAFT_ROUTE: vault-raft-route-vault-system{{ ROOT_DOMAIN }}
+VAULT_DOMAIN: vault{{ ROOT_DOMAIN }}
 
 # NEXUS
 NEXUS_NAMESPACE: nexus-system
-NEXUS_DOMAIN: nexus-system{{ ROOT_DOMAIN }}
+NEXUS_DOMAIN: nexus{{ ROOT_DOMAIN }}
 
 # HARBOR
 HARBOR_NAMESPACE: harbor-system
@@ -86,7 +95,7 @@ ARGOCD_ADMIN_PASSWORD: AnotherSuperPassword
 # KEYCLOAK
 KEYCLOAK_NAMESPACE: keycloak-system
 # Cannot be changed
-KEYCLOAK_DOMAIN: keycloak-keycloak-system{{ ROOT_DOMAIN }}
+KEYCLOAK_DOMAIN: keycloak{{ ROOT_DOMAIN }}
 
 # SOPS
 SOPS_NAMESPACE: sops-system

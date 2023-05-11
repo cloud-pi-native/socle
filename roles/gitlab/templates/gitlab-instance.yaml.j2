@@ -8,6 +8,7 @@ spec:
     values:
       certmanager:
         install: true
+{% if ingress.tls.type != 'tlsSecret' %}
       gitlab:
         webservice:
           ingress:
@@ -21,7 +22,8 @@ spec:
         ingress:
           tls:
             secretName: gitlab-minio
-      global:
+{% endif %}
+      global: 
         certificates:
           customCAs:
             - configMap: openshift-service-ca.crt
@@ -52,6 +54,9 @@ spec:
           configureCertmanager: false
           tls:
             enabled: true
+{% if ingress.tls.type == 'tlsSecret' %}
+            secretName: {{ ingress.tls.tlsSecret.name }}
+{% endif %}
         extraEnv:
 {% if USE_PROXY %}
           HTTP_PROXY: {{ HTTP_PROXY }}

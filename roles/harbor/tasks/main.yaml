@@ -4,8 +4,6 @@
       kind: Namespace
       metadata:
         name: "{{ HARBOR_NAMESPACE }}"
-        labels:
-          app: kubed
 
 - name: Create service account
   kubernetes.core.k8s:
@@ -49,6 +47,9 @@
           secret:
             secretName: {{ ingress.tls.tlsSecret.name }}
             notarySecretName: {{ ingress.tls.tlsSecret.name }}
+      {% else %}
+          certSource: null
+          secret: {}
       {% endif %}
         ingress:
           hosts:
@@ -102,15 +103,12 @@
       redis:
         internal:
           serviceAccountName: harbor-sa
-- debug: 
-    var: helm_values | from_yaml
 
 - name: Deploy helm
   kubernetes.core.helm:
     name: harbor
     chart_ref: harbor/harbor
     release_namespace: "{{ HARBOR_NAMESPACE }}"
-    create_namespace: true
     values: "{{ helm_values | from_yaml }}"
 
 - name: Update inventory

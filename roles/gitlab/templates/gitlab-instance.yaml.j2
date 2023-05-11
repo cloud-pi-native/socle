@@ -22,6 +22,17 @@ spec:
         ingress:
           tls:
             secretName: gitlab-minio
+{% else %}
+      gitlab:
+        webservice:
+          ingress:
+            tls: {}
+      registry:
+        ingress:
+          tls: {}
+      minio:
+        ingress:
+          tls: {}
 {% endif %}
       global: 
         certificates:

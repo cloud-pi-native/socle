@@ -64,12 +64,12 @@ CERTMANAGER_VERSION: v1.11.0
 # deployed by Argo
 CONSOLE_NAMESPACE: console-pi-system
 CONSOLE_DOMAIN: console{{ ROOT_DOMAIN }}
-CONSOLE_RELEASE: "3.3.0"
+CONSOLE_RELEASE: "3.3.1"
 CONSOLE_DB_PASSWORD: WowAPassword
 
 # GITLAB
 GITLAB_NAMESPACE: gitlab-system
-GITLAB_VERSION: "6.10.3"
+GITLAB_VERSION: "6.11.0"
 # Optional, gitlab generate host automatically
 # https://docs.gitlab.com/charts/charts/globals#configure-host-settings
 # This variable force host for gitlab property (webservice)

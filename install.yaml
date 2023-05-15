@@ -41,6 +41,10 @@
       tags:
         - gitlab
 
+    - name: gitlab-catalog
+      tags:
+        - catalog
+
     - name: gitlab-runner
       tags:
         - gitlab-runner

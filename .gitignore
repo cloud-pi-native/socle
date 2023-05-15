@@ -1,4 +1,5 @@
 # Variables
 vars.yaml
 
-roles/cert-manager/filter_plugins/__pycache__/*
+# compiled filter_plugins
+**/__pycache__/*

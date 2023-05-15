@@ -19,7 +19,7 @@
     import_url: https://github.com/hexa-forge/gitlab-ci-catalog.git
     name: Catalog
     path: catalog
-    group: forge-mi/projects
+    group: "{{ projectsRootDir | join('/') }}"
   register: catalog_repo
 
 - name: Get destination catalog branches
@@ -54,37 +54,39 @@
     branches: "{{ source_branches.json | diff_branches(destination_branches.json) }}"
     tags: "{{ source_tags.json | diff_tags(destination_tags.json) }}"
 
-- debug: var=branches
-- debug: var=tags
 - name: update refs
   block:
-  - name: Ensure no repo exist locally
-    shell: rm -rf test
+    - name: Ensure no repo exist locally
+      ansible.builtin.file:
+        path: test
+        state: absent
 
-  - name: synchronize branches
-    when: branches.to_push or branches.to_delete or tags.to_push or tags.to_delete 
-    shell: |
-      set -e
-      git clone https://github.com/hexa-forge/gitlab-ci-catalog.git test && cd test || exit 1
-      git remote add dest https://root:{{ gitlab_token }}@{{ GITLAB_DOMAIN }}/forge-mi/projects/catalog.git
-      for branch in {{ branches.to_delete }}; do
-        echo "delete branch $branch"
-        git push dest --delete $branch -f
-      done
-      for branch in {{ branches.to_push }}; do
-        git switch "$branch"
-        git reset --hard "origin/$branch"
-        git push --set-upstream dest "$branch" -f
-      done
-      for tag in {{ tags.to_delete }}; do
-        echo "delete tag $tag"
-        git push dest --delete $tag -f
-      done
-      for tag in {{ tags.to_push }}; do
-        git checkout 1
-        git push dest $tag -f
-      done
+    - name: synchronize branches
+      when: branches.to_push or branches.to_delete or tags.to_push or tags.to_delete
+      shell: |
+        set -e
+        git clone https://github.com/hexa-forge/gitlab-ci-catalog.git test && cd test || exit 1
+        git remote add dest https://root:{{ gitlab_token }}@{{ GITLAB_DOMAIN }}/{{ projectsRootDir | join('/') }}/catalog.git
+        for branch in {{ branches.to_delete }}; do
+          echo "delete branch $branch"
+          git push dest --delete $branch -f
+        done
+        for branch in {{ branches.to_push }}; do
+          git switch "$branch"
+          git reset --hard "origin/$branch"
+          git push --set-upstream dest "$branch" -f
+        done
+        for tag in {{ tags.to_delete }}; do
+          echo "delete tag $tag"
+          git push dest --delete $tag -f
+        done
+        for tag in {{ tags.to_push }}; do
+          git checkout 1
+          git push dest $tag -f
+        done
 
-  # always:
-  # - name: cleanup repo locally
-  #   shell: rm -rf test
+  always:
+    - name: cleanup repo locally
+      ansible.builtin.file:
+        path: test
+        state: absent

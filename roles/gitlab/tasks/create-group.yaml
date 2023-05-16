@@ -12,6 +12,7 @@
     subgroup_creation_level: "owner"
     project_creation_level: "developer"
     state: present
+    visibility: internal
 
 - name: Update parent group
   set_fact:

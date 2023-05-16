@@ -169,6 +169,8 @@
     group: "{{ projectsRootDir | join('/') }}"
     purge: false
     variables:
+      - name: CATALOG_PATH
+        value: "{{ projectsRootDir | join('/') }}/catalog"
       - name: VAULT_KV
         value: forge-dso
       - name: PROJECTS_ROOT_DIR

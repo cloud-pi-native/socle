@@ -20,6 +20,7 @@
     name: Catalog
     path: catalog
     group: "{{ projectsRootDir | join('/') }}"
+    visibility: internal
   register: catalog_repo
 
 - name: Get destination catalog branches

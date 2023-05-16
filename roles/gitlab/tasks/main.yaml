@@ -152,35 +152,29 @@
   when: get_settings.json.signup_enabled
   changed_when: true
 
-- name: "Create first level forge-mi directory"
-  community.general.gitlab_group:
-    api_url: "https://{{ GITLAB_DOMAIN }}"
-    api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
-    name: "forge-mi"
-    subgroup_creation_level: "owner"
-    project_creation_level: "developer"
-    state: present
+- name: Set parent group name
+  set_fact:
+    index: "0"
+    parent: ""
 
-- name: "Create first level forge-mi directory"
-  community.general.gitlab_group:
-    api_url: "https://{{ GITLAB_DOMAIN }}"
-    api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
-    parent: "forge-mi"
-    name: "projects"
-    subgroup_creation_level: "owner"
-    project_creation_level: "developer"
-    state: present
+- name: Include create group
+  include_tasks:
+    file: create-group.yaml
 
 - name: "Set or update some CI/CD variables"
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ additionals_ca | ternary(false, true) }}"
-    group: "forge-mi/projects"
+    group: "{{ projectsRootDir | join('/') }}"
     purge: false
     variables:
+      - name: CATALOG_PATH
+        value: "{{ projectsRootDir | join('/') }}/catalog"
+      - name: VAULT_KV
+        value: forge-dso
+      - name: PROJECTS_ROOT_DIR
+        value: "{{ projectsRootDir | join('/') }}"
       - name: "NEXUS_HOST_URL"
         value: "https://{{ NEXUS_DOMAIN }}"
       - name: "NEXUS_HOSTNAME"
@@ -205,7 +199,7 @@
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ additionals_ca | ternary(false, true) }}"
-    group: "forge-mi/projects"
+    group: "{{ projectsRootDir | join('/') }}"
     purge: false
     state: "{{ USE_PROXY | ternary('present', 'absent') }}"
     variables:

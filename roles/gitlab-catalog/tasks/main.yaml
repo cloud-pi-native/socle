@@ -1,0 +1,93 @@
+- name: Find gitlab token in inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ CONSOLE_NAMESPACE }}"
+    kind: ConfigMap
+    name: dso-config
+  register: ansible_inventory
+
+- name: Get gitlab token
+  ansible.builtin.set_fact:
+    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
+  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
+  register: set_token_inv
+
+- name: Create Catalog
+  community.general.gitlab_project:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    import_url: https://github.com/hexa-forge/gitlab-ci-catalog.git
+    name: Catalog
+    path: catalog
+    group: "{{ projectsRootDir | join('/') }}"
+    visibility: internal
+  register: catalog_repo
+
+- name: Get destination catalog branches
+  uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    url: "https://{{ GITLAB_DOMAIN }}/api/v4/projects/{{ catalog_repo.project.id }}/repository/branches"
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+  register: destination_branches
+  retries: 5
+  until: destination_branches.status != 404
+- name: Get destination catalog tags
+  uri:
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    url: "https://{{ GITLAB_DOMAIN }}/api/v4/projects/{{ catalog_repo.project.id }}/repository/tags"
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+  register: destination_tags
+
+- name: Get source catalog branches
+  uri:
+    url: https://api.github.com/repos/hexa-forge/gitlab-ci-catalog/branches
+  register: source_branches
+
+- name: Get source catalog tags
+  uri:
+    url: https://api.github.com/repos/hexa-forge/gitlab-ci-catalog/tags
+  register: source_tags
+
+- name: Set refs to update
+  set_fact:
+    branches: "{{ source_branches.json | diff_branches(destination_branches.json) }}"
+    tags: "{{ source_tags.json | diff_tags(destination_tags.json) }}"
+
+- name: update refs
+  block:
+    - name: Ensure no repo exist locally
+      ansible.builtin.file:
+        path: test
+        state: absent
+
+    - name: synchronize branches
+      when: branches.to_push or branches.to_delete or tags.to_push or tags.to_delete
+      shell: |
+        set -e
+        git clone https://github.com/hexa-forge/gitlab-ci-catalog.git test && cd test || exit 1
+        git remote add dest https://root:{{ gitlab_token }}@{{ GITLAB_DOMAIN }}/{{ projectsRootDir | join('/') }}/catalog.git
+        for branch in {{ branches.to_delete }}; do
+          echo "delete branch $branch"
+          git push dest --delete $branch -f
+        done
+        for branch in {{ branches.to_push }}; do
+          git switch "$branch"
+          git reset --hard "origin/$branch"
+          git push --set-upstream dest "$branch" -f
+        done
+        for tag in {{ tags.to_delete }}; do
+          echo "delete tag $tag"
+          git push dest --delete $tag -f
+        done
+        for tag in {{ tags.to_push }}; do
+          git checkout 1
+          git push dest $tag -f
+        done
+
+  always:
+    - name: cleanup repo locally
+      ansible.builtin.file:
+        path: test
+        state: absent

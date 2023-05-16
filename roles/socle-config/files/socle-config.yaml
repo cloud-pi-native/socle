@@ -41,6 +41,9 @@ ingress:
   annotations: {} # map<string>: string
   labels: {} # map<string>: string
 
+projectsRootDir:
+  - forge
+
 # PROXY
 USE_PROXY: false
 PROXY_HOST: "x.x.x.x"

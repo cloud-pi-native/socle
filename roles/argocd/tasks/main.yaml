@@ -126,7 +126,7 @@
     definition:
       data:
         password: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64encode }}"
-        url: "{{ ('https://' + GITLAB_DOMAIN + '/forge-mi/projects') | b64encode }}"
+        url: "{{ ('https://' + ([GITLAB_DOMAIN, projectsRootDir] | flatten | join ('/') )) | b64encode }}"
         username: "{{ 'root' | b64encode }}"
       kind: Secret
       metadata:

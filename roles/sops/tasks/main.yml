@@ -19,7 +19,7 @@
   register: age_secret
 
 - name: Generate age keys
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: age-keygen
   register: age_keys
   when: age_secret.resources | length == 0

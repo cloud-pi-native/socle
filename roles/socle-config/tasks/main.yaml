@@ -54,6 +54,8 @@
 - name: Set GITLAB_DOMAIN fact
   set_fact:
     GITLAB_DOMAIN: "{{ GITLAB_DOMAIN | default('gitlab' + ROOT_DOMAIN) }}"
+  tags:
+    - skip_ansible_lint
 
 - name: Check config model
   assert:

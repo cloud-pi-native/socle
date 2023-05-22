@@ -1,91 +1,81 @@
-apiVersion: apps.gitlab.com/v1beta1
-kind: GitLab
-metadata:
-  name: gitlab
-  namespace: {{ GITLAB_NAMESPACE }}
-spec:
-  chart:
-    values:
-      certmanager:
-        install: true
+certmanager:
+  install: true
 {% if ingress.tls.type != 'tlsSecret' %}
-      gitlab:
-        webservice:
-          ingress:
-            tls:
-              secretName: gitlab-webservice
-      registry:
-        ingress:
-          tls:
-            secretName: gitlab-registry
-      minio:
-        ingress:
-          tls:
-            secretName: gitlab-minio
+gitlab:
+  webservice:
+    ingress:
+      tls:
+        secretName: gitlab-webservice
+registry:
+  enabled: false
+  ingress:
+      enabled: false
+minio:
+  ingress:
+    tls:
+      secretName: gitlab-minio
 {% else %}
-      gitlab:
-        webservice:
-          ingress:
-            tls: {}
-      registry:
-        ingress:
-          tls: {}
-      minio:
-        ingress:
-          tls: {}
+gitlab:
+  webservice:
+    ingress:
+      tls: {}
+minio:
+  ingress:
+    tls: {}
 {% endif %}
-      global: 
-        certificates:
-          customCAs:
-            - configMap: openshift-service-ca.crt
+global:
+  certificates:
+    customCAs:
+      - configMap: openshift-service-ca.crt
 {% for item in additionals_ca %}
 {% if item.kind == 'ConfigMap' %}
-            - configMap: {{ item.name }}
+      - configMap: {{ item.name }}
 {% endif %}
 {% if item.kind == 'Secret' %}
-            - secret: {{ item.name }}
+      - secret: {{ item.name }}
 {% endif %}
 {% endfor %}
-        hosts:
-          domain: {{ ROOT_DOMAIN[1:] }}
+  hosts:
+    domain: {{ ROOT_DOMAIN[1:] }}
+    registry:
+      name: gitlab-registry.example.com
 {% if GITLAB_DOMAIN %}
-          gitlab:
-            name: {{ GITLAB_DOMAIN }}
+    gitlab:
+      name: {{ GITLAB_DOMAIN }}
 {% endif %}
-        ingress:
-          annotations:
+  ingress:
+    annotations:
 {% for key, val in ingress.annotations.items() %}
-            {{ key }}: {{ val }}
+      {{ key }}: {{ val }}
 {% endfor %}
-          labels:
+    labels:
 {% for key, val in ingress.labels.items() %}
-            {{ key }}: {{ val }}
+      {{ key }}: {{ val }}
 {% endfor %}
-          class: none
-          configureCertmanager: false
-          tls:
-            enabled: true
+    class: none
+    configureCertmanager: false
+    tls:
+      enabled: true
 {% if ingress.tls.type == 'tlsSecret' %}
-            secretName: {{ ingress.tls.tlsSecret.name }}
+      secretName: {{ ingress.tls.tlsSecret.name }}
 {% endif %}
-        extraEnv:
+  extraEnv:
 {% if USE_PROXY %}
-          HTTP_PROXY: {{ HTTP_PROXY }}
-          HTTPS_PROXY: {{ HTTPS_PROXY }}
-          NO_PROXY: {{ NO_PROXY }}
+    HTTP_PROXY: {{ HTTP_PROXY }}
+    HTTPS_PROXY: {{ HTTPS_PROXY }}
+    NO_PROXY: {{ NO_PROXY }}
 {% endif %}
-        appConfig:
-          ldap:
-            preventSignin: true
-          omniauth:
-            enabled: true
-            syncProfileAttributes: ["email"]
-            allowSingleSignOn: ["openid_connect"]
-            blockAutoCreatedUsers: false
-            autoSignInWithProvider: "openid_connect"
-            autoLinkLdapUser: false
-            autoLinkSamlUser: false
-            autoLinkUser: ["openid_connect"]
-            providers:
-              - secret: openid-connect
-    version: {{ GITLAB_VERSION }}
+  appConfig:
+    ldap:
+      preventSignin: true
+    omniauth:
+      enabled: true
+      syncProfileAttributes: ["email"]
+      allowSingleSignOn: ["openid_connect"]
+      blockAutoCreatedUsers: false
+      autoSignInWithProvider: "openid_connect"
+      autoLinkLdapUser: false
+      autoLinkSamlUser: false
+      autoLinkUser: ["openid_connect"]
+      providers:
+        - secret: openid-connect

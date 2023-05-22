@@ -52,9 +52,25 @@
         name: openid-connect
         namespace: "{{ GITLAB_NAMESPACE }}"
 
+- name: Prepare Gitlab helm values
+  ansible.builtin.set_fact:
+    gitlab_values: "{{ lookup('template', 'gitlab-instance.yaml.j2') | from_yaml }}"
+
+- name: Merge with gitlab user values
+  set_fact:
+    gitlab_values: "{{ gitlab_values | combine(GITLAB_VALUES, recursive=True) }}"
+
 - name: Install gitlab instance
   kubernetes.core.k8s:
-    template: gitlab-instance.yaml.j2
+    api_version: apps.gitlab.com/v1beta1
+    kind: GitLab
+    name: gitlab
+    namespace: "{{ GITLAB_NAMESPACE }}"
+    definition:
+      spec:
+        chart:
+          version: "{{ GITLAB_VERSION }}"
+          values: "{{ gitlab_values }}"
 
 - name: Wait gitlab instance to be 'Running'
   kubernetes.core.k8s_info:

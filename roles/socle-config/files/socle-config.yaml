@@ -77,6 +77,10 @@ GITLAB_VERSION: "6.11.0"
 # https://docs.gitlab.com/charts/charts/globals#configure-host-settings
 # This variable force host for gitlab property (webservice)
 GITLAB_DOMAIN: gitlab{{ ROOT_DOMAIN }}
+# You can merge customs values for gitlab, it will be merged with roles/gitlab/templates/gitlab-instance.yaml.j2
+# See https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
+# And https://docs.gitlab.com/charts/charts/globals.html
+GITLAB_VALUES: {}
 
 # HARBOR
 HARBOR_NAMESPACE: harbor-system

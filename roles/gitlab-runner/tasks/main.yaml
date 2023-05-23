@@ -28,6 +28,18 @@
   kubernetes.core.k8s:
     template: custom-env.yaml.j2
 
+- name: Create a ca_bundle secret
+  kubernetes.core.k8s:
+    definition:
+      kind: Secret
+      metadata:
+        name: ca-bundle-dso
+        namespace: "{{ GITLAB_NAMESPACE }}"
+      stringData:
+        tls.crt: |
+          "{{ ca_pem | indent(width=4, first=False) }}"
+  when: additionals_ca | length
+
 - name: Install gitlab instance
   kubernetes.core.k8s:
     template: gitlab-runner-instance.yaml.j2

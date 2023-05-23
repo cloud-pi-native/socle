@@ -10,4 +10,7 @@ spec:
   token: gitlab-gitlab-runner-secret
   tags: openshift
   env: custom-env
+{% if additionals_ca | length %}
+  ca: ca-bundle-dso
+{% endif %}
   #config: custom-config-toml

@@ -247,3 +247,6 @@
     variables:
       - name: "CA_BUNDLE"
         value: "{{ ca_pem }}"
+        variable_type: file
+
+# creer un maxi configmap avec plein de keys, un par certs

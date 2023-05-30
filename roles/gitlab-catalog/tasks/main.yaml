@@ -16,7 +16,7 @@
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ additionals_ca | ternary(false, true) }}"
-    import_url: https://github.com/hexa-forge/gitlab-ci-catalog.git
+    import_url: "https://github.com/cloud-pi-native/gitlab-ci-catalog.git"
     name: Catalog
     path: catalog
     group: "{{ projectsRootDir | join('/') }}"
@@ -42,12 +42,12 @@
 
 - name: Get source catalog branches
   uri:
-    url: https://api.github.com/repos/hexa-forge/gitlab-ci-catalog/branches
+    url: https://api.github.com/repos/cloud-pi-native/gitlab-ci-catalog/branches
   register: source_branches
 
 - name: Get source catalog tags
   uri:
-    url: https://api.github.com/repos/hexa-forge/gitlab-ci-catalog/tags
+    url: https://api.github.com/repos/cloud-pi-native/gitlab-ci-catalog/tags
   register: source_tags
 
 - name: Set refs to update
@@ -66,7 +66,7 @@
       when: branches.to_push or branches.to_delete or tags.to_push or tags.to_delete
       shell: |
         set -e
-        git clone https://github.com/hexa-forge/gitlab-ci-catalog.git test && cd test || exit 1
+        git clone https://github.com/cloud-pi-native/gitlab-ci-catalog.git test && cd test || exit 1
         git remote add dest https://root:{{ gitlab_token }}@{{ GITLAB_DOMAIN }}/{{ projectsRootDir | join('/') }}/catalog.git
         for branch in {{ branches.to_delete }}; do
           echo "delete branch $branch"

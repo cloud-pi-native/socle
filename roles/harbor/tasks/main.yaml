@@ -73,25 +73,41 @@
       {% for key, val in ingress.labels.items() %}
               {{ key }}: {{ val }}
       {% endfor %}
-      externalURL: https://harbor{{ ROOT_DOMAIN }}
+      externalURL: https://{{ HARBOR_DOMAIN }}
       persistence:
         enabled: true
         resourcePolicy: keep
       harborAdminPassword: "{{ HARBOR_ADMIN_PASSWORD }}"
       nginx:
         serviceAccountName: harbor-sa
+        image:
+          repository: docker.io/goharbor/nginx-photon
       portal:
         serviceAccountName: harbor-sa
+        image:
+          repository: docker.io/goharbor/harbor-portal
       core:
         serviceAccountName: harbor-sa
+        image:
+          repository: docker.io/goharbor/harbor-core
       jobservice:
         serviceAccountName: harbor-sa
+        image:
+          repository: docker.io/goharbor/harbor-jobservice
       registry:
         serviceAccountName: harbor-sa
+        registry:
+          image:
+            repository: docker.io/goharbor/registry-photon
+        controller:
+          image:
+            repository: docker.io/goharbor/harbor-registryctl
       chartmuseum:
         serviceAccountName: harbor-sa
       trivy:
         serviceAccountName: harbor-sa
+        image:
+          repository: docker.io/goharbor/trivy-adapter-photon
       notary:
         server:
           serviceAccountName: harbor-sa
@@ -100,9 +116,15 @@
       database:
         internal:
           serviceAccountName: harbor-sa
+          image: docker.io/goharbor/harbor-db
       redis:
         internal:
           serviceAccountName: harbor-sa
+          image:
+            repository: docker.io/goharbor/redis-photon
+      exporter:
+        image:
+          repository: docker.io/goharbor/harbor-exporter
 
 - name: Deploy helm
   kubernetes.core.helm:

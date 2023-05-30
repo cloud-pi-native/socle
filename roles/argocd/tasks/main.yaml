@@ -36,9 +36,10 @@
 
 - name: Set extra env vars
   ansible.builtin.set_fact:
+    # TODO variabilize openshift boolean
     helm_values: |
       openshift:
-        enabled: false
+        enabled: true
       config:
         secret:
           argocdServerAdminPassword: "{{ ARGOCD_ADMIN_PASSWORD }}"

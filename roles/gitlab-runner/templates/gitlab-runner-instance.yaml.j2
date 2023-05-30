@@ -10,4 +10,9 @@ spec:
   token: gitlab-gitlab-runner-secret
   tags: openshift
   env: custom-env
+{% if ingress.tls.type != 'tlsSecret' %}
+  ca: gitlab-webservice
+{% else %}
+  ca: {{ ingress.tls.tlsSecret.name }}
+{% endif %}
   #config: custom-config-toml

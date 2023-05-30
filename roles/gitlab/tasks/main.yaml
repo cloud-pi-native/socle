@@ -185,10 +185,10 @@
     group: "{{ projectsRootDir | join('/') }}"
     purge: false
     variables:
-      - name: CATALOG_PATH
-        value: "{{ projectsRootDir | join('/') }}/catalog"
       - name: VAULT_KV
         value: forge-dso
+      - name: CATALOG_PATH
+        value: "{{ projectsRootDir + 'catalog' | flatten | join('/') }}"
       - name: PROJECTS_ROOT_DIR
         value: "{{ projectsRootDir | join('/') }}"
       - name: "NEXUS_HOST_URL"
@@ -210,7 +210,7 @@
         variable_type: "file"
         value: "{{ npm_file }}"
 
-- name: "Set or update some CI/CD variables"
+- name: "Set or update proxy CI/CD variables"
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
@@ -235,3 +235,15 @@
         value: "{{ HTTPS_PROXY }}"
       - name: "no_proxy"
         value: "{{ NO_PROXY }}"
+
+- name: "Set or update CA_BUNDLE variable"
+  community.general.gitlab_group_variable:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    group: "{{ projectsRootDir | join('/') }}"
+    purge: false
+    state: "{{ additionals_ca | ternary('present', 'absent') }}"
+    variables:
+      - name: "CA_BUNDLE"
+        value: "{{ ca_pem }}"

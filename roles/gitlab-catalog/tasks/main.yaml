@@ -16,7 +16,7 @@
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ additionals_ca | ternary(false, true) }}"
-    import_url: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
+    import_url: "https://github.com/cloud-pi-native/gitlab-ci-catalog.git"
     name: Catalog
     path: catalog
     group: "{{ projectsRootDir | join('/') }}"

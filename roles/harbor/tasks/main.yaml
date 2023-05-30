@@ -73,7 +73,7 @@
       {% for key, val in ingress.labels.items() %}
               {{ key }}: {{ val }}
       {% endfor %}
-      externalURL: https://harbor{{ ROOT_DOMAIN }}
+      externalURL: https://{{ HARBOR_DOMAIN }}
       persistence:
         enabled: true
         resourcePolicy: keep

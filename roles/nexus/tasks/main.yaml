@@ -16,6 +16,10 @@
         name: nexus-sa
         namespace: "{{ NEXUS_NAMESPACE }}"
 
+- name: Manage PVC
+  include_tasks:
+    file: manage-pvc.yaml
+
 - name: Deploy nexus
   kubernetes.core.k8s:
     template: "{{ item }}"

@@ -52,6 +52,15 @@
         name: openid-connect
         namespace: "{{ GITLAB_NAMESPACE }}"
 
+- name: Create exposed_ca Secret
+  kubernetes.core.k8s:
+    kind: Secret
+    namespace: "{{ GITLAB_NAMESPACE }}"
+    name: exposed-ca
+    definition:
+      data:
+        tls.crt: "{{ exposed_ca_pem | b64encode }}"
+
 - name: Prepare Gitlab helm values
   ansible.builtin.set_fact:
     gitlab_values: "{{ lookup('template', 'gitlab-instance.yaml.j2') | from_yaml }}"
@@ -99,7 +108,7 @@
 - name: Test Gitlab token
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/admin/ci/variables"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -148,7 +157,7 @@
 
 - name: Get settings
   ansible.builtin.uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -157,7 +166,7 @@
 
 - name: Set some parameters
   ansible.builtin.uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     method: PUT
     headers:
@@ -182,7 +191,7 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     group: "{{ projectsRootDir | join('/') }}"
     purge: false
     variables:
@@ -215,7 +224,7 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     group: "{{ projectsRootDir | join('/') }}"
     purge: false
     state: "{{ USE_PROXY | ternary('present', 'absent') }}"
@@ -241,13 +250,11 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     group: "{{ projectsRootDir | join('/') }}"
     purge: false
     state: "{{ additionals_ca | ternary('present', 'absent') }}"
     variables:
       - name: "CA_BUNDLE"
-        value: "{{ ca_pem }}"
+        value: "{{ [additionals_ca_pem, exposed_ca_pem] | join('\n') }}"
         variable_type: file
-
-# creer un maxi configmap avec plein de keys, un par certs

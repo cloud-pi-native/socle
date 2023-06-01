@@ -37,7 +37,7 @@
 
 - name: Set harbor helm values
   ansible.builtin.set_fact:
-    helm_values: |
+    harbor_values: |
       expose:
         type: ingress
         tls:
@@ -53,7 +53,7 @@
       {% endif %}
         ingress:
           hosts:
-            core: harbor{{ ROOT_DOMAIN }}
+            core: {{ HARBOR_DOMAIN }}
             notary: notary{{ ROOT_DOMAIN }}
           notary:
             annotations:
@@ -147,7 +147,7 @@
 
 - name: Get harbor config
   ansible.builtin.uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
     password: "{{ HARBOR_ADMIN_PASSWORD }}"
     user: admin
@@ -181,7 +181,7 @@
       "oidc_name": "keycloak"
       "oidc_scope": "openid"
       "oidc_user_claim": "email"
-      "oidc_verify_cert": "{{ additionals_ca | length == 0 }}"
+      "oidc_verify_cert": "{{ exposed_ca.type == 'none' }}"
       "project_creation_restriction": "adminonly"
       "quota_per_project_enable": true
       "read_only": false
@@ -201,7 +201,7 @@
 
 - name: PUT harbor config
   ansible.builtin.uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     method: PUT
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
     password: "{{ HARBOR_ADMIN_PASSWORD }}"

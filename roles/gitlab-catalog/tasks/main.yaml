@@ -15,7 +15,7 @@
   community.general.gitlab_project:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     import_url: "https://github.com/cloud-pi-native/gitlab-ci-catalog.git"
     name: Catalog
     path: catalog
@@ -25,7 +25,7 @@
 
 - name: Get destination catalog branches
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/projects/{{ catalog_repo.project.id }}/repository/branches"
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
@@ -34,7 +34,7 @@
   until: destination_branches.status != 404
 - name: Get destination catalog tags
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/projects/{{ catalog_repo.project.id }}/repository/tags"
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"

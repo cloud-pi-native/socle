@@ -4,7 +4,7 @@
 
 - name: Unseal Vault
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/unseal"
     method: POST
     status_code: [200]

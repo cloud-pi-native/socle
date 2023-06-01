@@ -163,7 +163,7 @@
 
 - name: "Config: get auth method"
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     status_code: [200, 400]
     headers:
@@ -174,7 +174,7 @@
 - name: "Config: set auth method"
   when: jwt_state.status == 400
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     method: POST
     status_code: [204]
@@ -187,7 +187,7 @@
 
 - name: "Config: add role default-ci"
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/auth/jwt/role/default-ci"
     method: POST
     status_code: [204]
@@ -212,7 +212,7 @@
 
 - name: "Config: set jwt config"
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/auth/jwt/config"
     method: POST
     status_code: [204]
@@ -220,13 +220,13 @@
       "X-Vault-Token": "{{ root_token }}"
     body:
       oidc_discovery_url: "https://{{ GITLAB_DOMAIN }}"
-      oidc_discovery_ca_pem: "{{ ca_pem }}" # TODO check in non ca environment
+      oidc_discovery_ca_pem: "{{ exposed_ca_pem }}"
       default_role: default-ci
     body_format: json
 
 - name: "Config: get accessor jwt config"
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     status_code: [200]
     headers:
@@ -235,7 +235,7 @@
 
 - name: "Config: create policy"
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/policy/default-ci"
     method: POST
     status_code: [204]
@@ -253,7 +253,7 @@
 
 - name: "Config: get kv engines"
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/mounts/forge-dso"
     status_code: [200, 400]
     headers:
@@ -263,7 +263,7 @@
 - name: "Config: create kv engine"
   when: get_engines.status == 400
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/mounts/forge-dso"
     method: POST
     status_code: [204]

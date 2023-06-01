@@ -99,6 +99,9 @@ GITLAB_VALUES: {}
 HARBOR_NAMESPACE: harbor-system
 HARBOR_DOMAIN: harbor{{ ROOT_DOMAIN }}
 HARBOR_ADMIN_PASSWORD: MySuperPassword
+# You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml
+# See https://github.com/goharbor/harbor-helm
+HARBOR_VALUES: {}
 
 # KEYCLOAK
 KEYCLOAK_NAMESPACE: keycloak-system

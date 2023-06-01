@@ -1,0 +1,44 @@
+- name: get PVC info
+  kubernetes.core.k8s_info:
+    namespace: "{{ NEXUS_NAMESPACE }}"
+    name: nexus-data-claim
+    kind: PersistentVolumeClaim
+  register: nexus_pvc
+
+
+- name: manage incorrect pvc size
+  when: (nexus_pvc.resources | length) and (nexus_pvc.resources[0].status.capacity.storage != NEXUS_STORAGE_SIZE)
+  block:
+    - name: Disclaimer Storage downsize
+      when: nexus_pvc.resources[0].status.capacity.storage[:-2] > NEXUS_STORAGE_SIZE[:-2]
+      fail:
+        msg:
+          - Operation Cancelled
+          - you want to downsize NEXUS_STORAGE_SIZE, and we can't do it, 
+          - please change value and try again or operate pvc manually
+
+    - name: Disclaimer Bad storage unit size 
+      when: nexus_pvc.resources[0].status.capacity.storage[-2:] != NEXUS_STORAGE_SIZE[-2:]
+      fail:
+        msg:
+          - Operation Cancelled
+          - you are try to use another storage unit, and we can't ensure it works
+          - please change value and try again or operate pvc manually
+
+    - name: delete deployment
+      kubernetes.core.k8s:
+        template: nexus.yml.j2
+        state: absent
+
+    - name: Wait end of deletion
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: pod
+        namespace: "{{ NEXUS_NAMESPACE }}"
+      register: nexus_pod
+      until: nexus_pod.resources | length == 0
+      retries: 5
+
+- name: Create PVC
+  kubernetes.core.k8s:
+    template: pvc.yml.j2

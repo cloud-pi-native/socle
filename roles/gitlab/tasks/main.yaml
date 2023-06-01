@@ -164,8 +164,8 @@
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
     body:
       signup_enabled: false
-      outbound_local_requests_whitelist: 
-        - "0.0.0.0/0"
+      outbound_local_requests_allowlist_raw: "0.0.0.0/0"
+      default_branch_protection: 0
     body_format: form-urlencoded
   changed_when: true
 
@@ -189,7 +189,7 @@
       - name: VAULT_KV
         value: forge-dso
       - name: CATALOG_PATH
-        value: "{{ projectsRootDir + 'catalog' | flatten | join('/') }}"
+        value: "{{ projectsRootDir | join('/') }}/catalog"
       - name: PROJECTS_ROOT_DIR
         value: "{{ projectsRootDir | join('/') }}"
       - name: "NEXUS_HOST_URL"

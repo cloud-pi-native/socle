@@ -119,3 +119,4 @@ SOPS_NAMESPACE: sops-system
 # VAULT
 VAULT_NAMESPACE: vault-system
 VAULT_DOMAIN: vault{{ ROOT_DOMAIN }}
+VAULT_VALUES: {}

@@ -6,7 +6,7 @@
   community.general.gitlab_group:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     name: "{{ name }}"
     parent: "{{ parent }}"
     subgroup_creation_level: "owner"

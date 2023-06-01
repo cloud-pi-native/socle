@@ -7,7 +7,7 @@
       tags:
         - always
 
-    - name: additionals-ca
+    - name: ca
       tags:
         - always
 

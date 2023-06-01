@@ -1,0 +1,7 @@
+- name: additionals_ca tasks
+  include_tasks:
+    file: additionals_ca.yaml
+
+- name: exposed_ca tasks
+  include_tasks:
+    file: exposed_ca.yaml

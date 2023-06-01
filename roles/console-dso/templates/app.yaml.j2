@@ -39,7 +39,7 @@ spec:
           value: "{{ KEYCLOAK_DOMAIN }}/auth"
         - name: keycloak.realm
           value: dso
-{% if additionals_ca | length %}
+{% if exposed_ca.type != 'none' %}
         - name: server.extra_ca.name
           value: bundle
         - name: server.extra_ca.key

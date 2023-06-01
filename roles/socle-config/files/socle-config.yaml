@@ -13,6 +13,19 @@ additionals_ca: []
 #   name: kube-root-ca.crt
 #   key: ca.crt
 
+exposed_ca:
+  # none, configmap, secret, url, certmanager
+  type: none
+  configmap:
+    namespace:
+    name:
+    key:
+  secret:
+    namespace:
+    name:
+    key:
+  url: https://url.to.my.private.ca/raw
+
 # GLOBAL INGRESS
 ingress:
   tls:

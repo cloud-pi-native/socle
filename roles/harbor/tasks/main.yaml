@@ -37,95 +37,11 @@
 
 - name: Set harbor helm values
   ansible.builtin.set_fact:
-    harbor_values: |
-      expose:
-        type: ingress
-        tls:
-          enabled: true
-      {% if ingress.tls.type == 'tlsSecret' %}
-          certSource: secret
-          secret:
-            secretName: {{ ingress.tls.tlsSecret.name }}
-            notarySecretName: {{ ingress.tls.tlsSecret.name }}
-      {% else %}
-          certSource: null
-          secret: {}
-      {% endif %}
-        ingress:
-          hosts:
-            core: {{ HARBOR_DOMAIN }}
-            notary: notary{{ ROOT_DOMAIN }}
-          notary:
-            annotations:
-      {% for key, val in ingress.annotations.items() %}
-              {{ key }}: {{ val }}
-      {% endfor %}
-            labels:
-      {% for key, val in ingress.labels.items() %}
-              {{ key }}: {{ val }}
-      {% endfor %}
-          harbor:
-            annotations:
-      {% for key, val in ingress.annotations.items() %}
-              {{ key }}: {{ val }}
-      {% endfor %}
-            labels:
-      {% for key, val in ingress.labels.items() %}
-              {{ key }}: {{ val }}
-      {% endfor %}
-      externalURL: https://{{ HARBOR_DOMAIN }}
-      persistence:
-        enabled: true
-        resourcePolicy: keep
-      harborAdminPassword: "{{ HARBOR_ADMIN_PASSWORD }}"
-      nginx:
-        serviceAccountName: harbor-sa
-        image:
-          repository: docker.io/goharbor/nginx-photon
-      portal:
-        serviceAccountName: harbor-sa
-        image:
-          repository: docker.io/goharbor/harbor-portal
-      core:
-        serviceAccountName: harbor-sa
-        image:
-          repository: docker.io/goharbor/harbor-core
-      jobservice:
-        serviceAccountName: harbor-sa
-        image:
-          repository: docker.io/goharbor/harbor-jobservice
-      registry:
-        serviceAccountName: harbor-sa
-        registry:
-          image:
-            repository: docker.io/goharbor/registry-photon
-        controller:
-          image:
-            repository: docker.io/goharbor/harbor-registryctl
-      chartmuseum:
-        serviceAccountName: harbor-sa
-      trivy:
-        serviceAccountName: harbor-sa
-        image:
-          repository: docker.io/goharbor/trivy-adapter-photon
-      notary:
-        server:
-          serviceAccountName: harbor-sa
-        signer:
-          serviceAccountName: harbor-sa
-      database:
-        internal:
-          serviceAccountName: harbor-sa
-          image:
-            repository: docker.io/goharbor/harbor-db
-      redis:
-        internal:
-          serviceAccountName: harbor-sa
-          image:
-            repository: docker.io/goharbor/redis-photon
-      exporter:
-        image:
-          repository: docker.io/goharbor/harbor-exporter
+    harbor_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+
+- name: Merge with harbor user values
+  set_fact:
+    harbor_values: "{{ harbor_values | combine(HARBOR_VALUES, recursive=True) }}"
 
 - name: Deploy helm
   kubernetes.core.helm:
@@ -133,7 +49,7 @@
     chart_ref: harbor/harbor
     chart_version: "1.12.0"
     release_namespace: "{{ HARBOR_NAMESPACE }}"
-    values: "{{ helm_values | from_yaml }}"
+    values: "{{ harbor_values }}"
 
 - name: Update inventory
   kubernetes.core.k8s:

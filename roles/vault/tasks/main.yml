@@ -15,6 +15,11 @@
     values:
       global:
         openshift: true
+      injector:
+        image: 
+          repository: docker.io/hashicorp/vault-k8s
+        agentImage: 
+          repository: docker.io/hashicorp/vault
       server:
         route:
           enabled: false
@@ -27,6 +32,14 @@
         dataStorage:
           enable: true
           size: 23Gi
+        image:
+          repository: docker.io/hashicorp/vault
+      csi:
+        image:
+          repository: docker.io/hashicorp/vault-csi-provider
+        agent:
+          image:
+            repository: docker.io/hashicorp/vault
 
 - name: set proxy_fact
   set_fact:

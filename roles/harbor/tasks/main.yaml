@@ -116,7 +116,8 @@
       database:
         internal:
           serviceAccountName: harbor-sa
-          image: docker.io/goharbor/harbor-db
+          image:
+            repository: docker.io/goharbor/harbor-db
       redis:
         internal:
           serviceAccountName: harbor-sa
@@ -130,6 +131,7 @@
   kubernetes.core.helm:
     name: harbor
     chart_ref: harbor/harbor
+    chart_version: "1.12.0"
     release_namespace: "{{ HARBOR_NAMESPACE }}"
     values: "{{ helm_values | from_yaml }}"
 

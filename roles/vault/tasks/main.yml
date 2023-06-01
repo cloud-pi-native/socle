@@ -56,6 +56,10 @@
   set_fact:
     values: "{{ values | combine(proxy_fact, recursive=True) }}"
 
+- name: set VAULT_VALUES
+  set_fact:
+    values: "{{ values | combine(VAULT_VALUES, recursive=True) }}"
+
 - name: Deploy helm
   kubernetes.core.helm:
     name: vault

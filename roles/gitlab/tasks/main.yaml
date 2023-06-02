@@ -258,3 +258,19 @@
       - name: "CA_BUNDLE"
         value: "{{ [additionals_ca_pem, exposed_ca_pem] | join('\n') }}"
         variable_type: file
+
+- name: "Set or update insecure args variables"
+  community.general.gitlab_group_variable:
+    api_url: "https://{{ GITLAB_DOMAIN }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    group: "{{ projectsRootDir | join('/') }}"
+    purge: false
+    state: "{{ GITLAB_INSECURE_CI | ternary('present', 'absent') }}"
+    variables:
+      - name: "EXTRA_KANIKO_ARGS"
+        value: "--skip-tls-verify"
+      - name: "EXTRA_GIT_ARGS"
+        value: "-c http.sslVerify=false"
+      - name: "EXTRA_VAULT_ARGS"
+        value: "-tls-skip-verify"

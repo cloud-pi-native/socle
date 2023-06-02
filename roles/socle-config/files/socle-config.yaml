@@ -94,6 +94,8 @@ GITLAB_DOMAIN: gitlab{{ ROOT_DOMAIN }}
 # See https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
 # And https://docs.gitlab.com/charts/charts/globals.html
 GITLAB_VALUES: {}
+# If you use a private CA in exposed_ca, you should set it to true, configuring tools in pipelines container is not an easy job
+GITLAB_INSECURE_CI: false
 
 # HARBOR
 HARBOR_NAMESPACE: harbor-system

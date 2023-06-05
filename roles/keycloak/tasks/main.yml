@@ -44,6 +44,11 @@
   retries: 10
   delay: 5
 
+- name: set admin ids facts
+  ansible.builtin.set_fact:
+    KEYCLOAK_ADMIN_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
+    KEYCLOAK_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
+
 - name: Update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
@@ -52,8 +57,8 @@
     state: patched
     definition:
       data:
-        KEYCLOAK_ADMIN_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
-        KEYCLOAK_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
+        KEYCLOAK_ADMIN_PASSWORD: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
+        KEYCLOAK_ADMIN: "{{ KEYCLOAK_ADMIN }}"
 
 - name: Generate admin password
   ansible.builtin.set_fact:
@@ -101,3 +106,17 @@
     - keycloak-sonar-client.yaml.j2
     - keycloak-harbor-client.yaml.j2
     - keycloak-ingress.yaml.j2
+
+- name: Create base admins groups 
+  community.general.keycloak_group:
+    name: "{{ item }}"
+    realm: dso
+    state: present
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ KEYCLOAK_DOMAIN }}/auth
+    auth_realm: master
+    auth_username: "{{ KEYCLOAK_ADMIN }}"
+    auth_password: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
+  with_items: 
+    - admin
+    - ArgoCDAdmins

@@ -5,7 +5,7 @@
 - name: Get a ca resource
   include_tasks:
     file: get-ca.yaml
-  with_items: "{{ additionals_ca }}"
+  with_items: "{{ DSC.additionalsCA }}"
   vars:
     kind: "{{ item.kind }}"
     name: "{{ item.name }}"

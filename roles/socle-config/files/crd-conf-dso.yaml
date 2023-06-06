@@ -1,0 +1,440 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dso-socle-configs.cloud-pi-native.fr
+spec:
+  conversion:
+    strategy: None
+  group: cloud-pi-native.fr
+  names:
+    kind: DsoSocleConfig
+    listKind: DsoSocleConfigList
+    plural: dso-socle-configs
+    shortNames:
+    - dsc
+    singular: dso-socle-config
+  scope: Cluster
+  versions:
+  - name: v1alpha
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              additionalsCA:
+                description: Additional CAs to inject into tools; the resources should
+                  be available in all namespaces
+                items:
+                  properties:
+                    key:
+                      description: CA Resource key, optional, if not set, all keys
+                        will be imported
+                      type: string
+                    kind:
+                      default: ConfigMap
+                      description: CA Resource kind only ConfigMap and Secret are
+                        supported
+                      enum:
+                      - ConfigMap
+                      - Secret
+                      type: string
+                    name:
+                      default: kube-root-ca.crt
+                      description: CA Resource name
+                      type: string
+                  required:
+                  - kind
+                  - name
+                  type: object
+                type: array
+              exposedCA:
+                description: Private CA cert needed to validate HTTPS traffic between tools.
+                type: object
+                required:
+                - type
+                properties:
+                  configmap:
+                    description: The configmap with private CA
+                    type: object
+                    properties:
+                      namespace:
+                        description: The configmap namespace
+                        type: string
+                      name:
+                        description: The configmap name
+                        type: string
+                      key: 
+                        description: The configmap key providing the Private CA cert
+                        type: string
+                    required:
+                    - namespace
+                    - name
+                    - key
+                  secret:
+                    description: The secret with private CA
+                    type: object
+                    properties:
+                      namespace:
+                        description: The secret namespace
+                        type: string
+                      name:
+                        description: The secret name
+                        type: string
+                      key:
+                        description: The secret key providing the Private CA cert
+                        type: string
+                    required:
+                    - namespace
+                    - name
+                    - key
+                  url:
+                    description: An URL providing the private CA cert (it should be plain text)
+                    type: string
+                  type:
+                    description: |
+                      Method to find the private CA cert:
+                      - none: No private CA cert needed
+                      - configmap: Private CA cert is stored as a configmap
+                      - secret: Private CA cert is stored as a secret
+                      - url: Private CA cert comes from an external URL
+                      - certmanager: Private CA cert is managed by certmanager, please use ingress.tls.ca accordingly
+                    type: string
+                    enum:
+                    - none
+                    - configmap
+                    - secret
+                    - url
+                    - certmanager
+                    default: none
+              argocd:
+                description: Configuration for ArgoCD.
+                properties:
+                  admin:
+                    description: Configuration for the ArgoCD admin user.
+                    properties:
+                      # TO DO
+                      enabled:
+                        default: false
+                        description: Specifies whether the ArgoCD admin user is enabled.
+                        type: boolean
+                      password:
+                        description: The password for the ArgoCD admin user.
+                        type: string
+                    required:
+                    - enabled
+                    type: object
+                  namespace:
+                    default: dso-argocd
+                    description: The namespace for ArgoCD.
+                    type: string
+                  subDomain:
+                    default: argocd
+                    description: The subdomain for ArgoCD.
+                    type: string
+                type: object
+              certmanager:
+                description: Configuration for Cert Manager.
+                properties:
+                  version:
+                    default: v1.11.0
+                    description: Specifies the version of Cert Manager to use.
+                    type: string
+                required:
+                - version
+                type: object
+              console:
+                description: Configuration for the console.
+                properties:
+                  dbPassword:
+                    description: The password for the console's database.
+                    type: string
+                  namespace:
+                    default: dso-console
+                    description: The namespace for console.
+                    type: string
+                  release:
+                    default: 3.4.1
+                    description: Console version (e.g., "3.4.1").
+                    type: string
+                  subDomain:
+                    default: console
+                    description: The subdomain for console.
+                    type: string
+                required:
+                - dbPassword
+                type: object
+              gitlab:
+                description: Configuration for GitLab.
+                properties:
+                  namespace:
+                    default: dso-gitlab
+                    description: The namespace for GitLab.
+                    type: string
+                  subDomain:
+                    default: gitlab
+                    description: The subdomain for GitLab.
+                    type: string
+                  version:
+                    default: 6.11.4
+                    description: GitLab version (e.g., "6.11.4").
+                    type: string
+                  values:
+                    description: |
+                      You can merge customs values for gitlab, it will be merged with roles/gitlab/templates/gitlab-instance.yaml.j2
+                      See https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
+                      And https://docs.gitlab.com/charts/charts/globals.html
+                    type: object
+                    default: {}
+                    x-kubernetes-preserve-unknown-fields: true
+                  insecureCI:
+                    description: |
+                      If you use a private CA in exposed_ca, you should set it to true.
+                      Configuring tools in pipelines container is not an easy job.
+                    type: boolean
+                    default: false
+                required:
+                - version
+                type: object
+              global:
+                description: Global configuration not specific to one service
+                properties:
+                  projectsRootDir:
+                    default:
+                    - forge
+                    description: |
+                      Defines root directory for projects in Gitlab and Vault
+                      This values should NEVER be changed once a project is used !
+                      projects will not be migrated automatically
+                      Repesented as array of string (ex: ['company', 'forge', 'projects'])
+                      Cannot be an empty Array
+                    items:
+                      type: string
+                    minItems: 1
+                    type: array
+                  rootDomain:
+                    description: The top level of your domain. To expose Argo as "argo.mycompany.com",
+                      the value should be ".mycompany.com" (notice the leading dot).
+                    type: string
+                    default: .example.com
+                    pattern: "^\\..*$"
+                required:
+                - projectsRootDir
+                - rootDomain
+                type: object
+              harbor:
+                description: Configuration for Harbor.
+                properties:
+                  adminPassword:
+                    description: Administrator password for Harbor.
+                    type: string
+                  namespace:
+                    default: dso-harbor
+                    description: The namespace for Harbor.
+                    type: string
+                  subDomain:
+                    default: harbor
+                    description: The subdomain for Harbor.
+                    type: string
+                  values:
+                    description: |
+                      You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml
+                      See https://github.com/goharbor/harbor-helm
+                    type: object
+                    default: {}
+                    x-kubernetes-preserve-unknown-fields: true
+                required:
+                - adminPassword
+                type: object
+              ingress:
+                description: General configuration for ingress.
+                properties:
+                  annotations:
+                    x-kubernetes-preserve-unknown-fields: true
+                    default: {}
+                    description: Additionals annotations to add to all tools' ingresses
+                    type: object
+                  labels:
+                    x-kubernetes-preserve-unknown-fields: true
+                    default: {}
+                    description: Additionals labels to add to all tools' ingresses
+                    type: object
+                  tls:
+                    description: TLS configuration for ingresses.
+                    properties:
+                      acme:
+                        description: acme/let'sencrypt configuration, only http challenge
+                        properties:
+                          email:
+                            description: User email used for ACME
+                            type: string
+                        required:
+                        - email
+                        type: object
+                      ca:
+                        description: CA configuration, need a valid CA key/cert in
+                          cert-manager namespace
+                        properties:
+                          secretName:
+                            description: The TLS secret name available in cert-manager
+                              namespace
+                            type: string
+                        required:
+                        - secretName
+                        type: object
+                      tlsSecret:
+                        description: Define the tls secret name to use in ingress
+                        properties:
+                          method:
+                            description: |
+                              How to retrieve the secret names:
+                              - in-namespace: you are in charge to replicate the secret in tools' namespaces
+                            enum:
+                            - in-namespace
+                            type: string
+                            default: in-namespace
+                          name:
+                            description: tls secret name
+                            type: string
+                        required:
+                        - name
+                        - method
+                        type: object
+                      type:
+                        default: none
+                        description: "- none: no TLS (seems like a bad idea, unstable
+                          deployment). \n- acme: TLS with HTTP ACME challenge -> https://cert-manager.io/docs/configuration/acme/http01/\n-
+                          ca: TLS with custom CA -> https://cert-manager.io/docs/configuration/ca/\n-
+                          tlsSecret: TLS with a custom TLS secret name specified in
+                          ingress.spec.tls.secretName, should be wildcard or include
+                          all hosts -> https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets\n"
+                        enum:
+                        - none
+                        - acme
+                        - ca
+                        - tlsSecret
+                        type: string
+                    required:
+                    - type
+                    type: object
+                type: object
+              keycloak:
+                description: Configuration for Keycloak.
+                properties:
+                  namespace:
+                    default: dso-keycloak
+                    description: The namespace for Keycloak.
+                    type: string
+                  subDomain:
+                    default: keycloak
+                    description: The subdomain for Keycloak.
+                    type: string
+                type: object
+              nexus:
+                description: Configuration for Nexus.
+                properties:
+                  namespace:
+                    default: dso-nexus
+                    description: The namespace for Nexus.
+                    type: string
+                  subDomain:
+                    default: nexus
+                    description: The subdomain for Nexus.
+                    type: string
+                  storageSize:
+                    description: |
+                      The storage size for Nexus.
+                      Must comply with Kubernetes size defnitions (i.e 100Gi).
+                    type: string
+                    default: 25Gi
+                required:
+                - storageSize
+                type: object
+              proxy:
+                description: Proxy configuration for tools.
+                properties:
+                  enabled:
+                    default: false
+                    description: Enable or disable proxy on tools.
+                    type: boolean
+                  host:
+                    description: Distant proxy ip/hostname
+                    type: string
+                  http_proxy:
+                    description: URL for http traffic, (http://<host>:<port>/)
+                    type: string
+                  https_proxy:
+                    description: URL for https traffic, (http://<host>:<port>/)
+                    type: string
+                  no_proxy:
+                    default: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
+                    description: "Networks destination excluded by the proxy. Not
+                      so easy to configure. \nExample: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain\n"
+                    type: string
+                  port:
+                    default: "3128"
+                    description: Distant proxy port listenning
+                    type: string
+                required:
+                - enabled
+                type: object
+              sonarqube:
+                description: Configuration for SonarQube.
+                properties:
+                  namespace:
+                    default: dso-sonarqube
+                    description: The namespace for SonarQube.
+                    type: string
+                  subDomain:
+                    default: sonarqube
+                    description: The subdomain for SonarQube.
+                    type: string
+                type: object
+              sops:
+                properties:
+                  namespace:
+                    default: dso-sops
+                    description: Namespace for SOPS.
+                    type: string
+                type: object
+              vault:
+                description: Configuration for Vault.
+                properties:
+                  namespace:
+                    default: dso-vault
+                    description: The namespace for Vault.
+                    type: string
+                  subDomain:
+                    default: vault
+                    description: The subdomain for Vault.
+                    type: string
+                  values:
+                    description: |
+                      You can merge customs values for vault, it will be merged with roles/vault/tasks/main.yaml
+                      See https://github.com/hashicorp/vault-helm
+                    type: object
+                    default: {}
+                    x-kubernetes-preserve-unknown-fields: true
+                type: object
+            required:
+            - additionalsCA
+            - exposedCA
+            - ingress
+            - proxy
+            - certmanager
+            - console
+            - sonarqube
+            - vault
+            - keycloak
+            - nexus
+            - harbor
+            - gitlab
+            - argocd
+            - sops
+            - global
+            type: object
+        required:
+        - spec
+        - metadata
+        type: object
+    served: true
+    storage: true

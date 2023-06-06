@@ -15,7 +15,7 @@
     - name: Wait Keycloak
       kubernetes.core.k8s_info:
         kind: keycloak
-        namespace: "{{ KEYCLOAK_NAMESPACE }}"
+        namespace: "{{ DSC.keycloak.namespace }}"
         name: dso-keycloak
         api_version: keycloak.org/v1alpha1
       register: keycloak_instance
@@ -36,7 +36,7 @@
 
 - name: Find keycloak admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ KEYCLOAK_NAMESPACE }}"
+    namespace: "{{ DSC.keycloak.namespace }}"
     kind: Secret
     name: "{{ keycloak_instance.resources[0].status.credentialSecret }}"
   register: kc_admin
@@ -53,7 +53,7 @@
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     state: patched
     definition:
       data:
@@ -67,7 +67,7 @@
 
 - name: Find dso admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ KEYCLOAK_NAMESPACE }}"
+    namespace: "{{ DSC.keycloak.namespace }}"
     kind: Secret
     name: dso-admin-user-secret
   register: dso_admin
@@ -84,7 +84,7 @@
         definition:
           kind: Secret
           metadata:
-            namespace: "{{ KEYCLOAK_NAMESPACE }}"
+            namespace: "{{ DSC.keycloak.namespace }}"
             name: dso-admin-user-secret
           data:
             ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"

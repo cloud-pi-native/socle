@@ -4,7 +4,7 @@ metadata:
   name: harbor-client
   labels:
     app: sso
-  namespace: {{ KEYCLOAK_NAMESPACE }}
+  namespace: {{ DSC.keycloak.namespace }}
 spec:
   client:
     clientId: harbor-client

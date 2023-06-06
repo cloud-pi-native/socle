@@ -39,8 +39,8 @@
     definition:
       data:
         ca.pem: |
-          {{ ca_pem }}
-  when: additionals_ca | length != 0
+          {{ exposed_ca_pem }}
+  when: exposed_ca.type != 'none'
 
 - name: Apply app
   kubernetes.core.k8s:

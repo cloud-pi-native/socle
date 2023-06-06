@@ -13,6 +13,19 @@ additionals_ca: []
 #   name: kube-root-ca.crt
 #   key: ca.crt
 
+exposed_ca:
+  # none, configmap, secret, url, certmanager
+  type: none
+  configmap:
+    namespace:
+    name:
+    key:
+  secret:
+    namespace:
+    name:
+    key:
+  url: https://url.to.my.private.ca/raw
+
 # GLOBAL INGRESS
 ingress:
   tls:
@@ -81,11 +94,16 @@ GITLAB_DOMAIN: gitlab{{ ROOT_DOMAIN }}
 # See https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
 # And https://docs.gitlab.com/charts/charts/globals.html
 GITLAB_VALUES: {}
+# If you use a private CA in exposed_ca, you should set it to true, configuring tools in pipelines container is not an easy job
+GITLAB_INSECURE_CI: false
 
 # HARBOR
 HARBOR_NAMESPACE: harbor-system
 HARBOR_DOMAIN: harbor{{ ROOT_DOMAIN }}
 HARBOR_ADMIN_PASSWORD: MySuperPassword
+# You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml
+# See https://github.com/goharbor/harbor-helm
+HARBOR_VALUES: {}
 
 # KEYCLOAK
 KEYCLOAK_NAMESPACE: keycloak-system
@@ -95,6 +113,7 @@ KEYCLOAK_DOMAIN: keycloak{{ ROOT_DOMAIN }}
 # NEXUS
 NEXUS_NAMESPACE: nexus-system
 NEXUS_DOMAIN: nexus{{ ROOT_DOMAIN }}
+NEXUS_STORAGE_SIZE: 100Gi
 
 # SONARQUBE
 SONAR_NAMESPACE: sonar-system
@@ -106,3 +125,4 @@ SOPS_NAMESPACE: sops-system
 # VAULT
 VAULT_NAMESPACE: vault-system
 VAULT_DOMAIN: vault{{ ROOT_DOMAIN }}
+VAULT_VALUES: {}

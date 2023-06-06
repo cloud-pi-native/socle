@@ -1,6 +1,6 @@
 - name: Get vaulth health
   uri:
-    validate_certs: "{{ additionals_ca | ternary(false, true) }}"
+    validate_certs: "{{ exposed_ca.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/health"
     status_code: [200, 503, 501]
   register: vault_health

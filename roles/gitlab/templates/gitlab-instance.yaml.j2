@@ -35,6 +35,9 @@ global:
       - secret: {{ item.name }}
 {% endif %}
 {% endfor %}
+{% if exposed_ca.type != 'none' %}
+      - secret: exposed-ca
+{% endif %}
   hosts:
     domain: {{ ROOT_DOMAIN[1:] }}
     registry:

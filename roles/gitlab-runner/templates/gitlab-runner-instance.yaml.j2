@@ -4,15 +4,17 @@ metadata:
   name: gitlab-runner
   namespace: {{ GITLAB_NAMESPACE }}
 spec:
-  gitlabUrl: https://{{ GITLAB_DOMAIN }}/
-  runUntagged: true
   buildImage: alpine
-  token: gitlab-gitlab-runner-secret
-  tags: openshift
-  env: custom-env
-{% if ingress.tls.type != 'tlsSecret' %}
-  ca: gitlab-webservice
-{% else %}
+{% if ingress.tls.type == 'tlsSecret' %}
   ca: {{ ingress.tls.tlsSecret.name }}
+{% elif exposed_ca.type != 'none' %}
+  ca: exposed-ca
+{% else %}
+  ca: 
 {% endif %}
   #config: custom-config-toml
+  env: custom-env
+  gitlabUrl: https://{{ GITLAB_DOMAIN }}/
+  runUntagged: true
+  tags: openshift
+  token: gitlab-gitlab-runner-secret

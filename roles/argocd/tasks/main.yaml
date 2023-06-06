@@ -36,76 +36,7 @@
 
 - name: Set extra env vars
   ansible.builtin.set_fact:
-    # TODO variabilize openshift boolean
-    helm_values: |
-      openshift:
-        enabled: true
-      config:
-        secret:
-          argocdServerAdminPassword: "{{ ARGOCD_ADMIN_PASSWORD }}"
-      dex:
-        enabled: true
-      server:
-        insecure: true
-        config:
-          clusterResources: "true"
-          url: "https://{{ ARGOCD_DOMAIN }}/"
-          oidc.config: |
-            issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
-            requestedScopes: ["openid", "generic"]
-            name: Keycloak
-            clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
-            clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
-      {% if additionals_ca | length %}
-            rootCA: |
-              {{ ca_pem | indent(width=8, first=False) }}
-      {% endif %}
-          users.anonymous.enabled: "false"
-          admin.enabled: "false" # TODO variabilize
-          resource.exclusions: |
-            - apiGroups:
-              - tekton.dev
-              clusters:
-              - '*'
-              kinds:
-              - TaskRun
-              - PipelineRun
-        extraEnvVars:
-      {% if USE_PROXY %}
-          - name: HTTP_PROXY
-            value: "{{ HTTP_PROXY }}"
-          - name: HTTPS_PROXY
-            value: "{{ HTTPS_PROXY }}"
-          - name: NO_PROXY
-            value: "{{ NO_PROXY }},argo-argo-cd-repo-server"
-      {% endif %}
-      repoServer:
-        extraEnvVars:
-      {% if USE_PROXY %}
-          - name: HTTP_PROXY
-            value: "{{ HTTP_PROXY }}"
-          - name: HTTPS_PROXY
-            value: "{{ HTTPS_PROXY }}"
-          - name: NO_PROXY
-            value: "{{ NO_PROXY }}"
-      {% endif %}
-      extraDeploy:
-        - apiVersion: v1
-          data:
-            policy.csv: |
-              p, role:admin, *, *, */*, allow
-              p, role:nada, *, *, */*, deny
-              g, system:cluster-admins, role:admin
-              g, cluster-admins, role:admin
-              g, /ArgoCDAdmins, role:admin
-              g, ArgoCDAdmins, role:admin
-            scopes: "[groups]"
-            policy.default: role:nada
-            admin.enabled: "false"
-          kind: ConfigMap
-          metadata:
-            name: argocd-rbac-cm
-            namespace: {{ ARGOCD_NAMESPACE }}
+    argo_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
 - name: Deploy helm
   kubernetes.core.helm:
@@ -113,7 +44,7 @@
     chart_ref: bitnami/argo-cd
     release_namespace: "{{ ARGOCD_NAMESPACE }}"
     create_namespace: true
-    values: "{{ helm_values | from_yaml }}"
+    values: "{{ argo_values }}"
 
 - name: Find gitlab token in inventory
   kubernetes.core.k8s_info:

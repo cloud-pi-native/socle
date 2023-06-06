@@ -7,17 +7,17 @@
 
 - name: Set ca fact (cm)
   ansible.builtin.set_fact:
-    ca_pem_array: "{{ ca_pem_array + [ca_cert.resources[0].data[key]] }}"
+    additionals_ca_pem_array: "{{ additionals_ca_pem_array + [ca_cert.resources[0].data[key]] }}"
   when: kind == 'ConfigMap' and key | length != 0
 
 - name: Set ca fact (secret)
   ansible.builtin.set_fact:
-    ca_pem_array: "{{ ca_pem_array + [( ca_cert.resources[0].data[key] | b64decode )] }}"
+    additionals_ca_pem_array: "{{ additionals_ca_pem_array + [( ca_cert.resources[0].data[key] | b64decode )] }}"
   when: kind == 'Secret' and key | length != 0
 
 - name: Set ca fact (cm)
   ansible.builtin.set_fact:
-    ca_pem_array: "{{ ca_pem_array + [ca_cert.resources[0].data[resKey.key]] }}"
+    additionals_ca_pem_array: "{{ additionals_ca_pem_array + [ca_cert.resources[0].data[resKey.key]] }}"
   loop: "{{ ca_cert.resources[0].data | dict2items }}"
   when: kind == 'ConfigMap' and key | length == 0
   loop_control:
@@ -25,7 +25,7 @@
 
 - name: Set ca fact (secret)
   ansible.builtin.set_fact:
-    ca_pem_array: "{{ ca_pem_array + [( ca_cert.resources[0].data[resKey.key] | b64decode )] }}"
+    additionals_ca_pem_array: "{{ additionals_ca_pem_array + [( ca_cert.resources[0].data[resKey.key] | b64decode )] }}"
   loop: "{{ ca_cert.resources[0].data | dict2items }}"
   when: kind == 'Secret' and key | length == 0
   loop_control:

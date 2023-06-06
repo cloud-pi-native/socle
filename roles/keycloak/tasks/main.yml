@@ -109,6 +109,7 @@
 
 - name: Create base admins groups 
   community.general.keycloak_group:
+    validate_certs: false # Uncomment temporarily in case of task failure
     name: "{{ item }}"
     realm: dso
     state: present

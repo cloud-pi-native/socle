@@ -1,7 +1,7 @@
 - name: Get argo client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: "{{ KEYCLOAK_NAMESPACE }}"
+    namespace: "{{ DSC.keycloak.namespace }}"
     name: keycloak-client-secret-argo-client
   register: argocd_secret
   failed_when: argocd_secret.resources | length == 0
@@ -20,13 +20,13 @@
         name: system:openshift:scc:privileged
       subjects:
         - kind: ServiceAccount
-          namespace: "{{ ARGOCD_NAMESPACE }}"
+          namespace: "{{ DSC.argocd.namespace }}"
           name: argo-argo-cd-argocd-repo-server
         - kind: ServiceAccount
-          namespace: "{{ ARGOCD_NAMESPACE }}"
+          namespace: "{{ DSC.argocd.namespace }}"
           name: argo-argo-cd-argocd-server
         - kind: ServiceAccount
-          namespace: "{{ ARGOCD_NAMESPACE }}"
+          namespace: "{{ DSC.argocd.namespace }}"
           name: argo-redis
 
 - name: Add helm repo
@@ -42,13 +42,13 @@
   kubernetes.core.helm:
     name: argo
     chart_ref: bitnami/argo-cd
-    release_namespace: "{{ ARGOCD_NAMESPACE }}"
+    release_namespace: "{{ DSC.argocd.namespace }}"
     create_namespace: true
     values: "{{ argo_values }}"
 
 - name: Find gitlab token in inventory
   kubernetes.core.k8s_info:
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     kind: ConfigMap
     name: dso-config
   register: ansible_inventory
@@ -58,14 +58,14 @@
     definition:
       data:
         password: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64encode }}"
-        url: "{{ ('https://' + ([GITLAB_DOMAIN, projectsRootDir] | flatten | join ('/') )) | b64encode }}"
+        url: "{{ ('https://' + ([GITLAB_DOMAIN, DSC.global.projectsRootDir] | flatten | join ('/') )) | b64encode }}"
         username: "{{ 'root' | b64encode }}"
       kind: Secret
       metadata:
         labels:
           argocd.argoproj.io/secret-type: repo-creds
         name: gitlab
-        namespace: "{{ ARGOCD_NAMESPACE }}"
+        namespace: "{{ DSC.argocd.namespace }}"
       type: Opaque
 
 - name: Install routes

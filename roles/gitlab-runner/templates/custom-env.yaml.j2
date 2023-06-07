@@ -1,9 +1,9 @@
 apiVersion: v1
 data:
-  HTTP_PROXY: "{{ USE_PROXY | ternary(HTTP_PROXY, '') }}"
-  HTTPS_PROXY: "{{ USE_PROXY | ternary(HTTPS_PROXY, '') }}"
-  NO_PROXY: "{{ USE_PROXY | ternary(NO_PROXY, '') }}"
+  HTTP_PROXY: "{{ DSC.proxy.enabled | ternary(DSC.proxy.http_proxy, '') }}"
+  HTTPS_PROXY: "{{ DSC.proxy.enabled | ternary(DSC.proxy.https_proxy, '') }}"
+  NO_PROXY: "{{ DSC.proxy.enabled | ternary(DSC.proxy.no_proxy, '') }}"
 kind: ConfigMap
 metadata:
   name: custom-env
-  namespace: {{ GITLAB_NAMESPACE }}
+  namespace: {{ DSC.gitlab.namespace }}

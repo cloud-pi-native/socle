@@ -56,16 +56,14 @@
     SONAR_DOMAIN: "{{ DSC.sonarqube.subDomain }}{{ ROOT_DOMAIN }}"
     VAULT_DOMAIN: "{{ DSC.vault.subDomain }}{{ ROOT_DOMAIN }}"
 
-- debug:
-    var: to_debug
-  vars:
-    to_debug:
-      - "{{ ARGOCD_DOMAIN }}"
-      - "{{ GITLAB_DOMAIN }}"
-      - "{{ HARBOR_DOMAIN }}"
-      - "{{ KEYCLOAK_DOMAIN }}"
-      - "{{ NEXUS_DOMAIN }}"
-      - "{{ SONAR_DOMAIN }}"
-      - "{{ VAULT_DOMAIN }}"
+#- ansible.builtin.debug:
+#    msg:
+#      - "ARGOCD_DOMAIN: {{ ARGOCD_DOMAIN }}"
+#      - "GITLAB_DOMAIN: {{ GITLAB_DOMAIN }}"
+#      - "HARBOR_DOMAIN: {{ HARBOR_DOMAIN }}"
+#      - "KEYCLOAK_DOMAIN: {{ KEYCLOAK_DOMAIN }}"
+#      - "NEXUS_DOMAIN: {{ NEXUS_DOMAIN }}"
+#      - "SONAR_DOMAIN: {{ SONAR_DOMAIN }}"
+#      - "VAULT_DOMAIN: {{ VAULT_DOMAIN }}"
 
 #- meta: end_play

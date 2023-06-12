@@ -4,7 +4,7 @@ metadata:
   name: dso-keycloak
   labels:
     app: sso
-  namespace: {{ KEYCLOAK_NAMESPACE }}
+  namespace: {{ DSC.keycloak.namespace }}
 spec:
   externalAccess:
     enabled: false
@@ -15,12 +15,12 @@ spec:
   keycloakDeploymentSpec:
     experimental:
       env:
-{% if USE_PROXY %}
+{% if DSC.proxy.enabled %}
         - name: HTTP_PROXY
-          value: {{ HTTP_PROXY }}
+          value: {{ DSC.proxy.http_proxy }}
         - name: HTTPS_PROXY
-          value: {{ HTTPS_PROXY }}
+          value: {{ DSC.proxy.https_proxy }}
         - name: NO_PROXY
-          value: {{ NO_PROXY }}
+          value: {{ DSC.proxy.no_proxy }}
 {% endif %}
   instances: 1

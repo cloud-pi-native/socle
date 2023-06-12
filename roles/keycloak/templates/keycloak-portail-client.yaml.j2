@@ -4,7 +4,7 @@ metadata:
   name: portail-client
   labels:
     app: sso
-  namespace: {{ KEYCLOAK_NAMESPACE }}
+  namespace: {{ DSC.keycloak.namespace }}
 spec:
   client:
     clientId: portail-client

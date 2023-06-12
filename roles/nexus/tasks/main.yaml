@@ -5,7 +5,7 @@
       kind: Namespace
       metadata:
         creationTimestamp: null
-        name: "{{ NEXUS_NAMESPACE }}"
+        name: "{{ DSC.nexus.namespace }}"
 
 - name: Create nexus Service Account
   kubernetes.core.k8s:
@@ -14,7 +14,7 @@
       kind: ServiceAccount
       metadata:
         name: nexus-sa
-        namespace: "{{ NEXUS_NAMESPACE }}"
+        namespace: "{{ DSC.nexus.namespace }}"
 
 - name: Manage PVC
   include_tasks:
@@ -29,7 +29,7 @@
 
 - name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     kind: ConfigMap
     name: dso-config
   register: ansible_inventory
@@ -46,7 +46,7 @@
     - name: Wait nexus to initialize
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: "{{ NEXUS_NAMESPACE }}"
+        namespace: "{{ DSC.nexus.namespace }}"
         name: nexus
       register: endpoint
       until: endpoint.resources[0].subsets is defined and endpoint.resources[0].subsets | selectattr('addresses')
@@ -56,7 +56,7 @@
     - name: Get nexus pod's name
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: "{{ NEXUS_NAMESPACE }}"
+        namespace: "{{ DSC.nexus.namespace }}"
         name: nexus
       register: nx_ep
 
@@ -67,7 +67,7 @@
     - name: Récupération du compte admin
       kubernetes.core.k8s_exec:
         pod: "{{ nx_pod }}"
-        namespace: "{{ NEXUS_NAMESPACE }}"
+        namespace: "{{ DSC.nexus.namespace }}"
         command: cat /nexus-data/admin.password
       register: admin_account
       until: admin_account.stdout is defined and admin_account.stdout
@@ -84,6 +84,7 @@
 
     - name: Change nexus password
       ansible.builtin.uri:
+        validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
         force_basic_auth: true
         url: "https://{{ NEXUS_DOMAIN }}/service/rest/v1/security/users/admin/change-password"
         method: PUT
@@ -103,7 +104,7 @@
       kubernetes.core.k8s:
         kind: ConfigMap
         name: dso-config
-        namespace: "{{ CONSOLE_NAMESPACE }}"
+        namespace: "{{ DSC.console.namespace }}"
         state: patched
         definition:
           data:

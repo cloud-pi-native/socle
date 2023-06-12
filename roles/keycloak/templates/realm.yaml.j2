@@ -4,7 +4,7 @@ metadata:
   name: dso-realm
   labels:
     app: sso
-  namespace: {{ KEYCLOAK_NAMESPACE }}
+  namespace: {{ DSC.keycloak.namespace }}
 spec:
   realm:
     id: dso

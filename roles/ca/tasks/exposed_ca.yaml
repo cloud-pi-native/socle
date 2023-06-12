@@ -1,42 +1,42 @@
 - name: no exposed_ca
-  when: exposed_ca.type == 'none'
+  when: DSC.exposedCA.type == 'none'
   set_fact:
     exposed_ca_pem: ""
 
 - name: exposed_ca (configmap)
-  when: exposed_ca.type == 'configmap'
+  when: DSC.exposedCA.type == 'configmap'
   block:
     - name: get configMap
       kubernetes.core.k8s_info:
-        name: "{{ exposed_ca.configmap.name }}"
-        namespace: "{{ exposed_ca.configmap.namespace }}"
+        name: "{{ DSC.exposedCA.configmap.name }}"
+        namespace: "{{ DSC.exposedCA.configmap.namespace }}"
         kind: ConfigMap
       register: exposed_ca_resource
 
     - name: extract key
       set_fact:
-        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[exposed_ca.configmap.key] }}"
+        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[DSC.exposedCA.configmap.key] }}"
 
 - name: exposed_ca (secret)
-  when: exposed_ca.type == 'secret'
+  when: DSC.exposedCA.type == 'secret'
   block:
     - name: get secret
       kubernetes.core.k8s_info:
-        name: "{{ exposed_ca.configmap.name }}"
-        namespace: "{{ exposed_ca.configmap.namespace }}"
+        name: "{{ DSC.exposedCA.configmap.name }}"
+        namespace: "{{ DSC.exposedCA.configmap.namespace }}"
         kind: Secret
       register: exposed_ca_resource
 
     - name: extract key
       set_fact:
-        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[exposed_ca.configmap.key] | b64decode }}"
+        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[DSC.exposedCA.configmap.key] | b64decode }}"
 
 - name: exposed_ca (certmanager)
-  when: exposed_ca.type == 'certmanager'
+  when: DSC.exposedCA.type == 'certmanager'
   block:
     - name: get certmanager secret
       kubernetes.core.k8s_info:
-        name: "{{ ingress.tls.ca.secretName }}"
+        name: "{{ DSC.ingress.tls.ca.secretName }}"
         namespace: "cert-manager"
         kind: Secret
       register: exposed_ca_resource
@@ -46,11 +46,11 @@
         exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data['tls.crt'] | b64decode }}"
 
 - name: exposed_ca (url)
-  when: exposed_ca.type == 'url'
+  when: DSC.exposedCA.type == 'url'
   block:
     - name: get url
       ansible.builtin.shell:
-        cmd: "curl {{ exposed_ca.url }} -s | openssl x509"
+        cmd: "curl {{ DSC.exposedCA.url }} -s | openssl x509"
       changed_when: false
       register: exposed_ca_resource
       tags: ['skip_ansible_lint']

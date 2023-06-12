@@ -1,6 +1,6 @@
 certmanager:
   install: true
-{% if ingress.tls.type != 'tlsSecret' %}
+{% if DSC.ingress.tls.type != 'tlsSecret' %}
 gitlab:
   webservice:
     ingress:
@@ -27,7 +27,7 @@ global:
   certificates:
     customCAs:
       - configMap: openshift-service-ca.crt
-{% for item in additionals_ca %}
+{% for item in DSC.additionalsCA %}
 {% if item.kind == 'ConfigMap' %}
       - configMap: {{ item.name }}
 {% endif %}
@@ -35,11 +35,11 @@ global:
       - secret: {{ item.name }}
 {% endif %}
 {% endfor %}
-{% if exposed_ca.type != 'none' %}
+{% if DSC.exposedCA.type != 'none' %}
       - secret: exposed-ca
 {% endif %}
   hosts:
-    domain: {{ ROOT_DOMAIN[1:] }}
+    domain: {{ DSC.global.rootDomain[1:] }}
     registry:
       name: gitlab-registry.example.com
 {% if GITLAB_DOMAIN %}
@@ -48,28 +48,28 @@ global:
 {% endif %}
   ingress:
     annotations:
-{% for key, val in ingress.annotations.items() %}
+{% for key, val in DSC.ingress.annotations.items() %}
       {{ key }}: {{ val }}
 {% endfor %}
     labels:
-{% for key, val in ingress.labels.items() %}
+{% for key, val in DSC.ingress.labels.items() %}
       {{ key }}: {{ val }}
 {% endfor %}
     class: none
     configureCertmanager: false
     tls:
       enabled: true
-{% if ingress.tls.type == 'tlsSecret' %}
-      secretName: {{ ingress.tls.tlsSecret.name }}
+{% if DSC.ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ DSC.ingress.tls.tlsSecret.name }}
 {% endif %}
   extraEnv:
-{% if USE_PROXY %}
-    http_proxy: {{ HTTP_PROXY }}
-    https_proxy: {{ HTTPS_PROXY }}
-    no_proxy: {{ NO_PROXY }}
-    HTTP_PROXY: {{ HTTP_PROXY }}
-    HTTPS_PROXY: {{ HTTPS_PROXY }}
-    NO_PROXY: {{ NO_PROXY }}
+{% if DSC.proxy.enabled %}
+    http_proxy: {{ DSC.proxy.http_proxy }}
+    https_proxy: {{ DSC.proxy.https_proxy }}
+    no_proxy: {{ DSC.proxy.no_proxy }}
+    HTTP_PROXY: {{ DSC.proxy.http_proxy }}
+    HTTPS_PROXY: {{ DSC.proxy.https_proxy }}
+    NO_PROXY: {{ DSC.proxy.no_proxy }}
 {% endif %}
   appConfig:
     ldap:

@@ -5,7 +5,7 @@
 - name: Get console client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: "{{ KEYCLOAK_NAMESPACE }}"
+    namespace: "{{ DSC.keycloak.namespace }}"
     name: keycloak-client-secret-console-frontend-client
   register: console_frontend_secret
   failed_when: console_frontend_secret.resources | length == 0
@@ -13,7 +13,7 @@
 - name: Get console client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: "{{ KEYCLOAK_NAMESPACE }}"
+    namespace: "{{ DSC.keycloak.namespace }}"
     name: keycloak-client-secret-console-backend-client
   register: console_backend_secret
   failed_when: console_backend_secret.resources | length == 0
@@ -21,7 +21,7 @@
 - name: Get old app.yaml
   kubernetes.core.k8s_info:
     kind: Application
-    namespace: "{{ ARGOCD_NAMESPACE }}"
+    namespace: "{{ DSC.argocd.namespace }}"
     name: console-pi-native
   register: console_app
 
@@ -33,14 +33,14 @@
 - name: set bundle-ca cm
   kubernetes.core.k8s:
     name: bundle
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     kind: ConfigMap
     api_version: v1
     definition:
       data:
         ca.pem: |
           {{ exposed_ca_pem }}
-  when: exposed_ca.type != 'none'
+  when: DSC.exposedCA.type != 'none'
 
 - name: Apply app
   kubernetes.core.k8s:

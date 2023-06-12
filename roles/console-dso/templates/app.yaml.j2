@@ -4,16 +4,16 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration:
   name: console-pi-native
-  namespace: {{ ARGOCD_NAMESPACE }}
+  namespace: {{ DSC.argocd.namespace }}
 spec:
   destination:
-    namespace: {{ CONSOLE_NAMESPACE }}
+    namespace: {{ DSC.console.namespace }}
     server: https://kubernetes.default.svc
   project: console-pi-native
   source: 
     path: helm
     repoURL: https://github.com/cloud-pi-native/console.git
-    targetRevision: v{{ CONSOLE_RELEASE }}
+    targetRevision: v{{ DSC.console.release }}
     releaseName: console-pi
     helm:
       parameters:
@@ -24,7 +24,7 @@ spec:
         - name: postgres.container.user
           value: dso
         - name: postgres.container.pass
-          value: {{ CONSOLE_DB_PASSWORD }}
+          value: {{ DSC.console.dbPassword }}
         - name: keycloak.client_id_backend
           value: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
         - name: keycloak.client_secret_backend
@@ -39,29 +39,29 @@ spec:
           value: "{{ KEYCLOAK_DOMAIN }}/auth"
         - name: keycloak.realm
           value: dso
-{% if exposed_ca.type != 'none' %}
+{% if DSC.exposedCA.type != 'none' %}
         - name: server.extra_ca.name
           value: bundle
         - name: server.extra_ca.key
           value: ca.pem
 {% endif %}
-{% for key, val in ingress.annotations.items() %}
+{% for key, val in DSC.ingress.annotations.items() %}
         - name: server.ingress.annotations.{{ key | regex_escape }}
           value: {{ val }}
         - name: client.ingress.annotations.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
-{% for key, val in ingress.labels.items() %}
+{% for key, val in DSC.ingress.labels.items() %}
         - name: server.ingress.labels.{{ key | regex_escape }}
           value: {{ val }}
         - name: client.ingress.labels.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
-{% if ingress.tls.type == 'tlsSecret' %}
+{% if DSC.ingress.tls.type == 'tlsSecret' %}
         - name: server.ingress.tls.secretName
-          value: {{ ingress.tls.tlsSecret.name }}
+          value: {{ DSC.ingress.tls.tlsSecret.name }}
         - name: client.ingress.tls.secretName
-          value: {{ ingress.tls.tlsSecret.name }}
+          value: {{ DSC.ingress.tls.tlsSecret.name }}
 {% endif %}
   syncPolicy:
     automated: {}

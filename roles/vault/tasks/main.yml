@@ -2,7 +2,7 @@
   kubernetes.core.k8s:
     state: present
     kind: namespace
-    name: "{{ VAULT_NAMESPACE }}"
+    name: "{{ DSC.vault.namespace }}"
     api_version: v1
 
 - name: Add helm repo
@@ -46,25 +46,25 @@
     proxy_fact:
       server:
         extraEnvironmentVars:
-          HTTP_PROXY: "{{ HTTP_PROXY }}"
-          HTTPS_PROXY: "{{ HTTPS_PROXY }}"
-          NO_PROXY: "{{ NO_PROXY }}"
-  when: USE_PROXY
+          HTTP_PROXY: "{{ DSC.proxy.http_proxy }}"
+          HTTPS_PROXY: "{{ DSC.proxy.https_proxy }}"
+          NO_PROXY: "{{ DSC.proxy.no_proxy }}"
+  when: DSC.proxy.enabled
 
 - name: set extraEnv
-  when: USE_PROXY
+  when: DSC.proxy.enabled
   set_fact:
     values: "{{ values | combine(proxy_fact, recursive=True) }}"
 
 - name: set VAULT_VALUES
   set_fact:
-    values: "{{ values | combine(VAULT_VALUES, recursive=True) }}"
+    values: "{{ values | combine(DSC.vault['values'], recursive=True) }}"
 
 - name: Deploy helm
   kubernetes.core.helm:
     name: vault
     chart_ref: hashicorp/vault
-    release_namespace: "{{ VAULT_NAMESPACE }}"
+    release_namespace: "{{ DSC.vault.namespace }}"
     create_namespace: true
     values: "{{ values }}"
 
@@ -78,7 +78,7 @@
   kubernetes.core.k8s:
     kind: Pod
     name: vault-0
-    namespace: "{{ VAULT_NAMESPACE }}"
+    namespace: "{{ DSC.vault.namespace }}"
     wait: true
     wait_sleep: 10
     wait_timeout: 600
@@ -89,7 +89,7 @@
 
 - name: find vault keys
   kubernetes.core.k8s_info:
-    namespace: "{{ VAULT_NAMESPACE }}"
+    namespace: "{{ DSC.vault.namespace }}"
     kind: Secret
     name: vault-keys
   register: vault_keys
@@ -102,15 +102,15 @@
     that:
       - ((vault_status in ['sealed', 'OK']) and (vault_keys.resources | length > 0)) or ((vault_status == 'not init') and (vault_keys.resources | length == 0))
     fail_msg:
-      - "Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-keys dans {{ VAULT_NAMESPACE }}"
+      - "Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-keys dans {{ DSC.vault.namespace }}"
       - "Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation"
-      - "Soit le vault est initialisé mais vous n'avez pas de secret vault-keys dans {{ VAULT_NAMESPACE }}, et c'est inquiétant !"
+      - "Soit le vault est initialisé mais vous n'avez pas de secret vault-keys dans {{ DSC.vault.namespace }}, et c'est inquiétant !"
 
 - name: init vault
   kubernetes.core.k8s_exec:
     container: vault
     pod: vault-0
-    namespace: "{{ VAULT_NAMESPACE }}"
+    namespace: "{{ DSC.vault.namespace }}"
     command: vault operator init -key-shares=3 -key-threshold=2
   when: vault_status == 'not init'
   register: init
@@ -124,7 +124,7 @@
       kind: Secret
       metadata:
         name: vault-keys
-        namespace: "{{ VAULT_NAMESPACE }}"
+        namespace: "{{ DSC.vault.namespace }}"
       data:
         key1: "{{ init.stdout_lines[0] | regex_replace('^Unseal Key 1: (.*)$', '\\1', multiline=True) | b64encode }}"
         key2: "{{ init.stdout_lines[1] | regex_replace('^Unseal Key 2: (.*)$', '\\1', multiline=True) | b64encode }}"
@@ -134,7 +134,7 @@
 
 - name: find vault keys
   kubernetes.core.k8s_info:
-    namespace: "{{ VAULT_NAMESPACE }}"
+    namespace: "{{ DSC.vault.namespace }}"
     kind: Secret
     name: vault-keys
   register: vault_keys
@@ -143,7 +143,7 @@
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     state: patched
     definition:
       data:
@@ -167,7 +167,7 @@
 
 - name: "Config: get auth method"
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     status_code: [200, 400]
     headers:
@@ -178,7 +178,7 @@
 - name: "Config: set auth method"
   when: jwt_state.status == 400
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     method: POST
     status_code: [204]
@@ -191,7 +191,7 @@
 
 - name: "Config: add role default-ci"
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/auth/jwt/role/default-ci"
     method: POST
     status_code: [204]
@@ -216,7 +216,7 @@
 
 - name: "Config: set jwt config"
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/auth/jwt/config"
     method: POST
     status_code: [204]
@@ -230,7 +230,7 @@
 
 - name: "Config: get accessor jwt config"
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/auth/jwt"
     status_code: [200]
     headers:
@@ -239,7 +239,7 @@
 
 - name: "Config: create policy"
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/policy/default-ci"
     method: POST
     status_code: [204]
@@ -257,7 +257,7 @@
 
 - name: "Config: get kv engines"
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/mounts/forge-dso"
     status_code: [200, 400]
     headers:
@@ -267,7 +267,7 @@
 - name: "Config: create kv engine"
   when: get_engines.status == 400
   uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/mounts/forge-dso"
     method: POST
     status_code: [204]

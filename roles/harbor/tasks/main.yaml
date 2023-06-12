@@ -3,7 +3,7 @@
     definition:
       kind: Namespace
       metadata:
-        name: "{{ HARBOR_NAMESPACE }}"
+        name: "{{ DSC.harbor.namespace }}"
 
 - name: Create service account
   kubernetes.core.k8s:
@@ -11,7 +11,7 @@
       kind: ServiceAccount
       metadata:
         name: harbor-sa
-        namespace: "{{ HARBOR_NAMESPACE }}"
+        namespace: "{{ DSC.harbor.namespace }}"
 
 - name: Harbor crb
   kubernetes.core.k8s:
@@ -27,7 +27,7 @@
         name: system:openshift:scc:privileged
       subjects:
         - kind: ServiceAccount
-          namespace: "{{ HARBOR_NAMESPACE }}"
+          namespace: "{{ DSC.harbor.namespace }}"
           name: harbor-sa
 
 - name: Add helm repo
@@ -41,31 +41,31 @@
 
 - name: Merge with harbor user values
   set_fact:
-    harbor_values: "{{ harbor_values | combine(HARBOR_VALUES, recursive=True) }}"
+    harbor_values: "{{ harbor_values | combine(DSC.harbor['values'], recursive=True) }}"
 
 - name: Deploy helm
   kubernetes.core.helm:
     name: harbor
     chart_ref: harbor/harbor
     chart_version: "1.12.0"
-    release_namespace: "{{ HARBOR_NAMESPACE }}"
+    release_namespace: "{{ DSC.harbor.namespace }}"
     values: "{{ harbor_values }}"
 
 - name: Update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     state: patched
     definition:
       data:
-        HARBOR_ADMIN_PASSWORD: "{{ HARBOR_ADMIN_PASSWORD }}"
+        HARBOR_ADMIN_PASSWORD: "{{ DSC.harbor.adminPassword }}"
 
 - name: Get harbor config
   ansible.builtin.uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
-    password: "{{ HARBOR_ADMIN_PASSWORD }}"
+    password: "{{ DSC.harbor.adminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -77,7 +77,7 @@
 - name: Get harbor client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: "{{ KEYCLOAK_NAMESPACE }}"
+    namespace: "{{ DSC.keycloak.namespace }}"
     name: keycloak-client-secret-harbor-client
   register: harbor_secret
   failed_when: harbor_secret.resources | length == 0
@@ -97,7 +97,7 @@
       "oidc_name": "keycloak"
       "oidc_scope": "openid"
       "oidc_user_claim": "email"
-      "oidc_verify_cert": "{{ exposed_ca.type == 'none' }}"
+      "oidc_verify_cert": "{{ DSC.exposedCA.type == 'none' }}"
       "project_creation_restriction": "adminonly"
       "quota_per_project_enable": true
       "read_only": false
@@ -117,10 +117,10 @@
 
 - name: PUT harbor config
   ansible.builtin.uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     method: PUT
     url: https://{{ HARBOR_DOMAIN }}/api/v2.0/configurations
-    password: "{{ HARBOR_ADMIN_PASSWORD }}"
+    password: "{{ DSC.harbor.adminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json

@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: {{ NEXUS_NAMESPACE }}
+  namespace: {{ DSC.nexus.namespace }}
   name: nexus  # Sets Deployment name
 spec:
   replicas: 1
@@ -37,7 +37,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ NEXUS_NAMESPACE }}
+  namespace: {{ DSC.nexus.namespace }}
   name: nexus # Sets service name
   labels:
     app: nexus # Labels and Selectors

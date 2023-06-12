@@ -9,14 +9,14 @@
   kubernetes.core.k8s_info:
     api_version: apps.gitlab.com/v1beta1
     kind: GitLab
-    namespace: "{{ GITLAB_NAMESPACE }}"
+    namespace: "{{ DSC.gitlab.namespace }}"
   register: gitlab_kind
   until: gitlab_kind.api_found
 
 - name: Get Gitlab client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: "{{ KEYCLOAK_NAMESPACE }}"
+    namespace: "{{ DSC.keycloak.namespace }}"
     name: keycloak-client-secret-gitlab-client
   register: gitlab_secret
   failed_when: gitlab_secret.resources | length == 0
@@ -50,12 +50,12 @@
       kind: Secret
       metadata:
         name: openid-connect
-        namespace: "{{ GITLAB_NAMESPACE }}"
+        namespace: "{{ DSC.gitlab.namespace }}"
 
 - name: Create exposed_ca Secret
   kubernetes.core.k8s:
     kind: Secret
-    namespace: "{{ GITLAB_NAMESPACE }}"
+    namespace: "{{ DSC.gitlab.namespace }}"
     name: exposed-ca
     definition:
       data:
@@ -67,25 +67,25 @@
 
 - name: Merge with gitlab user values
   set_fact:
-    gitlab_values: "{{ gitlab_values | combine(GITLAB_VALUES, recursive=True) }}"
+    gitlab_values: "{{ gitlab_values | combine(DSC.gitlab['values'], recursive=True) }}"
 
 - name: Install gitlab instance
   kubernetes.core.k8s:
     api_version: apps.gitlab.com/v1beta1
     kind: GitLab
     name: gitlab
-    namespace: "{{ GITLAB_NAMESPACE }}"
+    namespace: "{{ DSC.gitlab.namespace }}"
     definition:
       spec:
         chart:
-          version: "{{ GITLAB_VERSION }}"
+          version: "{{ DSC.gitlab.version }}"
           values: "{{ gitlab_values }}"
 
 - name: Wait gitlab instance to be 'Running'
   kubernetes.core.k8s_info:
     api_version: apps.gitlab.com/v1beta1
     kind: GitLab
-    namespace: "{{ GITLAB_NAMESPACE }}"
+    namespace: "{{ DSC.gitlab.namespace }}"
     name: gitlab
   register: gitlab_instance
   until: gitlab_instance.resources[0] is defined and gitlab_instance.resources[0].status is defined and gitlab_instance.resources[0].status.phase == 'Running'
@@ -94,7 +94,7 @@
 
 - name: Find gitlab token in inventory
   kubernetes.core.k8s_info:
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     kind: ConfigMap
     name: dso-config
   register: ansible_inventory
@@ -108,7 +108,7 @@
 - name: Test Gitlab token
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/admin/ci/variables"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -123,7 +123,7 @@
         kind: pod
         label_selectors:
           - app = toolbox
-        namespace: "{{ GITLAB_NAMESPACE }}"
+        namespace: "{{ DSC.gitlab.namespace }}"
       register: toolbox_pods
 
     - name: Set toolbox pod name
@@ -133,7 +133,7 @@
     - name: Create Token
       kubernetes.core.k8s_exec:
         pod: "{{ tb_pod }}"
-        namespace: "{{ GITLAB_NAMESPACE }}"
+        namespace: "{{ DSC.gitlab.namespace }}"
         command: >
           bash -c "echo 'PersonalAccessToken.create!(user_id: 1
           , name: \"ANSIBLE-DSO\"
@@ -149,7 +149,7 @@
       kubernetes.core.k8s:
         kind: ConfigMap
         name: dso-config
-        namespace: "{{ CONSOLE_NAMESPACE }}"
+        namespace: "{{ DSC.console.namespace }}"
         state: patched
         definition:
           data:
@@ -157,7 +157,7 @@
 
 - name: Get settings
   ansible.builtin.uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -166,7 +166,7 @@
 
 - name: Set some parameters
   ansible.builtin.uri:
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     url: "https://{{ GITLAB_DOMAIN }}/api/v4/application/settings"
     method: PUT
     headers:
@@ -191,16 +191,16 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
-    group: "{{ projectsRootDir | join('/') }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
+    group: "{{ DSC.global.projectsRootDir | join('/') }}"
     purge: false
     variables:
       - name: VAULT_KV
         value: forge-dso
       - name: CATALOG_PATH
-        value: "{{ projectsRootDir | join('/') }}/catalog"
+        value: "{{ DSC.global.projectsRootDir | join('/') }}/catalog"
       - name: PROJECTS_ROOT_DIR
-        value: "{{ projectsRootDir | join('/') }}"
+        value: "{{ DSC.global.projectsRootDir | join('/') }}"
       - name: "NEXUS_HOST_URL"
         value: "https://{{ NEXUS_DOMAIN }}"
       - name: "NEXUS_HOSTNAME"
@@ -224,36 +224,36 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
-    group: "{{ projectsRootDir | join('/') }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
+    group: "{{ DSC.global.projectsRootDir | join('/') }}"
     purge: false
-    state: "{{ USE_PROXY | ternary('present', 'absent') }}"
+    state: "{{ DSC.proxy.enabled | ternary('present', 'absent') }}"
     variables:
       - name: "HTTP_PROXY"
-        value: "{{ HTTP_PROXY }}"
+        value: "{{ DSC.proxy.http_proxy }}"
       - name: "HTTPS_PROXY"
-        value: "{{ HTTPS_PROXY }}"
+        value: "{{ DSC.proxy.https_proxy }}"
       - name: "NO_PROXY"
-        value: "{{ NO_PROXY }}"
+        value: "{{ DSC.proxy.no_proxy }}"
       - name: "PROXY_HOST"
-        value: "{{ PROXY_HOST }}"
+        value: "{{ DSC.proxy.host }}"
       - name: "PROXY_PORT"
-        value: "{{ PROXY_PORT }}"
+        value: "{{ DSC.proxy.port }}"
       - name: "http_proxy"
-        value: "{{ HTTP_PROXY }}"
+        value: "{{ DSC.proxy.http_proxy }}"
       - name: "https_proxy"
-        value: "{{ HTTPS_PROXY }}"
+        value: "{{ DSC.proxy.https_proxy }}"
       - name: "no_proxy"
-        value: "{{ NO_PROXY }}"
+        value: "{{ DSC.proxy.no_proxy }}"
 
 - name: "Set or update CA_BUNDLE variable"
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
-    group: "{{ projectsRootDir | join('/') }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
+    group: "{{ DSC.global.projectsRootDir | join('/') }}"
     purge: false
-    state: "{{ additionals_ca | ternary('present', 'absent') }}"
+    state: "{{ DSC.additionalsCA | ternary('present', 'absent') }}"
     variables:
       - name: "CA_BUNDLE"
         value: "{{ [additionals_ca_pem, exposed_ca_pem] | join('\n') }}"
@@ -263,10 +263,10 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
-    group: "{{ projectsRootDir | join('/') }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
+    group: "{{ DSC.global.projectsRootDir | join('/') }}"
     purge: false
-    state: "{{ GITLAB_INSECURE_CI | ternary('present', 'absent') }}"
+    state: "{{ DSC.gitlab.insecureCI | ternary('present', 'absent') }}"
     variables:
       - name: "EXTRA_KANIKO_ARGS"
         value: "--skip-tls-verify"

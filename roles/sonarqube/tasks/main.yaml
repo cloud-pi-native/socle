@@ -1,16 +1,16 @@
-- name: create "{{ SONAR_NAMESPACE }}" namespace
+- name: Create "{{ DSC.sonarqube.namespace }}" namespace
   kubernetes.core.k8s:
     kind: Namespace
-    name: "{{ SONAR_NAMESPACE }}"
+    name: "{{ DSC.sonarqube.namespace }}"
 
-- name: get dso-postgres-secret
+- name: Get dso-postgres-secret
   kubernetes.core.k8s_info:
     kind: Secret
     name: dso-postgres-secret
-    namespace: "{{ SONAR_NAMESPACE }}"
+    namespace: "{{ DSC.sonarqube.namespace }}"
   register: dso_postgres_secret
 
-- name: create dso-postgres-secret values
+- name: Create dso-postgres-secret values
   when: dso_postgres_secret.resources | length == 0
   block:
     - name: Set postgres login
@@ -18,13 +18,13 @@
         postgres_admin_user: admin-dso
         postgres_admin_password: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
 
-    - name: get dso-postgres-secret
+    - name: Create dso-postgres-secret
       kubernetes.core.k8s:
         definition:
           kind: Secret
           metadata:
             name: dso-postgres-secret
-            namespace: "{{ SONAR_NAMESPACE }}"
+            namespace: "{{ DSC.sonarqube.namespace }}"
           data:
             POSTGRES_ADMIN_USER: "{{ postgres_admin_user | b64encode }}"
             POSTGRES_ADMIN_PASSWORD: "{{ postgres_admin_password | b64encode }}"
@@ -41,79 +41,87 @@
     - sonar-service.yaml.j2
     - sonar-ingress.yaml.j2
 
-- name: find sonar admin password
+- name: Find Sonarqube admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ CONSOLE_NAMESPACE }}"
+    namespace: "{{ DSC.console.namespace }}"
     kind: ConfigMap
     name: dso-config
   register: ansible_inventory
 
-- name: reset admin password
+- name: Reset admin password
   when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is undefined
   block:
     - name: Missing Token disclaimer
       debug:
-        msg: "Impossible de retrouver le TOKEN du compte admin, initialisation en cours"
-    - name: wait sonar to initialize
+        msg: "Impossible de retrouver le TOKEN du compte admin, initialisation en cours …"
+
+    - name: Wait sonar endpoint to initialize
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: "{{ SONAR_NAMESPACE }}"
+        namespace: "{{ DSC.sonarqube.namespace }}"
         name: sonar
       register: endpoint
       until: endpoint.resources[0].subsets is defined and endpoint.resources[0].subsets | selectattr('addresses')
       retries: 30
       delay: 5
 
-    - name: wait sonar to initialize
+    - name: Wait postgres endpoint to initialize
       kubernetes.core.k8s_info:
         kind: Endpoints
-        namespace: "{{ SONAR_NAMESPACE }}"
+        namespace: "{{ DSC.sonarqube.namespace }}"
         name: postgres
       register: pg_ep
 
-    - name: set pg_pod
+    - name: Set pg_pod
       set_fact:
         pg_pod: "{{ pg_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
 
-    - name: récupération du compte admin
+    - name: Get admin account
       kubernetes.core.k8s_exec:
         pod: "{{ pg_pod }}"
-        namespace: "{{ SONAR_NAMESPACE }}"
+        namespace: "{{ DSC.sonarqube.namespace }}"
         command: psql -d sonardb -U dso_admin -c "{{ query }}" -t
       vars:
         query: select row_to_json(row) from (SELECT * FROM  users WHERE login = 'admin') row;
       register: admin_account
       until: "admin_account is not failed"
-      retries: 5
+      retries: 10
       delay: 5
 
     - name: Generate random password
       set_fact:
         admin: "{{ admin_account.stdout | from_json }}"
         token_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
+      until: "admin is defined and token_pass is defined"
+      retries: 5
+      delay: 5
 
     - name: Get sha384sum of token
       shell: "echo -n {{ token_pass }} | sha384sum | awk '{ print $1 }'"
       register: token_sha
       changed_when: true
 
-    - name: Ajout d'un token admin
+    - name: Adding admin token
       kubernetes.core.k8s_exec:
         pod: "{{ pg_pod }}"
-        namespace: "{{ SONAR_NAMESPACE }}"
+        namespace: "{{ DSC.sonarqube.namespace }}"
         command: psql -d sonardb -U dso_admin -c "{{ query }}" -t
       vars:
         query: >
           INSERT INTO user_tokens
-           (uuid, user_uuid, "name", token_hash, last_connection_date, created_at, project_key, "type", expiration_date)
-           VALUES('mysuperuuid', '{{ admin.uuid }}', 'DSO', '{{ token_sha.stdout_lines[0] }}', null, 0, '', 'USER_TOKEN', null)
-           ON CONFLICT(uuid) DO UPDATE SET token_hash = '{{ token_sha.stdout_lines[0] }}';
+          (uuid, user_uuid, "name", token_hash, last_connection_date, created_at, project_key, "type", expiration_date)
+          VALUES('mysuperuuid', '{{ admin.uuid }}', 'DSO', '{{ token_sha.stdout_lines[0] }}', null, 0, '', 'USER_TOKEN', null)
+          ON CONFLICT(uuid) DO UPDATE SET token_hash = '{{ token_sha.stdout_lines[0] }}';
+      register: admin_token_check
+      until: "admin_token_check is not failed"
+      retries: 5
+      delay: 5
 
-    - name: update inventory
+    - name: Update inventory
       kubernetes.core.k8s:
         kind: ConfigMap
         name: dso-config
-        namespace: "{{ CONSOLE_NAMESPACE }}"
+        namespace: "{{ DSC.console.namespace }}"
         state: patched
         definition:
           data:

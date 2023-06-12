@@ -85,13 +85,16 @@
         query: select row_to_json(row) from (SELECT * FROM  users WHERE login = 'admin') row;
       register: admin_account
       until: "admin_account is not failed"
-      retries: 5
+      retries: 10
       delay: 5
 
     - name: Generate random password
       set_fact:
         admin: "{{ admin_account.stdout | from_json }}"
         token_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
+      until: "admin is defined and token_pass is defined"
+      retries: 5
+      delay: 5
 
     - name: Get sha384sum of token
       shell: "echo -n {{ token_pass }} | sha384sum | awk '{ print $1 }'"
@@ -109,6 +112,10 @@
           (uuid, user_uuid, "name", token_hash, last_connection_date, created_at, project_key, "type", expiration_date)
           VALUES('mysuperuuid', '{{ admin.uuid }}', 'DSO', '{{ token_sha.stdout_lines[0] }}', null, 0, '', 'USER_TOKEN', null)
           ON CONFLICT(uuid) DO UPDATE SET token_hash = '{{ token_sha.stdout_lines[0] }}';
+      register: admin_token_check
+      until: "admin_token_check is not failed"
+      retries: 5
+      delay: 5
 
     - name: Update inventory
       kubernetes.core.k8s:

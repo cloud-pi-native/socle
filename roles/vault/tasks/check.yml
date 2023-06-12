@@ -4,7 +4,9 @@
     url: "https://{{ VAULT_DOMAIN }}/v1/sys/health"
     status_code: [200, 503, 501]
   register: vault_health
-  retries: 5
+  retries: 12
+  delay: 5
+  until: vault_health.json is defined
 
 - name: set vault_status to OK
   set_fact:

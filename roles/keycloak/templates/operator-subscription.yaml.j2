@@ -2,7 +2,7 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: keycloak-operator-kubernetes
-  namespace: {{ KEYCLOAK_NAMESPACE }}
+  namespace: {{ DSC.keycloak.namespace }}
 spec:
   channel: alpha
   installPlanApproval: Automatic

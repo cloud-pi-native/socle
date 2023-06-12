@@ -7,7 +7,7 @@
 
 - name: Download cert-manager
   ansible.builtin.uri:
-    url: "https://github.com/cert-manager/cert-manager/releases/download/{{ CERTMANAGER_VERSION }}/cert-manager.yaml"
+    url: "https://github.com/cert-manager/cert-manager/releases/download/{{ DSC.certmanager.version }}/cert-manager.yaml"
     return_content: true
   register: cert_manifest
 
@@ -17,12 +17,12 @@
   vars:
     envs:
       - name: http_proxy
-        value: "{{ HTTP_PROXY }}"
+        value: "{{ DSC.proxy.http_proxy }}"
       - name: https_proxy
-        value: "{{ HTTPS_PROXY }}"
+        value: "{{ DSC.proxy.https_proxy }}"
       - name: no_proxy
-        value: "{{ NO_PROXY }}"
-  when: USE_PROXY
+        value: "{{ DSC.proxy.no_proxy }}"
+  when: DSC.proxy.enabled
 
 - name: Apply cert-manager
   kubernetes.core.k8s:
@@ -54,10 +54,10 @@
   kubernetes.core.k8s:
     state: present
     template: cluster-issuer-acme.j2
-  when: ingress.tls.type == 'acme'
+  when: DSC.ingress.tls.type == 'acme'
 
 - name: Create CA ClusterIssuer
   kubernetes.core.k8s:
     state: present
     template: cluster-issuer-ca.j2
-  when: ingress.tls.type == 'ca'
+  when: DSC.ingress.tls.type == 'ca'

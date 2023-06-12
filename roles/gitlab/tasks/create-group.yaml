@@ -1,12 +1,12 @@
 - name: Set group name
   set_fact:
-    name: "{{ projectsRootDir[index | int] }}"
+    name: "{{ DSC.global.projectsRootDir[index | int] }}"
 
 - name: "Create group {{ name }}"
   community.general.gitlab_group:
     api_url: "https://{{ GITLAB_DOMAIN }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ exposed_ca.type == 'none' }}"
+    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
     name: "{{ name }}"
     parent: "{{ parent }}"
     subgroup_creation_level: "owner"
@@ -20,9 +20,9 @@
 
 - name: Update parent group
   set_fact:
-    parent: "{{ projectsRootDir[0:(index | int)] | join('/') }}"
+    parent: "{{ DSC.global.projectsRootDir[0:(index | int)] | join('/') }}"
 
 - name: Include create group
   include_tasks:
     file: create-group.yaml
-  when: (index | int) < (projectsRootDir | length)
+  when: (index | int) < (DSC.global.projectsRootDir | length)

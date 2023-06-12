@@ -1,66 +1,69 @@
-- name: Create cluster-infra
+- name: Create or update DsoSocleConfig CRD
   kubernetes.core.k8s:
-    kind: Namespace
-    name: cluster-infra
+    definition: "{{ lookup('ansible.builtin.file', 'crd-conf-dso.yaml') | from_yaml }}"
 
-- name: Get socle config in cluster
+- name: Get socle config from dsc
   kubernetes.core.k8s_info:
-    kind: ConfigMap
-    namespace: cluster-infra
-    name: socle-config
+    kind: dsc
+    name: conf-dso
+    api_version: cloud-pi-native.fr/v1alpha
   register: socle_config
-
-- name: Load default config
-  ansible.builtin.set_fact:
-    default_config_block: "{{ lookup('ansible.builtin.file', 'socle-config.yaml') }}"
 
 - name: Initialize config and exit
   when: socle_config.resources | length == 0
   block:
     - name: Create socle config example
       kubernetes.core.k8s:
-        definition:
-          kind: ConfigMap
-          metadata:
-            namespace: cluster-infra
-            name: socle-config
-          data:
-            vars: "{{ default_config_block }}"
+        definition: "{{ lookup('ansible.builtin.file', 'cr-conf-dso-default.yaml') | from_yaml }}"
 
     - name: Disclaimer
       debug:
         msg:
           - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster."
-          - "Veuillez modifier le ConfigMap dso-console dans le namespace cluster-infra"
+          - "Veuillez modifier la resource de type dsc nommée conf-dso et de scope cluster"
           - "via la commande suivante :"
-          - "kubectl edit cm -n cluster-infra socle-config "
+          - ""
+          - "kubectl edit dsc conf-dso"
+          - ""
+          - "Puis relancer l'installation."
+          - ""
+          - "Alternativement, vous pouvez aussi déclarer la resource conf-dso dans un fichier YAML"
+          - "nommé par exemple 'ma-conf-dso.yaml' et la créer via la commande suivante :"
+          - ""
+          - "kubectl apply -f ma-conf-dso.yaml"
+          - ""
           - "Puis relancer l'installation."
 
     - name: Exit playbook
       meta: end_play
 
-- name: Save vars locally and temporally
-  copy:
-    dest: vars.yaml
-    content: "{{ socle_config.resources[0].data.vars | from_yaml | to_nice_yaml }}"
-    mode: 0400
+- name: Set DSC fact
+  ansible.builtin.set_fact:
+    DSC: "{{ socle_config.resources[0].spec }}"
 
-- name: Load vars
-  ansible.builtin.include_vars:
-    file: vars.yaml
-  tags:
-    - always
+- name: Set ROOT_DOMAIN fact
+  ansible.builtin.set_fact:
+    ROOT_DOMAIN: "{{ DSC.global.rootDomain }}"
 
-- name: Set GITLAB_DOMAIN fact
-  set_fact:
-    GITLAB_DOMAIN: "{{ GITLAB_DOMAIN | default('gitlab' + ROOT_DOMAIN) }}"
-  tags:
-    - skip_ansible_lint
+- name: Set tools domains facts
+  ansible.builtin.set_fact:
+    ARGOCD_DOMAIN: "{{ DSC.argocd.subDomain }}{{ ROOT_DOMAIN }}"
+    CONSOLE_DOMAIN: "{{ DSC.console.subDomain }}{{ ROOT_DOMAIN }}"
+    GITLAB_DOMAIN: "{{ DSC.gitlab.subDomain }}{{ ROOT_DOMAIN }}"
+    HARBOR_DOMAIN: "{{ DSC.harbor.subDomain }}{{ ROOT_DOMAIN }}"
+    KEYCLOAK_DOMAIN: "{{ DSC.keycloak.subDomain }}{{ ROOT_DOMAIN }}"
+    NEXUS_DOMAIN: "{{ DSC.nexus.subDomain }}{{ ROOT_DOMAIN }}"
+    SONAR_DOMAIN: "{{ DSC.sonarqube.subDomain }}{{ ROOT_DOMAIN }}"
+    VAULT_DOMAIN: "{{ DSC.vault.subDomain }}{{ ROOT_DOMAIN }}"
 
-- name: Check config model
-  assert:
-    that:
-      - vars[item.key] is defined
-    fail_msg: "La configMap dans le cluster n'inclut pas toutes les clés du modèle d'exemple veuillez le mettre à jour pour ajouter {{ item.key }}"
-    quiet: true
-  with_dict: "{{ default_config_block | from_yaml }}"
+#- ansible.builtin.debug:
+#    msg:
+#      - "ARGOCD_DOMAIN: {{ ARGOCD_DOMAIN }}"
+#      - "GITLAB_DOMAIN: {{ GITLAB_DOMAIN }}"
+#      - "HARBOR_DOMAIN: {{ HARBOR_DOMAIN }}"
+#      - "KEYCLOAK_DOMAIN: {{ KEYCLOAK_DOMAIN }}"
+#      - "NEXUS_DOMAIN: {{ NEXUS_DOMAIN }}"
+#      - "SONAR_DOMAIN: {{ SONAR_DOMAIN }}"
+#      - "VAULT_DOMAIN: {{ VAULT_DOMAIN }}"
+
+#- meta: end_play

@@ -2,12 +2,12 @@ apiVersion: apps.gitlab.com/v1beta2
 kind: Runner
 metadata:
   name: gitlab-runner
-  namespace: {{ GITLAB_NAMESPACE }}
+  namespace: {{ DSC.gitlab.namespace }}
 spec:
   buildImage: alpine
-{% if ingress.tls.type == 'tlsSecret' %}
-  ca: {{ ingress.tls.tlsSecret.name }}
-{% elif exposed_ca.type != 'none' %}
+{% if DSC.ingress.tls.type == 'tlsSecret' %}
+  ca: {{ DSC.ingress.tls.tlsSecret.name }}
+{% elif DSC.exposedCA.type != 'none' %}
   ca: exposed-ca
 {% else %}
   ca: 

@@ -1,13 +1,13 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: {{ GITLAB_NAMESPACE }}
+  name: {{ DSC.gitlab.namespace }}
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: gitlab-opgroup
-  namespace: {{ GITLAB_NAMESPACE }}
+  namespace: {{ DSC.gitlab.namespace }}
 spec:
   targetNamespaces:
-    - {{ GITLAB_NAMESPACE }}
+    - {{ DSC.gitlab.namespace }}

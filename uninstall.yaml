@@ -13,19 +13,19 @@
         kind: Namespace
         name: "{{ item }}"
       with_items:
-        - "{{ CONSOLE_NAMESPACE }}"
-        - "{{ SOPS_NAMESPACE }}"
-        - "{{ SONAR_NAMESPACE }}"
-        - "{{ VAULT_NAMESPACE }}"
-        - "{{ NEXUS_NAMESPACE }}"
-        - "{{ HARBOR_NAMESPACE }}"
-        - "{{ ARGOCD_NAMESPACE }}"
+        - "{{ DSC.console.namespace }}"
+        - "{{ DSC.sops.namespace }}"
+        - "{{ DSC.sonarqube.namespace }}"
+        - "{{ DSC.vault.namespace }}"
+        - "{{ DSC.nexus.namespace }}"
+        - "{{ DSC.harbor.namespace }}"
+        - "{{ DSC.argocd.namespace }}"
 
     - name: Récupérations des clients Keycloak
       kubernetes.core.k8s_info:
         api_version: keycloak.org/v1alpha1
         kind: KeycloakClient
-        namespace: "{{ KEYCLOAK_NAMESPACE }}"
+        namespace: "{{ DSC.keycloak.namespace }}"
       register: keycloak_clients
 
     - name: Suppression des clients Keycloak
@@ -34,7 +34,7 @@
         api_version: keycloak.org/v1alpha1
         kind: KeycloakClient
         name: "{{ item.metadata.name }}"
-        namespace: "{{ KEYCLOAK_NAMESPACE }}"
+        namespace: "{{ DSC.keycloak.namespace }}"
       with_items: "{{ keycloak_clients.resources }}"
 
     - name: Suppression des ressources Keycloak
@@ -43,7 +43,7 @@
         api_version: keycloak.org/v1alpha1
         kind: "{{ item.kind }}"
         name: "{{ item.name }}"
-        namespace: "{{ KEYCLOAK_NAMESPACE }}"
+        namespace: "{{ DSC.keycloak.namespace }}"
       with_items:
         - kind: KeycloakRealm
           name: dso-realm
@@ -56,7 +56,7 @@
         api_version: apps.gitlab.com/v1beta2
         kind: Runner
         name: gitlab-runner
-        namespace: "{{ GITLAB_NAMESPACE }}"
+        namespace: "{{ DSC.gitlab.namespace }}"
 
     - name: Suppression des namespaces restants
       kubernetes.core.k8s:
@@ -64,8 +64,8 @@
         kind: Namespace
         name: "{{ item }}"
       with_items:
-        - "{{ KEYCLOAK_NAMESPACE }}"
-        - "{{ GITLAB_NAMESPACE }}"
+        - "{{ DSC.keycloak.namespace }}"
+        - "{{ DSC.gitlab.namespace }}"
         - cluster-infra
 
     - name: Remove local vars

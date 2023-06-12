@@ -1,0 +1,33 @@
+---
+# https://kubernetes.io/docs/concepts/configuration/configmap/
+kind: DsoSocleConfig
+apiVersion: cloud-pi-native.fr/v1alpha
+metadata:
+  name: conf-dso
+spec:
+  additionalsCA: []
+  exposedCA:
+    type: none
+  argocd: {}
+  certmanager:
+    version: v1.11.0
+  console:
+    dbPassword: myAwesomePassword
+  gitlab:
+    version: ""
+  global:
+    projectsRootDir:
+      - forge
+    rootDomain:
+      .example.com
+  harbor:
+    adminPassword: anotherGreatPassword
+  ingress: {}
+  keycloak: {}
+  nexus:
+    storageSize: 25Gi
+  proxy:
+    enabled: false
+  sonarqube: {}
+  sops: {}
+  vault: {}

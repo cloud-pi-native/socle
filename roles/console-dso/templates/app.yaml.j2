@@ -17,7 +17,7 @@ spec:
     releaseName: console-pi
     helm:
       parameters:
-        - name: client.ingress.hosts[0]
+        - name: ingress.hosts[0]
           value: {{ CONSOLE_DOMAIN }}
         - name: postgres.container.db
           value: dso-console-db
@@ -46,21 +46,15 @@ spec:
           value: ca.pem
 {% endif %}
 {% for key, val in ingress.annotations.items() %}
-        - name: server.ingress.annotations.{{ key | regex_escape }}
-          value: {{ val }}
-        - name: client.ingress.annotations.{{ key | regex_escape }}
+        - name: ingress.annotations.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
 {% for key, val in ingress.labels.items() %}
-        - name: server.ingress.labels.{{ key | regex_escape }}
-          value: {{ val }}
-        - name: client.ingress.labels.{{ key | regex_escape }}
+        - name: ingress.labels.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
 {% if ingress.tls.type == 'tlsSecret' %}
-        - name: server.ingress.tls.secretName
-          value: {{ ingress.tls.tlsSecret.name }}
-        - name: client.ingress.tls.secretName
+        - name: ingress.tls.secretName
           value: {{ ingress.tls.tlsSecret.name }}
 {% endif %}
   syncPolicy:

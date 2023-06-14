@@ -15,7 +15,7 @@
     - name: Wait Keycloak
       kubernetes.core.k8s_info:
         kind: keycloak
-        namespace: "{{ DSC.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
         name: dso-keycloak
         api_version: keycloak.org/v1alpha1
       register: keycloak_instance
@@ -23,7 +23,7 @@
         (keycloak_instance.resources[0].status.phase is defined and keycloak_instance.resources[0].status.phase == 'failing') or keycloak_instance.attempts > 28
       until: >
         (keycloak_instance.resources[0].status.phase is defined and keycloak_instance.resources[0].status.phase == 'reconciling') or
-         KEYCLOAK_NO_CHECK is defined
+        KEYCLOAK_NO_CHECK is defined
       retries: 30
       delay: 10
   rescue:
@@ -36,7 +36,7 @@
 
 - name: Find keycloak admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ DSC.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
     name: "{{ keycloak_instance.resources[0].status.credentialSecret }}"
   register: kc_admin
@@ -44,21 +44,21 @@
   retries: 10
   delay: 5
 
-- name: set admin ids facts
+- name: Set admin ids facts
   ansible.builtin.set_fact:
-    KEYCLOAK_ADMIN_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
-    KEYCLOAK_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
+    keycloak_admin_password: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
+    keycloak_admin: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
 
 - name: Update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
-    namespace: "{{ DSC.console.namespace }}"
+    namespace: "{{ dsc.console.namespace }}"
     state: patched
     definition:
       data:
-        KEYCLOAK_ADMIN_PASSWORD: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
-        KEYCLOAK_ADMIN: "{{ KEYCLOAK_ADMIN }}"
+        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password }}"
+        KEYCLOAK_ADMIN: "{{ keycloak_admin }}"
 
 - name: Generate admin password
   ansible.builtin.set_fact:
@@ -67,7 +67,7 @@
 
 - name: Find dso admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ DSC.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
     name: dso-admin-user-secret
   register: dso_admin
@@ -84,7 +84,7 @@
         definition:
           kind: Secret
           metadata:
-            namespace: "{{ DSC.keycloak.namespace }}"
+            namespace: "{{ dsc.keycloak.namespace }}"
             name: dso-admin-user-secret
           data:
             ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"
@@ -94,7 +94,173 @@
       kubernetes.core.k8s:
         template: keycloak-create-admin-user.yaml.j2
 
-- name: Create clients and alternative route
+- name: Create alternative route
+  kubernetes.core.k8s:
+    template: keycloak-ingress.yaml.j2
+
+- name: Create generic keycloak client scope
+  community.general.keycloak_clientscope:
+    validate_certs: false
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}/auth
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    name: generic
+    realm: dso
+    description: Generic client scope
+    protocol: openid-connect
+    attributes:
+      include.in.token.scope: true
+      display.on.consent.screen: true
+      gui.order: ''
+      consent.screen.text: ''
+    protocolMappers:
+      - id: e0491f43-3e4c-4649-b16e-3c0e47bbc2c0
+        name: family name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: lastName
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: family_name
+          jsonType.label: String
+      - id: 000f3a6c-bec3-40dd-8397-0c45019df7e0
+        name: given name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: firstName
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: given_name
+          jsonType.label: String
+      - id: 2acd698c-03d2-4d0b-99a4-db00ed08f25d
+        name: name
+        protocol: openid-connect
+        protocolMapper: oidc-full-name-mapper
+        config:
+          id.token.claim: true
+          access.token.claim: true
+          userinfo.token.claim: true
+      - id: 13e8d53a-415f-4f98-a133-8795e0173efd
+        name: phone number
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: phoneNumber
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: phone_number
+          jsonType.label: String
+      - id: 5a8652b6-9a42-48e5-819f-59259c349883
+        name: acr loa level
+        protocol: openid-connect
+        protocolMapper: oidc-acr-mapper
+        config:
+          id.token.claim: true
+          access.token.claim: true
+      - id: 9d090281-1d17-4283-8fb7-183e1b536328
+        name: nickname
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: nickname
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: nickname
+          jsonType.label: String
+      - id: 79bccac1-d0f1-4c28-a040-e0e640889e52
+        name: username
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: username
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: preferred_username
+          jsonType.label: String
+      - id: 7d976f67-441d-4491-a1fe-f17343a03120
+        name: full name
+        protocol: openid-connect
+        protocolMapper: oidc-full-name-mapper
+        config:
+          id.token.claim: true
+          access.token.claim: true
+          userinfo.token.claim: true
+      - id: 5ca2ebe3-ef32-4f62-bcad-e764c70d20e6
+        name: locale
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: locale
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: locale
+          jsonType.label: String
+      - id: 84629e2c-c129-4d49-bb04-a03a5124ed47
+        name: email verified
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: emailVerified
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: email_verified
+          jsonType.label: boolean
+      - id: bb8a7b6e-2f1a-46b2-91e1-8d027dabe93d
+        name: updated at
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: updatedAt
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: updated_at
+          jsonType.label: long
+      - id: f5c4b940-47ad-4734-8712-4f53357cff1c
+        name: middle name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: middleName
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: middle_name
+          jsonType.label: String
+      - id: e1e82435-1b52-4b41-aa0e-14a3e9779670
+        name: groups
+        protocol: openid-connect
+        protocolMapper: oidc-group-membership-mapper
+        config:
+          full.path: true
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: groups
+          userinfo.token.claim: true
+      - id: c3803e56-b542-45e3-a780-0fb70841dd5c
+        name: email
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          userinfo.token.claim: true
+          user.attribute: email
+          id.token.claim: true
+          access.token.claim: true
+          claim.name: email
+          jsonType.label: String
+
+- name: Create clients
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
@@ -105,19 +271,18 @@
     - keycloak-portail-client.yaml.j2
     - keycloak-sonar-client.yaml.j2
     - keycloak-harbor-client.yaml.j2
-    - keycloak-ingress.yaml.j2
 
-- name: Create base admins groups 
+- name: Create base admins groups
   community.general.keycloak_group:
-    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     name: "{{ item }}"
     realm: dso
     state: present
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ KEYCLOAK_DOMAIN }}/auth
+    auth_keycloak_url: https://{{ keycloak_domain }}/auth
     auth_realm: master
-    auth_username: "{{ KEYCLOAK_ADMIN }}"
-    auth_password: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
-  with_items: 
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+  with_items:
     - admin
     - ArgoCDAdmins

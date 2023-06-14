@@ -2,28 +2,28 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sonar-ingress
-  namespace: {{ DSC.sonarqube.namespace }}
+  namespace: {{ dsc.sonarqube.namespace }}
   annotations:
-{% for key, val in DSC.ingress.annotations.items() %}
+{% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
-{% for key, val in DSC.ingress.labels.items() %}
+{% for key, val in dsc.ingress.labels.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
-{% if not DSC.ingress.tls.type == 'none' %}
+{% if not dsc.ingress.tls.type == 'none' %}
   tls:
     - hosts:
-        - {{ SONAR_DOMAIN }}
-{% if DSC.ingress.tls.type == 'tlsSecret' %}
-      secretName: {{ DSC.ingress.tls.tlsSecret.name }}
+        - {{ sonar_domain }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
       secretName: sonar-tls-secret
 {% endif %}
 {% endif %}
   rules:
-    - host: {{ SONAR_DOMAIN }}
+    - host: {{ sonar_domain }}
       http:
         paths:
           - path: /

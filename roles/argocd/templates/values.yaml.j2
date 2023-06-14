@@ -3,10 +3,10 @@ openshift:
   enabled: true
 config:
   secret:
-    argocdServerAdminPassword: "{{ DSC.argocd.admin.password }}"
-{% if DSC.exposedCA != 'none' %}
+    argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
+{% if dsc.exposedCA != 'none' %}
   tlsCerts:
-    {{ GITLAB_DOMAIN }}: |
+    {{ gitlab_domain }}: |
       {{ exposed_ca_pem | indent(width=6, first=False) }}
 {% endif %}
 dex:
@@ -15,14 +15,14 @@ server:
   insecure: true
   config:
     clusterResources: "true"
-    url: "https://{{ ARGOCD_DOMAIN }}/"
+    url: "https://{{ argocd_domain }}/"
     oidc.config: |
-      issuer: https://{{ KEYCLOAK_DOMAIN }}/auth/realms/dso
+      issuer: https://{{ keycloak_domain }}/auth/realms/dso
       requestedScopes: ["openid", "generic"]
       name: Keycloak
       clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
       clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
-{% if DSC.exposedCA != 'none' %}
+{% if dsc.exposedCA != 'none' %}
       rootCA: |
         {{ exposed_ca_pem | indent(width=8, first=False) }}
 {% endif %}
@@ -37,23 +37,23 @@ server:
         - TaskRun
         - PipelineRun
   extraEnvVars:
-{% if DSC.proxy.enabled %}
+{% if dsc.proxy.enabled %}
     - name: HTTP_PROXY
-      value: "{{ DSC.proxy.http_proxy }}"
+      value: "{{ dsc.proxy.http_proxy }}"
     - name: HTTPS_PROXY
-      value: "{{ DSC.proxy.https_proxy }}"
+      value: "{{ dsc.proxy.https_proxy }}"
     - name: NO_PROXY
-      value: "{{ DSC.proxy.no_proxy }},argo-argo-cd-repo-server"
+      value: "{{ dsc.proxy.no_proxy }},argo-argo-cd-repo-server"
 {% endif %}
 repoServer:
   extraEnvVars:
-{% if DSC.proxy.enabled %}
+{% if dsc.proxy.enabled %}
     - name: HTTP_PROXY
-      value: "{{ DSC.proxy.http_proxy }}"
+      value: "{{ dsc.proxy.http_proxy }}"
     - name: HTTPS_PROXY
-      value: "{{ DSC.proxy.https_proxy }}"
+      value: "{{ dsc.proxy.https_proxy }}"
     - name: NO_PROXY
-      value: "{{ DSC.proxy.no_proxy }}"
+      value: "{{ dsc.proxy.no_proxy }}"
 {% endif %}
 extraDeploy:
   - apiVersion: v1
@@ -71,4 +71,4 @@ extraDeploy:
     kind: ConfigMap
     metadata:
       name: argocd-rbac-cm
-      namespace: {{ DSC.argocd.namespace }}
+      namespace: {{ dsc.argocd.namespace }}

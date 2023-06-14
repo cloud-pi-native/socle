@@ -1,13 +1,13 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: {{ DSC.keycloak.namespace }}
+  name: {{ dsc.keycloak.namespace }}
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: {{ DSC.keycloak.namespace }}-opgroup
-  namespace: {{ DSC.keycloak.namespace }}
+  name: {{ dsc.keycloak.namespace }}-opgroup
+  namespace: {{ dsc.keycloak.namespace }}
 spec:
   targetNamespaces:
-    - {{ DSC.keycloak.namespace }}
+    - {{ dsc.keycloak.namespace }}

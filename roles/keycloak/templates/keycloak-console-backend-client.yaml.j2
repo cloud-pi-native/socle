@@ -4,17 +4,17 @@ metadata:
   name: console-backend-client
   labels:
     app: sso
-  namespace: {{ DSC.keycloak.namespace }}
+  namespace: {{ dsc.keycloak.namespace }}
 spec:
   client:
     clientId: console-backend
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
-      - https://{{ CONSOLE_DOMAIN }}/*
-      - https://{{ CONSOLE_DOMAIN }}/
+      - https://{{ console_domain }}/*
+      - https://{{ console_domain }}/
     webOrigins:
-      - https://{{ CONSOLE_DOMAIN }}
+      - https://{{ console_domain }}
     defaultClientScopes:
     - generic
 

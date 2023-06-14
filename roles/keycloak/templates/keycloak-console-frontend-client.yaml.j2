@@ -4,16 +4,16 @@ metadata:
   name: console-frontend-client
   labels:
     app: sso
-  namespace: {{ DSC.keycloak.namespace }}
+  namespace: {{ dsc.keycloak.namespace }}
 spec:
   client:
     clientId: console-frontend
     standardFlowEnabled: true
     publicClient: true
     redirectUris:
-      - "*"
+      - "https://{{ console_domain }}/*"
     webOrigins:
-      - "*"
+      - "https://{{ console_domain }}"
     defaultClientScopes:
     - generic
 

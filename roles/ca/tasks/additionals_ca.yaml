@@ -3,9 +3,9 @@
     additionals_ca_pem_array: []
 
 - name: Get a ca resource
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: get-ca.yaml
-  with_items: "{{ DSC.additionalsCA }}"
+  with_items: "{{ dsc.additionalsCA }}"
   vars:
     kind: "{{ item.kind }}"
     name: "{{ item.name }}"

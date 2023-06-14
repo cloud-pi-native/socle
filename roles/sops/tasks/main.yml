@@ -2,7 +2,7 @@
   kubernetes.core.k8s:
     state: present
     kind: namespace
-    name: "{{ DSC.sops.namespace }}"
+    name: "{{ dsc.sops.namespace }}"
     api_version: v1
 
 - name: Add helm repo
@@ -15,7 +15,7 @@
     api_version: v1
     kind: Secret
     name: sops-age-key-file
-    namespace: "{{ DSC.sops.namespace }}"
+    namespace: "{{ dsc.sops.namespace }}"
   register: age_secret
 
 - name: Generate age keys
@@ -23,6 +23,7 @@
     cmd: age-keygen
   register: age_keys
   when: age_secret.resources | length == 0
+  changed_when: false
 
 - name: Create secret sops-age-key-file
   kubernetes.core.k8s:
@@ -32,7 +33,7 @@
       kind: Secret
       metadata:
         name: sops-age-key-file
-        namespace: "{{ DSC.sops.namespace }}"
+        namespace: "{{ dsc.sops.namespace }}"
       type: Opaque
   when: age_secret.resources | length == 0
 
@@ -40,7 +41,7 @@
   kubernetes.core.helm:
     name: sops
     chart_ref: sops/sops-secrets-operator
-    release_namespace: "{{ DSC.sops.namespace }}"
+    release_namespace: "{{ dsc.sops.namespace }}"
     create_namespace: true
     values:
       extraEnv:
@@ -56,7 +57,7 @@
     api_version: v1
     kind: Secret
     name: sops-age-key-file
-    namespace: "{{ DSC.sops.namespace }}"
+    namespace: "{{ dsc.sops.namespace }}"
   register: age_secret
 
 - name: Retrieve age public key

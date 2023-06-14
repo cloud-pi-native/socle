@@ -1,6 +1,6 @@
 - name: Create dso-console namespace
   kubernetes.core.k8s:
-    name: "{{ DSC.console.namespace }}"
+    name: "{{ dsc.console.namespace }}"
     api_version: v1
     kind: Namespace
     state: present
@@ -11,15 +11,15 @@
       kind: ConfigMap
       metadata:
         name: dso-config
-        namespace: "{{ DSC.console.namespace }}"
+        namespace: "{{ dsc.console.namespace }}"
       data:
-        ARGOCD_URL: https://{{ ARGOCD_DOMAIN }}/
-        GITLAB_URL: https://{{ GITLAB_DOMAIN }}/
-        HARBOR_URL: https://{{ HARBOR_DOMAIN }}/
-        KEYCLOAK_URL: https://{{ KEYCLOAK_DOMAIN }}/
-        NEXUS_URL: https://{{ NEXUS_DOMAIN }}/
-        SONARQUBE_URL: https://{{ SONAR_DOMAIN }}/
-        VAULT_URL: https://{{ VAULT_DOMAIN }}/
+        ARGOCD_URL: https://{{ argocd_domain }}/
+        GITLAB_URL: https://{{ gitlab_domain }}/
+        HARBOR_URL: https://{{ harbor_domain }}/
+        KEYCLOAK_URL: https://{{ keycloak_domain }}/
+        NEXUS_URL: https://{{ nexus_domain }}/
+        SONARQUBE_URL: https://{{ sonar_domain }}/
+        VAULT_URL: https://{{ vault_domain }}/
         HARBOR_ADMIN: admin
         # HARBOR_ADMIN_PASSWORD: roles/harbor/tasks/main.yaml
         KEYCLOAK_ADMIN: admin
@@ -29,5 +29,5 @@
         # NEXUS_ADMIN_PASSWORD: roles/nexus/tasks/main.yaml
         # SONAR_API_TOKEN: roles/sonarqube/tasks/main.yaml
         # VAULT_TOKEN: roles/vault/tasks/main.yaml
-        ARGO_NAMESPACE: "{{ DSC.argocd.namespace }}"
-        PROJECTS_ROOT_DIR: "{{ DSC.global.projectsRootDir | join('/') }}"
+        ARGO_NAMESPACE: "{{ dsc.argocd.namespace }}"
+        PROJECTS_ROOT_DIR: "{{ dsc.global.projectsRootDir | join('/') }}"

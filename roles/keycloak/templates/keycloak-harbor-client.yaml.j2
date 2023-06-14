@@ -4,7 +4,7 @@ metadata:
   name: harbor-client
   labels:
     app: sso
-  namespace: {{ DSC.keycloak.namespace }}
+  namespace: {{ dsc.keycloak.namespace }}
 spec:
   client:
     clientId: harbor-client
@@ -12,9 +12,9 @@ spec:
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
-      - https://{{ HARBOR_DOMAIN }}/c/oidc/callback
+      - https://{{ harbor_domain }}/c/oidc/callback
     webOrigins:
-      - https://{{ HARBOR_DOMAIN }}
+      - https://{{ harbor_domain }}
     defaultClientScopes:
     - generic
 

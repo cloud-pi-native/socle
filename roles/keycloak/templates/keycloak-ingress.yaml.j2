@@ -2,30 +2,30 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: keycloak-alternative
-  namespace: {{ DSC.keycloak.namespace }}
+  namespace: {{ dsc.keycloak.namespace }}
   annotations:
-{% for key, val in DSC.ingress.annotations.items() %}
+{% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
     route.openshift.io/termination: reencrypt
   labels:
     app: keycloak
-{% for key, val in DSC.ingress.labels.items() %}
+{% for key, val in dsc.ingress.labels.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
-{% if not DSC.ingress.tls.type == 'none' %}
+{% if not dsc.ingress.tls.type == 'none' %}
   tls:
   - hosts:
-    - {{ KEYCLOAK_DOMAIN }}
-{% if DSC.ingress.tls.type == 'tlsSecret' %}
-    secretName: {{ DSC.ingress.tls.tlsSecret.name }}
+    - {{ keycloak_domain }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
     secretName: keycloak-tls-secret
 {% endif %}
 {% endif %}
   rules:
-    - host: {{ KEYCLOAK_DOMAIN }}
+    - host: {{ keycloak_domain }}
       http:
         paths:
           - path: /

@@ -1,7 +1,7 @@
-- name: additionals_ca tasks
-  include_tasks:
+- name: Additionals_ca tasks
+  ansible.builtin.include_tasks:
     file: additionals_ca.yaml
 
-- name: exposed_ca tasks
-  include_tasks:
+- name: Exposed_ca tasks
+  ansible.builtin.include_tasks:
     file: exposed_ca.yaml

@@ -1,60 +1,60 @@
-- name: no exposed_ca
-  when: DSC.exposedCA.type == 'none'
-  set_fact:
+- name: No exposed_ca
+  when: dsc.exposedCA.type == 'none'
+  ansible.builtin.set_fact:
     exposed_ca_pem: ""
 
-- name: exposed_ca (configmap)
-  when: DSC.exposedCA.type == 'configmap'
+- name: Exposed_ca (configmap)
+  when: dsc.exposedCA.type == 'configmap'
   block:
-    - name: get configMap
+    - name: Get configMap
       kubernetes.core.k8s_info:
-        name: "{{ DSC.exposedCA.configmap.name }}"
-        namespace: "{{ DSC.exposedCA.configmap.namespace }}"
+        name: "{{ dsc.exposedCA.configmap.name }}"
+        namespace: "{{ dsc.exposedCA.configmap.namespace }}"
         kind: ConfigMap
       register: exposed_ca_resource
 
-    - name: extract key
-      set_fact:
-        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[DSC.exposedCA.configmap.key] }}"
+    - name: Extract key
+      ansible.builtin.set_fact:
+        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[dsc.exposedCA.configmap.key] }}"
 
-- name: exposed_ca (secret)
-  when: DSC.exposedCA.type == 'secret'
+- name: Exposed_ca (secret)
+  when: dsc.exposedCA.type == 'secret'
   block:
-    - name: get secret
+    - name: Get secret
       kubernetes.core.k8s_info:
-        name: "{{ DSC.exposedCA.configmap.name }}"
-        namespace: "{{ DSC.exposedCA.configmap.namespace }}"
+        name: "{{ dsc.exposedCA.configmap.name }}"
+        namespace: "{{ dsc.exposedCA.configmap.namespace }}"
         kind: Secret
       register: exposed_ca_resource
 
-    - name: extract key
-      set_fact:
-        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[DSC.exposedCA.configmap.key] | b64decode }}"
+    - name: Extract key
+      ansible.builtin.set_fact:
+        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[dsc.exposedCA.configmap.key] | b64decode }}"
 
-- name: exposed_ca (certmanager)
-  when: DSC.exposedCA.type == 'certmanager'
+- name: Exposed_ca (certmanager)
+  when: dsc.exposedCA.type == 'certmanager'
   block:
-    - name: get certmanager secret
+    - name: Get certmanager secret
       kubernetes.core.k8s_info:
-        name: "{{ DSC.ingress.tls.ca.secretName }}"
+        name: "{{ dsc.ingress.tls.ca.secretName }}"
         namespace: "cert-manager"
         kind: Secret
       register: exposed_ca_resource
 
-    - name: extract key
-      set_fact:
+    - name: Extract key
+      ansible.builtin.set_fact:
         exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data['tls.crt'] | b64decode }}"
 
-- name: exposed_ca (url)
-  when: DSC.exposedCA.type == 'url'
+- name: Exposed_ca (url)
+  when: dsc.exposedCA.type == 'url'
   block:
-    - name: get url
+    - name: Get url
       ansible.builtin.shell:
-        cmd: "curl {{ DSC.exposedCA.url }} -s | openssl x509"
+        cmd: "curl {{ dsc.exposedCA.url }} -s | openssl x509"
       changed_when: false
       register: exposed_ca_resource
       tags: ['skip_ansible_lint']
 
-    - name: extract key
-      set_fact:
+    - name: Extract key
+      ansible.builtin.set_fact:
         exposed_ca_pem: "{{ exposed_ca_resource.stdout }}"

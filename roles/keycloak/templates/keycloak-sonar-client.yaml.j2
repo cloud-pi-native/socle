@@ -4,7 +4,7 @@ metadata:
   name: sonar-client
   labels:
     app: sso
-  namespace: {{ DSC.keycloak.namespace }}
+  namespace: {{ dsc.keycloak.namespace }}
 spec:
   client:
     clientId: sonar-client
@@ -12,9 +12,9 @@ spec:
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
-      - https://{{ SONAR_DOMAIN }}/auth/callback
+      - https://{{ sonar_domain }}/auth/callback
     webOrigins:
-      - https://{{ SONAR_DOMAIN }}
+      - https://{{ sonar_domain }}
     defaultClientScopes:
     - generic
 

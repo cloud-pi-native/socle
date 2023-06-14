@@ -1,7 +1,7 @@
 - name: Get Gitlab namespace
   kubernetes.core.k8s_info:
     kind: Namespace
-    name: "{{ DSC.gitlab.namespace }}"
+    name: "{{ dsc.gitlab.namespace }}"
   register: gitlab_ns
 
 - name: Fail if Gitlab namespace is not present

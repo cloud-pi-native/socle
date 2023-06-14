@@ -4,27 +4,27 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration:
   name: console-pi-native
-  namespace: {{ DSC.argocd.namespace }}
+  namespace: {{ dsc.argocd.namespace }}
 spec:
   destination:
-    namespace: {{ DSC.console.namespace }}
+    namespace: {{ dsc.console.namespace }}
     server: https://kubernetes.default.svc
   project: console-pi-native
   source: 
     path: helm
     repoURL: https://github.com/cloud-pi-native/console.git
-    targetRevision: v{{ DSC.console.release }}
+    targetRevision: v{{ dsc.console.release }}
     releaseName: console-pi
     helm:
       parameters:
         - name: client.ingress.hosts[0]
-          value: {{ CONSOLE_DOMAIN }}
+          value: {{ console_domain }}
         - name: postgres.container.db
           value: dso-console-db
         - name: postgres.container.user
           value: dso
         - name: postgres.container.pass
-          value: {{ DSC.console.dbPassword }}
+          value: {{ dsc.console.dbPassword }}
         - name: keycloak.client_id_backend
           value: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
         - name: keycloak.client_secret_backend
@@ -32,36 +32,36 @@ spec:
         - name: keycloak.client_id_frontend
           value: {{ console_frontend_secret.resources[0].data.CLIENT_ID | b64decode }}
         - name: keycloak.redirect_uri
-          value: https://{{ CONSOLE_DOMAIN }}
+          value: https://{{ console_domain }}
         - name: keycloak.session_secret
           value: {{ session_secret }}
         - name: keycloak.domain
-          value: "{{ KEYCLOAK_DOMAIN }}/auth"
+          value: "{{ keycloak_domain }}/auth"
         - name: keycloak.realm
           value: dso
-{% if DSC.exposedCA.type != 'none' %}
+{% if dsc.exposedCA.type != 'none' %}
         - name: server.extra_ca.name
           value: bundle
         - name: server.extra_ca.key
           value: ca.pem
 {% endif %}
-{% for key, val in DSC.ingress.annotations.items() %}
+{% for key, val in dsc.ingress.annotations.items() %}
         - name: server.ingress.annotations.{{ key | regex_escape }}
           value: {{ val }}
         - name: client.ingress.annotations.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
-{% for key, val in DSC.ingress.labels.items() %}
+{% for key, val in dsc.ingress.labels.items() %}
         - name: server.ingress.labels.{{ key | regex_escape }}
           value: {{ val }}
         - name: client.ingress.labels.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
-{% if DSC.ingress.tls.type == 'tlsSecret' %}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
         - name: server.ingress.tls.secretName
-          value: {{ DSC.ingress.tls.tlsSecret.name }}
+          value: {{ dsc.ingress.tls.tlsSecret.name }}
         - name: client.ingress.tls.secretName
-          value: {{ DSC.ingress.tls.tlsSecret.name }}
+          value: {{ dsc.ingress.tls.tlsSecret.name }}
 {% endif %}
   syncPolicy:
     automated: {}

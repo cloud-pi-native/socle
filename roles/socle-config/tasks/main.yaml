@@ -17,7 +17,7 @@
         definition: "{{ lookup('ansible.builtin.file', 'cr-conf-dso-default.yaml') | from_yaml }}"
 
     - name: Disclaimer
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster."
           - "Veuillez modifier la resource de type dsc nommée conf-dso et de scope cluster"
@@ -35,35 +35,37 @@
           - "Puis relancer l'installation."
 
     - name: Exit playbook
-      meta: end_play
+      ansible.builtin.meta: end_play
 
 - name: Set DSC fact
   ansible.builtin.set_fact:
-    DSC: "{{ socle_config.resources[0].spec }}"
+    dsc: "{{ socle_config.resources[0].spec }}"
 
-- name: Set ROOT_DOMAIN fact
+- name: Set root_domain fact
   ansible.builtin.set_fact:
-    ROOT_DOMAIN: "{{ DSC.global.rootDomain }}"
+    root_domain: "{{ dsc.global.rootDomain }}"
 
 - name: Set tools domains facts
   ansible.builtin.set_fact:
-    ARGOCD_DOMAIN: "{{ DSC.argocd.subDomain }}{{ ROOT_DOMAIN }}"
-    CONSOLE_DOMAIN: "{{ DSC.console.subDomain }}{{ ROOT_DOMAIN }}"
-    GITLAB_DOMAIN: "{{ DSC.gitlab.subDomain }}{{ ROOT_DOMAIN }}"
-    HARBOR_DOMAIN: "{{ DSC.harbor.subDomain }}{{ ROOT_DOMAIN }}"
-    KEYCLOAK_DOMAIN: "{{ DSC.keycloak.subDomain }}{{ ROOT_DOMAIN }}"
-    NEXUS_DOMAIN: "{{ DSC.nexus.subDomain }}{{ ROOT_DOMAIN }}"
-    SONAR_DOMAIN: "{{ DSC.sonarqube.subDomain }}{{ ROOT_DOMAIN }}"
-    VAULT_DOMAIN: "{{ DSC.vault.subDomain }}{{ ROOT_DOMAIN }}"
+    argocd_domain: "{{ dsc.argocd.subDomain }}{{ root_domain }}"
+    console_domain: "{{ dsc.console.subDomain }}{{ root_domain }}"
+    gitlab_domain: "{{ dsc.gitlab.subDomain }}{{ root_domain }}"
+    harbor_domain: "{{ dsc.harbor.subDomain }}{{ root_domain }}"
+    keycloak_domain: "{{ dsc.keycloak.subDomain }}{{ root_domain }}"
+    nexus_domain: "{{ dsc.nexus.subDomain }}{{ root_domain }}"
+    sonar_domain: "{{ dsc.sonarqube.subDomain }}{{ root_domain }}"
+    vault_domain: "{{ dsc.vault.subDomain }}{{ root_domain }}"
 
-#- ansible.builtin.debug:
-#    msg:
-#      - "ARGOCD_DOMAIN: {{ ARGOCD_DOMAIN }}"
-#      - "GITLAB_DOMAIN: {{ GITLAB_DOMAIN }}"
-#      - "HARBOR_DOMAIN: {{ HARBOR_DOMAIN }}"
-#      - "KEYCLOAK_DOMAIN: {{ KEYCLOAK_DOMAIN }}"
-#      - "NEXUS_DOMAIN: {{ NEXUS_DOMAIN }}"
-#      - "SONAR_DOMAIN: {{ SONAR_DOMAIN }}"
-#      - "VAULT_DOMAIN: {{ VAULT_DOMAIN }}"
-
-#- meta: end_play
+# - name: Debug domains facts
+#   ansible.builtin.debug:
+#     msg:
+#       - "argocd_domain: {{ argocd_domain }}"
+#       - "gitlab_domain: {{ gitlab_domain }}"
+#       - "harbor_domain: {{ harbor_domain }}"
+#       - "keycloak_domain: {{ keycloak_domain }}"
+#       - "nexus_domain: {{ nexus_domain }}"
+#       - "sonar_domain: {{ sonar_domain }}"
+#       - "vault_domain: {{ vault_domain }}"
+# 
+# - name: End playbook
+#   ansible.builtin.meta: end_play

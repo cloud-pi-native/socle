@@ -4,7 +4,7 @@ metadata:
   name: gitlab-client
   labels:
     app: sso
-  namespace: {{ DSC.keycloak.namespace }}
+  namespace: {{ dsc.keycloak.namespace }}
 spec:
   client:
     clientId: gitlab-client
@@ -12,9 +12,9 @@ spec:
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
-      - https://{{ GITLAB_DOMAIN }}/users/auth/openid_connect/callback
+      - https://{{ gitlab_domain }}/users/auth/openid_connect/callback
     webOrigins:
-      - https://{{ GITLAB_DOMAIN }}
+      - https://{{ gitlab_domain }}
     defaultClientScopes:
     - generic
 

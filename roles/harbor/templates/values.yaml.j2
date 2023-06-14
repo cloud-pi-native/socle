@@ -2,42 +2,42 @@ expose:
   type: ingress
   tls:
     enabled: true
-{% if DSC.ingress.tls.type == 'tlsSecret' %}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
     certSource: secret
     secret:
-      secretName: {{ DSC.ingress.tls.tlsSecret.name }}
-      notarySecretName: {{ DSC.ingress.tls.tlsSecret.name }}
+      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+      notarySecretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
     certSource: null
     secret: {}
 {% endif %}
   ingress:
     hosts:
-      core: {{ HARBOR_DOMAIN }}
-      notary: notary{{ ROOT_DOMAIN }}
+      core: {{ harbor_domain }}
+      notary: notary{{ root_domain }}
     notary:
       annotations:
-{% for key, val in DSC.ingress.annotations.items() %}
+{% for key, val in dsc.ingress.annotations.items() %}
         {{ key }}: {{ val }}
 {% endfor %}
       labels:
-{% for key, val in DSC.ingress.labels.items() %}
+{% for key, val in dsc.ingress.labels.items() %}
         {{ key }}: {{ val }}
 {% endfor %}
     harbor:
       annotations:
-{% for key, val in DSC.ingress.annotations.items() %}
+{% for key, val in dsc.ingress.annotations.items() %}
         {{ key }}: {{ val }}
 {% endfor %}
       labels:
-{% for key, val in DSC.ingress.labels.items() %}
+{% for key, val in dsc.ingress.labels.items() %}
         {{ key }}: {{ val }}
 {% endfor %}
-externalURL: https://{{ HARBOR_DOMAIN }}
+externalURL: https://{{ harbor_domain }}
 persistence:
   enabled: true
   resourcePolicy: keep
-harborAdminPassword: "{{ DSC.harbor.adminPassword }}"
+harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
 nginx:
   serviceAccountName: harbor-sa
   image:

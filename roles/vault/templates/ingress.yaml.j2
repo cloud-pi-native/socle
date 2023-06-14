@@ -2,29 +2,29 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: vault-ingress
-  namespace: {{ DSC.vault.namespace }}
+  namespace: {{ dsc.vault.namespace }}
   annotations:
-{% for key, val in DSC.ingress.annotations.items() %}
+{% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
     app: nexus
-{% for key, val in DSC.ingress.labels.items() %}
+{% for key, val in dsc.ingress.labels.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
-{% if not DSC.ingress.tls.type == 'none' %}
+{% if not dsc.ingress.tls.type == 'none' %}
   tls:
     - hosts:
-        - {{ VAULT_DOMAIN }}
-{% if DSC.ingress.tls.type == 'tlsSecret' %}
-      secretName: {{ DSC.ingress.tls.tlsSecret.name }}
+        - {{ vault_domain }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
       secretName: vault-tls-secret
 {% endif %}
 {% endif %}
   rules:
-    - host: {{ VAULT_DOMAIN }}
+    - host: {{ vault_domain }}
       http:
         paths:
           - path: /

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: {{ DSC.sonarqube.namespace }}
+  namespace: {{ dsc.sonarqube.namespace }}
   name: sonar-dso  # Sets Deployment name
 spec:
   replicas: 1

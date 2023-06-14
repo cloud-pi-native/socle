@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: gitlab-runner
-  namespace: {{ DSC.gitlab.namespace }}
+  namespace: {{ dsc.gitlab.namespace }}
 rules:
   - apiGroups: [""]
     resources: ["pods", "secrets", "configmaps"]
@@ -19,7 +19,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: "RoleBinding"
 metadata:
   name: gitlab-runner-gitlab-runner
-  namespace: {{ DSC.gitlab.namespace }}
+  namespace: {{ dsc.gitlab.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: "Role"
@@ -27,14 +27,14 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: gitlab-runner-sa
-    namespace: {{ DSC.gitlab.namespace }}
+    namespace: {{ dsc.gitlab.namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   creationTimestamp: null
   name: system:openshift:scc:anyuid
-  namespace: {{ DSC.gitlab.namespace }}
+  namespace: {{ dsc.gitlab.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -42,4 +42,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: gitlab-runner-sa
-  namespace: {{ DSC.gitlab.namespace }}
+  namespace: {{ dsc.gitlab.namespace }}

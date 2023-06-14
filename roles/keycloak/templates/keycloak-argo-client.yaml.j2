@@ -4,7 +4,7 @@ metadata:
   name: argo-client
   labels:
     app: sso
-  namespace: {{ DSC.keycloak.namespace }}
+  namespace: {{ dsc.keycloak.namespace }}
 spec:
   client:
     clientId: argo-client
@@ -12,10 +12,10 @@ spec:
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
-      - https://{{ ARGOCD_DOMAIN }}/auth/callback
+      - https://{{ argocd_domain }}/auth/callback
       - "*"
     webOrigins:
-      - https://{{ ARGOCD_DOMAIN }}
+      - https://{{ argocd_domain }}
     defaultClientScopes:
       - generic
   realmSelector:

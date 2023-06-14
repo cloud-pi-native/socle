@@ -15,7 +15,7 @@
     - name: Wait Keycloak
       kubernetes.core.k8s_info:
         kind: keycloak
-        namespace: "{{ DSC.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
         name: dso-keycloak
         api_version: keycloak.org/v1alpha1
       register: keycloak_instance
@@ -36,7 +36,7 @@
 
 - name: Find keycloak admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ DSC.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
     name: "{{ keycloak_instance.resources[0].status.credentialSecret }}"
   register: kc_admin
@@ -44,21 +44,21 @@
   retries: 10
   delay: 5
 
-- name: set admin ids facts
+- name: Set admin ids facts
   ansible.builtin.set_fact:
-    KEYCLOAK_ADMIN_PASSWORD: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
-    KEYCLOAK_ADMIN: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
+    keycloak_admin_password: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
+    keycloak_admin: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
 
 - name: Update inventory
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
-    namespace: "{{ DSC.console.namespace }}"
+    namespace: "{{ dsc.console.namespace }}"
     state: patched
     definition:
       data:
-        KEYCLOAK_ADMIN_PASSWORD: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
-        KEYCLOAK_ADMIN: "{{ KEYCLOAK_ADMIN }}"
+        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password }}"
+        KEYCLOAK_ADMIN: "{{ keycloak_admin }}"
 
 - name: Generate admin password
   ansible.builtin.set_fact:
@@ -67,7 +67,7 @@
 
 - name: Find dso admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ DSC.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
     name: dso-admin-user-secret
   register: dso_admin
@@ -84,7 +84,7 @@
         definition:
           kind: Secret
           metadata:
-            namespace: "{{ DSC.keycloak.namespace }}"
+            namespace: "{{ dsc.keycloak.namespace }}"
             name: dso-admin-user-secret
           data:
             ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"
@@ -98,14 +98,14 @@
   kubernetes.core.k8s:
     template: keycloak-ingress.yaml.j2
 
-- name: Create generic keycloak client scope 
+- name: Create generic keycloak client scope
   community.general.keycloak_clientscope:
     validate_certs: false
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ KEYCLOAK_DOMAIN }}/auth
+    auth_keycloak_url: https://{{ keycloak_domain }}/auth
     auth_realm: master
-    auth_username: "{{ KEYCLOAK_ADMIN }}"
-    auth_password: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
     name: generic
     realm: dso
     description: Generic client scope
@@ -272,17 +272,17 @@
     - keycloak-sonar-client.yaml.j2
     - keycloak-harbor-client.yaml.j2
 
-- name: Create base admins groups 
+- name: Create base admins groups
   community.general.keycloak_group:
-    validate_certs: "{{ DSC.exposedCA.type == 'none' }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     name: "{{ item }}"
     realm: dso
     state: present
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ KEYCLOAK_DOMAIN }}/auth
+    auth_keycloak_url: https://{{ keycloak_domain }}/auth
     auth_realm: master
-    auth_username: "{{ KEYCLOAK_ADMIN }}"
-    auth_password: "{{ KEYCLOAK_ADMIN_PASSWORD }}"
-  with_items: 
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+  with_items:
     - admin
     - ArgoCDAdmins

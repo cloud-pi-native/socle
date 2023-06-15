@@ -28,6 +28,7 @@ server:
 {% endif %}
     users.anonymous.enabled: "false"
     admin.enabled: "false" # TODO variabilize
+    kustomize.buildOptions: '{{dsc.argocd.kustomize_buildOptions}}'
     resource.exclusions: |
       - apiGroups:
         - tekton.dev

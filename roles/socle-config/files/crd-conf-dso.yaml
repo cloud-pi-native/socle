@@ -109,6 +109,10 @@ spec:
               argocd:
                 description: Configuration for ArgoCD.
                 properties:
+                  kustomize_buildOptions:
+                    description: Additional parameters for kustomize
+                    type: string
+                    default: --enable-helm
                   admin:
                     description: Configuration for the ArgoCD admin user.
                     properties:

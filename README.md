@@ -183,6 +183,6 @@ En cas d'échec lors de l'installation, vous vérifierez ce qu'il en est avec la
 
 ```kubectl get keycloak dso-keycloak -n mynamespace-keycloak -o yaml```
 
-Il se peut que Keycloak reste bloqué en status "initializing" mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook à partir de l'outil immédiatement suivant, à savoir  :
+Il se peut que Keycloak reste bloqué en status "initializing" mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook comme ceci :
 
-```ansible-playbook install.yaml -t nexus```
+```ansible-playbook install.yaml -e KEYCLOAK_NO_CHECK=```

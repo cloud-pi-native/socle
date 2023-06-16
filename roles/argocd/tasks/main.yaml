@@ -38,6 +38,10 @@
   ansible.builtin.set_fact:
     argo_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
+- name: Merge with argo user values
+  ansible.builtin.set_fact:
+    argo_values: "{{ argo_values | combine(dsc.argocd['values'], recursive=True) }}"
+
 - name: Deploy helm
   kubernetes.core.helm:
     name: argo

@@ -131,6 +131,13 @@ spec:
                     default: argocd
                     description: The subdomain for ArgoCD.
                     type: string
+                  values:
+                    description: |
+                      You can merge customs values for argocd, it will be merged with roles/argocd/tasks/main.yaml
+                      See https://github.com/bitnami/charts/tree/main/bitnami/argo-cd
+                    type: object
+                    default: {}
+                    x-kubernetes-preserve-unknown-fields: true
                 type: object
               certmanager:
                 description: Configuration for Cert Manager.
@@ -203,9 +210,9 @@ spec:
                     - forge
                     description: |
                       Defines root directory for projects in Gitlab and Vault
-                      This values should NEVER be changed once a project is used !
+                      These values should NEVER be changed once a project is used !
                       projects will not be migrated automatically
-                      Repesented as array of string (ex: ['company', 'forge', 'projects'])
+                      Represented as array of strings (ex: ['company', 'forge', 'projects'])
                       Cannot be an empty Array
                     items:
                       type: string

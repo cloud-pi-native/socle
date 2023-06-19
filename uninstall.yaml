@@ -1,4 +1,5 @@
-- hosts: localhost
+- name: Désinstallation du socle DSO
+  hosts: localhost
   gather_facts: false
 
   roles:
@@ -7,19 +8,17 @@
         - always
 
   post_tasks:
-    - name: Suppression des namespaces
-      kubernetes.core.k8s:
+
+    - name: Désinstallation de Kubed
+      kubernetes.core.helm:
+        name: kubed
+        chart_ref: appscode/kubed
+        release_namespace: openshift-infra
         state: absent
-        kind: Namespace
-        name: "{{ item }}"
-      with_items:
-        - "{{ dsc.console.namespace }}"
-        - "{{ dsc.sops.namespace }}"
-        - "{{ dsc.sonarqube.namespace }}"
-        - "{{ dsc.vault.namespace }}"
-        - "{{ dsc.nexus.namespace }}"
-        - "{{ dsc.harbor.namespace }}"
-        - "{{ dsc.argocd.namespace }}"
+        wait: true
+      tags:
+        - confSyncer
+        - kubed
 
     - name: Récupérations des clients Keycloak
       kubernetes.core.k8s_info:
@@ -27,6 +26,24 @@
         kind: KeycloakClient
         namespace: "{{ dsc.keycloak.namespace }}"
       register: keycloak_clients
+      tags:
+        - keycloak
+        - all
+
+    - name: Patch des clients Keycloak (finalizers)
+      kubernetes.core.k8s:
+        state: patched
+        api_version: keycloak.org/v1alpha1
+        kind: KeycloakClient
+        name: "{{ item.metadata.name }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        definition:
+          metadata:
+            finalizers: []
+      with_items: "{{ keycloak_clients.resources }}"
+      tags:
+        - keycloak
+        - all
 
     - name: Suppression des clients Keycloak
       kubernetes.core.k8s:
@@ -36,6 +53,28 @@
         name: "{{ item.metadata.name }}"
         namespace: "{{ dsc.keycloak.namespace }}"
       with_items: "{{ keycloak_clients.resources }}"
+      tags:
+        - keycloak
+        - all
+
+    - name: Patch des ressources Keycloak (finalizers)
+      kubernetes.core.k8s:
+        state: patched
+        api_version: keycloak.org/v1alpha1
+        kind: "{{ item.kind }}"
+        name: "{{ item.name }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        definition:
+          metadata:
+            finalizers: []
+      with_items:
+        - kind: KeycloakRealm
+          name: dso-realm
+        - kind: KeycloakUser
+          name: admin-gitlab
+      tags:
+        - keycloak
+        - all
 
     - name: Suppression des ressources Keycloak
       kubernetes.core.k8s:
@@ -49,6 +88,36 @@
           name: dso-realm
         - kind: KeycloakUser
           name: admin-gitlab
+      tags:
+        - keycloak
+        - all
+
+    - name: Suppression du namespace Keycloak
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.keycloak.namespace }}"
+      tags:
+        - keycloak
+        - all
+
+    - name: Suppression du namespace Nexus
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.nexus.namespace }}"
+      tags:
+        - nexus
+        - all
+
+    - name: Suppression du namespace Sonarqube
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.sonarqube.namespace }}"
+      tags:
+        - sonarqube
+        - all
 
     - name: Suppression du gitlab runner
       kubernetes.core.k8s:
@@ -57,16 +126,68 @@
         kind: Runner
         name: gitlab-runner
         namespace: "{{ dsc.gitlab.namespace }}"
+      tags:
+        - gitlab-runner
+        - gitlab
+        - all
 
-    - name: Suppression des namespaces restants
+    - name: Suppression du namespace GitLab
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
-        name: "{{ item }}"
-      with_items:
-        - "{{ dsc.keycloak.namespace }}"
-        - "{{ dsc.gitlab.namespace }}"
-        - cluster-infra
+        name: "{{ dsc.gitlab.namespace }}"
+      tags:
+        - gitlab
+        - all
+
+    - name: Suppression du namespace Vault
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.vault.namespace }}"
+      tags:
+        - vault
+        - all
+
+    - name: Suppression du namespace SOPS
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.sops.namespace }}"
+      tags:
+        - sops
+        - all
+
+    - name: Suppression du namespace ArgoCD
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.argocd.namespace }}"
+      tags:
+        - argocd
+        - argo
+        - gitops
+        - all
+
+    - name: Suppression du namespace Harbor
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.harbor.namespace }}"
+      tags:
+        - harbor
+        - registry
+        - all
+
+    - name: Suppression du namespace Console
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.console.namespace }}"
+      tags:
+        - console-dso
+        - console
+        - all
 
     - name: Remove local vars
       ansible.builtin.file:

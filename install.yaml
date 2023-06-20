@@ -72,10 +72,3 @@
         - console
         - console-dso
 
-  post_tasks:
-    - name: Remove local vars
-      ansible.builtin.file:
-        state: absent
-        path: vars.yaml
-      tags:
-        - always

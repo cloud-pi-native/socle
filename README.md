@@ -33,7 +33,7 @@ Elle nécessitera d'avoir installé au préalable les éléments suivants **sur 
 
 Exemple d'installation du module python-gitlab pour l'utilisateur courant :
 
-```
+```sh
 python3 -m pip install --user python-gitlab
 ```
 

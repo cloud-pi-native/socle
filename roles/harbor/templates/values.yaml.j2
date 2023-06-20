@@ -38,6 +38,22 @@ persistence:
   enabled: true
   resourcePolicy: keep
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
+{% if dsc.proxy.enabled %}
+proxy:
+  http_proxy: {{ dsc.proxy.http_proxy }}
+  https_proxy: {{ dsc.proxy.https_proxy }}
+  no_proxy: {{ dsc.proxy.no_proxy }},.local,.internal
+  components:
+    - nginx
+    - portal
+    - core
+    - jobservice
+    - registry
+    - trivy
+    - database
+    - redis
+    - exporter
+{% endif %}
 nginx:
   serviceAccountName: harbor-sa
   image:

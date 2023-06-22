@@ -270,7 +270,7 @@ kubectl get keycloak dso-keycloak -n mynamespace-keycloak -o yaml
 Ou bien si vous avez installé la commande `yq` :
 
 ```bash
-kubectl get keycloak dso-keycloak -n dso-keycloak -o yaml | yq '.status.phase'
+kubectl get keycloak dso-keycloak -n mynamespace-keycloak -o yaml | yq '.status.phase'
 ```
 
 Il se peut que Keycloak reste bloqué en status "initializing" mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook avec l'extra variable `KEYCLOAK_NO_CHECK` comme ceci :
@@ -298,7 +298,7 @@ ansible-playbook uninstall.yaml -e dsc_cr=ma-dsc
 
 Selon les performances ou la charge de votre cluster, la désinstallation de certains composants (par exemple Harbor) pourra prendre un peu de temps.
 
-Pour surveiller l'état d'une désinstallation en cours il sera possible, si vous avez correctement préfixé ou suffixé vos namespaces dans votre configuration, de vous appuyer sur la commande suivante (exemple avec le préfixe 'mynamespace-') :
+Pour surveiller l'état d'une désinstallation en cours il sera possible, si vous avez correctement préfixé ou suffixé vos namespaces dans votre configuration, de vous appuyer sur la commande suivante (exemple avec le préfixe « mynamespace- ») :
 
 ```bash
 watch "kubectl get ns | grep 'mynamespace-'"
@@ -319,4 +319,4 @@ Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre c
 ````
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 ````
-**Remarque importante** : Par défaut, le playbook de désinstallation ne supprimera pas la resource **kubed**, déployée dans le namespace `openshift-infra`. Ceci parce qu'elle pourrait éventuellement être utilisée par une autre instance de la chaîne DSO. Si vous voulez absolument la désinstaller malgré tout, vous pourrez le faire via l'utilisation du tag correspondant (`-t kubed` ou bien `-t confSyncer`).
+**Remarque importante** : Par défaut, le playbook de désinstallation ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`. Ceci parce qu'elle pourrait éventuellement être utilisée par une autre instance de la chaîne DSO. Si vous voulez absolument la désinstaller malgré tout, vous pourrez le faire via l'utilisation du tag correspondant (`-t kubed` ou bien `-t confSyncer`).

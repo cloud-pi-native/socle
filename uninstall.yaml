@@ -54,6 +54,8 @@
 
         - name: Exit playbook
           ansible.builtin.meta: end_play
+      tags:
+        - always
 
     - name: Set socle_config fact when dsc_cr defined and not empty
       ansible.builtin.set_fact:

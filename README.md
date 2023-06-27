@@ -15,6 +15,7 @@
     - [Keycloak](#keycloak)
   - [Désinstallation](#désinstallation)
   - [Gel des versions](#gel-des-versions)
+    - [Cert-manager](#cert-manager)
     - [Argo CD](#argo-cd)
       - [Gel de l'image](#gel-de-limage)
 
@@ -67,7 +68,7 @@ Une fois le dépôt socle cloné, lancez une première fois la commande suivante
 ansible-playbook install.yaml
 ```
 
-Elle vous signalera que vous n'avez encore jamais installé le socle sur votre cluster, puis vous invitera à modifier la resource de scope cluster et de type **dsc** nommée **conf-dso** via la commande suivante :
+Elle vous signalera que vous n'avez encore jamais installé le socle sur votre cluster, puis vous invitera à modifier la ressource de scope cluster et de type **dsc** nommée **conf-dso** via la commande suivante :
 
 ```bash
 kubectl edit dsc conf-dso
@@ -75,7 +76,7 @@ kubectl edit dsc conf-dso
 
 Lancer la commande ci-dessus pour éditer la ressource indiquée.
 
-Alternativement, et comme précisé, vous pourrez aussi déclarer la ressource dsc `conf-dso` dans un fichier YAML, nommé par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
+Alternativement, et comme précisé, vous pourrez aussi déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -165,7 +166,7 @@ spec:
 ## Installation
 
 ### Lancement
-Dès que votre [configuration](#configuration) est prête, c'est à dire que la resource dsc par défaut  `conf-dso` a bien été mise à jour, relancez la commande suivante :
+Dès que votre [configuration](#configuration) est prête, c'est à dire que la ressource `dsc` par défaut  `conf-dso` a bien été mise à jour, relancez la commande suivante :
 
 ```bash
 ansible-playbook install.yaml
@@ -183,11 +184,11 @@ watch "kubectl get ns | grep 'mynamespace-'"
 
 Suite à une première installation réussie et selon vos besoins, il est possible d'installer dans un même cluster une ou plusieurs autres forges DSO, en parallèle de celle installée par défaut.
 
-Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la resource dsc par défaut qui, pour rappel, se nomme `conf-dso`, et en y modifiant les noms des namespaces.
+Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui, pour rappel, se nomme `conf-dso`, et en y modifiant les noms des namespaces.
 
-Comme vu plus haut dans la section [Configuration](#configuration), déclarez votre ressource dsc personnalisée **dans un fichier YAML**.
+Comme vu plus haut dans la section [Configuration](#configuration), déclarez votre ressource de type `dsc` personnalisée **dans un fichier YAML**.
 
-Il s'agira simplement de **modifier le nom de la ressource dsc** (section `metadata`, champ `name`) puis **adapter le nom de tous les namespaces de vos outils** (en les préfixant ou suffixant différemment de ceux déclarés dans la dsc `conf-dso`).
+Il s'agira simplement de **modifier le nom de la ressource dsc** (section `metadata`, champ `name`) puis **adapter le nom de tous les namespaces de vos outils** (en les préfixant ou suffixant différemment de ceux déclarés dans la `dsc` nommée `conf-dso`).
 
 Adaptez également si nécessaire les autres éléments de votre nouvelle configuration (mots de passe, ingress, CA, domaines, proxy …).
 
@@ -203,7 +204,7 @@ Vous pourrer ensuite la retrouver via la commande :
 kubectl get dsc
 ```
 
-Puis éventuellement l'afficher (exemple avec une dsc nommée `ma-dsc`) :
+Puis éventuellement l'afficher (exemple avec une `dsc` nommée `ma-dsc`) :
 
 ```bash
 kubectl get dsc ma-dsc -o yaml
@@ -211,7 +212,7 @@ kubectl get dsc ma-dsc -o yaml
 
 Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO  dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'extra variable prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
 
-Par exemple, si votre nouvelle resource dsc se nomme `ma-dsc`, alors vous lancerez l'installation correspondante comme ceci : 
+Par exemple, si votre nouvelle ressource `dsc` se nomme `ma-dsc`, alors vous lancerez l'installation correspondante comme ceci : 
 
 ```bash
 ansible-playbook install.yaml -e dsc_cr=ma-dsc
@@ -236,7 +237,7 @@ Ce playbook permet également de cibler un outil en particulier, grâce à l'uti
 ansible-playbook admin-tools/get-credentials.yaml -t keycloak
 ```
 
-Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'extra variable `dsc_cr`, exemple avec la chaîne utilisant la dsc `ma-conf` :
+Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'extra variable `dsc_cr`, exemple avec la chaîne utilisant la `dsc` nommée `ma-conf` :
 
 ```bash
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf
@@ -256,13 +257,13 @@ Si vous rencontrez des problèmes lors de l'éxécution du playbook, vous voudre
 
 Pour cela, vous pouvez utiliser les tags associés aux rôles dans le fichier « install.yaml ».
 
-Voici par exemple comment réinstaller uniquement les composants keycloak et console, dans la chaîne DSO paramétrée avec la dsc par défaut (`conf-dso`), via les tags correspondants :
+Voici par exemple comment réinstaller uniquement les composants keycloak et console, dans la chaîne DSO paramétrée avec la `dsc` par défaut (`conf-dso`), via les tags correspondants :
 
 ```bash
 ansible-playbook install.yaml -t keycloak,console
 ```
 
-Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votre propre dsc (nommée par exemple `ma-dsc`), alors vous utiliserez l'extra variable `dsc_cr` comme ceci :
+Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votre propre `dsc` (nommée par exemple `ma-dsc`), alors vous utiliserez l'extra variable `dsc_cr` comme ceci :
 
 ```bash
 ansible-playbook install.yaml -e dsc_cr=ma-dsc -t keycloak,console
@@ -294,13 +295,13 @@ Un playbook de désinstallation nommé « uninstall.yaml » est disponible.
 
 Il permet de désinstaller toute la chaîne DSO en une seule fois.
 
-Pour le lancer, en vue de désinstaller la chaîne DSO utilisant le dsc par défaut `conf-dso` :
+Pour le lancer, en vue de désinstaller la chaîne DSO utilisant la `dsc` par défaut `conf-dso` :
 
 ```bash
 ansible-playbook uninstall.yaml
 ```
 
-**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource dsc, alors vous devrez utiliser l'extra variable `dsc_cr`, comme ceci (exemple avec une dsc nommée `ma-dsc`) :
+**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource de type `dsc`, alors vous devrez utiliser l'extra variable `dsc_cr`, comme ceci (exemple avec une `dsc` nommée `ma-dsc`) :
 
 ```bash
 ansible-playbook uninstall.yaml -e dsc_cr=ma-dsc
@@ -318,32 +319,67 @@ Le playbook de désinstallation peut aussi être utilisé pour supprimer un ou p
 
 L'idée est de faciliter leur réinstallation complète, en utilisant ensuite le playbook d'installation (voir la sous-section [Réinstallation](#réinstallation) de la section Debug).
 
-Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configurés avec le dsc par défaut (`conf-dso`), la commande sera la suivante :
+Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configurés avec le `dsc` par défaut (`conf-dso`), la commande sera la suivante :
 
 ````
 ansible-playbook uninstall.yaml -t keycloak,argocd
 ````
 
-Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre configuration (via une dsc nommée `ma-dsc`), vous rajouterez là encore l'extra variable `dsc_cr`. Exemple :
+Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre configuration (via une `dsc` nommée `ma-dsc`), vous rajouterez là encore l'extra variable `dsc_cr`. Exemple :
 
 ````
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 ````
-**Remarque importante** : Par défaut, le playbook de désinstallation ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`. Ceci parce qu'elle pourrait éventuellement être utilisée par une autre instance de la chaîne DSO. Si vous voulez absolument la désinstaller malgré tout, vous pourrez le faire via l'utilisation du tag correspondant (`-t kubed` ou bien `-t confSyncer`).
+**Remarque importante** : Par défaut, le playbook de désinstallation lancé sans aucun tag ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`, ni **cert-manager** déployé dans le namespace `cert-manager`. Ceci parce que ces deux composants pourraient être utilisés par une autre instance de la chaîne DSO. Si vous voulez absolument les désinstaller malgré tout, vous pourrez le faire via l'utilisation des tags correspondants. Pour Kubed : `-t kubed` ou bien `-t confSyncer`). Pour cert-manager : `-t cert-manager`. 
 
 ## Gel des versions
 
-Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils utilisées.
+Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils ou composants utilisées.
 
-Ceci est géré par divers paramètres que vous pourrez spécifier dans la dsc de configuration par défaut (`conf-dso`) ou votre propre dsc.
+Ceci est géré par divers paramètres que vous pourrez spécifier dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
 
 Les sections suivantes détaillent comment procéder, outil par outil.
 
+**Remarque importante** : Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
+
+### Cert-manager
+
+**Attention !** Cert-manager est déployé dans le namespace "openshift-infra", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
+
+Le composant cert-manager est déployé directement via son manifest, téléchargé sur GitHub.
+
+La liste des versions ("releases") est disponible ici : https://github.com/cert-manager/cert-manager/releases
+
+Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est la release "v1.11.0" qui sera déployée.
+
+Pour déployer une autre version, il suffira d'éditer cette même `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante :
+
+```yaml
+  certmanager:
+    version: v1.11.0
+```
+
+En la remplaçant par le numéro de release désiré, exemple :
+
+```yaml
+  certmanager:
+    version: v1.11.1
+```
+Puis appliquer le changement de configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+Et relancer l'installation de cert-manager, laquelle procédera a la mise à jour de version, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t cert-manager
+```
 ### Argo CD
 
 Tel qu'il est conçu, le rôle argocd déploie par défaut la dernière version du [chart helm Bitnami Argo CD](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd) disponible dans le cache des dépôts helm de l'utilisateur.
 
-Ceci est lié au fait que le paramètre de configuration `chartVersion` d'Argo CD, présent dans la dsc par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+Ceci est lié au fait que le paramètre de configuration `chartVersion` d'Argo CD, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
 Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
 
@@ -378,7 +414,7 @@ Pour connaître la liste des versions de charts helm d'Argo CD que vous pouvez m
   helm search repo -l argo-cd
 ```
 
-Si vous souhaitez fixer la version du chart helm, et donc celle d'Argo CD, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre resource `dsc` de configuration.
+Si vous souhaitez fixer la version du chart helm, et donc celle d'Argo CD, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
 
 Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante :
 
@@ -423,7 +459,7 @@ Les différents tags utilisables pour l'image d'Argo CD sont disponibles ici : h
 
 Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "2.7.6-debian-11-r2" est un tag immutable.
 
-Pour spécifier un tel tag, il nous suffira d'éditer la resource `dsc` de configuration (par défaut ce sera la dsc `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
 
 ```yaml
   argocd:

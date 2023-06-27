@@ -131,6 +131,10 @@ spec:
                     default: argocd
                     description: The subdomain for ArgoCD.
                     type: string
+                  chartVersion:
+                    default: 4.7.13
+                    description: ArgoCD Bitnami helm chart version (e.g., "4.7.13").
+                    type: string
                   values:
                     description: |
                       You can merge customs values for argocd, it will be merged with roles/argocd/tasks/main.yaml
@@ -138,6 +142,8 @@ spec:
                     type: object
                     default: {}
                     x-kubernetes-preserve-unknown-fields: true
+                required:
+                - chartVersion
                 type: object
               certmanager:
                 description: Configuration for Cert Manager.

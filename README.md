@@ -14,6 +14,9 @@
     - [Réinstallation](#réinstallation)
     - [Keycloak](#keycloak)
   - [Désinstallation](#désinstallation)
+  - [Gel des versions](#gel-des-versions)
+    - [Argo CD](#argo-cd)
+    - [Gel de l'image](#gel-de-limage)
 
 ## Introduction
 
@@ -102,6 +105,13 @@ spec:
       password: WeAreThePasswords
     namespace: mynamespace-argocd
     subDomain: argocd
+    chartVersion: "4.7.13"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/argo-cd
+        tag: 2.7.6-debian-11-r2
+        imagePullPolicy: IfNotPresent
   certmanager:
     version: v1.11.0
   console:
@@ -290,7 +300,7 @@ Pour le lancer, en vue de désinstaller la chaîne DSO utilisant le dsc par déf
 ansible-playbook uninstall.yaml
 ```
 
-**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre resource dsc, alors vous devrez utiliser l'extra variable `dsc_cr`, comme ceci (exemple avec une dsc nommée `ma-dsc`) :
+**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource dsc, alors vous devrez utiliser l'extra variable `dsc_cr`, comme ceci (exemple avec une dsc nommée `ma-dsc`) :
 
 ```bash
 ansible-playbook uninstall.yaml -e dsc_cr=ma-dsc
@@ -320,3 +330,123 @@ Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre c
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 ````
 **Remarque importante** : Par défaut, le playbook de désinstallation ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`. Ceci parce qu'elle pourrait éventuellement être utilisée par une autre instance de la chaîne DSO. Si vous voulez absolument la désinstaller malgré tout, vous pourrez le faire via l'utilisation du tag correspondant (`-t kubed` ou bien `-t confSyncer`).
+
+## Gel des versions
+
+Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils utilisées.
+
+Ceci est géré par divers paramètres que vous pourrez spécifier dans la dsc de configuration par défaut (`conf-dso`) ou votre propre dsc.
+
+Les sections suivantes détaillent comment procéder, outil par outil.
+
+### Argo CD
+
+Tel qu'il est conçu, le rôle argocd déploie par défaut la dernière version du [chart helm Bitnami Argo CD](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` d'Argo CD, présent dans la dsc par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo argo-cd
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME            CHART VERSION   APP VERSION     DESCRIPTION                                       
+bitnami/argo-cd 4.7.9          2.7.4           Argo CD is a continuous delivery tool for Kuber...
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer alors la commande de recherche :
+
+```bash
+helm search repo argo-cd
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit maintenant vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm d'Argo CD que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+  helm search repo -l argo-cd
+```
+
+Si vous souhaitez fixer la version du chart helm, et donc celle d'Argo CD, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre resource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante :
+
+```yaml
+  argocd:
+    admin:
+      enabled: true
+      password: WeAreThePasswords
+    namespace: mynamespace-argocd
+    subDomain: argocd
+    chartVersion: ""
+```
+
+Pour y spécifier la version souhaitée, exemple :
+
+```yaml
+  argocd:
+    admin:
+      enabled: true
+      password: WeAreThePasswords
+    namespace: mynamespace-argocd
+    subDomain: argocd
+    chartVersion: "4.7.13"
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation d'Argo CD, laquelle mettra à jour la version du chart et l'image associée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t argocd
+```
+### Gel de l'image
+
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image d'Argo CD de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**). 
+
+Les différents tags utilisables pour l'image d'Argo CD sont disponibles ici : https://hub.docker.com/r/bitnami/argo-cd/tags
+
+Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "2.7.6-debian-11-r2" est un tag immutable.
+
+Pour spécifier un tel tag, il nous suffira d'éditer la resource `dsc` de configuration (par défaut ce sera la dsc `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+
+```yaml
+  argocd:
+    admin:
+      enabled: true
+      password: WeAreThePasswords
+    namespace: mynamespace-argocd
+    subDomain: argocd
+    chartVersion: "4.7.13"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/argo-cd
+        tag: 2.7.6-debian-11-r2
+        imagePullPolicy: IfNotPresent
+```
+
+Puis relancer l'installation avec le tag `argocd` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t argocd
+```
+
+Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml
+
+Les releases d'Argo CD et leurs changelogs se trouvent ici : https://github.com/argoproj/argo-cd/releases

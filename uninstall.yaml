@@ -2,12 +2,79 @@
   hosts: localhost
   gather_facts: false
 
-  roles:
-    - name: socle-config
+#  roles:
+#    - name: socle-config
+#      tags:
+#        - always
+
+#  post_tasks:
+
+  tasks:
+
+    - name: "Get socle config from conf-dso dsc (default)"
+      kubernetes.core.k8s_info:
+        kind: dsc
+        name: conf-dso
+        api_version: cloud-pi-native.fr/v1alpha
+      register: socle_config
       tags:
         - always
 
-  post_tasks:
+    - name: Get socle config from dsc_cr extra var when defined
+      kubernetes.core.k8s_info:
+        kind: dsc
+        name: "{{ dsc_cr }}"
+        api_version: cloud-pi-native.fr/v1alpha
+      register: socle_config_custom
+      when: dsc_cr is defined
+      tags:
+        - always
+
+    - name: Check socle_config_custom and exit if empty
+      when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
+      block:
+        - name: Warning message
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Vous avez lancé le playbook avec l'option '-e dsc_cr={{ dsc_cr }}'"
+              - "mais la ressource dsc nommée '{{ dsc_cr }}' est vide ou inexistante côté cluster !"
+              - ""
+              - "Vérifiez que vous ne vous êtes pas trompé de nom et que la ressource existe bien, via la commande suivante :"
+              - ""
+              - " kubectl get dsc {{ dsc_cr }} "
+              - ""
+              - "Si elle n'est pas trouvée (not found), listez simplement les resources dsc actuellement déclarées :"
+              - ""
+              - " kubectl get dsc "
+              - ""
+              - "Puis relancez le playbook avec une resource dsc existante."
+              - ""
+              - "Rappel : le présent playbook lancé seul, sans extra vars, procédera à des désinstallations d'outils,"
+              - "ou de la chaîne DSO complète, en s'appuyant sur les namespaces déclarés dans le dsc par défaut (conf-dso)."
+
+        - name: Exit playbook
+          ansible.builtin.meta: end_play
+      tags:
+        - always
+
+    - name: Set socle_config fact when dsc_cr defined and not empty
+      ansible.builtin.set_fact:
+        socle_config: "{{ socle_config_custom }}"
+      when: (socle_config_custom is not skipped) and (socle_config_custom.resources | length > 0)
+      tags:
+        - always
+
+    - name: Set DSC Name fact
+      ansible.builtin.set_fact:
+        dsc_name: "{{ socle_config.resources[0].metadata.name }}"
+      tags:
+        - always
+
+    - name: Set DSC fact
+      ansible.builtin.set_fact:
+        dsc: "{{ socle_config.resources[0].spec }}"
+      tags:
+        - always
 
     - name: Désinstallation de Kubed
       kubernetes.core.helm:
@@ -17,6 +84,7 @@
         state: absent
         wait: true
       tags:
+        - never
         - confSyncer
         - kubed
 
@@ -28,7 +96,6 @@
       register: keycloak_clients
       tags:
         - keycloak
-        - all
 
     - name: Patch des clients Keycloak (finalizers)
       kubernetes.core.k8s:
@@ -43,7 +110,6 @@
       with_items: "{{ keycloak_clients.resources }}"
       tags:
         - keycloak
-        - all
 
     - name: Suppression des clients Keycloak
       kubernetes.core.k8s:
@@ -55,7 +121,6 @@
       with_items: "{{ keycloak_clients.resources }}"
       tags:
         - keycloak
-        - all
 
     - name: Patch des ressources Keycloak (finalizers)
       kubernetes.core.k8s:
@@ -74,7 +139,6 @@
           name: admin-gitlab
       tags:
         - keycloak
-        - all
 
     - name: Suppression des ressources Keycloak
       kubernetes.core.k8s:
@@ -90,7 +154,6 @@
           name: admin-gitlab
       tags:
         - keycloak
-        - all
 
     - name: Suppression du namespace Keycloak
       kubernetes.core.k8s:
@@ -99,7 +162,6 @@
         name: "{{ dsc.keycloak.namespace }}"
       tags:
         - keycloak
-        - all
 
     - name: Suppression du namespace Nexus
       kubernetes.core.k8s:
@@ -108,7 +170,6 @@
         name: "{{ dsc.nexus.namespace }}"
       tags:
         - nexus
-        - all
 
     - name: Suppression du namespace Sonarqube
       kubernetes.core.k8s:
@@ -117,7 +178,6 @@
         name: "{{ dsc.sonarqube.namespace }}"
       tags:
         - sonarqube
-        - all
 
     - name: Suppression du gitlab runner
       kubernetes.core.k8s:
@@ -129,7 +189,6 @@
       tags:
         - gitlab-runner
         - gitlab
-        - all
 
     - name: Suppression du namespace GitLab
       kubernetes.core.k8s:
@@ -138,7 +197,6 @@
         name: "{{ dsc.gitlab.namespace }}"
       tags:
         - gitlab
-        - all
 
     - name: Suppression du namespace Vault
       kubernetes.core.k8s:
@@ -147,7 +205,6 @@
         name: "{{ dsc.vault.namespace }}"
       tags:
         - vault
-        - all
 
     - name: Suppression du namespace SOPS
       kubernetes.core.k8s:
@@ -156,7 +213,6 @@
         name: "{{ dsc.sops.namespace }}"
       tags:
         - sops
-        - all
 
     - name: Suppression du namespace ArgoCD
       kubernetes.core.k8s:
@@ -167,7 +223,6 @@
         - argocd
         - argo
         - gitops
-        - all
 
     - name: Suppression du namespace Harbor
       kubernetes.core.k8s:
@@ -177,7 +232,6 @@
       tags:
         - harbor
         - registry
-        - all
 
     - name: Suppression du namespace Console
       kubernetes.core.k8s:
@@ -187,4 +241,3 @@
       tags:
         - console-dso
         - console
-        - all

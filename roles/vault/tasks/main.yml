@@ -62,7 +62,7 @@
 
 - name: Deploy helm
   kubernetes.core.helm:
-    name: vault
+    name: "{{ dsc_name }}-vault"
     chart_ref: hashicorp/vault
     release_namespace: "{{ dsc.vault.namespace }}"
     create_namespace: true
@@ -77,7 +77,7 @@
 - name: Wait vault container
   kubernetes.core.k8s:
     kind: Pod
-    name: vault-0
+    name: "{{ dsc_name }}-vault-0"
     namespace: "{{ dsc.vault.namespace }}"
     wait: true
     wait_sleep: 10
@@ -91,7 +91,7 @@
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: vault-keys
+    name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
 
 - name: Check Vault health
@@ -110,7 +110,7 @@
 - name: Init vault
   kubernetes.core.k8s_exec:
     container: vault
-    pod: vault-0
+    pod: "{{ dsc_name }}-vault-0"
     namespace: "{{ dsc.vault.namespace }}"
     command: vault operator init -key-shares=3 -key-threshold=2
   when: vault_status == 'not init'
@@ -124,7 +124,7 @@
     definition:
       kind: Secret
       metadata:
-        name: vault-keys
+        name: "{{ dsc_name }}-vault-keys"
         namespace: "{{ dsc.vault.namespace }}"
       data:
         key1: "{{ init.stdout_lines[0] | regex_replace('^Unseal Key 1: (.*)$', '\\1', multiline=True) | b64encode }}"
@@ -137,7 +137,7 @@
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: vault-keys
+    name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
 
 - name: Update inventory

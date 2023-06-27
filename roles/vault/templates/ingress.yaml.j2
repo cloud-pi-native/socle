@@ -8,7 +8,7 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
-    app: nexus
+    app: vault
 {% for key, val in dsc.ingress.labels.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
@@ -31,6 +31,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: vault
+                name: {{ dsc_name }}-vault
                 port:
                   number: 8200

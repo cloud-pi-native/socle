@@ -39,7 +39,7 @@
 
 - name: Deploy helm
   kubernetes.core.helm:
-    name: sops
+    name: "{{ dsc_name }}-sops"
     chart_ref: sops/sops-secrets-operator
     release_namespace: "{{ dsc.sops.namespace }}"
     create_namespace: true

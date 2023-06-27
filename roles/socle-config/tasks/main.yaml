@@ -2,12 +2,50 @@
   kubernetes.core.k8s:
     definition: "{{ lookup('ansible.builtin.file', 'crd-conf-dso.yaml') | from_yaml }}"
 
-- name: Get socle config from dsc
+- name: "Get socle config from conf-dso dsc (default)"
   kubernetes.core.k8s_info:
     kind: dsc
     name: conf-dso
     api_version: cloud-pi-native.fr/v1alpha
+#  register: socle_config_default
   register: socle_config
+
+- name: Get socle config from dsc_cr extra var when defined
+  kubernetes.core.k8s_info:
+    kind: dsc
+    name: "{{ dsc_cr }}"
+    api_version: cloud-pi-native.fr/v1alpha
+  register: socle_config_custom
+  when: dsc_cr is defined
+
+- name: Check socle_config_custom and exit if empty
+  when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
+  block:
+    - name: Warning message
+      ansible.builtin.debug:
+        msg:
+          - "Attention ! Vous avez lancé le playbook d'installation avec l'option '-e dsc_cr={{ dsc_cr }}'"
+          - "mais la ressource dsc nommée '{{ dsc_cr }}' est vide ou inexistante côté cluster !"
+          - ""
+          - "Si votre intention est bien d'utiliser votre propre configuration plutôt que 'conf-dso', ressource dsc par défaut,"
+          - "alors veuiller déclarer votre resource dsc '{{ dsc_cr }}' dans un fichier YAML"
+          - "nommé par exemple 'ma-conf-dso.yaml' et la créer via la commande suivante :"
+          - ""
+          - " kubectl apply -f ma-conf-dso.yaml "
+          - ""
+          - "Puis relancer l'installation."
+
+    - name: Exit playbook
+      ansible.builtin.meta: end_play
+
+# - name: Set default socle_config fact
+#   ansible.builtin.set_fact:
+#     socle_config: "{{ socle_config_default }}"
+
+- name: Set socle_config fact when dsc_cr defined and not empty
+  ansible.builtin.set_fact:
+    socle_config: "{{ socle_config_custom }}"
+  when: (socle_config_custom is not skipped) and (socle_config_custom.resources | length > 0)
 
 - name: Initialize config and exit
   when: socle_config.resources | length == 0
@@ -19,23 +57,39 @@
     - name: Disclaimer
       ansible.builtin.debug:
         msg:
-          - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster."
-          - "Veuillez modifier la resource de type dsc nommée conf-dso et de scope cluster"
+          - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster ou que la configuration par défaut ait été supprimée."
+          - "Veuillez modifier la resource de type dsc par défaut nommée 'conf-dso' et de scope cluster"
           - "via la commande suivante :"
           - ""
-          - "kubectl edit dsc conf-dso"
+          - " kubectl edit dsc conf-dso "
           - ""
           - "Puis relancer l'installation."
           - ""
-          - "Alternativement, vous pouvez aussi déclarer la resource conf-dso dans un fichier YAML"
-          - "nommé par exemple 'ma-conf-dso.yaml' et la créer via la commande suivante :"
+          - "Attention ! Si vous relancez l'installation sans modifier la configuration par défaut, celle-ci s'appliquera telle qu'elle."
+          - "Ce n'est probablement pas ce que vous souhaitez faire."
           - ""
-          - "kubectl apply -f ma-conf-dso.yaml"
+          - "Alternativement, vous pouvez aussi déclarer la resource dsc de nom conf-dso (ou tout autre nom à votre convenance)"
+          - "dans un fichier YAML nommé par exemple 'ma-conf-dso.yaml', pour ensuite la créer via la commande suivante :"
+          - ""
+          - " kubectl apply -f ma-conf-dso.yaml "
           - ""
           - "Puis relancer l'installation."
+          - ""
+          - "Si vous utilisez la resource dsc par défaut nommée conf-dso, vous relancerez le playbook d'installation comme ceci :"
+          - ""
+          - " ansible-playbook install.yaml "
+          - ""
+          - "Si au contraire vous souhaitez utiliser un nom de resource différent, associé à une configuration différente,"
+          - "alors vous devrez utiliser la commande suivante pour relancer l'installation (exemple avec une dsc nommée conf-perso) :"
+          - ""
+          - " ansible-playbook install.yaml -e dsc_cr=conf-perso "
 
     - name: Exit playbook
       ansible.builtin.meta: end_play
+
+- name: Set DSC Name fact
+  ansible.builtin.set_fact:
+    dsc_name: "{{ socle_config.resources[0].metadata.name }}"
 
 - name: Set DSC fact
   ansible.builtin.set_fact:
@@ -56,16 +110,16 @@
     sonar_domain: "{{ dsc.sonarqube.subDomain }}{{ root_domain }}"
     vault_domain: "{{ dsc.vault.subDomain }}{{ root_domain }}"
 
-# - name: Debug domains facts
-#   ansible.builtin.debug:
-#     msg:
-#       - "argocd_domain: {{ argocd_domain }}"
-#       - "gitlab_domain: {{ gitlab_domain }}"
-#       - "harbor_domain: {{ harbor_domain }}"
-#       - "keycloak_domain: {{ keycloak_domain }}"
-#       - "nexus_domain: {{ nexus_domain }}"
-#       - "sonar_domain: {{ sonar_domain }}"
-#       - "vault_domain: {{ vault_domain }}"
-# 
+- name: Debug domains facts
+  ansible.builtin.debug:
+    msg:
+      - "argocd_domain: {{ argocd_domain }}"
+      - "gitlab_domain: {{ gitlab_domain }}"
+      - "harbor_domain: {{ harbor_domain }}"
+      - "keycloak_domain: {{ keycloak_domain }}"
+      - "nexus_domain: {{ nexus_domain }}"
+      - "sonar_domain: {{ sonar_domain }}"
+      - "vault_domain: {{ vault_domain }}"
+
 # - name: End playbook
 #   ansible.builtin.meta: end_play

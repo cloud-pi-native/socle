@@ -16,7 +16,7 @@
   - [Désinstallation](#désinstallation)
   - [Gel des versions](#gel-des-versions)
     - [Argo CD](#argo-cd)
-    - [Gel de l'image](#gel-de-limage)
+      - [Gel de l'image](#gel-de-limage)
 
 ## Introduction
 
@@ -415,7 +415,7 @@ Puis de relancer l'installation d'Argo CD, laquelle mettra à jour la version du
 ```bash
 ansible-playbook install.yaml -t argocd
 ```
-### Gel de l'image
+#### Gel de l'image
 
 En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image d'Argo CD de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**). 
 

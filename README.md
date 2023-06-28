@@ -18,6 +18,7 @@
     - [Cert-manager](#cert-manager)
     - [Argo CD](#argo-cd)
       - [Gel de l'image](#gel-de-limage)
+    - [Kubed (config-syncer)](#kubed-config-syncer)
 
 ## Introduction
 
@@ -143,6 +144,8 @@ spec:
   keycloak:
     namespace: mynamespace-keycloak
     subDomain: keycloak
+  kubed:
+    chartVersion: "v0.13.2"
   nexus:
     namespace: mynamespace-nexus
     subDomain: nexus
@@ -344,7 +347,7 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 
 ### Cert-manager
 
-**Attention !** Cert-manager est déployé dans le namespace "openshift-infra", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
+**Attention !** Cert-manager est déployé dans le namespace "cert-manager", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
 
 Le composant cert-manager est déployé directement via son manifest, téléchargé sur GitHub.
 
@@ -411,7 +414,7 @@ Si votre cache n'était pas déjà à jour, la sortie doit maintenant vous indiq
 Pour connaître la liste des versions de charts helm d'Argo CD que vous pouvez maintenant installer, utilisez la commande suivante : 
 
 ```bash
-  helm search repo -l argo-cd
+helm search repo -l argo-cd
 ```
 
 Si vous souhaitez fixer la version du chart helm, et donc celle d'Argo CD, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
@@ -486,3 +489,66 @@ ansible-playbook install.yaml -t argocd
 Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml
 
 Les releases d'Argo CD et leurs changelogs se trouvent ici : https://github.com/argoproj/argo-cd/releases
+
+### Kubed (config-syncer)
+
+**Attention !** Kubed est déployé dans le namespace "openshift-infra", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
+
+Tel qu'il est conçu, le rôle confSyncer qui sert à installer Kubed déploie par défaut la dernière version du [chart helm ](https://github.com/appscode/charts/tree/master/stable/kubed) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de Kubed, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo kubed
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+appscode/kubed                          v0.13.1         v0.13.1         Config Syncer by AppsCode - Kubernetes daemon
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer alors la commande de recherche :
+
+```bash
+helm search repo kubed
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit maintenant vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de Kubed que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l kubed
+```
+
+Si vous souhaitez fixer la version du chart helm, et donc celle de Kubed, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante :
+
+```yaml
+  kubed:
+    chartVersion: "v0.13.2"
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de Kubed, laquelle mettra à jour la version du chart et l'image associée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t kubed
+```
+**Remarque importante** : Le numéro de version du chart Helm est corrélé à celui de l'image utilisée pour l'application, de sorte que fixer ce numéro de version fixe aussi celui de l'image.

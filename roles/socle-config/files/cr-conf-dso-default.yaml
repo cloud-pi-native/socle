@@ -25,6 +25,8 @@ spec:
     adminPassword: anotherGreatPassword
   ingress: {}
   keycloak: {}
+  kubed:
+    chartVersion: ""
   nexus:
     storageSize: 25Gi
   proxy:

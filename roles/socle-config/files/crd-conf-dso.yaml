@@ -342,6 +342,16 @@ spec:
                     description: The subdomain for Keycloak.
                     type: string
                 type: object
+              kubed:
+                description: Configuration for Kubed (config-syncer).
+                properties:
+                  chartVersion:
+                    default: v0.13.2
+                    description: Kubed helm chart version (e.g., "v0.13.2").
+                    type: string
+                required:
+                - chartVersion
+                type: object
               nexus:
                 description: Configuration for Nexus.
                 properties:

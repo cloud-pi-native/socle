@@ -7,5 +7,6 @@
   kubernetes.core.helm:
     name: kubed
     chart_ref: appscode/kubed
+    chart_version: "{{ dsc.kubed.chartVersion }}"
     release_namespace: openshift-infra
     create_namespace: true

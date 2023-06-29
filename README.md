@@ -23,6 +23,7 @@
     - [Console Cloud π Native](#console-cloud-π-native)
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
+    - [SonarQube Community Edition](#sonarqube-community-edition)
 
 ## Introduction
 
@@ -30,22 +31,22 @@ L'installation de la forge DSO (DevSecOps) s'effectue de manière automatisée a
 
 Les éléments déployés seront les suivants :
 
-| Outil                     | Site officiel                                               |
-| ------------------------- | ----------------------------------------------------------- |
-| Argo CD                   | https://argo-cd.readthedocs.io                              |
-| Cert-manager              | https://cert-manager.io                                     |
-| Console Cloud π Native    | https://github.com/cloud-pi-native/console                  |
-| Gitlab                    | https://about.gitlab.com                                    |
-| Gitlab Runner             | https://docs.gitlab.com/runner                              |
-| Harbor                    | https://goharbor.io                                         |
-| Keycloak                  | https://www.keycloak.org                                    |
-| Kubed                     | https://appscode.com/products/kubed                         |
-| Sonatype Nexus Repository | https://www.sonatype.com/products/sonatype-nexus-repository |
-| SonarQube                 | https://www.sonarsource.com/products/sonarqube              |
-| SOPS                      | https://github.com/isindir/sops-secrets-operator            |
-| Vault                     | https://www.hashicorp.com/products/vault                    |
+| Outil                       | Site officiel                                                                |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| Argo CD                     | https://argo-cd.readthedocs.io                                               |
+| Cert-manager                | https://cert-manager.io                                                      |
+| Console Cloud π Native      | https://github.com/cloud-pi-native/console                                   |
+| Gitlab                      | https://about.gitlab.com                                                     |
+| Gitlab Runner               | https://docs.gitlab.com/runner                                               |
+| Harbor                      | https://goharbor.io                                                          |
+| Keycloak                    | https://www.keycloak.org                                                     |
+| Kubed                       | https://appscode.com/products/kubed                                          |
+| Sonatype Nexus Repository   | https://www.sonatype.com/products/sonatype-nexus-repository                  |
+| SonarQube Community Edition | https://www.sonarsource.com/open-source-editions/sonarqube-community-edition |
+| SOPS                        | https://github.com/isindir/sops-secrets-operator                             |
+| Vault                       | https://www.hashicorp.com/products/vault                                     |
 
-Certains peuvent prendre un peu de temps, par exemple Keycloak ou GitLab.
+Certains peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
 ## Prérequis
 
 Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.
@@ -183,6 +184,7 @@ spec:
   sonarqube:
     namespace: mynamespace-sonarqube
     subDomain: sonarqube
+    imageTag: 9.9-community
   sops:
     namespace: mynamespace-sops
   vault:
@@ -595,7 +597,7 @@ ansible-playbook install.yaml -t kubed
 
 ### Sonatype Nexus Repository
 
-Le composant nexus est installé directement via le manifest de deployment "nexus.yml.j2" intégré au role.
+Le composant nexus est installé directement via le manifest de deployment "nexus.yml.j2" intégré au role associé.
 
 Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est l'image "3.56.0" qui sera déployée.
 
@@ -619,5 +621,33 @@ kubectl apply -f ma-conf-dso.yaml
 Et relancer l'installation de nexus, laquelle procédera a la mise à jour de version, **avec coupure de service** :
 
 ```bash
-ansible-playbook install.yaml -t console
+ansible-playbook install.yaml -t nexus
+```
+
+### SonarQube Community Edition
+
+Le composant sonarqube est installé directement via le manifest de deployment "sonar-deployment.yaml.j2" intégré au role associé.
+
+Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est l'image "9.9-community" qui sera déployée.
+
+Les tags d'images utilisables pour l'édition community sont disponibles ici : https://hub.docker.com/_/sonarqube/tags?name=community
+
+Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageTag**. Exemple :
+
+```yaml
+  sonarqube:
+    namespace: mynamespace-sonarqube
+    subDomain: sonarqube
+    imageTag: 9.9.1-community
+```
+
+Puis appliquer le changement de configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+Et relancer l'installation de sonarqube, laquelle procédera a la mise à jour de version, **avec coupure de service** :
+
+```bash
+ansible-playbook install.yaml -t sonarqube
 ```

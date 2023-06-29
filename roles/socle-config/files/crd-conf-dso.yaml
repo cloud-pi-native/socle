@@ -416,6 +416,12 @@ spec:
                     default: sonarqube
                     description: The subdomain for SonarQube.
                     type: string
+                  imageTag:
+                    default: 9.9-community
+                    description: SonarQube version based on image tag (e.g., "9.9-community").
+                    type: string
+                required:
+                - imageTag
                 type: object
               sops:
                 properties:

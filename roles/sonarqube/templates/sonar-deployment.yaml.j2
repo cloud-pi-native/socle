@@ -27,8 +27,8 @@ spec:
 #            privileged: true
       containers:
         - name: sonar
-          #image: sonarqube@sha256:2c14cb8b69da559bef28fdd1bcd022ecf59961fb30ef187ecc7f03d9f0e642b9 # Sets Image
-          image: sonarqube@sha256:e2c686ea37803a6b50b09670918dc68f9845660397d8925168be0fca24915b27 # Sets Image
+          #image: sonarqube@sha256:e2c686ea37803a6b50b09670918dc68f9845660397d8925168be0fca24915b27 # Sets Image
+          image: sonarqube:{{ dsc.sonarqube.imageTag }}
           imagePullPolicy: "IfNotPresent"
           livenessProbe:
             httpGet:

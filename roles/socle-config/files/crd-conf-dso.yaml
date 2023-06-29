@@ -166,8 +166,8 @@ spec:
                     description: The namespace for console.
                     type: string
                   release:
-                    default: 3.4.1
-                    description: Console version (e.g., "3.4.1").
+                    default: 4.1.0
+                    description: Console version (e.g., "4.1.0").
                     type: string
                   subDomain:
                     default: console
@@ -188,8 +188,8 @@ spec:
                     description: The subdomain for GitLab.
                     type: string
                   version:
-                    default: 6.11.4
-                    description: GitLab version (e.g., "6.11.4").
+                    default: 6.11.9
+                    description: GitLab version (e.g., "6.11.9").
                     type: string
                   values:
                     description: |

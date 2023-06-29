@@ -14,21 +14,42 @@
     - [Réinstallation](#réinstallation)
     - [Keycloak](#keycloak)
   - [Désinstallation](#désinstallation)
+    - [Chaîne complète](#chaîne-complète)
+    - [Un ou plusieurs outils](#un-ou-plusieurs-outils)
   - [Gel des versions](#gel-des-versions)
-    - [Cert-manager](#cert-manager)
     - [Argo CD](#argo-cd)
       - [Gel de l'image](#gel-de-limage)
+    - [Cert-manager](#cert-manager)
+    - [Console Cloud π Native](#console-cloud-π-native)
     - [Kubed (config-syncer)](#kubed-config-syncer)
 
 ## Introduction
 
-L'installation de la forge DSO (DevSecOps) se fait **via Ansible**. Chaque élément sera donc installé de manière automatisée. Certains peuvent prendre un peu de temps, par exemple Keycloak ou GitLab.
+L'installation de la forge DSO (DevSecOps) s'effectue de manière automatisée avec **Ansible**.
 
+Les éléments déployés seront les suivants :
+
+| Outil                     | Site officiel                                               |
+| ------------------------- | ----------------------------------------------------------- |
+| Argo CD                   | https://argo-cd.readthedocs.io                              |
+| Cert-manager              | https://cert-manager.io                                     |
+| Console Cloud π Native    | https://github.com/cloud-pi-native/console                  |
+| Gitlab                    | https://about.gitlab.com                                    |
+| Gitlab Runner             | https://docs.gitlab.com/runner                              |
+| Harbor                    | https://goharbor.io                                         |
+| Keycloak                  | https://www.keycloak.org                                    |
+| Kubed                     | https://appscode.com/products/kubed                         |
+| Sonatype Nexus Repository | https://www.sonatype.com/products/sonatype-nexus-repository |
+| SonarQube                 | https://www.sonarsource.com/products/sonarqube              |
+| SOPS                      | https://github.com/isindir/sops-secrets-operator            |
+| Vault                     | https://www.hashicorp.com/products/vault                    |
+
+Certains peuvent prendre un peu de temps, par exemple Keycloak ou GitLab.
 ## Prérequis
 
 Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.
 
-Elle nécessite l'utilisation de [ce dépôt](https://github.com/cloud-pi-native/socle) qui devra donc être cloné sur votre environnement de déploiement ([Ansible control node](https://docs.ansible.com/ansible/latest/network/getting_started/basic_concepts.html#control-node)).
+Elle nécessite l'utilisation du présent [dépôt](https://github.com/cloud-pi-native/socle) qui devra donc être cloné sur votre environnement de déploiement ([Ansible control node](https://docs.ansible.com/ansible/latest/network/getting_started/basic_concepts.html#control-node)).
 
 Elle nécessitera d'avoir installé au préalable les éléments suivants **sur l'environnement de déploiement** :
 
@@ -294,11 +315,13 @@ ansible-playbook install.yaml -e KEYCLOAK_NO_CHECK=
 ```
 ## Désinstallation
 
+### Chaîne complète
+
 Un playbook de désinstallation nommé « uninstall.yaml » est disponible.
 
-Il permet de désinstaller toute la chaîne DSO en une seule fois.
+Il permet de désinstaller **toute la chaîne DSO en une seule fois**.
 
-Pour le lancer, en vue de désinstaller la chaîne DSO utilisant la `dsc` par défaut `conf-dso` :
+Pour le lancer, en vue de désinstaller la chaîne DSO qui utilise la `dsc` par défaut `conf-dso` :
 
 ```bash
 ansible-playbook uninstall.yaml
@@ -318,11 +341,15 @@ Pour surveiller l'état d'une désinstallation en cours il sera possible, si vou
 watch "kubectl get ns | grep 'mynamespace-'"
 ```
 
-Le playbook de désinstallation peut aussi être utilisé pour supprimer un ou plusieurs outils de manière ciblée, via les tags associés.
+**Remarque importante** : Par défaut, le playbook de désinstallation lancé sans aucun tag ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`, ni **cert-manager** déployé dans le namespace `cert-manager`. Ceci parce que ces deux composants pourraient être utilisés par une autre instance de la chaîne DSO. Si vous voulez absolument les désinstaller malgré tout, vous pourrez le faire via l'utilisation des tags correspondants. Pour Kubed : `-t kubed` ou bien `-t confSyncer`). Pour cert-manager : `-t cert-manager`.
+
+### Un ou plusieurs outils
+
+Le playbook de désinstallation peut aussi être utilisé pour supprimer un ou plusieurs outils **de manière ciblée**, via les tags associés.
 
 L'idée est de faciliter leur réinstallation complète, en utilisant ensuite le playbook d'installation (voir la sous-section [Réinstallation](#réinstallation) de la section Debug).
 
-Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configurés avec le `dsc` par défaut (`conf-dso`), la commande sera la suivante :
+Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configurés avec la `dsc` par défaut (`conf-dso`), la commande sera la suivante :
 
 ````
 ansible-playbook uninstall.yaml -t keycloak,argocd
@@ -333,11 +360,12 @@ Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre c
 ````
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 ````
-**Remarque importante** : Par défaut, le playbook de désinstallation lancé sans aucun tag ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`, ni **cert-manager** déployé dans le namespace `cert-manager`. Ceci parce que ces deux composants pourraient être utilisés par une autre instance de la chaîne DSO. Si vous voulez absolument les désinstaller malgré tout, vous pourrez le faire via l'utilisation des tags correspondants. Pour Kubed : `-t kubed` ou bien `-t confSyncer`). Pour cert-manager : `-t cert-manager`. 
+
+**Remarque importante** : Si vous désinstallez la resource **console** via le tag approprié, et que vous souhaitez ensuite la réinstaller, il sera préférable de **relancer une installation complète** du socle DSO (sans tags) plutôt que de réinstaller la console seule. En effet, la configmap `dso-config` qui lui est associée est alimentée par les autres outils à mesure de l'installation.
 
 ## Gel des versions
 
-Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils ou composants utilisées.
+Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils ou composants utilisés.
 
 Ceci est géré par divers paramètres que vous pourrez spécifier dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
 
@@ -345,42 +373,9 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 
 **Remarque importante** : Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
 
-### Cert-manager
-
-**Attention !** Cert-manager est déployé dans le namespace "cert-manager", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
-
-Le composant cert-manager est déployé directement via son manifest, téléchargé sur GitHub.
-
-La liste des versions ("releases") est disponible ici : https://github.com/cert-manager/cert-manager/releases
-
-Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est la release "v1.11.0" qui sera déployée.
-
-Pour déployer une autre version, il suffira d'éditer cette même `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante :
-
-```yaml
-  certmanager:
-    version: v1.11.0
-```
-
-En la remplaçant par le numéro de release désiré, exemple :
-
-```yaml
-  certmanager:
-    version: v1.11.1
-```
-Puis appliquer le changement de configuration, exemple :
-
-```bash
-kubectl apply -f ma-conf-dso.yaml
-```
-Et relancer l'installation de cert-manager, laquelle procédera a la mise à jour de version, sans coupure de service :
-
-```bash
-ansible-playbook install.yaml -t cert-manager
-```
 ### Argo CD
 
-Tel qu'il est conçu, le rôle argocd déploie par défaut la dernière version du [chart helm Bitnami Argo CD](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd) disponible dans le cache des dépôts helm de l'utilisateur.
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle argocd déploiera la dernière version du [chart helm Bitnami Argo CD](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd) disponible dans le cache des dépôts helm de l'utilisateur.
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` d'Argo CD, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
@@ -419,19 +414,7 @@ helm search repo -l argo-cd
 
 Si vous souhaitez fixer la version du chart helm, et donc celle d'Argo CD, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
 
-Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante :
-
-```yaml
-  argocd:
-    admin:
-      enabled: true
-      password: WeAreThePasswords
-    namespace: mynamespace-argocd
-    subDomain: argocd
-    chartVersion: ""
-```
-
-Pour y spécifier la version souhaitée, exemple :
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
 
 ```yaml
   argocd:
@@ -489,12 +472,67 @@ ansible-playbook install.yaml -t argocd
 Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml
 
 Les releases d'Argo CD et leurs changelogs se trouvent ici : https://github.com/argoproj/argo-cd/releases
+### Cert-manager
+
+**Attention !** Cert-manager est déployé dans le namespace "cert-manager", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
+
+Le composant cert-manager est déployé directement via son manifest, téléchargé sur GitHub.
+
+La liste des versions ("releases") est disponible ici : https://github.com/cert-manager/cert-manager/releases
+
+Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est la release "v1.11.0" qui sera déployée.
+
+Pour déployer une autre version, il suffira d'éditer cette même `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la valeur du paramètre **version**. Exemple :
+
+```yaml
+  certmanager:
+    version: v1.11.1
+```
+Il vous faudra ensuite appliquer le changement de configuration en utisant votre fichier de définition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+Puis relancer l'installation de cert-manager, laquelle procédera a la mise à jour de version, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t cert-manager
+```
+
+### Console Cloud π Native
+
+Le composant console est déployé directement via son manifest, téléchargé sur GitHub.
+
+La liste des versions ("releases") est disponible ici : https://github.com/cloud-pi-native/console/releases
+
+Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est la release "v4.1.0" qui sera déployée.
+
+Pour déployer une autre version, il suffira d'éditer cette même `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant le numéro désiré au niveau du paramètre **release**. Exemple :
+
+```yaml
+  console:
+    dbPassword: AnotherPassBitesTheDust
+    namespace: mynamespace-console
+    release: 4.0.0
+    subDomain: console
+```
+
+Puis appliquer le changement de configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+Et relancer l'installation de la console, laquelle procédera a la mise à jour de version, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t console
+```
 
 ### Kubed (config-syncer)
 
 **Attention !** Kubed est déployé dans le namespace "openshift-infra", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
 
-Tel qu'il est conçu, le rôle confSyncer qui sert à installer Kubed déploie par défaut la dernière version du [chart helm ](https://github.com/appscode/charts/tree/master/stable/kubed) disponible dans le cache des dépôts helm de l'utilisateur.
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle confSyncer qui sert à installer Kubed déploie par défaut la dernière version du [chart helm ](https://github.com/appscode/charts/tree/master/stable/kubed) disponible dans le cache des dépôts helm de l'utilisateur.
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` de Kubed, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
@@ -517,7 +555,7 @@ Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière 
 helm repo update
 ```
 
-Relancer alors la commande de recherche :
+Relancez alors la commande de recherche :
 
 ```bash
 helm search repo kubed

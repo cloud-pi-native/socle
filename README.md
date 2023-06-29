@@ -22,6 +22,7 @@
     - [Cert-manager](#cert-manager)
     - [Console Cloud π Native](#console-cloud-π-native)
     - [Kubed (config-syncer)](#kubed-config-syncer)
+    - [Sonatype Nexus Repository](#sonatype-nexus-repository)
 
 ## Introduction
 
@@ -171,6 +172,7 @@ spec:
     namespace: mynamespace-nexus
     subDomain: nexus
     storageSize: 100Gi
+    imageTag: 3.56.0
   proxy:
     enabled: true
     host: "192.168.xx.xx"
@@ -590,3 +592,32 @@ Puis de relancer l'installation de Kubed, laquelle mettra à jour la version du 
 ansible-playbook install.yaml -t kubed
 ```
 **Remarque importante** : Le numéro de version du chart Helm est corrélé à celui de l'image utilisée pour l'application, de sorte que fixer ce numéro de version fixe aussi celui de l'image.
+
+### Sonatype Nexus Repository
+
+Le composant nexus est installé directement via le manifest de deployment "nexus.yml.j2" intégré au role.
+
+Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est l'image "3.56.0" qui sera déployée.
+
+Les tags d'images utilisables sont disponibles ici : https://hub.docker.com/r/sonatype/nexus3/tags
+
+Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageTag**. Exemple :
+
+```yaml
+  nexus:
+    namespace: mynamespace-nexus
+    subDomain: nexus
+    storageSize: 100Gi
+    imageTag: 3.55.0
+```
+
+Puis appliquer le changement de configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+Et relancer l'installation de nexus, laquelle procédera a la mise à jour de version, **avec coupure de service** :
+
+```bash
+ansible-playbook install.yaml -t console
+```

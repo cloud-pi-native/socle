@@ -29,6 +29,7 @@ spec:
     chartVersion: ""
   nexus:
     storageSize: 25Gi
+    imageTag: ""
   proxy:
     enabled: false
   sonarqube: {}

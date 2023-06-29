@@ -369,8 +369,13 @@ spec:
                       Must comply with Kubernetes size defnitions (i.e 100Gi).
                     type: string
                     default: 25Gi
+                  imageTag:
+                    default: 3.56.0
+                    description: Nexus version based on image tag (e.g., "3.56.0").
+                    type: string
                 required:
                 - storageSize
+                - imageTag
                 type: object
               proxy:
                 description: Proxy configuration for tools.

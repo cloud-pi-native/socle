@@ -64,6 +64,7 @@
   kubernetes.core.helm:
     name: "{{ dsc_name }}-vault"
     chart_ref: hashicorp/vault
+    chart_version: "{{ dsc.vault.chartVersion }}"
     release_namespace: "{{ dsc.vault.namespace }}"
     create_namespace: true
     values: "{{ values }}"

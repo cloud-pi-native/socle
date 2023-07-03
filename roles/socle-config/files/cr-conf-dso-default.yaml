@@ -35,4 +35,5 @@ spec:
   sonarqube:
     imageTag: ""
   sops: {}
-  vault: {}
+  vault:
+    chartVersion: ""

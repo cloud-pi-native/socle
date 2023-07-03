@@ -441,6 +441,10 @@ spec:
                     default: vault
                     description: The subdomain for Vault.
                     type: string
+                  chartVersion:
+                    default: 0.25.0
+                    description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                    type: string
                   values:
                     description: |
                       You can merge customs values for vault, it will be merged with roles/vault/tasks/main.yaml
@@ -448,6 +452,8 @@ spec:
                     type: object
                     default: {}
                     x-kubernetes-preserve-unknown-fields: true
+                required:
+                - chartVersion
                 type: object
             required:
             - additionalsCA

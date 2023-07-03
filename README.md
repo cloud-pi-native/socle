@@ -24,6 +24,8 @@
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
+    - [Vault](#vault)
+      - [Gel des images](#gel-des-images)
 
 ## Introduction
 
@@ -44,7 +46,7 @@ Les éléments déployés seront les suivants :
 | Sonatype Nexus Repository   | https://www.sonatype.com/products/sonatype-nexus-repository                  |
 | SonarQube Community Edition | https://www.sonarsource.com/open-source-editions/sonarqube-community-edition |
 | SOPS                        | https://github.com/isindir/sops-secrets-operator                             |
-| Vault                       | https://www.hashicorp.com/products/vault                                     |
+| Vault                       | https://www.vaultproject.io                                     |
 
 Certains peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
 ## Prérequis
@@ -190,6 +192,22 @@ spec:
   vault:
     namespace: mynamespace-vault
     subDomain: vault
+    chartVersion: 0.25.0
+    values:
+      injector:
+        image:
+          repository: "docker.io/hashicorp/vault-k8s"
+          tag: "1.2.1"
+          pullPolicy: IfNotPresent
+        agentImage:
+          repository: "docker.io/hashicorp/vault"
+          tag: "1.14.0"
+      server:
+        image:
+          repository: "docker.io/hashicorp/vault"
+          tag: "1.14.0"
+          pullPolicy: IfNotPresent
+        updateStrategyType: "RollingUpdate"
 ```
 ## Installation
 
@@ -497,7 +515,7 @@ Il vous faudra ensuite appliquer le changement de configuration en utisant votre
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
-Puis relancer l'installation de cert-manager, laquelle procédera a la mise à jour de version, sans coupure de service :
+Puis relancer l'installation de cert-manager, laquelle procédera à la mise à jour de version, sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t cert-manager
@@ -526,7 +544,7 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
-Et relancer l'installation de la console, laquelle procédera a la mise à jour de version, sans coupure de service :
+Et relancer l'installation de la console, laquelle procédera à la mise à jour de version, sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t console
@@ -618,7 +636,7 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
-Et relancer l'installation de nexus, laquelle procédera a la mise à jour de version, **avec coupure de service** :
+Et relancer l'installation de nexus, laquelle procédera à la mise à jour de version, **avec coupure de service** :
 
 ```bash
 ansible-playbook install.yaml -t nexus
@@ -646,8 +664,139 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
-Et relancer l'installation de sonarqube, laquelle procédera a la mise à jour de version, **avec coupure de service** :
+Et relancer l'installation de sonarqube, laquelle procédera à la mise à jour de version, **avec coupure de service** :
 
 ```bash
 ansible-playbook install.yaml -t sonarqube
 ```
+
+### Vault
+
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle vault déploiera la dernière version du [chart helm Hashicorp Vault](https://developer.hashicorp.com/vault/docs/platform/k8s/helm) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de Vault, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo hashicorp/vault
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                                    CHART VERSION   APP VERSION     DESCRIPTION                               
+hashicorp/vault                         0.24.1          1.13.1          Official HashiCorp Vault Chart
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer alors la commande de recherche :
+
+```bash
+helm search repo hashicorp/vault
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit maintenant vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de Vault que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l hashicorp/vault
+```
+
+Si vous souhaitez fixer la version du chart helm, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  vault:
+    namespace: mynamespace-vault
+    subDomain: vault
+    chartVersion: 0.25.0
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de Vault, laquelle mettra à jour la version du chart, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t vault
+```
+
+**Remarque importante** : Le changement du paramètre `chartVersion` et la relance de l'installation ne mettra à jour que la version du chart Helm, et éventuellement l'image utilisée par le pod agent-injector si vous n'en avez pas déjà fixé la version.
+
+Pour fixer les versions d'images, voir ci-dessous.
+
+#### Gel des images
+
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer les versions d'images de Vault de façon plus fine (**recommandé en production**). 
+
+Il sera ainsi possible de fixer l'image :
+* du Vault Agent Sidecar Injector (via le repository hashicorp/vault-k8s),
+* du Vault Agent (via le repository hashicorp/vault).
+
+Les différents tags utilisables sont disponibles ici :
+* Pour le Vault Agent Sidecar Injector : https://hub.docker.com/r/hashicorp/vault-k8s/tags
+* Pour le Vault Agent : https://hub.docker.com/r/hashicorp/vault/tags
+
+Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+
+```yaml
+  vault:
+    namespace: mynamespace-vault
+    subDomain: vault
+    chartVersion: 0.25.0
+    values:
+      injector:
+        image:
+          repository: "docker.io/hashicorp/vault-k8s"
+          tag: "1.2.1"
+          pullPolicy: IfNotPresent
+        agentImage:
+          repository: "docker.io/hashicorp/vault"
+          tag: "1.13.4"
+      server:
+        image:
+          repository: "docker.io/hashicorp/vault"
+          tag: "1.13.4"
+          pullPolicy: IfNotPresent
+        updateStrategyType: "RollingUpdate"
+```
+
+**Remarque importante** : Dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse se mettre à jour avec le tag que vous avez indiqué.
+
+Pour mémoire, les values utilisables sont disponibles et documentées ici : https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
+
+Lorsque vos values sont à jour avec les versions désirées, vous devez relancer l'installation avec le tag `vault` pour procéder au remplacement par les images spécifiées :
+
+```bash
+ansible-playbook install.yaml -t vault
+```
+
+La mise à jour des pods s'effectuera **avec coupure de service**.
+
+Lorsque l'installation a été relancée, vérifiez les ressources présentes dans votre namespace de Vault, exemple :
+
+```bash
+oc get all -n mynamespace-vault
+```
+
+Il se peut que le pod vault-0 se retrouve en "STATUS Running" mais ne soit pas "READY".
+
+Si tel est la cas, relancez simplement l'installation avec le tag `vault`, comme vu plus haut :
+
+```bash
+ansible-playbook install.yaml -t vault
+```
+
+Puis revérifiez l'état du vault-0 qui devrait maintenant être correctement déployé.
+

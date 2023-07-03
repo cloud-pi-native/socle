@@ -24,6 +24,8 @@
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
+    - [SOPS](#sops)
+      - [Gel de l'image](#gel-de-limage-1)
     - [Vault](#vault)
       - [Gel des images](#gel-des-images)
 
@@ -46,7 +48,7 @@ Les éléments déployés seront les suivants :
 | Sonatype Nexus Repository   | https://www.sonatype.com/products/sonatype-nexus-repository                  |
 | SonarQube Community Edition | https://www.sonarsource.com/open-source-editions/sonarqube-community-edition |
 | SOPS                        | https://github.com/isindir/sops-secrets-operator                             |
-| Vault                       | https://www.vaultproject.io                                     |
+| HashiCorp Vault             | https://www.vaultproject.io                                                  |
 
 Certains peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
 ## Prérequis
@@ -189,6 +191,10 @@ spec:
     imageTag: 9.9-community
   sops:
     namespace: mynamespace-sops
+    chartVersion: "0.15.1"
+    values:
+      image:
+        tag: 0.9.1
   vault:
     namespace: mynamespace-vault
     subDomain: vault
@@ -420,13 +426,13 @@ Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière 
 helm repo update
 ```
 
-Relancer alors la commande de recherche :
+Relancer immédiatement la commande de recherche :
 
 ```bash
 helm search repo argo-cd
 ```
 
-Si votre cache n'était pas déjà à jour, la sortie doit maintenant vous indiquer des versions plus récentes.
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
 Pour connaître la liste des versions de charts helm d'Argo CD que vous pouvez maintenant installer, utilisez la commande suivante : 
 
@@ -583,7 +589,7 @@ Relancez alors la commande de recherche :
 helm search repo kubed
 ```
 
-Si votre cache n'était pas déjà à jour, la sortie doit maintenant vous indiquer des versions plus récentes.
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
 Pour connaître la liste des versions de charts helm de Kubed que vous pouvez maintenant installer, utilisez la commande suivante : 
 
@@ -670,6 +676,106 @@ Et relancer l'installation de sonarqube, laquelle procédera à la mise à jour 
 ansible-playbook install.yaml -t sonarqube
 ```
 
+### SOPS
+
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle sops déploiera la dernière version du [chart helm SOPS](https://github.com/isindir/sops-secrets-operator) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de SOPS, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo sops/sops-secrets-operator
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                            CHART VERSION   APP VERSION     DESCRIPTION                             
+sops/sops-secrets-operator      0.14.2          0.8.2           Helm chart deploys sops-secrets-operator
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer immédiatement la commande de recherche :
+
+```bash
+helm search repo sops/sops-secrets-operator
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de SOPS que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l sops/sops-secrets-operator
+```
+
+Si vous souhaitez fixer la version du chart helm, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  sops:
+    namespace: mynamespace-sops
+    chartVersion: "0.15.1"
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de SOPS, laquelle mettra à jour la version du chart, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t vault
+```
+
+Pour fixer la version d'image, voir ci-dessous.
+
+#### Gel de l'image
+
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de SOPS de façon plus fine (**recommandé en production**). 
+
+Pour spécifier cette version d'image, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+
+```yaml
+  sops:
+    namespace: mynamespace-sops
+    chartVersion: "0.15.1"
+    values:
+      image:
+        tag: 0.9.1
+```
+
+Pour mémoire, les values utilisables sont disponibles et documentées ici : https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator
+
+Les numéros de version de chart Helm et d'image se trouvent ici : https://github.com/isindir/sops-secrets-operator/blob/master/README.md#versioning
+
+S'agissant de l'image, ces numéros correspondent à la colonne "Operator".
+
+Il est également possible de les retrouver via la commande de recherche dans vos dépôts Helm vue précédemment :
+
+```bash
+helm search repo -l sops/sops-secrets-operator
+```
+
+Ceci à condition que vos dépôts soient à jour.
+
+Lorsque vos values ont été actualisées, avec la version d'image désirée, vous devez relancer l'installation avec le tag `sops` pour procéder à la mise à jour et au gel de l'image :
+
+```bash
+ansible-playbook install.yaml -t sops
+```
+
+La mise à jour du pod s'effectuera **sans coupure de service**.
+
 ### Vault
 
 Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle vault déploiera la dernière version du [chart helm Hashicorp Vault](https://developer.hashicorp.com/vault/docs/platform/k8s/helm) disponible dans le cache des dépôts helm de l'utilisateur.
@@ -695,13 +801,13 @@ Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière 
 helm repo update
 ```
 
-Relancer alors la commande de recherche :
+Relancer immédiatement la commande de recherche :
 
 ```bash
 helm search repo hashicorp/vault
 ```
 
-Si votre cache n'était pas déjà à jour, la sortie doit maintenant vous indiquer des versions plus récentes.
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
 Pour connaître la liste des versions de charts helm de Vault que vous pouvez maintenant installer, utilisez la commande suivante : 
 

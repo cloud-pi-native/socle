@@ -429,6 +429,19 @@ spec:
                     default: dso-sops
                     description: Namespace for SOPS.
                     type: string
+                  chartVersion:
+                    default: 0.15.1
+                    description: SOPS helm chart version (e.g., "0.15.1").
+                    type: string
+                  values:
+                    description: |
+                      You can merge customs values for sops, it will be merged with roles/sops/tasks/main.yaml
+                      See https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator
+                    type: object
+                    default: {}
+                    x-kubernetes-preserve-unknown-fields: true
+                required:
+                - chartVersion
                 type: object
               vault:
                 description: Configuration for Vault.

@@ -37,12 +37,8 @@
       type: Opaque
   when: age_secret.resources | length == 0
 
-- name: Deploy helm
-  kubernetes.core.helm:
-    name: "{{ dsc_name }}-sops"
-    chart_ref: sops/sops-secrets-operator
-    release_namespace: "{{ dsc.sops.namespace }}"
-    create_namespace: true
+- name: Set values
+  ansible.builtin.set_fact:
     values:
       extraEnv:
         - name: SOPS_AGE_KEY_FILE
@@ -51,6 +47,19 @@
         - mountPath: /etc/sops-age-key-file/
           name: sops-age-key-file
           secretName: sops-age-key-file
+
+- name: Combine values with dsc
+  ansible.builtin.set_fact:
+    values: "{{ values | combine(dsc.sops['values'], recursive=True) }}"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: "{{ dsc_name }}-sops"
+    chart_ref: sops/sops-secrets-operator
+    chart_version: "{{ dsc.sops.chartVersion }}"
+    release_namespace: "{{ dsc.sops.namespace }}"
+    create_namespace: true
+    values: "{{ values }}"
 
 - name: Get age secret
   kubernetes.core.k8s_info:

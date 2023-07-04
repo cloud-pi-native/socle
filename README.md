@@ -551,6 +551,12 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         imagePullPolicy: IfNotPresent
 ```
 
+Appliquer le changement en utilisant votre fichier de défnition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
 Puis relancer l'installation avec le tag `argocd` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
 
 ```bash
@@ -778,7 +784,13 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : https://github.com/goharbor/harbor-helm/tree/master
 
-Lorsque vos values sont à jour avec les versions désirées, vous devez relancer l'installation avec le tag `harbor` pour procéder au remplacement par les images spécifiées :
+Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de défnition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancez l'installation avec le tag `harbor` pour procéder au remplacement par les images spécifiées :
 
 ```bash
 ansible-playbook install.yaml -t harbor
@@ -1006,7 +1018,12 @@ helm search repo -l sops/sops-secrets-operator
 
 Ceci à condition que vos dépôts soient à jour.
 
-Lorsque vos values ont été actualisées, avec la version d'image désirée, vous devez relancer l'installation avec le tag `sops` pour procéder à la mise à jour et au gel de l'image :
+Lorsque vos values ont été actualisées, avec la version d'image désirée, appliquez le changement en utilisant votre fichier de défnition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+Puis relancez l'installation avec le tag `sops` pour procéder à la mise à jour et au gel de l'image :
 
 ```bash
 ansible-playbook install.yaml -t sops
@@ -1120,7 +1137,13 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
 
-Lorsque vos values sont à jour avec les versions désirées, vous devez relancer l'installation avec le tag `vault` pour procéder au remplacement par les images spécifiées :
+Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de défnition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancez l'installation avec le tag `vault` pour procéder au remplacement par les images spécifiées :
 
 ```bash
 ansible-playbook install.yaml -t vault
@@ -1143,4 +1166,3 @@ ansible-playbook install.yaml -t vault
 ```
 
 Puis revérifiez l'état du vault-0 qui devrait maintenant être déployé comme attendu.
-

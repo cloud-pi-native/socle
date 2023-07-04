@@ -984,7 +984,7 @@ kubectl apply -f ma-conf-dso.yaml
 Puis de relancer l'installation de SOPS, laquelle mettra à jour la version du chart sans coupure de service :
 
 ```bash
-ansible-playbook install.yaml -t vault
+ansible-playbook install.yaml -t sops
 ```
 
 Pour fixer la version d'image, voir ci-dessous.

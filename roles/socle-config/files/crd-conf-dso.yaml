@@ -249,8 +249,8 @@ spec:
                     description: The subdomain for Harbor.
                     type: string
                   chartVersion:
-                    default: 1.12.0
-                    description: Harbor helm chart version (e.g., "0.12.0").
+                    default: 1.12.2
+                    description: Harbor helm chart version (e.g., "1.12.2").
                     type: string
                   values:
                     description: |

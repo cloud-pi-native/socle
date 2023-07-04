@@ -21,13 +21,15 @@
       - [Gel de l'image](#gel-de-limage)
     - [Cert-manager](#cert-manager)
     - [Console Cloud π Native](#console-cloud-π-native)
+    - [Harbor](#harbor)
+      - [Gel des images](#gel-des-images)
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [SOPS](#sops)
       - [Gel de l'image](#gel-de-limage-1)
     - [Vault](#vault)
-      - [Gel des images](#gel-des-images)
+      - [Gel des images](#gel-des-images-1)
 
 ## Introduction
 
@@ -162,6 +164,64 @@ spec:
     adminPassword: WhoWantsToPassForever
     namespace: mynamespace-harbor
     subDomain: harbor
+    chartVersion: "1.12.2"
+    values:
+      persistence:
+        persistentVolumeClaim:
+          registry:
+            size: 100Gi
+      nginx:
+        image:
+          repository: docker.io/goharbor/nginx-photon
+          tag: v2.8.2
+      portal:
+        image:
+          repository: docker.io/goharbor/harbor-portal
+          tag: v2.8.2
+      core:
+        image:
+          repository: docker.io/goharbor/harbor-core
+          tag: v2.8.2
+      jobservice:
+        image:
+          repository: docker.io/goharbor/harbor-jobservice
+          tag: v2.8.2
+      registry:
+        registry:
+          image:
+            repository: docker.io/goharbor/registry-photon
+            tag: v2.8.2
+        controller:
+          image:
+            repository: docker.io/goharbor/harbor-registryctl
+            tag: v2.8.2
+      trivy:
+        image:
+          repository: docker.io/goharbor/trivy-adapter-photon
+          tag: v2.8.2
+      notary:
+        server:
+          image:
+            repository: docker.io/goharbor/notary-server-photon
+            tag: v2.8.2
+        signer:
+          image:
+            repository: docker.io/goharbor/notary-signer-photon
+            tag: v2.8.2
+      database:
+        internal:
+            image:
+            repository: docker.io/goharbor/harbor-db
+            tag: v2.8.2
+      redis:
+        internal:
+            image:
+            repository: docker.io/goharbor/redis-photon
+            tag: v2.8.2
+      exporter:
+        image:
+          repository: docker.io/goharbor/harbor-exporter
+          tag: v2.8.2
   ingress:
     tls:
       type: tlsSecret
@@ -521,7 +581,7 @@ Il vous faudra ensuite appliquer le changement de configuration en utisant votre
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
-Puis relancer l'installation de cert-manager, laquelle procédera à la mise à jour de version, sans coupure de service :
+Puis relancer l'installation de cert-manager, laquelle procédera à la mise à jour de version sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t cert-manager
@@ -550,11 +610,189 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
-Et relancer l'installation de la console, laquelle procédera à la mise à jour de version, sans coupure de service :
+Et relancer l'installation de la console, laquelle procédera à la mise à jour de version sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t console
 ```
+### Harbor
+
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle harbor déploiera la dernière version du [chart helm Harbor](https://github.com/goharbor/harbor-helm) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de Harbor, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo harbor/harbor
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME            CHART VERSION   APP VERSION     DESCRIPTION                                       
+harbor/harbor   1.12.0          2.8.0           An open source trusted cloud native registry th...
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer immédiatement la commande de recherche :
+
+```bash
+helm search repo harbor/harbor
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm Harbor que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l harbor/harbor
+```
+
+Si vous souhaitez fixer la version du chart helm, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  harbor:
+    adminPassword: WhoWantsToPassForever
+    namespace: mynamespace-harbor
+    subDomain: harbor
+    chartVersion: "1.12.2"
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+**Remarques importantes** :
+* Il est fortement recommnandé de **sauvegarder votre base de données** avant de poursuivre, sauf s'il s'agit d'une première installation de Harbor, ou d'une [suppression complète](#un-ou-plusieurs-outils) suivie d'une réinstallation sans persistance des données.
+* S'il s'agit d'un **upgrade** de version sans désinstallation préalable, il est également plutôt recommandé de réaliser cet upgrade **vers une version directement supérieure** et ainsi de suite, jusqu'à parvenir à la version désirée. Par exemple de "1.12.0" vers "1.12.1" puis vers "1.12.2".
+* Le **downgrade** par mise à jour de la version du chart est source de problèmes. Il est susceptible de mal se passer et n'est donc pas recommandé. Mieux vaut désinstaller Harbor (cf. [désinstallation](#un-ou-plusieurs-outils)), puis procéder à sa réinstallation en spécifiant le numéro de version du chart souhaité, puis en important vos données sauvegardées.
+* Fixer le numéro de version du chart Helm sera normalement suffisant pour fixer aussi le numéro de version des images associées. Le numéro de version de ces images sera celui visible dans la colonne "APP VERSION" de la commande `helm search repo -l harbor/harbor`.
+
+Si vous avez bien pris connaissance des avertissements ci-dessus, vous pouvez maintenant relancer l'installation de Harbor, laquelle mettra à jour la version du chart et de l'application **avec coupure de service** :
+
+```bash
+ansible-playbook install.yaml -t harbor
+```
+
+Veuillez noter qu'un upgrade de version prendra facilement 8 à 10 minutes pour être pleinement finalisé, voire davantage selon les performances de votre cluster.
+
+Pour fixer les versions d'images, voir ci-dessous.
+
+#### Gel des images
+
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer les versions d'images de Harbor de façon plus fine (**recommandé en production**). 
+
+Il sera ainsi possible de fixer l'image de chacun des composants.
+
+Les différents tags utilisables sont disponibles ici :
+* nginx : https://hub.docker.com/r/goharbor/nginx-photon/tags
+* portal : https://hub.docker.com/r/goharbor/harbor-portal/tags
+* core : https://hub.docker.com/r/goharbor/harbor-core/tags
+* jobservice : https://hub.docker.com/r/goharbor/harbor-jobservice/tags
+* registry (registry) : https://hub.docker.com/r/goharbor/registry-photon/tags
+* registry (controller) : https://hub.docker.com/r/goharbor/harbor-registryctl/tags
+* trivy : https://hub.docker.com/r/goharbor/trivy-adapter-photon/tags
+* notary (server) : https://hub.docker.com/r/goharbor/notary-server-photon/tags
+* notary (signer) : https://hub.docker.com/r/goharbor/notary-signer-photon/tags
+* database : https://hub.docker.com/r/goharbor/harbor-db/tags
+* redis : https://hub.docker.com/r/goharbor/redis-photon/tags
+* exporter : https://hub.docker.com/r/goharbor/harbor-exporter/tags
+
+**Remarque** : Il est néanmois recommandé, si possible, de positionner des tags d'image en adéquation avec la version du chart Helm utilsé, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor` vue précédemment.
+
+Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+
+```yaml
+  harbor:
+    adminPassword: WhoWantsToPassForever
+    namespace: mynamespace-harbor
+    subDomain: harbor
+    chartVersion: 1.12.2
+    values:
+      persistence:
+        persistentVolumeClaim:
+          registry:
+            size: 100Gi
+      nginx:
+        image:
+          repository: docker.io/goharbor/nginx-photon
+          tag: v2.8.2
+      portal:
+        image:
+          repository: docker.io/goharbor/harbor-portal
+          tag: v2.8.2
+      core:
+        image:
+          repository: docker.io/goharbor/harbor-core
+          tag: v2.8.2
+      jobservice:
+        image:
+          repository: docker.io/goharbor/harbor-jobservice
+          tag: v2.8.2
+      registry:
+        registry:
+          image:
+            repository: docker.io/goharbor/registry-photon
+            tag: v2.8.2
+        controller:
+          image:
+            repository: docker.io/goharbor/harbor-registryctl
+            tag: v2.8.2
+      trivy:
+        image:
+          repository: docker.io/goharbor/trivy-adapter-photon
+          tag: v2.8.2
+      notary:
+        server:
+          image:
+            repository: docker.io/goharbor/notary-server-photon
+            tag: v2.8.2
+        signer:
+          image:
+            repository: docker.io/goharbor/notary-signer-photon
+            tag: v2.8.2
+      database:
+        internal:
+            image:
+            repository: docker.io/goharbor/harbor-db
+            tag: v2.8.2
+      redis:
+        internal:
+            image:
+            repository: docker.io/goharbor/redis-photon
+            tag: v2.8.2
+      exporter:
+        image:
+          repository: docker.io/goharbor/harbor-exporter
+          tag: v2.8.2
+```
+
+Pour mémoire, les values utilisables sont disponibles et documentées ici : https://github.com/goharbor/harbor-helm/tree/master
+
+Lorsque vos values sont à jour avec les versions désirées, vous devez relancer l'installation avec le tag `harbor` pour procéder au remplacement par les images spécifiées :
+
+```bash
+ansible-playbook install.yaml -t harbor
+```
+
+Lorsque l'installation a été relancée, surveillez les ressources présentes dans votre namespace Harbor, exemple :
+
+```bash
+watch "oc get all -n mynamespace-harbor"
+```
+
+Vous devriez observer la suppression et le remplacement des pods impactés par vos changements.
+
+
 
 ### Kubed (config-syncer)
 
@@ -670,7 +908,7 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
-Et relancer l'installation de sonarqube, laquelle procédera à la mise à jour de version, **avec coupure de service** :
+Et relancer l'installation de sonarqube, laquelle procédera à la mise à jour de version **avec coupure de service** :
 
 ```bash
 ansible-playbook install.yaml -t sonarqube
@@ -731,7 +969,7 @@ Il vous suffit alors de mettre à jour votre configuration, exemple :
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Puis de relancer l'installation de SOPS, laquelle mettra à jour la version du chart, sans coupure de service :
+Puis de relancer l'installation de SOPS, laquelle mettra à jour la version du chart sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t vault
@@ -774,7 +1012,7 @@ Lorsque vos values ont été actualisées, avec la version d'image désirée, vo
 ansible-playbook install.yaml -t sops
 ```
 
-La mise à jour du pod s'effectuera **sans coupure de service**.
+La mise à jour du pod s'effectuera sans coupure de service.
 
 ### Vault
 
@@ -832,7 +1070,7 @@ Il vous suffit alors de mettre à jour votre configuration, exemple :
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Puis de relancer l'installation de Vault, laquelle mettra à jour la version du chart, sans coupure de service :
+Puis de relancer l'installation de Vault, laquelle mettra à jour la version du chart sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t vault
@@ -850,7 +1088,7 @@ Il sera ainsi possible de fixer l'image :
 * du Vault Agent Sidecar Injector (via le repository hashicorp/vault-k8s),
 * du Vault Agent (via le repository hashicorp/vault).
 
-Les différents tags utilisables sont disponibles ici :
+Les différents tags d'images utilisables sont disponibles ici :
 * Pour le Vault Agent Sidecar Injector : https://hub.docker.com/r/hashicorp/vault-k8s/tags
 * Pour le Vault Agent : https://hub.docker.com/r/hashicorp/vault/tags
 
@@ -904,5 +1142,5 @@ Si tel est la cas, relancez simplement l'installation avec le tag `vault`, comme
 ansible-playbook install.yaml -t vault
 ```
 
-Puis revérifiez l'état du vault-0 qui devrait maintenant être correctement déployé.
+Puis revérifiez l'état du vault-0 qui devrait maintenant être déployé comme attendu.
 

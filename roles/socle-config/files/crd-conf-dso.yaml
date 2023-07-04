@@ -248,6 +248,10 @@ spec:
                     default: harbor
                     description: The subdomain for Harbor.
                     type: string
+                  chartVersion:
+                    default: 1.12.0
+                    description: Harbor helm chart version (e.g., "0.12.0").
+                    type: string
                   values:
                     description: |
                       You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml
@@ -257,6 +261,7 @@ spec:
                     x-kubernetes-preserve-unknown-fields: true
                 required:
                 - adminPassword
+                - chartVersion
                 type: object
               ingress:
                 description: General configuration for ingress.

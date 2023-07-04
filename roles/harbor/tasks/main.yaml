@@ -47,7 +47,7 @@
   kubernetes.core.helm:
     name: harbor
     chart_ref: harbor/harbor
-    chart_version: "1.12.0"
+    chart_version: "{{ dsc.harbor.chartVersion }}"
     release_namespace: "{{ dsc.harbor.namespace }}"
     values: "{{ harbor_values }}"
 

@@ -32,6 +32,8 @@
 
     - name: Check socle_config_custom and exit if empty
       when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
+      tags:
+        - always
       block:
         - name: Warning message
           ansible.builtin.debug:
@@ -54,8 +56,6 @@
 
         - name: Exit playbook
           ansible.builtin.meta: end_play
-      tags:
-        - always
 
     - name: Set socle_config fact when dsc_cr defined and not empty
       ansible.builtin.set_fact:

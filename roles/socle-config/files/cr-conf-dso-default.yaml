@@ -15,7 +15,7 @@ spec:
   console:
     dbPassword: myAwesomePassword
   gitlab:
-    version: ""
+    chartVersion: "6.11.10"
   global:
     projectsRootDir:
       - forge

@@ -1,6 +1,7 @@
 - name: Get vault health
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     url: "https://{{ vault_domain }}/v1/sys/health"
     status_code: [200, 503, 501]
   register: vault_health

@@ -63,7 +63,8 @@
 
 - name: Get harbor config
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     url: https://{{ harbor_domain }}/api/v2.0/configurations
     password: "{{ dsc.harbor.adminPassword }}"
     user: admin
@@ -117,7 +118,8 @@
 
 - name: PUT harbor config
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     method: PUT
     url: https://{{ harbor_domain }}/api/v2.0/configurations
     password: "{{ dsc.harbor.adminPassword }}"

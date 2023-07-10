@@ -21,6 +21,7 @@
       - [Gel de l'image](#gel-de-limage)
     - [Cert-manager](#cert-manager)
     - [Console Cloud π Native](#console-cloud-π-native)
+    - [GitLab](#gitlab)
     - [Harbor](#harbor)
       - [Gel des images](#gel-des-images)
     - [Kubed (config-syncer)](#kubed-config-syncer)
@@ -112,7 +113,7 @@ Alternativement, et comme précisé, vous pourrez aussi déclarer la ressource `
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau des mots de passe, des numéros de versions et des namespaces :
+Voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau du "rootDomain" (votre domaine principal précédé d'un point), des mots de passe, des numéros de versions et des namespaces :
 
 ```yaml
 ---
@@ -621,6 +622,76 @@ Et relancer l'installation de la console, laquelle procédera à la mise à jour
 ```bash
 ansible-playbook install.yaml -t console
 ```
+### GitLab
+
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle gitlab déploiera la dernière version **stable** de l'[opérateur Gitlab](https://operatorhub.io/operator/gitlab-operator-kubernetes).
+
+La version exacte de l'opérateur déployé pourra être obtenue à l'aide de la commande suivante (à adapter en fonction de votre namespace) :
+
+```bash
+kubectl get operator gitlab-operator-kubernetes.mynamespace-gitlab -o yaml | grep -o "gitlab-operator-kubernetes.v.*"
+```
+
+Ou bien de manière plus ciblée :
+
+```bash
+kubectl get operator gitlab-operator-kubernetes.mynamespace-gitlab -o yaml | yq '.status.components.refs[8].name'
+```
+
+Via cet opérateur, le rôle tentera de déployer par défaut la version 6.11.10 du chart Helm Gitlab.
+
+La version de GitLab installée est donc déjà figée via la version du chart utilisée, car il existe une correspondance biunivoque entre les deux.
+
+Les correspondances entre versions du chart et versions de GitLab sont fournies ici :
+https://docs.gitlab.com/charts/installation/version_mappings.html
+
+L'opérateur sera en capacité de proposer différentes versions du chart à l'installation.
+
+Pour connaître les versions de chart **utilisables**, il sera possible de se référer à la page suivante, exemple avec la branche 0.21 stable de l'opérateur :
+https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/0-21-stable/CHART_VERSIONS
+
+Ces versions de charts proposées par l'opérateur évolueront dans le temps, afin de tenir compte notamment des mises à jour de sécurité.
+
+C'est la raison pour laquelle, selon le moment où nous tentons d'installer GitLab, il se peut que la version du chart Helm que nous tentons d'utiliser soit déjà obsolète.
+
+Si tel est le cas, le playbook échouera avec une erreur explicite de type "Invalid value" semblable à ceci :
+
+```
+TASK [gitlab : Install gitlab instance] *********************************************************************************************************************
+fatal: [localhost]: FAILED! => {"changed": false, "msg": "Failed to create object: b'{\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"admission webhook \\\\\"vgitlab.kb.io\\\\\" denied the request: gitlab.apps.gitlab.com \\\\\"gitlab\\\\\" is invalid: spec.chart.version: Invalid value: \\\\\"6.11.9\\\\\": chart version 6.11.9 not supported; please use one of the following: 6.11.10, 7.0.6, 7.1.1\",\"reason\":\"Invalid\",\"details\":{\"name\":\"gitlab\",\"group\":\"apps.gitlab.com\",\"kind\":\"gitlab\",\"causes\":[{\"reason\":\"FieldValueInvalid\",\"message\":\"Invalid value: \\\\\"6.11.9\\\\\": chart version 6.11.9 not supported; please use one of the following: 6.11.10, 7.0.6, 7.1.1\",\"field\":\"spec.chart.version\"}]},\"code\":422}\\n'", "reason": "Unprocessable Entity"}
+```
+
+Dans l'exemple ci-dessus, nous avons tenté une installation de GitLab avec la version 6.11.9 du chart Helm mais, comme indiqué, au moment de notre tentative l'opérateur ne supporte que les versions 6.11.10, 7.0.6 et 7.1.1. La version 6.11.10 correspond à une mise à jour mineure de la version 6.11.9.
+
+Il nous faudra donc spécifier une version valide, en l'occurence 6.11.10 si nous voulons rester sur la branche 15.11 de GitLab au moment de l'installation, ou bien l'une des deux autres version supérieures proposées.
+
+Rappel : les correspondances entre versions du chart et versions de GitLab sont fournies ici :
+https://docs.gitlab.com/charts/installation/version_mappings.html
+
+Si vous souhaitez changer la version du chart helm utilisé, il vous suffira de relever le **numéro de version du chart** désiré **parmi ceux supportés par l'opérateur**, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  gitlab:
+    insecureCI: true
+    namespace: mynamespace-gitlab
+    subDomain: gitlab
+    version: "6.11.10"
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de GitLab :
+
+```bash
+ansible-playbook install.yaml -t gitlab
+```
+
 ### Harbor
 
 Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle harbor déploiera la dernière version du [chart helm Harbor](https://github.com/goharbor/harbor-helm) disponible dans le cache des dépôts helm de l'utilisateur.

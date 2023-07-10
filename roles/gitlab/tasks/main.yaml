@@ -78,7 +78,7 @@
     definition:
       spec:
         chart:
-          version: "{{ dsc.gitlab.version }}"
+          version: "{{ dsc.gitlab.chartVersion }}"
           values: "{{ gitlab_values }}"
 
 - name: Wait gitlab instance to be 'Running'
@@ -108,7 +108,8 @@
 - name: Test Gitlab token
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     url: "https://{{ gitlab_domain }}/api/v4/admin/ci/variables"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -157,7 +158,8 @@
 
 - name: Get settings
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     url: "https://{{ gitlab_domain }}/api/v4/application/settings"
     headers:
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
@@ -166,7 +168,8 @@
 
 - name: Set some parameters
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     url: "https://{{ gitlab_domain }}/api/v4/application/settings"
     method: PUT
     headers:
@@ -191,7 +194,8 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ gitlab_domain }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     variables:
@@ -224,7 +228,8 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ gitlab_domain }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     state: "{{ dsc.proxy.enabled | ternary('present', 'absent') }}"
@@ -250,7 +255,8 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ gitlab_domain }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     state: "{{ dsc.additionalsCA | ternary('present', 'absent') }}"
@@ -263,7 +269,8 @@
   community.general.gitlab_group_variable:
     api_url: "https://{{ gitlab_domain }}"
     api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     state: "{{ dsc.gitlab.insecureCI | ternary('present', 'absent') }}"

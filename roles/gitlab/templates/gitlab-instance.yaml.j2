@@ -42,6 +42,10 @@ global:
     domain: {{ dsc.global.rootDomain[1:] }}
     registry:
       name: gitlab-registry.example.com
+    minio:
+      name: {{ dsc_name }}-minio{{ dsc.global.rootDomain }}
+    kas:
+      name: {{ dsc_name }}-kas{{ dsc.global.rootDomain }}
 {% if gitlab_domain %}
     gitlab:
       name: {{ gitlab_domain }}

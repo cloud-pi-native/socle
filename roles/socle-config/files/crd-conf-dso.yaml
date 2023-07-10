@@ -187,9 +187,9 @@ spec:
                     default: gitlab
                     description: The subdomain for GitLab.
                     type: string
-                  version:
-                    default: 6.11.9
-                    description: GitLab version (e.g., "6.11.9").
+                  chartVersion:
+                    default: 6.11.10
+                    description: GitLab chart version (e.g., "6.11.10").
                     type: string
                   values:
                     description: |
@@ -206,7 +206,7 @@ spec:
                     type: boolean
                     default: false
                 required:
-                - version
+                - chartVersion
                 type: object
               global:
                 description: Global configuration not specific to one service

@@ -2,7 +2,7 @@
   kubernetes.core.k8s:
     template: project.j2
 
-- name: Get console client secret
+- name: Get console frontend client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ dsc.keycloak.namespace }}"
@@ -10,7 +10,7 @@
   register: console_frontend_secret
   failed_when: console_frontend_secret.resources | length == 0
 
-- name: Get console client secret
+- name: Get console backend client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ dsc.keycloak.namespace }}"

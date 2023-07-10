@@ -274,7 +274,8 @@
 
 - name: Create base admins groups
   community.general.keycloak_group:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: false
     name: "{{ item }}"
     realm: dso
     state: present

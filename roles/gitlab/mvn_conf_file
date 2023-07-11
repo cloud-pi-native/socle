@@ -46,26 +46,6 @@
 						<enabled>true</enabled>
 					</snapshots>
 				</repository>
-				<repository>
-					<id>nexus</id>
-					<url>$${env.NEXUS_HOST_URL}/$${env.PROJECT_PATH}-repository-snapshot/</url>
-					<releases>
-						<enabled>false</enabled>
-					</releases>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</repository>
-				<repository>
-					<id>nexus</id>
-					<url>$${env.NEXUS_HOST_URL}/$${env.PROJECT_PATH}-repository-release/</url>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</repository>
 			</repositories>
 		</profile>
 	</profiles>

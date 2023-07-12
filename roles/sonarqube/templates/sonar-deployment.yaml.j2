@@ -47,6 +47,14 @@ spec:
               value: "OR64-#Yr!)"
             - name: "SONAR_JDBC_URL"
               value: "jdbc:postgresql://postgres:5432/sonardb"
+{% if dsc.proxy.enabled %}
+            - name: http_proxy
+              value: "{{ dsc.proxy.http_proxy }}"
+            - name: https_proxy
+              value: "{{ dsc.proxy.https_proxy }}"
+            - name: no_proxy
+              value: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
           volumeMounts:
             - mountPath: /opt/sonarqube/data
               subPath: data

@@ -100,6 +100,7 @@
 
 - name: Create generic keycloak client scope
   community.general.keycloak_clientscope:
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     validate_certs: false
     auth_client_id: admin-cli
     auth_keycloak_url: https://{{ keycloak_domain }}/auth

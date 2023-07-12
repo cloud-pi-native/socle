@@ -78,7 +78,7 @@
     definition:
       spec:
         chart:
-          version: "{{ dsc.gitlab.version }}"
+          version: "{{ dsc.gitlab.chartVersion }}"
           values: "{{ gitlab_values }}"
 
 - name: Wait gitlab instance to be 'Running'

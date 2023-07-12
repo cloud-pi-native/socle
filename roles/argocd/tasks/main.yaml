@@ -46,6 +46,7 @@
   kubernetes.core.helm:
     name: argo
     chart_ref: bitnami/argo-cd
+    chart_version: "{{ dsc.argocd.chartVersion }}"
     release_namespace: "{{ dsc.argocd.namespace }}"
     create_namespace: true
     values: "{{ argo_values }}"

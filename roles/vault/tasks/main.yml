@@ -64,6 +64,7 @@
   kubernetes.core.helm:
     name: "{{ dsc_name }}-vault"
     chart_ref: hashicorp/vault
+    chart_version: "{{ dsc.vault.chartVersion }}"
     release_namespace: "{{ dsc.vault.namespace }}"
     create_namespace: true
     values: "{{ values }}"
@@ -228,6 +229,7 @@
       oidc_discovery_url: "https://{{ gitlab_domain }}"
       oidc_discovery_ca_pem: "{{ exposed_ca_pem }}"
       default_role: default-ci
+      namespace_in_state: false
     body_format: json
 
 - name: "Config: get accessor jwt config"

@@ -8,13 +8,14 @@ spec:
   additionalsCA: []
   exposedCA:
     type: none
-  argocd: {}
+  argocd:
+    chartVersion: ""
   certmanager:
     version: v1.11.0
   console:
     dbPassword: myAwesomePassword
   gitlab:
-    version: ""
+    chartVersion: "6.11.10"
   global:
     projectsRootDir:
       - forge
@@ -22,12 +23,19 @@ spec:
       .example.com
   harbor:
     adminPassword: anotherGreatPassword
+    chartVersion: ""
   ingress: {}
   keycloak: {}
+  kubed:
+    chartVersion: ""
   nexus:
     storageSize: 25Gi
+    imageTag: ""
   proxy:
     enabled: false
-  sonarqube: {}
-  sops: {}
-  vault: {}
+  sonarqube:
+    imageTag: ""
+  sops:
+    chartVersion: ""
+  vault:
+    chartVersion: ""

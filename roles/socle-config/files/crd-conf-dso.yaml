@@ -131,6 +131,10 @@ spec:
                     default: argocd
                     description: The subdomain for ArgoCD.
                     type: string
+                  chartVersion:
+                    default: 4.7.13
+                    description: ArgoCD Bitnami helm chart version (e.g., "4.7.13").
+                    type: string
                   values:
                     description: |
                       You can merge customs values for argocd, it will be merged with roles/argocd/tasks/main.yaml
@@ -138,6 +142,8 @@ spec:
                     type: object
                     default: {}
                     x-kubernetes-preserve-unknown-fields: true
+                required:
+                - chartVersion
                 type: object
               certmanager:
                 description: Configuration for Cert Manager.
@@ -160,8 +166,8 @@ spec:
                     description: The namespace for console.
                     type: string
                   release:
-                    default: 3.4.1
-                    description: Console version (e.g., "3.4.1").
+                    default: 4.1.0
+                    description: Console version (e.g., "4.1.0").
                     type: string
                   subDomain:
                     default: console
@@ -181,9 +187,9 @@ spec:
                     default: gitlab
                     description: The subdomain for GitLab.
                     type: string
-                  version:
-                    default: 6.11.4
-                    description: GitLab version (e.g., "6.11.4").
+                  chartVersion:
+                    default: 6.11.10
+                    description: GitLab chart version (e.g., "6.11.10").
                     type: string
                   values:
                     description: |
@@ -200,7 +206,7 @@ spec:
                     type: boolean
                     default: false
                 required:
-                - version
+                - chartVersion
                 type: object
               global:
                 description: Global configuration not specific to one service
@@ -242,6 +248,10 @@ spec:
                     default: harbor
                     description: The subdomain for Harbor.
                     type: string
+                  chartVersion:
+                    default: 1.12.2
+                    description: Harbor helm chart version (e.g., "1.12.2").
+                    type: string
                   values:
                     description: |
                       You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml
@@ -251,6 +261,7 @@ spec:
                     x-kubernetes-preserve-unknown-fields: true
                 required:
                 - adminPassword
+                - chartVersion
                 type: object
               ingress:
                 description: General configuration for ingress.
@@ -336,6 +347,16 @@ spec:
                     description: The subdomain for Keycloak.
                     type: string
                 type: object
+              kubed:
+                description: Configuration for Kubed (config-syncer).
+                properties:
+                  chartVersion:
+                    default: v0.13.2
+                    description: Kubed helm chart version (e.g., "v0.13.2").
+                    type: string
+                required:
+                - chartVersion
+                type: object
               nexus:
                 description: Configuration for Nexus.
                 properties:
@@ -353,8 +374,13 @@ spec:
                       Must comply with Kubernetes size defnitions (i.e 100Gi).
                     type: string
                     default: 25Gi
+                  imageTag:
+                    default: 3.56.0
+                    description: Nexus version based on image tag (e.g., "3.56.0").
+                    type: string
                 required:
                 - storageSize
+                - imageTag
                 type: object
               proxy:
                 description: Proxy configuration for tools.
@@ -395,6 +421,12 @@ spec:
                     default: sonarqube
                     description: The subdomain for SonarQube.
                     type: string
+                  imageTag:
+                    default: 9.9-community
+                    description: SonarQube version based on image tag (e.g., "9.9-community").
+                    type: string
+                required:
+                - imageTag
                 type: object
               sops:
                 properties:
@@ -402,6 +434,19 @@ spec:
                     default: dso-sops
                     description: Namespace for SOPS.
                     type: string
+                  chartVersion:
+                    default: 0.15.1
+                    description: SOPS helm chart version (e.g., "0.15.1").
+                    type: string
+                  values:
+                    description: |
+                      You can merge customs values for sops, it will be merged with roles/sops/tasks/main.yaml
+                      See https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator
+                    type: object
+                    default: {}
+                    x-kubernetes-preserve-unknown-fields: true
+                required:
+                - chartVersion
                 type: object
               vault:
                 description: Configuration for Vault.
@@ -414,6 +459,10 @@ spec:
                     default: vault
                     description: The subdomain for Vault.
                     type: string
+                  chartVersion:
+                    default: 0.25.0
+                    description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                    type: string
                   values:
                     description: |
                       You can merge customs values for vault, it will be merged with roles/vault/tasks/main.yaml
@@ -421,6 +470,8 @@ spec:
                     type: object
                     default: {}
                     x-kubernetes-preserve-unknown-fields: true
+                required:
+                - chartVersion
                 type: object
             required:
             - additionalsCA

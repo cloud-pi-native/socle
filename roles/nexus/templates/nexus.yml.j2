@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: nexus
-          image: sonatype/nexus3
+          image: sonatype/nexus3:{{ dsc.nexus.imageTag }}
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 8081  # Exposes container port

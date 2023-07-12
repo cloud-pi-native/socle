@@ -4,8 +4,7 @@
 
 - name: Unseal Vault
   ansible.builtin.uri:
-#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    validate_certs: false
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: "https://{{ vault_domain }}/v1/sys/unseal"
     method: POST
     status_code: [200]

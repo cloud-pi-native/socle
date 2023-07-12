@@ -84,8 +84,7 @@
 
     - name: Change nexus password
       ansible.builtin.uri:
-#        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        validate_certs: false
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         force_basic_auth: true
         url: "https://{{ nexus_domain }}/service/rest/v1/security/users/admin/change-password"
         method: PUT

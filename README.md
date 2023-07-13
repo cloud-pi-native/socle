@@ -143,7 +143,6 @@ spec:
         registry: docker.io
         repository: bitnami/argo-cd
         tag: 2.7.6-debian-11-r2
-        imagePullPolicy: IfNotPresent
   certmanager:
     version: v1.11.0
   console:
@@ -211,12 +210,12 @@ spec:
             tag: v2.8.2
       database:
         internal:
-            image:
+          image:
             repository: docker.io/goharbor/harbor-db
             tag: v2.8.2
       redis:
         internal:
-            image:
+          image:
             repository: docker.io/goharbor/redis-photon
             tag: v2.8.2
       exporter:

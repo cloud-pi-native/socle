@@ -12,7 +12,7 @@
 
 - name: Wait Keycloak instance
   block:
-    - name: Wait Keycloak
+    - name: Waiting for Keycloak instance
       kubernetes.core.k8s_info:
         kind: keycloak
         namespace: "{{ dsc.keycloak.namespace }}"
@@ -98,7 +98,43 @@
   kubernetes.core.k8s:
     template: keycloak-ingress.yaml.j2
 
+- name: Wait Keycloak URL
+  ansible.builtin.uri:
+    url: "https://{{ keycloak_domain }}"
+    method: GET
+    status_code: [200, 202]
+    return_content: false
+  register: kc_response
+  until: kc_response is not failed
+  retries: 15
+  delay: 5
+
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: "https://{{ keycloak_domain }}/auth/realms/master/protocol/openid-connect/token"
+    method: POST
+    status_code: [200, 202]
+    return_content: true
+    body: "username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli"
+  register: kc_token
+
+- name: Set kc_access_token fact
+  ansible.builtin.set_fact:
+    kc_access_token: "{{ kc_token.json.access_token }}"
+
+- name: Get dso keycloak client scopes from API
+  ansible.builtin.uri:
+    url: "https://{{ keycloak_domain }}/auth/admin/realms/dso/client-scopes"
+    method: GET
+    status_code: [200, 202]
+    return_content: true
+    body_format: json
+    headers:
+      Authorization: "bearer {{ kc_access_token }}"
+  register: kc_client_scopes
+
 - name: Create generic keycloak client scope
+  when: kc_client_scopes.json | selectattr('name', 'equalto', 'generic') | length == 0
   community.general.keycloak_clientscope:
 #    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     validate_certs: false

@@ -459,7 +459,9 @@ Ceci est géré par divers paramètres que vous pourrez spécifier dans la resso
 
 Les sections suivantes détaillent comment procéder, outil par outil.
 
-**Remarque importante** : Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
+**Remarques importantes** :
+ * Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
+ * Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
 
 ### Argo CD
 
@@ -783,7 +785,7 @@ Les différents tags utilisables sont disponibles ici :
 * redis : https://hub.docker.com/r/goharbor/redis-photon/tags
 * exporter : https://hub.docker.com/r/goharbor/harbor-exporter/tags
 
-**Remarque** : Il est néanmois recommandé, si possible, de positionner des tags d'image en adéquation avec la version du chart Helm utilsé, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor` vue précédemment.
+**Rappel** : Il est néanmoins recommandé, si possible, de positionner des tags d'images en adéquation avec la version du chart Helm utilisé, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor` vue précédemment.
 
 Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
 

@@ -136,8 +136,7 @@
 - name: Create generic keycloak client scope
   when: kc_client_scopes.json | selectattr('name', 'equalto', 'generic') | length == 0
   community.general.keycloak_clientscope:
-#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    validate_certs: false
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: https://{{ keycloak_domain }}/auth
     auth_realm: master

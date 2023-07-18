@@ -71,6 +71,9 @@
         namespace: "{{ dsc.sonarqube.namespace }}"
         name: postgres
       register: pg_ep
+      until: pg_ep.resources[0].subsets[0].addresses[0] is defined
+      retries: 15
+      delay: 5
 
     - name: Set pg_pod
       ansible.builtin.set_fact:
@@ -92,9 +95,6 @@
       ansible.builtin.set_fact:
         admin: '{{ admin_account.stdout | from_json }}'
         token_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
-      until: "admin is defined and token_pass is defined"
-      retries: 5
-      delay: 5
 
     - name: Get sha384sum of token
       ansible.builtin.shell: "set -o pipefail && echo -n {{ token_pass }} | sha384sum | awk '{ print $1 }'"

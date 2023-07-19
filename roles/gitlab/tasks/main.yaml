@@ -12,6 +12,8 @@
     namespace: "{{ dsc.gitlab.namespace }}"
   register: gitlab_kind
   until: gitlab_kind.api_found
+  retries: 15
+  delay: 5
 
 - name: Get Gitlab client secret
   kubernetes.core.k8s_info:
@@ -81,14 +83,24 @@
           version: "{{ dsc.gitlab.chartVersion }}"
           values: "{{ gitlab_values }}"
 
-- name: Wait gitlab instance to be 'Running'
+ #- name: Wait gitlab instance to be 'Running'
+ #  kubernetes.core.k8s_info:
+ #    api_version: apps.gitlab.com/v1beta1
+ #    kind: GitLab
+ #    namespace: "{{ dsc.gitlab.namespace }}"
+ #    name: gitlab
+ #  register: gitlab_instance
+ #  until: gitlab_instance.resources[0] is defined and gitlab_instance.resources[0].status is defined and gitlab_instance.resources[0].status.phase == 'Running'
+ #  retries: 45
+ #  delay: 20
+
+- name: Wait Gitlab webservice endpoint to be available
   kubernetes.core.k8s_info:
-    api_version: apps.gitlab.com/v1beta1
-    kind: GitLab
+    kind: Endpoints
     namespace: "{{ dsc.gitlab.namespace }}"
-    name: gitlab
-  register: gitlab_instance
-  until: gitlab_instance.resources[0] is defined and gitlab_instance.resources[0].status is defined and gitlab_instance.resources[0].status.phase == 'Running'
+    name: gitlab-webservice-default
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
   retries: 45
   delay: 20
 

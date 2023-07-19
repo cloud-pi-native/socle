@@ -285,8 +285,21 @@ spec:
                           email:
                             description: User email used for ACME
                             type: string
+                          environment:
+                            description: |
+                              Let's encrypt environment to use for issuing certificates:
+                              - production : Use this value for production ready certificates.
+                                Beware of rate limits. See: https://letsencrypt.org/docs/rate-limits/
+                              - staging : Use this value for testing purposes. It has significantly higher rate limits.
+                                Beware of root certificates. See: https://letsencrypt.org/docs/staging-environment/
+                            enum:
+                            - production
+                            - staging
+                            type: string
+                            default: production
                         required:
                         - email
+                        - environment
                         type: object
                       ca:
                         description: CA configuration, need a valid CA key/cert in

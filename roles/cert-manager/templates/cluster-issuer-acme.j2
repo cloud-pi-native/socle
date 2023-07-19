@@ -6,7 +6,11 @@ metadata:
 spec:
   acme:
     email: {{ dsc.ingress.tls.acme.email }}
+{% if dsc.ingress.tls.acme.environment == 'staging' %}
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+{% else %}
     server: https://acme-v02.api.letsencrypt.org/directory
+{% endif %}
     privateKeySecretRef:
       name: acme-issuer-account-key
     solvers:

@@ -1,14 +1,22 @@
 certmanager:
   install: true
+
+registry:
+  enabled: false
+
 {% if dsc.ingress.tls.type != 'tlsSecret' %}
 gitlab:
   webservice:
     ingress:
       tls:
         secretName: gitlab-webservice
-registry:
-  enabled: false
-  ingress:
+    registry:
+      enabled: false
+  sidekiq:
+    registry:
+      enabled: false
+  unicorn:
+    registry:
       enabled: false
 minio:
   ingress:
@@ -19,11 +27,22 @@ gitlab:
   webservice:
     ingress:
       tls: {}
+    registry:
+      enabled: false
+  sidekiq:
+    registry:
+      enabled: false
+  unicorn:
+    registry:
+      enabled: false
+
 minio:
   ingress:
     tls: {}
 {% endif %}
 global:
+  registry:
+    enabled: false
   certificates:
     customCAs:
       - configMap: openshift-service-ca.crt
@@ -76,6 +95,8 @@ global:
     NO_PROXY: {{ dsc.proxy.no_proxy }}
 {% endif %}
   appConfig:
+    defaultProjectsFeatures:
+      containerRegistry: false
     ldap:
       preventSignin: true
     omniauth:

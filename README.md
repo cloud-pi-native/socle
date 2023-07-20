@@ -6,6 +6,7 @@
   - [Introduction](#introduction)
   - [Prérequis](#prérequis)
   - [Configuration](#configuration)
+    - [Utilisation de vos propres values](#utilisation-de-vos-propres-values)
   - [Installation](#installation)
     - [Lancement](#lancement)
     - [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster)
@@ -275,6 +276,20 @@ spec:
           pullPolicy: IfNotPresent
         updateStrategyType: "RollingUpdate"
 ```
+### Utilisation de vos propres values
+
+Comme nous pouvons le voir dans l'exemple ci-dessus, plusieurs outils sont notamment configurés à l'aide d'un champ `values`.
+
+Il s'agit de valeurs de chart helm. Vous pouvez les utiliser ici pour surcharger les valeurs par défaut.
+
+Voici les liens vers les documentations de chart helm pour les outils concernés :
+
+- [Argo CD](https://github.com/bitnami/charts/tree/main/bitnami/argo-cd)
+- [Gitlab](https://docs.gitlab.com/charts)
+- [Harbor](https://github.com/goharbor/harbor-helm)
+- [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
+- [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
+
 ## Installation
 
 ### Lancement

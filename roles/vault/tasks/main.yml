@@ -95,6 +95,17 @@
     name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
 
+- name: Wait Vault URL
+  ansible.builtin.uri:
+    url: "https://{{ vault_domain }}"
+    method: GET
+    status_code: [200, 202]
+    return_content: false
+  register: vault_response
+  until: vault_response is not failed
+  retries: 15
+  delay: 5
+
 - name: Check Vault health
   ansible.builtin.include_tasks:
     file: check.yml
@@ -167,6 +178,16 @@
   when: vault_status == 'sealed'
   ansible.builtin.include_tasks:
     file: unseal.yml
+
+- name: Wait vault pod to be ready
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vault.namespace }}"
+    kind: Pod
+    name: "{{ dsc_name }}-vault-0"
+  register: vault_pod
+  until: (vault_pod.resources[0].status.conditions is defined) and (vault_pod.resources[0].status.conditions | selectattr('status', 'equalto', 'True') | selectattr('type', 'equalto', 'Ready'))
+  retries: 15
+  delay: 5
 
 - name: "Config: get auth method"
   ansible.builtin.uri:

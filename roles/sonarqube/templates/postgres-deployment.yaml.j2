@@ -28,6 +28,14 @@ spec:
               value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_DB
               value: sonardb
+{% if dsc.proxy.enabled %}
+            - name: http_proxy
+              value: "{{ dsc.proxy.http_proxy }}"
+            - name: https_proxy
+              value: "{{ dsc.proxy.https_proxy }}"
+            - name: no_proxy
+              value: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
           image: postgres@sha256:390b0cdc715e189d0245d9f149912738e86535f02e011b6209500fccdda37440
           name: postgres-dso
           ports:

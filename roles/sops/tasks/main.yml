@@ -39,18 +39,11 @@
 
 - name: Set values
   ansible.builtin.set_fact:
-    values:
-      extraEnv:
-        - name: SOPS_AGE_KEY_FILE
-          value: /etc/sops-age-key-file/key
-      secretsAsFiles:
-        - mountPath: /etc/sops-age-key-file/
-          name: sops-age-key-file
-          secretName: sops-age-key-file
+    sops_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
-- name: Combine values with dsc
+- name: Merge with SOPS user values
   ansible.builtin.set_fact:
-    values: "{{ values | combine(dsc.sops['values'], recursive=True) }}"
+    sops_values: "{{ sops_values | combine(dsc.sops['values'], recursive=True) }}"
 
 - name: Deploy helm
   kubernetes.core.helm:
@@ -59,7 +52,7 @@
     chart_version: "{{ dsc.sops.chartVersion }}"
     release_namespace: "{{ dsc.sops.namespace }}"
     create_namespace: true
-    values: "{{ values }}"
+    values: "{{ sops_values }}"
 
 - name: Get age secret
   kubernetes.core.k8s_info:

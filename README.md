@@ -6,6 +6,7 @@
   - [Introduction](#introduction)
   - [Prérequis](#prérequis)
   - [Configuration](#configuration)
+    - [Utilisation de vos propres values](#utilisation-de-vos-propres-values)
   - [Installation](#installation)
     - [Lancement](#lancement)
     - [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster)
@@ -143,7 +144,6 @@ spec:
         registry: docker.io
         repository: bitnami/argo-cd
         tag: 2.7.6-debian-11-r2
-        imagePullPolicy: IfNotPresent
   certmanager:
     version: v1.11.0
   console:
@@ -211,12 +211,12 @@ spec:
             tag: v2.8.2
       database:
         internal:
-            image:
+          image:
             repository: docker.io/goharbor/harbor-db
             tag: v2.8.2
       redis:
         internal:
-            image:
+          image:
             repository: docker.io/goharbor/redis-photon
             tag: v2.8.2
       exporter:
@@ -276,6 +276,20 @@ spec:
           pullPolicy: IfNotPresent
         updateStrategyType: "RollingUpdate"
 ```
+### Utilisation de vos propres values
+
+Comme nous pouvons le voir dans l'exemple ci-dessus, plusieurs outils sont notamment configurés à l'aide d'un champ `values`.
+
+Il s'agit de valeurs de chart helm. Vous pouvez les utiliser ici pour surcharger les valeurs par défaut.
+
+Voici les liens vers les documentations de chart helm pour les outils concernés :
+
+- [Argo CD](https://github.com/bitnami/charts/tree/main/bitnami/argo-cd)
+- [Gitlab](https://docs.gitlab.com/charts)
+- [Harbor](https://github.com/goharbor/harbor-helm)
+- [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
+- [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
+
 ## Installation
 
 ### Lancement
@@ -460,7 +474,9 @@ Ceci est géré par divers paramètres que vous pourrez spécifier dans la resso
 
 Les sections suivantes détaillent comment procéder, outil par outil.
 
-**Remarque importante** : Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
+**Remarques importantes** :
+ * Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
+ * Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
 
 ### Argo CD
 
@@ -784,7 +800,7 @@ Les différents tags utilisables sont disponibles ici :
 * redis : https://hub.docker.com/r/goharbor/redis-photon/tags
 * exporter : https://hub.docker.com/r/goharbor/harbor-exporter/tags
 
-**Remarque** : Il est néanmois recommandé, si possible, de positionner des tags d'image en adéquation avec la version du chart Helm utilsé, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor` vue précédemment.
+**Rappel** : Il est néanmoins recommandé, si possible, de positionner des tags d'images en adéquation avec la version du chart Helm utilisé, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor` vue précédemment.
 
 Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
 

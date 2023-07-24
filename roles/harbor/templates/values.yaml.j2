@@ -1,4 +1,5 @@
 expose:
+  imagePullPolicy: IfNotPresent
   type: ingress
   tls:
     enabled: true
@@ -6,15 +7,17 @@ expose:
     certSource: secret
     secret:
       secretName: {{ dsc.ingress.tls.tlsSecret.name }}
-      notarySecretName: {{ dsc.ingress.tls.tlsSecret.name }}
+      notarySecretName: {{ dsc.ingress.tls.tlsSecret.name }}-notary
 {% else %}
-    certSource: null
-    secret: {}
+    certSource: secret
+    secret:
+      secretName: harbor-ingress
+      notarySecretName: harbor-ingress-notary
 {% endif %}
   ingress:
     hosts:
       core: {{ harbor_domain }}
-      notary: notary{{ root_domain }}
+      notary: {{ dsc.harbor.subDomain }}-notary{{ root_domain }}
     notary:
       annotations:
 {% for key, val in dsc.ingress.annotations.items() %}

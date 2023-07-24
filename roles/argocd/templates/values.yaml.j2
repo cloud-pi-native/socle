@@ -1,6 +1,8 @@
 # TODO variabilize openshift boolean
 openshift:
   enabled: true
+image:
+  PullPolicy: IfNotPresent
 config:
   secret:
     argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"

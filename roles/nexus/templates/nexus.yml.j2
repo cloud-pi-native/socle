@@ -29,6 +29,14 @@ spec:
           env:
             - name: INSTALL4J_ADD_VM_PARAMS
               value: "-Djava.util.prefs.userRoot=/nexus-data/app"
+{% if dsc.proxy.enabled %}
+            - name: http_proxy
+              value: "{{ dsc.proxy.http_proxy }}"
+            - name: https_proxy
+              value: "{{ dsc.proxy.https_proxy }}"
+            - name: no_proxy
+              value: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
       volumes:
         - name: nexus-data-volume
           persistentVolumeClaim:

@@ -187,6 +187,8 @@
       signup_enabled: false
       outbound_local_requests_allowlist_raw: "0.0.0.0/0"
       default_branch_protection: 0
+      import_sources:
+        - git
     body_format: form-urlencoded
   changed_when: true
 

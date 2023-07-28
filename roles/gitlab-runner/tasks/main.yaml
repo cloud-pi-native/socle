@@ -20,6 +20,8 @@
   kubernetes.core.k8s_info:
     api_version: apps.gitlab.com/v1beta2
     kind: Runner
+    name: gitlab-runner
+    namespace: "{{ dsc.gitlab.namespace }}"
   register: runner_kind
   until: runner_kind.api_found
   retries: 5

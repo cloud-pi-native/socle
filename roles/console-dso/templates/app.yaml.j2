@@ -25,15 +25,15 @@ spec:
           value: dso
         - name: postgres.container.pass
           value: {{ dsc.console.dbPassword }}
-        - name: keycloak.client_id_backend
+        - name: keycloak.clientIdBackend
           value: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
-        - name: keycloak.client_secret_backend
+        - name: keycloak.clientSecretBackend
           value: {{ console_backend_secret.resources[0].data.CLIENT_SECRET | b64decode }}
-        - name: keycloak.client_id_frontend
+        - name: keycloak.clientIdFrontend
           value: {{ console_frontend_secret.resources[0].data.CLIENT_ID | b64decode }}
-        - name: keycloak.redirect_uri
+        - name: keycloak.redirectUri
           value: https://{{ console_domain }}
-        - name: keycloak.session_secret
+        - name: keycloak.sessionSecret
           value: {{ session_secret }}
         - name: keycloak.domain
           value: "{{ keycloak_domain }}/auth"

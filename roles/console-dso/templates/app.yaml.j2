@@ -17,7 +17,7 @@ spec:
     releaseName: console-pi
     helm:
       parameters:
-        - name: client.ingress.hosts[0]
+        - name: ingress.hosts[0]
           value: {{ console_domain }}
         - name: postgres.container.db
           value: dso-console-db
@@ -40,29 +40,22 @@ spec:
         - name: keycloak.realm
           value: dso
 {% if dsc.exposedCA.type != 'none' %}
-        - name: server.extra_ca.name
+        - name: server.extraCa.name
           value: bundle
-        - name: server.extra_ca.key
+        - name: server.extraCa.key
           value: ca.pem
 {% endif %}
 {% for key, val in dsc.ingress.annotations.items() %}
-        - name: server.ingress.annotations.{{ key | regex_escape }}
-          value: {{ val }}
-        - name: client.ingress.annotations.{{ key | regex_escape }}
+        - name: ingress.annotations.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
 {% for key, val in dsc.ingress.labels.items() %}
-        - name: server.ingress.labels.{{ key | regex_escape }}
-          value: {{ val }}
-        - name: client.ingress.labels.{{ key | regex_escape }}
+        - name: ingress.labels.{{ key | regex_escape }}
           value: {{ val }}
 {% endfor %}
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
-        - name: server.ingress.tls.secretName
+        - name: ingress.tls.secretName
           value: {{ dsc.ingress.tls.tlsSecret.name }}
-        - name: client.ingress.tls.secretName
-          value: {{ dsc.ingress.tls.tlsSecret.name }}
-{% endif %}
   syncPolicy:
     automated: {}
     syncOptions:

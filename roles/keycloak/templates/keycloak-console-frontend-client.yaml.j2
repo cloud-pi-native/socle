@@ -13,12 +13,12 @@ spec:
     redirectUris:
       - "https://{{ console_domain }}/*"
 {% if dsc.global.environment == 'development' %}
-      - "https://dso.local/*"
+      - "http://dso.local/*"
 {% endif %}
     webOrigins:
       - "https://{{ console_domain }}"
 {% if dsc.global.environment == 'development' %}
-      - "https://dso.local"
+      - "http://dso.local"
 {% endif %}
     defaultClientScopes:
     - generic

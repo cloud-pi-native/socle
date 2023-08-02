@@ -12,8 +12,14 @@ spec:
     publicClient: true
     redirectUris:
       - "https://{{ console_domain }}/*"
-    webOrigins:
-      - "https://{{ console_domain }}"
+{% if dsc.environment == 'development' %}
+      - "https://dso.local/*"
+{% endif %}
+      webOrigins:
+    - "https://{{ console_domain }}"
+{% if dsc.environment == 'development' %}
+    - "https://dso.local"
+{% endif %}
     defaultClientScopes:
     - generic
 

@@ -211,6 +211,11 @@ spec:
               global:
                 description: Global configuration not specific to one service
                 properties:
+                  environment:
+                    default: production
+                    description: |
+                      Defines DSO environment type, i.e. development or production.
+                    type: string
                   projectsRootDir:
                     default:
                     - forge
@@ -233,6 +238,7 @@ spec:
                 required:
                 - projectsRootDir
                 - rootDomain
+                - environment
                 type: object
               harbor:
                 description: Configuration for Harbor.

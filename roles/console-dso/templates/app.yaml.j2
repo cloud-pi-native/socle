@@ -56,13 +56,8 @@ spec:
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
         - name: ingress.tls.secretName
           value: {{ dsc.ingress.tls.tlsSecret.name }}
+{% endif %}
   syncPolicy:
     automated: {}
     syncOptions:
     - CreateNamespace=true
-
-
-
-
-
-

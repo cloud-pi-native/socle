@@ -1,0 +1,206 @@
+image:
+  pullPolicy: "IfNotPresent"
+
+auth:
+  adminUser: "admin"
+  existingSecret: "keycloak"
+  passwordSecretKey: "admin-password"
+
+tls:
+  enabled: false
+
+production: true
+
+proxy: "edge"
+
+httpRelativePath: "/"
+
+initContainers: "[]"
+
+configuration: ""
+
+existingConfigmap: ""
+
+extraStartupArgs: ""
+
+initdbScripts: ""
+
+initdbScriptsConfigMap: ""
+
+command: []
+
+args: []
+
+extraEnvVars: []
+
+extraEnvVarsCM: ""
+
+extraEnvVarsSecret: ""
+
+replicaCount: 1
+
+containerPorts:
+  http: 8080
+  https: 8443
+  infinispan: 7800
+
+extraContainerPorts: []
+
+podSecurityContext:
+  enabled: false
+
+containerSecurityContext:
+  enabled: false
+
+  resources:
+  limits:
+    memory: "2048Mi"
+  requests:
+    memory: "1024Mi"
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 300
+  periodSeconds: 1
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 60
+  successThreshold: 1
+
+service:
+  type: "ClusterIP"
+  http:
+    enabled: true
+  ports:
+    http: 80
+    https: 443
+  nodePorts:
+    http: ""
+    https: ""
+  sessionAffinity: "None"
+  sessionAffinityConfig: 
+  clusterIP: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  externalTrafficPolicy: "Cluster"
+  annotations: 
+  extraPorts: []
+  extraHeadlessPorts: []
+  headless:
+    annotations: 
+    extraPorts: []
+
+ingress:
+  enabled: true
+  ingressClassName: ""
+  pathType: "Prefix"
+  apiVersion: ""
+  hostname: "{{ keycloak_domain }}"
+  path: /
+  servicePort: "http"
+  annotations:
+    route.openshift.io/termination: "edge"
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: "{{ val }}"
+{% endfor %}
+  labels: 
+    app: "keycloak"
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: "{{ val }}"
+{% endfor %}
+  tls: true
+  selfSigned: false
+  extraHosts: []
+  extraPaths: []
+  extraTls: []
+  secrets: []
+  extraRules: []
+
+networkPolicy:
+  enabled: false
+  allowExternal: true
+  additionalRules: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: true
+  annotations:
+  extraLabels:
+
+rbac:
+  create: false
+  rules: []
+
+pdb:
+  create: false
+
+autoscaling:
+  enabled: false
+
+metrics:
+  enabled: false
+
+keycloakConfigCli:
+  enabled: false
+
+postgresql:
+  enabled: false
+#  auth:
+#    postgresPassword: ""
+#    username: bn_keycloak
+#    password: ""
+#    database: bitnami_keycloak
+#    existingSecret: ""
+#  architecture: standalone
+
+## External PostgreSQL configuration
+## All of these values are only used when postgresql.enabled is set to false
+## @param externalDatabase.host Database host
+## @param externalDatabase.port Database port number
+## @param externalDatabase.user Non-root username for Keycloak
+## @param externalDatabase.password Password for the non-root username for Keycloak
+## @param externalDatabase.database Keycloak database name
+## @param externalDatabase.existingSecret Name of an existing secret resource containing the database credentials
+## @param externalDatabase.existingSecretHostKey Name of an existing secret key containing the database host name
+## @param externalDatabase.existingSecretPortKey Name of an existing secret key containing the database port
+## @param externalDatabase.existingSecretUserKey Name of an existing secret key containing the database user
+## @param externalDatabase.existingSecretDatabaseKey Name of an existing secret key containing the database name
+## @param externalDatabase.existingSecretPasswordKey Name of an existing secret key containing the database credentials
+##
+externalDatabase:
+  host: pg-cluster-keycloak-rw
+  port: 5432
+#  user: ""
+  database: keycloak
+#  password: ""
+  existingSecret: pg-cluster-keycloak-app
+#  existingSecretHostKey: host
+#  existingSecretPortKey: port
+  existingSecretUserKey: username
+#  existingSecretDatabaseKey: database
+  existingSecretPasswordKey: password
+
+cache:
+  enabled: true
+  stackName: "kubernetes"
+  stackFile: ""
+
+logging:
+  output: "default"
+  level: "INFO"

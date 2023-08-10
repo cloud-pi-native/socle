@@ -155,6 +155,20 @@ spec:
                 required:
                 - version
                 type: object
+              cloudnativepg:
+                description: Configuration for CloudNativePG.
+                properties:
+                  namespace:
+                    default: dso-cloudnativepg
+                    description: The namespace for cloudnativepg.
+                    type: string
+                  chartVersion:
+                    default: 0.18.2
+                    description: CloudNativePG helm chart version (e.g., "0.18.2").
+                    type: string
+                required:
+                - chartVersion
+                type: object
               console:
                 description: Configuration for the console.
                 properties:
@@ -365,6 +379,18 @@ spec:
                     default: keycloak
                     description: The subdomain for Keycloak.
                     type: string
+                  chartVersion:
+                    default: 16.0.3
+                    description: Keycloak chart version (e.g., "16.0.3").
+                    type: string
+                  values:
+                    description: |
+                      You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values.j2
+                      See https://github.com/bitnami/charts/tree/main/bitnami/keycloak
+                      And https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                    type: object
+                    default: {}
+                    x-kubernetes-preserve-unknown-fields: true
                 type: object
               kubed:
                 description: Configuration for Kubed (config-syncer).

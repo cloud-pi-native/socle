@@ -146,6 +146,9 @@ spec:
         tag: 2.7.6-debian-11-r2
   certmanager:
     version: v1.11.0
+  cloudnativepg:
+    namespace: mynamespace-cloudnativepg
+    chartVersion: 0.18.2
   console:
     dbPassword: AnotherPassBitesTheDust
     namespace: mynamespace-console
@@ -232,6 +235,7 @@ spec:
   keycloak:
     namespace: mynamespace-keycloak
     subDomain: keycloak
+    chartVersion: "16.0.3"
   kubed:
     chartVersion: "v0.13.2"
   nexus:

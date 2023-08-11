@@ -7,7 +7,7 @@
 
 - name: Create PostgreSQL cluster and keycloak database
   kubernetes.core.k8s:
-    template: pg-cluster.yaml.j2
+    template: pg-cluster-keycloak.yaml.j2
 
 - name: Wait pg-cluster-keycloak-rw endpoint
   kubernetes.core.k8s_info:
@@ -204,7 +204,7 @@
         realm: dso
         username: admin@example.com
 
-    - name: Create dso user
+    - name: Create dso admin user
       community.general.keycloak_user:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
@@ -224,7 +224,7 @@
         email: admin@example.com
         enabled: true
         email_verified: true
-#        force: true  ## Ne fontionne pas.
+#        force: true  ## Ne fontionne pas quand user supprimé via la GUI.
 
 - name: Get dso keycloak client scopes from API
   ansible.builtin.uri:
@@ -268,6 +268,7 @@
     state: present
     realm: dso
     clientId: gitlab-client
+#    secret: 530169ec-83e6-430e-84d7-22c937dc789c
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
@@ -275,61 +276,142 @@
     webOrigins:
       - https://{{ gitlab_domain }}
     defaultClientScopes:
-    - generic
+      - generic
 
-#- name: Create console-frontend client
-#  community.general.keycloak_client:
-#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-#    auth_client_id: admin-cli
-#    auth_keycloak_url: https://{{ keycloak_domain }}
-#    auth_realm: master
-#    auth_username: "{{ keycloak_admin }}"
-#    auth_password: "{{ keycloak_admin_password }}"
-#    state: present
-#    realm: dso
-#    clientId: console-frontend
-#    standardFlowEnabled: true
-#    publicClient: true
-#    redirectUris:
-#      - "https://{{ console_domain }}/*"
-#{% if dsc.global.environment == 'development' %}
-#      - "http://dso.local/*"
-#      - "http://console.dso.local/*"
-#{% endif %}
-#    webOrigins:
-#      - "https://{{ console_domain }}"
-#{% if dsc.global.environment == 'development' %}
-#      - "http://dso.local"
-#      - "http://console.dso.local"
-#{% endif %}
-#    defaultClientScopes:
-#    - generic
+- name: Create console-frontend client
+  community.general.keycloak_client:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    clientId: console-frontend
+    standardFlowEnabled: true
+    publicClient: true
+    redirectUris: "{{ lookup('ansible.builtin.template', 'console-frontend-redirectUris.yaml') | from_yaml }}"
+    webOrigins: "{{ lookup('ansible.builtin.template', 'console-frontend-webOrigins.yaml') | from_yaml }}"
+    defaultClientScopes:
+      - generic
 
+- name: Create console-backend client
+  community.general.keycloak_client:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    clientId: console-backend
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ console_domain }}/*
+      - https://{{ console_domain }}/
+    webOrigins:
+      - https://{{ console_domain }}
+    defaultClientScopes:
+      - generic
 
-#- name: Create clients
-#  kubernetes.core.k8s:
-#    template: "{{ item }}"
-#  with_items:
-#    - keycloak-gitlab-client.yaml.j2
-#    - keycloak-console-frontend-client.yaml.j2
-#    - keycloak-console-backend-client.yaml.j2
-#    - keycloak-argo-client.yaml.j2
-#    - keycloak-portail-client.yaml.j2
-#    - keycloak-sonar-client.yaml.j2
-#    - keycloak-harbor-client.yaml.j2
-#
-#- name: Create base admins groups
-#  community.general.keycloak_group:
-#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-#    name: "{{ item }}"
-#    realm: dso
-#    state: present
-#    auth_client_id: admin-cli
-#    auth_keycloak_url: https://{{ keycloak_domain }}/auth
-#    auth_realm: master
-#    auth_username: "{{ keycloak_admin }}"
-#    auth_password: "{{ keycloak_admin_password }}"
-#  with_items:
-#    - admin
-#    - ArgoCDAdmins
-#
+- name: Create argo-client
+  community.general.keycloak_client:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    clientId: argo-client
+#    secret: 810f6a26-173a-4fdc-b080-15357ff9ed36
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ argocd_domain }}/auth/callback
+      - "*"
+    webOrigins:
+      - https://{{ argocd_domain }}
+    defaultClientScopes:
+      - generic
+
+- name: Create portail-client
+  community.general.keycloak_client:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    clientId: portail-client
+#    clientAuthenticatorType: public
+    clientAuthenticatorType: client-secret
+    redirectUris:
+      - "*"
+    webOrigins:
+      - "*"
+    defaultClientScopes:
+      - generic
+
+- name: Create sonar-client
+  community.general.keycloak_client:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    clientId: sonar-client
+#    secret: 3c6ec656-defe-4fa3-be05-a24460ec97eb
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ sonar_domain }}/auth/callback
+    webOrigins:
+      - https://{{ sonar_domain }}
+    defaultClientScopes:
+      - generic
+
+- name: Create harbor-client
+  community.general.keycloak_client:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    clientId: harbor-client
+#    secret: 4474aa7f-e392-4481-9c47-5891c8970ac8
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ harbor_domain }}/c/oidc/callback
+    webOrigins:
+      - https://{{ harbor_domain }}
+    defaultClientScopes:
+      - generic
+
+- name: Create base admins groups
+  community.general.keycloak_group:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    name: "{{ item }}"
+  with_items:
+    - admin
+    - ArgoCDAdmins

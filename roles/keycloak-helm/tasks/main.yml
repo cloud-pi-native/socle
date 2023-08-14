@@ -167,7 +167,7 @@
       Authorization: "bearer {{ kc_access_token }}"
   register: kc_dso_users
 
-- name: Find dso admin password
+- name: Find dso admin secret
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
@@ -175,7 +175,7 @@
   register: dso_admin
 
 - name: Create dso admin secret and user
-  when: (dso_admin.resources | length == 0) or (kc_dso_users.json | selectattr('username', 'equalto', 'admin@example.com') | length == 0)
+  when: (dso_admin.resources | length == 0) or (kc_dso_users.json | selectattr('username', 'equalto', dso_admin.resources[0].data.ADMIN_USER|b64decode) | length == 0)
   block:
     - name: Generate admin user password
       ansible.builtin.set_fact:
@@ -189,7 +189,8 @@
             namespace: "{{ dsc.keycloak.namespace }}"
             name: dso-admin-user-secret
           data:
-            ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"
+            ADMIN_USER: "{{ 'admin@example.com'|b64encode }}"
+            ADMIN_USER_PASSWORD: "{{ admin_user_password|b64encode }}"
           type: Opaque
 
     - name: Remove dso admin user
@@ -322,19 +323,6 @@
     defaultClientScopes:
       - generic
 
-- name: Get console-frontend client secret from keycloak
-  community.general.keycloak_clientsecret_info:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
-    auth_realm: master
-    auth_username: "{{ keycloak_admin }}"
-    auth_password: "{{ keycloak_admin_password }}"
-    realm: dso
-    clientId: console-frontend
-  register: console_frontend_client_secret
-  no_log: true
-
 - name: Set console-frontend client secret in keycloak namespace
   kubernetes.core.k8s:
     state: present
@@ -343,7 +331,6 @@
       kind: Secret
       data:
         CLIENT_ID: "{{ 'console-frontend'|b64encode }}"
-        CLIENT_SECRET: ""
       metadata:
         name: keycloak-client-secret-console-frontend-client
         namespace: "{{ dsc.keycloak.namespace }}"

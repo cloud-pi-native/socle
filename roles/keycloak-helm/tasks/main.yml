@@ -59,7 +59,7 @@
         admin-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')|b64encode }}"
       metadata:
         name: keycloak
-        namespace: testcm-keycloak
+        namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque
 
 - name: Add bitnami helm repo
@@ -268,7 +268,6 @@
     state: present
     realm: dso
     clientId: gitlab-client
-#    secret: 530169ec-83e6-430e-84d7-22c937dc789c
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
@@ -277,6 +276,33 @@
       - https://{{ gitlab_domain }}
     defaultClientScopes:
       - generic
+
+- name: Get gitlab-client secret from keycloak
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: gitlab-client
+  register: gitlab_client_secret
+  no_log: true
+
+- name: Set gitlab-client secret in keycloak namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ 'gitlab-client'|b64encode }}"
+        CLIENT_SECRET: "{{ gitlab_client_secret.clientsecret_info.value|b64encode }}"
+      metadata:
+        name: keycloak-client-secret-gitlab-client
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
 
 - name: Create console-frontend client
   community.general.keycloak_client:
@@ -295,6 +321,33 @@
     webOrigins: "{{ lookup('ansible.builtin.template', 'console-frontend-webOrigins.yaml') | from_yaml }}"
     defaultClientScopes:
       - generic
+
+- name: Get console-frontend client secret from keycloak
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: console-frontend
+  register: console_frontend_client_secret
+  no_log: true
+
+- name: Set console-frontend client secret in keycloak namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ 'console-frontend'|b64encode }}"
+        CLIENT_SECRET: ""
+      metadata:
+        name: keycloak-client-secret-console-frontend-client
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
 
 - name: Create console-backend client
   community.general.keycloak_client:
@@ -316,6 +369,33 @@
       - https://{{ console_domain }}
     defaultClientScopes:
       - generic
+
+- name: Get console-backend client secret from keycloak
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: console-backend
+  register: console_backend_client_secret
+  no_log: true
+
+- name: Set console-backend client secret in keycloak namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ 'console-backend'|b64encode }}"
+        CLIENT_SECRET: "{{ console_backend_client_secret.clientsecret_info.value|b64encode }}"
+      metadata:
+        name: keycloak-client-secret-console-backend-client
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
 
 - name: Create argo-client
   community.general.keycloak_client:
@@ -339,6 +419,33 @@
     defaultClientScopes:
       - generic
 
+- name: Get argo-client secret from keycloak
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: argo-client
+  register: argo_client_secret
+  no_log: true
+
+- name: Set argo-client secret in keycloak namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ 'argo-client'|b64encode }}"
+        CLIENT_SECRET: "{{ argo_client_secret.clientsecret_info.value|b64encode }}"
+      metadata:
+        name: keycloak-client-secret-argo-client
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
+
 - name: Create portail-client
   community.general.keycloak_client:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -358,6 +465,33 @@
       - "*"
     defaultClientScopes:
       - generic
+
+- name: Get portail-client secret from keycloak
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: portail-client
+  register: portail_client_secret
+  no_log: true
+
+- name: Set portail-client secret in keycloak namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ 'portail-client'|b64encode }}"
+        CLIENT_SECRET: "{{ portail_client_secret.clientsecret_info.value|b64encode }}"
+      metadata:
+        name: keycloak-client-secret-portail-client
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
 
 - name: Create sonar-client
   community.general.keycloak_client:
@@ -380,6 +514,33 @@
     defaultClientScopes:
       - generic
 
+- name: Get sonar-client secret from keycloak
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: sonar-client
+  register: sonar_client_secret
+  no_log: true
+
+- name: Set sonar-client secret in keycloak namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ 'sonar-client'|b64encode }}"
+        CLIENT_SECRET: "{{ sonar_client_secret.clientsecret_info.value|b64encode }}"
+      metadata:
+        name: keycloak-client-secret-sonar-client
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
+
 - name: Create harbor-client
   community.general.keycloak_client:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -400,6 +561,33 @@
       - https://{{ harbor_domain }}
     defaultClientScopes:
       - generic
+
+- name: Get harbor-client secret from keycloak
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: harbor-client
+  register: harbor_client_secret
+  no_log: true
+
+- name: Set harbor-client secret in keycloak namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ 'harbor-client'|b64encode }}"
+        CLIENT_SECRET: "{{ harbor_client_secret.clientsecret_info.value|b64encode }}"
+      metadata:
+        name: keycloak-client-secret-harbor-client
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
 
 - name: Create base admins groups
   community.general.keycloak_group:

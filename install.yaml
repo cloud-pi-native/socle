@@ -30,7 +30,6 @@
         - cloudnativepg
         - always
 
-#    - name: keycloak
     - name: keycloak-helm
       tags:
         - keycloak

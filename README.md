@@ -25,11 +25,13 @@
     - [GitLab](#gitlab)
     - [Harbor](#harbor)
       - [Gel des images](#gel-des-images)
+    - [Keycloak](#keycloak-1)
+      - [Gel de l'image](#gel-de-limage-1)
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [SOPS](#sops)
-      - [Gel de l'image](#gel-de-limage-1)
+      - [Gel de l'image](#gel-de-limage-2)
     - [Vault](#vault)
       - [Gel des images](#gel-des-images-1)
 
@@ -54,7 +56,7 @@ Les éléments déployés seront les suivants :
 | SOPS                        | https://github.com/isindir/sops-secrets-operator                             |
 | HashiCorp Vault             | https://www.vaultproject.io                                                  |
 
-Certains peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
+Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
 ## Prérequis
 
 Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.
@@ -152,14 +154,15 @@ spec:
   console:
     dbPassword: AnotherPassBitesTheDust
     namespace: mynamespace-console
-    release: 4.1.0
+    release: 5.4.0
     subDomain: console
   gitlab:
     insecureCI: true
     namespace: mynamespace-gitlab
     subDomain: gitlab
-    version: "6.11.5"
+    version: "7.0.8"
   global:
+    environment: production
     projectsRootDir:
       - my-root-dir
       - projects-sub-dir
@@ -236,6 +239,11 @@ spec:
     namespace: mynamespace-keycloak
     subDomain: keycloak
     chartVersion: "16.0.3"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/keycloak
+        tag: 19.0.3-debian-11-r22
   kubed:
     chartVersion: "v0.13.2"
   nexus:
@@ -248,7 +256,7 @@ spec:
     host: "192.168.xx.xx"
     http_proxy: http://192.168.xx.xx:3128/
     https_proxy: http://192.168.xx.xx:3128/
-    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
+    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
     port: "3128"
   sonarqube:
     namespace: mynamespace-sonarqube
@@ -280,9 +288,15 @@ spec:
           pullPolicy: IfNotPresent
         updateStrategyType: "RollingUpdate"
 ```
+
+Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec argocd :
+```
+kubectl explain dsc.spec.argocd
+```
+
 ### Utilisation de vos propres values
 
-Comme nous pouvons le voir dans l'exemple ci-dessus, plusieurs outils sont notamment configurés à l'aide d'un champ `values`.
+Comme nous pouvons le voir dans l'exemple de configuration fourni ci-dessus, plusieurs outils sont notamment configurés à l'aide d'un champ `values`.
 
 Il s'agit de valeurs de chart helm. Vous pouvez les utiliser ici pour surcharger les valeurs par défaut.
 
@@ -291,6 +305,7 @@ Voici les liens vers les documentations de chart helm pour les outils concernés
 - [Argo CD](https://github.com/bitnami/charts/tree/main/bitnami/argo-cd)
 - [Gitlab](https://docs.gitlab.com/charts)
 - [Harbor](https://github.com/goharbor/harbor-helm)
+- [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
 - [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
@@ -315,7 +330,7 @@ watch "kubectl get ns | grep 'mynamespace-'"
 
 Suite à une première installation réussie et selon vos besoins, il est possible d'installer dans un même cluster une ou plusieurs autres forges DSO, en parallèle de celle installée par défaut.
 
-Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui, pour rappel, se nomme `conf-dso`, et en y modifiant les noms des namespaces.
+Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui pour rappel se nomme `conf-dso`, et en y modifiant les noms des namespaces.
 
 Comme vu plus haut dans la section [Configuration](#configuration), déclarez votre ressource de type `dsc` personnalisée **dans un fichier YAML**.
 
@@ -401,25 +416,17 @@ ansible-playbook install.yaml -e dsc_cr=ma-dsc -t keycloak,console
 ```
 
 ### Keycloak
-L'opérateur Keycloak peut être assez capricieux. Son état souhaité est `status.phase == 'reconciling'`.
 
-En cas d'échec lors de l'installation, vous vérifierez ce qu'il en est avec la commande :
+La BDD PostgreSQL du composant Keycloak est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/), via le role "cloudnativepg".
 
-```bash
-kubectl get keycloak dso-keycloak -n mynamespace-keycloak -o yaml
-```
+Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement que cet opérateur n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
+- L'API "postgresql.cnpg.io/v1".
+- La "MutatingWebhookConfiguration" nommée "cnpg-mutating-webhook-configuration".
 
-Ou bien si vous avez installé la commande `yq` :
+Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur CloudNativePG n'est pas installé. Le rôle associé procédera donc à son installation.
 
-```bash
-kubectl get keycloak dso-keycloak -n mynamespace-keycloak -o yaml | yq '.status.phase'
-```
+**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux éléments vérifiés par le role soient toujours présents. Dans ce cas de figure, l'installation de Keycloak échouera car l'opérateur CloudNativePG n'aura pas été installé par le role.  
 
-Il se peut que Keycloak reste bloqué en status "initializing" mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook avec l'extra variable `KEYCLOAK_NO_CHECK` comme ceci :
-
-```bash
-ansible-playbook install.yaml -e KEYCLOAK_NO_CHECK=
-```
 ## Désinstallation
 
 ### Chaîne complète
@@ -895,7 +902,104 @@ watch "oc get all -n mynamespace-harbor"
 
 Vous devriez observer la suppression et le remplacement des pods impactés par vos changements.
 
+### Keycloak
 
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle keycloak déploiera la dernière version du [chart helm Bitnami Keycloak](https://bitnami.com/stack/keycloak/helm) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de Keycloak, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo bitnami/keycloak
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+bitnami/keycloak        15.1.7          21.1.2          Keycloak is a high performance Java-based ident...
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer immédiatement la commande de recherche :
+
+```bash
+helm search repo bitnami/keycloak
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de Keycloak que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l bitnami/keycloak
+```
+
+Si vous souhaitez fixer la version du chart helm, et donc celle de Keycloak, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  keycloak:
+    namespace: mynamespace-keycloak
+    subDomain: keycloak
+    chartVersion: "16.0.3"
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de Keycloak, laquelle mettra à jour la version du chart et l'image associée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t keycloak
+```
+#### Gel de l'image
+
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de Keycloak de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**). 
+
+Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : https://hub.docker.com/r/bitnami/keycloak/tags
+
+Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "19.0.3-debian-11-r22" est un tag immutable.
+
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+
+```yaml
+  keycloak:
+    namespace: mynamespace-keycloak
+    subDomain: keycloak
+    chartVersion: "16.0.3"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/keycloak
+        tag: 19.0.3-debian-11-r22
+```
+
+Appliquer le changement en utilisant votre fichier de défnition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancer l'installation avec le tag `argocd` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t keycloak
+```
+
+Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+
+Les release notes de Keycloak se trouvent ici : https://github.com/keycloak/keycloak/releases
 
 ### Kubed (config-syncer)
 

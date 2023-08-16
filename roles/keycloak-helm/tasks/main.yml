@@ -261,22 +261,22 @@
 - name: Create gitlab-client
   community.general.keycloak_client:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
-    auth_realm: master
+    auth_client_id: "admin-cli"
+    auth_keycloak_url: "https://{{ keycloak_domain }}"
+    auth_realm: "master"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
-    state: present
-    realm: dso
-    clientId: gitlab-client
-    clientAuthenticatorType: client-secret
+    state: "present"
+    realm: "dso"
+    clientId: "gitlab-client"
+    clientAuthenticatorType: "client-secret"
     standardFlowEnabled: true
     redirectUris:
-      - https://{{ gitlab_domain }}/users/auth/openid_connect/callback
+      - "https://{{ gitlab_domain }}/users/auth/openid_connect/callback"
     webOrigins:
-      - https://{{ gitlab_domain }}
+      - "https://{{ gitlab_domain }}"
     defaultClientScopes:
-      - generic
+      - "generic"
 
 - name: Get gitlab-client secret from keycloak
   community.general.keycloak_clientsecret_info:

@@ -391,6 +391,8 @@ spec:
                     type: object
                     default: {}
                     x-kubernetes-preserve-unknown-fields: true
+                required:
+                - chartVersion
                 type: object
               kubed:
                 description: Configuration for Kubed (config-syncer).

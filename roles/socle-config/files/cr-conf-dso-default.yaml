@@ -27,7 +27,8 @@ spec:
     adminPassword: anotherGreatPassword
     chartVersion: ""
   ingress: {}
-  keycloak: {}
+  keycloak:
+    chartVersion: ""
   kubed:
     chartVersion: ""
   nexus:

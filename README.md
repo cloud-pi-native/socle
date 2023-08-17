@@ -18,6 +18,7 @@
     - [Chaîne complète](#chaîne-complète)
     - [Un ou plusieurs outils](#un-ou-plusieurs-outils)
   - [Gel des versions](#gel-des-versions)
+    - [Introduction](#introduction-1)
     - [Argo CD](#argo-cd)
       - [Gel de l'image](#gel-de-limage)
     - [Cert-manager](#cert-manager)
@@ -46,8 +47,9 @@ Les éléments déployés seront les suivants :
 | Argo CD                     | https://argo-cd.readthedocs.io                                               |
 | Cert-manager                | https://cert-manager.io                                                      |
 | Console Cloud π Native      | https://github.com/cloud-pi-native/console                                   |
-| Gitlab                      | https://about.gitlab.com                                                     |
-| Gitlab Runner               | https://docs.gitlab.com/runner                                               |
+| CloudNativePG               | https://cloudnative-pg.io                                                    |
+| GitLab                      | https://about.gitlab.com                                                     |
+| GitLab Runner               | https://docs.gitlab.com/runner                                               |
 | Harbor                      | https://goharbor.io                                                          |
 | Keycloak                    | https://www.keycloak.org                                                     |
 | Kubed                       | https://appscode.com/products/kubed                                          |
@@ -303,7 +305,7 @@ Il s'agit de valeurs de chart helm. Vous pouvez les utiliser ici pour surcharger
 Voici les liens vers les documentations de chart helm pour les outils concernés :
 
 - [Argo CD](https://github.com/bitnami/charts/tree/main/bitnami/argo-cd)
-- [Gitlab](https://docs.gitlab.com/charts)
+- [GitLab](https://docs.gitlab.com/charts)
 - [Harbor](https://github.com/goharbor/harbor-helm)
 - [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
 - [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
@@ -356,7 +358,7 @@ Puis éventuellement l'afficher (exemple avec une `dsc` nommée `ma-dsc`) :
 kubectl get dsc ma-dsc -o yaml
 ```
 
-Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO  dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'extra variable prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
+Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO  dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
 
 Par exemple, si votre nouvelle ressource `dsc` se nomme `ma-dsc`, alors vous lancerez l'installation correspondante comme ceci : 
 
@@ -383,7 +385,7 @@ Ce playbook permet également de cibler un outil en particulier, grâce à l'uti
 ansible-playbook admin-tools/get-credentials.yaml -t keycloak
 ```
 
-Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'extra variable `dsc_cr`, exemple avec la chaîne utilisant la `dsc` nommée `ma-conf` :
+Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`, exemple avec la chaîne utilisant la `dsc` nommée `ma-conf` :
 
 ```bash
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf
@@ -409,7 +411,7 @@ Voici par exemple comment réinstaller uniquement les composants keycloak et con
 ansible-playbook install.yaml -t keycloak,console
 ```
 
-Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votre propre `dsc` (nommée par exemple `ma-dsc`), alors vous utiliserez l'extra variable `dsc_cr` comme ceci :
+Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votre propre `dsc` (nommée par exemple `ma-dsc`), alors vous utiliserez l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` comme ceci :
 
 ```bash
 ansible-playbook install.yaml -e dsc_cr=ma-dsc -t keycloak,console
@@ -441,7 +443,7 @@ Pour le lancer, en vue de désinstaller la chaîne DSO qui utilise la `dsc` par 
 ansible-playbook uninstall.yaml
 ```
 
-**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource de type `dsc`, alors vous devrez utiliser l'extra variable `dsc_cr`, comme ceci (exemple avec une `dsc` nommée `ma-dsc`) :
+**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource de type `dsc`, alors vous devrez utiliser l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`, comme ceci (exemple avec une `dsc` nommée `ma-dsc`) :
 
 ```bash
 ansible-playbook uninstall.yaml -e dsc_cr=ma-dsc
@@ -455,7 +457,15 @@ Pour surveiller l'état d'une désinstallation en cours il sera possible, si vou
 watch "kubectl get ns | grep 'mynamespace-'"
 ```
 
-**Remarque importante** : Par défaut, le playbook de désinstallation lancé sans aucun tag ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`, ni **cert-manager** déployé dans le namespace `cert-manager`. Ceci parce que ces deux composants pourraient être utilisés par une autre instance de la chaîne DSO. Si vous voulez absolument les désinstaller malgré tout, vous pourrez le faire via l'utilisation des tags correspondants. Pour Kubed : `-t kubed` ou bien `-t confSyncer`). Pour cert-manager : `-t cert-manager`.
+**Remarques importantes** :
+- Par défaut le playbook de désinstallation, s'il est lancé sans aucun tag, ne supprimera pas les ressources suivantes :
+  - **Kubed** déployé dans le namespace `openshift-infra`.
+  - **Cert-manager** déployé dans le namespace `cert-manager`.
+  - **CloudNativePG** déployé dans le namespace spécifié par la ressource `dsc` de configuration utilisée lors de l'installation.
+- Les trois composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un des ces trois outils, vous pourrez le faire via l'utilisation des tags correspondants :
+  - Pour Kubed : `-t kubed` (ou bien `-t confSyncer`).
+  - Pour Cert-manager : `-t cert-manager`.
+  - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`).
 
 ### Un ou plusieurs outils
 
@@ -469,7 +479,7 @@ Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configu
 ansible-playbook uninstall.yaml -t keycloak,argocd
 ````
 
-Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre configuration (via une `dsc` nommée `ma-dsc`), vous rajouterez là encore l'extra variable `dsc_cr`. Exemple :
+Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre configuration (via une `dsc` nommée `ma-dsc`), vous rajouterez là encore l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`. Exemple :
 
 ````
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
@@ -479,6 +489,8 @@ ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 
 ## Gel des versions
 
+### Introduction
+
 Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils ou composants utilisés.
 
 Ceci est géré par divers paramètres que vous pourrez spécifier dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
@@ -486,7 +498,7 @@ Ceci est géré par divers paramètres que vous pourrez spécifier dans la resso
 Les sections suivantes détaillent comment procéder, outil par outil.
 
 **Remarques importantes** :
- * Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
+ * Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée.
  * Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
 
 ### Argo CD
@@ -651,7 +663,7 @@ ansible-playbook install.yaml -t console
 ```
 ### GitLab
 
-Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle gitlab déploiera la dernière version **stable** de l'[opérateur Gitlab](https://operatorhub.io/operator/gitlab-operator-kubernetes).
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle gitlab déploiera la dernière version **stable** de l'[opérateur GitLab](https://operatorhub.io/operator/gitlab-operator-kubernetes).
 
 La version exacte de l'opérateur déployé pourra être obtenue à l'aide de la commande suivante (à adapter en fonction de votre namespace) :
 
@@ -665,7 +677,7 @@ Ou bien de manière plus ciblée :
 kubectl get operator gitlab-operator-kubernetes.mynamespace-gitlab -o yaml | yq '.status.components.refs[8].name'
 ```
 
-Via cet opérateur, le rôle tentera de déployer par défaut la version 6.11.10 du chart Helm Gitlab.
+Via cet opérateur, le rôle tentera de déployer par défaut la version 6.11.10 du chart Helm GitLab.
 
 La version de GitLab installée est donc déjà figée via la version du chart utilisée, car il existe une correspondance biunivoque entre les deux.
 

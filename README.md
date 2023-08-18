@@ -22,12 +22,15 @@
     - [Argo CD](#argo-cd)
       - [Gel de l'image](#gel-de-limage)
     - [Cert-manager](#cert-manager)
+    - [CloudNativePG](#cloudnativepg)
+      - [Gel de l'image](#gel-de-limage-1)
     - [Console Cloud π Native](#console-cloud-π-native)
     - [GitLab](#gitlab)
     - [Harbor](#harbor)
       - [Gel des images](#gel-des-images)
     - [Keycloak](#keycloak-1)
-      - [Gel de l'image](#gel-de-limage-1)
+      - [Gel de l'image Keycloak](#gel-de-limage-keycloak)
+      - [Gel de l'image PostgreSQL pour Keycloak](#gel-de-limage-postgresql-pour-keycloak)
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
@@ -241,6 +244,7 @@ spec:
     namespace: mynamespace-keycloak
     subDomain: keycloak
     chartVersion: "16.0.3"
+    postgreSQLimageName: "ghcr.io/cloudnative-pg/postgresql:15.4"
     values:
       image:
         registry: docker.io
@@ -591,7 +595,7 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         imagePullPolicy: IfNotPresent
 ```
 
-Appliquer le changement en utilisant votre fichier de défnition, exemple :
+Appliquer le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -632,6 +636,82 @@ Puis relancer l'installation de cert-manager, laquelle procédera à la mise à 
 ```bash
 ansible-playbook install.yaml -t cert-manager
 ```
+
+### CloudNativePG
+
+**Attention !** Pour un cluster donné, **une seule instance** de CloudNativePG devra être déployée. Si vous souhaitez donc modifier la version de chart utilisée par CloudNativePG, assurez vous préalablement que cette instance n'est pas aussi utilisée par d'autres chaînes DSO ou toute autre application, car cela pourrait les affecter également.
+
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle cloudnativepg déploiera la dernière version du [chart helm CloudNativePG](https://github.com/cloudnative-pg/charts) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de CloudNativePG, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo cloudnative-pg
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+cnpg/cloudnative-pg     0.18.0          1.20.0          CloudNativePG Helm Chart
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer immédiatement la commande de recherche :
+
+```bash
+helm search repo cloudnative-pg
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de CloudNativePG que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l cloudnative-pg
+```
+
+Si vous souhaitez fixer la version du chart helm, et donc celle de CloudNativePG, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  cloudnativepg:
+    namespace: mynamespace-cloudnativepg
+    chartVersion: 0.18.2
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de CloudNativePG, laquelle mettra à jour la version du chart et l'image associée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t cloudnativepg
+```
+#### Gel de l'image
+
+Il existe une correspondance biunivoque entre la version de chart utilisée et la version d'application ("APP VERSION") de l'opérateur.
+
+Ainsi, spécifier une version de chart est suffisant pour geler la version d'image au niveau de l'opérateur.
+
+Comme indiqué dans sa [documentation officielle](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster), par défaut CloudNativePG installera la dernière version mineure disponible de la dernière version majeure de PostgreSQL au moment de la publication de l'opérateur.
+
+De plus, comme l'indique la [FAQ officielle](https://cloudnative-pg.io/documentation/1.20/faq/), CloudNativePG utilise des conteneurs d'application immutables. Cela signifie que le conteneur ne sera pas modifié durant tout son cycle de vie (aucun patch, aucune mise à jour ni changement de configuration).
+
+Si dans nos applications qui s'appuient sur l'opérateur CloudNativePG pour leurs bases de données, nous voulons utiliser une version spécifique de PostgreSQL, et ainsi geler l'image de conteneur correspondante, nous devrons le faire au niveau de la définition de la ressource de type `Cluster`, en principe dans le namespace de notre application.
+
+Le gel d'image de conteneur PostgreSQL est géré par l'installation du socle DSO au niveau de chaque outil faisant appel à l'opérateur CloudNativePG. Il est donc documenté dans la section correspondante des outils en question.
 
 ### Console Cloud π Native
 
@@ -894,7 +974,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : https://github.com/goharbor/harbor-helm/tree/master
 
-Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de défnition, exemple :
+Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -975,9 +1055,9 @@ Puis de relancer l'installation de Keycloak, laquelle mettra à jour la version 
 ```bash
 ansible-playbook install.yaml -t keycloak
 ```
-#### Gel de l'image
+#### Gel de l'image Keycloak
 
-En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de Keycloak de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**). 
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de Keycloak de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/apps/keycloak/configuration/understand-rolling-immutable-tags/)" (**recommandé en production**).
 
 Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : https://hub.docker.com/r/bitnami/keycloak/tags
 
@@ -997,13 +1077,13 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         tag: 19.0.3-debian-11-r22
 ```
 
-Appliquer le changement en utilisant votre fichier de défnition, exemple :
+Appliquer le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Puis relancer l'installation avec le tag `argocd` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
+Puis relancer l'installation avec le tag `keycloak` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t keycloak
@@ -1012,6 +1092,48 @@ ansible-playbook install.yaml -t keycloak
 Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
 
 Les release notes de Keycloak se trouvent ici : https://github.com/keycloak/keycloak/releases
+#### Gel de l'image PostgreSQL pour Keycloak
+
+Tel qu'il est déployé, Keycloak s'appuie sur un cluster de base de donnée PostgreSQL géré par l'opérateur CloudNativePG.
+
+Comme indiqué dans sa [documentation officielle](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster), par défaut CloudNativePG installera la dernière version mineure disponible de la dernière version majeure de PostgreSQL au moment de la publication de l'opérateur.
+
+De plus, comme l'indique la [FAQ officielle](https://cloudnative-pg.io/documentation/1.20/faq/), CloudNativePG utilise des conteneurs d'application immutables. Cela signifie que le conteneur ne sera pas modifié durant tout son cycle de vie (aucun patch, aucune mise à jour ni changement de configuration).
+
+Il est toutefois possible et **recommandé en production** de fixer la version d'image de BDD pour Keycloak.
+
+Pour cela, nous utiliserons l'un des tags d'image immutables proposés par CloudNativePG.
+
+Les tags en question sont disponibles ici : https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql
+
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et d'indiquer le tag souhaité au niveau du paramètre `postgreSQLimageName`. Exemple :
+
+```yaml
+  keycloak:
+    namespace: mynamespace-keycloak
+    subDomain: keycloak
+    chartVersion: "16.0.3"
+    postgreSQLimageName: "ghcr.io/cloudnative-pg/postgresql:15.4"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/keycloak
+        tag: 19.0.3-debian-11-r22
+```
+
+**Attention !** : Comme indiqué dans la [documentation officielle de CloudNativePG](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster) il ne faudra **jamais** utiliser en production de tag tel que `latest` ou juste `15` (sans numéro de version mineure).
+
+Appliquer le changement en utilisant votre fichier de définition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancer l'installation avec le tag `keycloak` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t keycloak
+```
 
 ### Kubed (config-syncer)
 
@@ -1225,7 +1347,7 @@ helm search repo -l sops/sops-secrets-operator
 
 Ceci à condition que vos dépôts soient à jour.
 
-Lorsque vos values ont été actualisées, avec la version d'image désirée, appliquez le changement en utilisant votre fichier de défnition, exemple :
+Lorsque vos values ont été actualisées, avec la version d'image désirée, appliquez le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -1344,7 +1466,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
 
-Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de défnition, exemple :
+Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml

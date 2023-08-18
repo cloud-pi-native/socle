@@ -5,6 +5,7 @@ metadata:
   namespace: {{ dsc.keycloak.namespace }}
 spec:
   instances: 2
+  imageName: {{ dsc.keycloak.postgreSQLimageName }}
 
   # Parameters and pg_hba configuration will be append
   # to the default ones to make the cluster work

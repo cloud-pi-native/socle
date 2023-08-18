@@ -383,6 +383,20 @@ spec:
                     default: 16.0.3
                     description: Keycloak chart version (e.g., "16.0.3").
                     type: string
+                  postgreSQLimageName:
+                    default: ""
+                    description: |
+                      PostgreSQL image name that will be installed by CNPG operator.
+                      By default, the operator will install the latest available minor version of the latest major version of PostgreSQL when the operator was released.
+                      See : https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster
+                      You can override this by setting the postgreSQLimageName here.
+                      In example, you could set the value to "ghcr.io/cloudnative-pg/postgresql:14.9".
+                      Remember you should NEVER use tags like "latest" or just "14" in a production environment.
+                      More about container image requirements here :
+                      https://cloudnative-pg.io/documentation/1.20/container_images/
+                      You can browse available image tags here :
+                      https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql
+                    type: string
                   values:
                     description: |
                       You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values.j2

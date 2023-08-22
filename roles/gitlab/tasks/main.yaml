@@ -34,7 +34,7 @@
           - openid
           - generic
         response_type: code
-        issuer: https://{{ keycloak_domain }}/auth/realms/dso
+        issuer: https://{{ keycloak_domain }}/realms/dso
         client_auth_method: query
         discovery: true
         uid_field: email

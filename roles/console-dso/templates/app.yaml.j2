@@ -36,7 +36,7 @@ spec:
         - name: keycloak.sessionSecret
           value: {{ session_secret }}
         - name: keycloak.domain
-          value: "{{ keycloak_domain }}/auth"
+          value: "{{ keycloak_domain }}"
         - name: keycloak.realm
           value: dso
 {% if dsc.exposedCA.type != 'none' %}

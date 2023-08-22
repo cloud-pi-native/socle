@@ -2,13 +2,6 @@
   hosts: localhost
   gather_facts: false
 
-#  roles:
-#    - name: socle-config
-#      tags:
-#        - always
-
-#  post_tasks:
-
   tasks:
 
     - name: "Get socle config from conf-dso dsc (default)"
@@ -97,70 +90,33 @@
         - confSyncer
         - kubed
 
-    - name: Récupérations des clients Keycloak
-      kubernetes.core.k8s_info:
-        api_version: keycloak.org/v1alpha1
-        kind: KeycloakClient
-        namespace: "{{ dsc.keycloak.namespace }}"
-      register: keycloak_clients
+    - name: Suppression de l'instance CloudNativePG
+      kubernetes.core.helm:
+        name: cloudnative-pg
+        release_namespace: "{{ dsc.cloudnativepg.namespace }}"
+        state: absent
+        wait: true
       tags:
-        - keycloak
+        - never
+        - cnpg
+        - cloudnativepg
 
-    - name: Patch des clients Keycloak (finalizers)
-      kubernetes.core.k8s:
-        state: patched
-        api_version: keycloak.org/v1alpha1
-        kind: KeycloakClient
-        name: "{{ item.metadata.name }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
-        definition:
-          metadata:
-            finalizers: []
-      with_items: "{{ keycloak_clients.resources }}"
-      tags:
-        - keycloak
-
-    - name: Suppression des clients Keycloak
+    - name: Suppression du namespace CloudNativePG
       kubernetes.core.k8s:
         state: absent
-        api_version: keycloak.org/v1alpha1
-        kind: KeycloakClient
-        name: "{{ item.metadata.name }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
-      with_items: "{{ keycloak_clients.resources }}"
+        kind: Namespace
+        name: "{{ dsc.cloudnativepg.namespace }}"
       tags:
-        - keycloak
+        - never
+        - cnpg
+        - cloudnativepg
 
-    - name: Patch des ressources Keycloak (finalizers)
-      kubernetes.core.k8s:
-        state: patched
-        api_version: keycloak.org/v1alpha1
-        kind: "{{ item.kind }}"
-        name: "{{ item.name }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
-        definition:
-          metadata:
-            finalizers: []
-      with_items:
-        - kind: KeycloakRealm
-          name: dso-realm
-        - kind: KeycloakUser
-          name: admin-gitlab
-      tags:
-        - keycloak
-
-    - name: Suppression des ressources Keycloak
-      kubernetes.core.k8s:
+    - name: Suppression de l'instance Keycloak
+      kubernetes.core.helm:
+        name: keycloak
+        release_namespace: "{{ dsc.keycloak.namespace }}"
         state: absent
-        api_version: keycloak.org/v1alpha1
-        kind: "{{ item.kind }}"
-        name: "{{ item.name }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
-      with_items:
-        - kind: KeycloakRealm
-          name: dso-realm
-        - kind: KeycloakUser
-          name: admin-gitlab
+        wait: true
       tags:
         - keycloak
 

@@ -12,6 +12,8 @@ spec:
     chartVersion: ""
   certmanager:
     version: v1.11.0
+  cloudnativepg:
+    chartVersion: ""
   console:
     dbPassword: myAwesomePassword
   gitlab:
@@ -25,7 +27,8 @@ spec:
     adminPassword: anotherGreatPassword
     chartVersion: ""
   ingress: {}
-  keycloak: {}
+  keycloak:
+    chartVersion: ""
   kubed:
     chartVersion: ""
   nexus:

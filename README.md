@@ -18,18 +18,24 @@
     - [Chaîne complète](#chaîne-complète)
     - [Un ou plusieurs outils](#un-ou-plusieurs-outils)
   - [Gel des versions](#gel-des-versions)
+    - [Introduction](#introduction-1)
     - [Argo CD](#argo-cd)
       - [Gel de l'image](#gel-de-limage)
     - [Cert-manager](#cert-manager)
+    - [CloudNativePG](#cloudnativepg)
+      - [Gel de l'image](#gel-de-limage-1)
     - [Console Cloud π Native](#console-cloud-π-native)
     - [GitLab](#gitlab)
     - [Harbor](#harbor)
       - [Gel des images](#gel-des-images)
+    - [Keycloak](#keycloak-1)
+      - [Gel de l'image Keycloak](#gel-de-limage-keycloak)
+      - [Gel de l'image PostgreSQL pour Keycloak](#gel-de-limage-postgresql-pour-keycloak)
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [SOPS](#sops)
-      - [Gel de l'image](#gel-de-limage-1)
+      - [Gel de l'image](#gel-de-limage-2)
     - [Vault](#vault)
       - [Gel des images](#gel-des-images-1)
 
@@ -44,8 +50,9 @@ Les éléments déployés seront les suivants :
 | Argo CD                     | https://argo-cd.readthedocs.io                                               |
 | Cert-manager                | https://cert-manager.io                                                      |
 | Console Cloud π Native      | https://github.com/cloud-pi-native/console                                   |
-| Gitlab                      | https://about.gitlab.com                                                     |
-| Gitlab Runner               | https://docs.gitlab.com/runner                                               |
+| CloudNativePG               | https://cloudnative-pg.io                                                    |
+| GitLab                      | https://about.gitlab.com                                                     |
+| GitLab Runner               | https://docs.gitlab.com/runner                                               |
 | Harbor                      | https://goharbor.io                                                          |
 | Keycloak                    | https://www.keycloak.org                                                     |
 | Kubed                       | https://appscode.com/products/kubed                                          |
@@ -54,7 +61,7 @@ Les éléments déployés seront les suivants :
 | SOPS                        | https://github.com/isindir/sops-secrets-operator                             |
 | HashiCorp Vault             | https://www.vaultproject.io                                                  |
 
-Certains peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
+Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
 ## Prérequis
 
 Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.
@@ -146,17 +153,21 @@ spec:
         tag: 2.7.6-debian-11-r2
   certmanager:
     version: v1.11.0
+  cloudnativepg:
+    namespace: mynamespace-cloudnativepg
+    chartVersion: 0.18.2
   console:
     dbPassword: AnotherPassBitesTheDust
     namespace: mynamespace-console
-    release: 4.1.0
+    release: 5.4.0
     subDomain: console
   gitlab:
     insecureCI: true
     namespace: mynamespace-gitlab
     subDomain: gitlab
-    version: "6.11.5"
+    version: "7.0.8"
   global:
+    environment: production
     projectsRootDir:
       - my-root-dir
       - projects-sub-dir
@@ -232,6 +243,13 @@ spec:
   keycloak:
     namespace: mynamespace-keycloak
     subDomain: keycloak
+    chartVersion: "16.0.3"
+    postgreSQLimageName: "ghcr.io/cloudnative-pg/postgresql:15.4"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/keycloak
+        tag: 19.0.3-debian-11-r22
   kubed:
     chartVersion: "v0.13.2"
   nexus:
@@ -244,7 +262,7 @@ spec:
     host: "192.168.xx.xx"
     http_proxy: http://192.168.xx.xx:3128/
     https_proxy: http://192.168.xx.xx:3128/
-    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
+    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
     port: "3128"
   sonarqube:
     namespace: mynamespace-sonarqube
@@ -276,17 +294,24 @@ spec:
           pullPolicy: IfNotPresent
         updateStrategyType: "RollingUpdate"
 ```
+
+Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec argocd :
+```
+kubectl explain dsc.spec.argocd
+```
+
 ### Utilisation de vos propres values
 
-Comme nous pouvons le voir dans l'exemple ci-dessus, plusieurs outils sont notamment configurés à l'aide d'un champ `values`.
+Comme nous pouvons le voir dans l'exemple de configuration fourni ci-dessus, plusieurs outils sont notamment configurés à l'aide d'un champ `values`.
 
 Il s'agit de valeurs de chart helm. Vous pouvez les utiliser ici pour surcharger les valeurs par défaut.
 
 Voici les liens vers les documentations de chart helm pour les outils concernés :
 
 - [Argo CD](https://github.com/bitnami/charts/tree/main/bitnami/argo-cd)
-- [Gitlab](https://docs.gitlab.com/charts)
+- [GitLab](https://docs.gitlab.com/charts)
 - [Harbor](https://github.com/goharbor/harbor-helm)
+- [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
 - [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
@@ -311,7 +336,7 @@ watch "kubectl get ns | grep 'mynamespace-'"
 
 Suite à une première installation réussie et selon vos besoins, il est possible d'installer dans un même cluster une ou plusieurs autres forges DSO, en parallèle de celle installée par défaut.
 
-Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui, pour rappel, se nomme `conf-dso`, et en y modifiant les noms des namespaces.
+Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui pour rappel se nomme `conf-dso`, et en y modifiant les noms des namespaces.
 
 Comme vu plus haut dans la section [Configuration](#configuration), déclarez votre ressource de type `dsc` personnalisée **dans un fichier YAML**.
 
@@ -337,7 +362,7 @@ Puis éventuellement l'afficher (exemple avec une `dsc` nommée `ma-dsc`) :
 kubectl get dsc ma-dsc -o yaml
 ```
 
-Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO  dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'extra variable prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
+Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO  dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
 
 Par exemple, si votre nouvelle ressource `dsc` se nomme `ma-dsc`, alors vous lancerez l'installation correspondante comme ceci : 
 
@@ -364,7 +389,7 @@ Ce playbook permet également de cibler un outil en particulier, grâce à l'uti
 ansible-playbook admin-tools/get-credentials.yaml -t keycloak
 ```
 
-Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'extra variable `dsc_cr`, exemple avec la chaîne utilisant la `dsc` nommée `ma-conf` :
+Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`, exemple avec la chaîne utilisant la `dsc` nommée `ma-conf` :
 
 ```bash
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf
@@ -390,32 +415,24 @@ Voici par exemple comment réinstaller uniquement les composants keycloak et con
 ansible-playbook install.yaml -t keycloak,console
 ```
 
-Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votre propre `dsc` (nommée par exemple `ma-dsc`), alors vous utiliserez l'extra variable `dsc_cr` comme ceci :
+Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votre propre `dsc` (nommée par exemple `ma-dsc`), alors vous utiliserez l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` comme ceci :
 
 ```bash
 ansible-playbook install.yaml -e dsc_cr=ma-dsc -t keycloak,console
 ```
 
 ### Keycloak
-L'opérateur Keycloak peut être assez capricieux. Son état souhaité est `status.phase == 'reconciling'`.
 
-En cas d'échec lors de l'installation, vous vérifierez ce qu'il en est avec la commande :
+La BDD PostgreSQL du composant Keycloak est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/), via le role "cloudnativepg".
 
-```bash
-kubectl get keycloak dso-keycloak -n mynamespace-keycloak -o yaml
-```
+Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement que cet opérateur n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
+- L'API "postgresql.cnpg.io/v1".
+- La "MutatingWebhookConfiguration" nommée "cnpg-mutating-webhook-configuration".
 
-Ou bien si vous avez installé la commande `yq` :
+Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur CloudNativePG n'est pas installé. Le rôle associé procédera donc à son installation.
 
-```bash
-kubectl get keycloak dso-keycloak -n mynamespace-keycloak -o yaml | yq '.status.phase'
-```
+**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux éléments vérifiés par le role soient toujours présents. Dans ce cas de figure, l'installation de Keycloak échouera car l'opérateur CloudNativePG n'aura pas été installé par le role.  
 
-Il se peut que Keycloak reste bloqué en status "initializing" mais que tout soit provisionné. Dans ce cas, relancez plutôt le playbook avec l'extra variable `KEYCLOAK_NO_CHECK` comme ceci :
-
-```bash
-ansible-playbook install.yaml -e KEYCLOAK_NO_CHECK=
-```
 ## Désinstallation
 
 ### Chaîne complète
@@ -430,7 +447,7 @@ Pour le lancer, en vue de désinstaller la chaîne DSO qui utilise la `dsc` par 
 ansible-playbook uninstall.yaml
 ```
 
-**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource de type `dsc`, alors vous devrez utiliser l'extra variable `dsc_cr`, comme ceci (exemple avec une `dsc` nommée `ma-dsc`) :
+**Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource de type `dsc`, alors vous devrez utiliser l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`, comme ceci (exemple avec une `dsc` nommée `ma-dsc`) :
 
 ```bash
 ansible-playbook uninstall.yaml -e dsc_cr=ma-dsc
@@ -444,7 +461,15 @@ Pour surveiller l'état d'une désinstallation en cours il sera possible, si vou
 watch "kubectl get ns | grep 'mynamespace-'"
 ```
 
-**Remarque importante** : Par défaut, le playbook de désinstallation lancé sans aucun tag ne supprimera pas la ressource **kubed**, déployée dans le namespace `openshift-infra`, ni **cert-manager** déployé dans le namespace `cert-manager`. Ceci parce que ces deux composants pourraient être utilisés par une autre instance de la chaîne DSO. Si vous voulez absolument les désinstaller malgré tout, vous pourrez le faire via l'utilisation des tags correspondants. Pour Kubed : `-t kubed` ou bien `-t confSyncer`). Pour cert-manager : `-t cert-manager`.
+**Remarques importantes** :
+- Par défaut le playbook de désinstallation, s'il est lancé sans aucun tag, ne supprimera pas les ressources suivantes :
+  - **Kubed** déployé dans le namespace `openshift-infra`.
+  - **Cert-manager** déployé dans le namespace `cert-manager`.
+  - **CloudNativePG** déployé dans le namespace spécifié par la ressource `dsc` de configuration utilisée lors de l'installation.
+- Les trois composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un des ces trois outils, vous pourrez le faire via l'utilisation des tags correspondants :
+  - Pour Kubed : `-t kubed` (ou bien `-t confSyncer`).
+  - Pour Cert-manager : `-t cert-manager`.
+  - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`).
 
 ### Un ou plusieurs outils
 
@@ -458,7 +483,7 @@ Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configu
 ansible-playbook uninstall.yaml -t keycloak,argocd
 ````
 
-Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre configuration (via une `dsc` nommée `ma-dsc`), vous rajouterez là encore l'extra variable `dsc_cr`. Exemple :
+Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre configuration (via une `dsc` nommée `ma-dsc`), vous rajouterez là encore l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`. Exemple :
 
 ````
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
@@ -468,6 +493,8 @@ ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 
 ## Gel des versions
 
+### Introduction
+
 Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils ou composants utilisés.
 
 Ceci est géré par divers paramètres que vous pourrez spécifier dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
@@ -475,7 +502,7 @@ Ceci est géré par divers paramètres que vous pourrez spécifier dans la resso
 Les sections suivantes détaillent comment procéder, outil par outil.
 
 **Remarques importantes** :
- * Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'extra variable `dsc_cr` appropriée.
+ * Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée.
  * Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
 
 ### Argo CD
@@ -568,7 +595,7 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         imagePullPolicy: IfNotPresent
 ```
 
-Appliquer le changement en utilisant votre fichier de défnition, exemple :
+Appliquer le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -610,6 +637,82 @@ Puis relancer l'installation de cert-manager, laquelle procédera à la mise à 
 ansible-playbook install.yaml -t cert-manager
 ```
 
+### CloudNativePG
+
+**Attention !** Pour un cluster donné, **une seule instance** de CloudNativePG devra être déployée. Si vous souhaitez donc modifier la version de chart utilisée par CloudNativePG, assurez vous préalablement que cette instance n'est pas aussi utilisée par d'autres chaînes DSO ou toute autre application, car cela pourrait les affecter également.
+
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle cloudnativepg déploiera la dernière version du [chart helm CloudNativePG](https://github.com/cloudnative-pg/charts) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de CloudNativePG, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo cloudnative-pg
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+cnpg/cloudnative-pg     0.18.0          1.20.0          CloudNativePG Helm Chart
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer immédiatement la commande de recherche :
+
+```bash
+helm search repo cloudnative-pg
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de CloudNativePG que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l cloudnative-pg
+```
+
+Si vous souhaitez fixer la version du chart helm, et donc celle de CloudNativePG, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  cloudnativepg:
+    namespace: mynamespace-cloudnativepg
+    chartVersion: 0.18.2
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de CloudNativePG, laquelle mettra à jour la version du chart et l'image associée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t cloudnativepg
+```
+#### Gel de l'image
+
+Il existe une correspondance biunivoque entre la version de chart utilisée et la version d'application ("APP VERSION") de l'opérateur.
+
+Ainsi, spécifier une version de chart est suffisant pour geler la version d'image au niveau de l'opérateur.
+
+Comme indiqué dans sa [documentation officielle](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster), par défaut CloudNativePG installera la dernière version mineure disponible de la dernière version majeure de PostgreSQL au moment de la publication de l'opérateur.
+
+De plus, comme l'indique la [FAQ officielle](https://cloudnative-pg.io/documentation/1.20/faq/), CloudNativePG utilise des conteneurs d'application immutables. Cela signifie que le conteneur ne sera pas modifié durant tout son cycle de vie (aucun patch, aucune mise à jour ni changement de configuration).
+
+Si dans nos applications qui s'appuient sur l'opérateur CloudNativePG pour leurs bases de données, nous voulons utiliser une version spécifique de PostgreSQL, et ainsi geler l'image de conteneur correspondante, nous devrons le faire au niveau de la définition de la ressource de type `Cluster`, en principe dans le namespace de notre application.
+
+Le gel d'image de conteneur PostgreSQL est géré par l'installation du socle DSO au niveau de chaque outil faisant appel à l'opérateur CloudNativePG. Il est donc documenté dans la section correspondante des outils en question.
+
 ### Console Cloud π Native
 
 Le composant console est déployé directement via son manifest, téléchargé sur GitHub.
@@ -640,7 +743,7 @@ ansible-playbook install.yaml -t console
 ```
 ### GitLab
 
-Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle gitlab déploiera la dernière version **stable** de l'[opérateur Gitlab](https://operatorhub.io/operator/gitlab-operator-kubernetes).
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle gitlab déploiera la dernière version **stable** de l'[opérateur GitLab](https://operatorhub.io/operator/gitlab-operator-kubernetes).
 
 La version exacte de l'opérateur déployé pourra être obtenue à l'aide de la commande suivante (à adapter en fonction de votre namespace) :
 
@@ -654,7 +757,7 @@ Ou bien de manière plus ciblée :
 kubectl get operator gitlab-operator-kubernetes.mynamespace-gitlab -o yaml | yq '.status.components.refs[8].name'
 ```
 
-Via cet opérateur, le rôle tentera de déployer par défaut la version 6.11.10 du chart Helm Gitlab.
+Via cet opérateur, le rôle tentera de déployer par défaut la version 6.11.10 du chart Helm GitLab.
 
 La version de GitLab installée est donc déjà figée via la version du chart utilisée, car il existe une correspondance biunivoque entre les deux.
 
@@ -871,7 +974,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : https://github.com/goharbor/harbor-helm/tree/master
 
-Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de défnition, exemple :
+Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -891,7 +994,146 @@ watch "oc get all -n mynamespace-harbor"
 
 Vous devriez observer la suppression et le remplacement des pods impactés par vos changements.
 
+### Keycloak
 
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle keycloak déploiera la dernière version du [chart helm Bitnami Keycloak](https://bitnami.com/stack/keycloak/helm) disponible dans le cache des dépôts helm de l'utilisateur.
+
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de Keycloak, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
+
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+
+```bash
+helm search repo bitnami/keycloak
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+bitnami/keycloak        15.1.7          21.1.2          Keycloak is a high performance Java-based ident...
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer immédiatement la commande de recherche :
+
+```bash
+helm search repo bitnami/keycloak
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de Keycloak que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l bitnami/keycloak
+```
+
+Si vous souhaitez fixer la version du chart helm, et donc celle de Keycloak, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
+
+```yaml
+  keycloak:
+    namespace: mynamespace-keycloak
+    subDomain: keycloak
+    chartVersion: "16.0.3"
+```
+
+Il vous suffit alors de mettre à jour votre configuration, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis de relancer l'installation de Keycloak, laquelle mettra à jour la version du chart et l'image associée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t keycloak
+```
+#### Gel de l'image Keycloak
+
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de Keycloak de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/apps/keycloak/configuration/understand-rolling-immutable-tags/)" (**recommandé en production**).
+
+Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : https://hub.docker.com/r/bitnami/keycloak/tags
+
+Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "19.0.3-debian-11-r22" est un tag immutable.
+
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+
+```yaml
+  keycloak:
+    namespace: mynamespace-keycloak
+    subDomain: keycloak
+    chartVersion: "16.0.3"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/keycloak
+        tag: 19.0.3-debian-11-r22
+```
+
+Appliquer le changement en utilisant votre fichier de définition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancer l'installation avec le tag `keycloak` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t keycloak
+```
+
+Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+
+Les release notes de Keycloak se trouvent ici : https://github.com/keycloak/keycloak/releases
+#### Gel de l'image PostgreSQL pour Keycloak
+
+Tel qu'il est déployé, Keycloak s'appuie sur un cluster de base de donnée PostgreSQL géré par l'opérateur CloudNativePG.
+
+Comme indiqué dans sa [documentation officielle](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster), par défaut CloudNativePG installera la dernière version mineure disponible de la dernière version majeure de PostgreSQL au moment de la publication de l'opérateur.
+
+De plus, comme l'indique la [FAQ officielle](https://cloudnative-pg.io/documentation/1.20/faq/), CloudNativePG utilise des conteneurs d'application immutables. Cela signifie que le conteneur ne sera pas modifié durant tout son cycle de vie (aucun patch, aucune mise à jour ni changement de configuration).
+
+Il est toutefois possible et **recommandé en production** de fixer la version d'image de BDD pour Keycloak.
+
+Pour cela, nous utiliserons l'un des tags d'image immutables proposés par CloudNativePG.
+
+Les tags en question sont disponibles ici : https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql
+
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et d'indiquer le tag souhaité au niveau du paramètre `postgreSQLimageName`. Exemple :
+
+```yaml
+  keycloak:
+    namespace: mynamespace-keycloak
+    subDomain: keycloak
+    chartVersion: "16.0.3"
+    postgreSQLimageName: "ghcr.io/cloudnative-pg/postgresql:15.4"
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/keycloak
+        tag: 19.0.3-debian-11-r22
+```
+
+**Attention !** : Comme indiqué dans la [documentation officielle de CloudNativePG](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster) il ne faudra **jamais** utiliser en production de tag tel que `latest` ou juste `15` (sans numéro de version mineure).
+
+Appliquer le changement en utilisant votre fichier de définition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancer l'installation avec le tag `keycloak` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t keycloak
+```
 
 ### Kubed (config-syncer)
 
@@ -1105,7 +1347,7 @@ helm search repo -l sops/sops-secrets-operator
 
 Ceci à condition que vos dépôts soient à jour.
 
-Lorsque vos values ont été actualisées, avec la version d'image désirée, appliquez le changement en utilisant votre fichier de défnition, exemple :
+Lorsque vos values ont été actualisées, avec la version d'image désirée, appliquez le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -1224,7 +1466,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
 
-Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de défnition, exemple :
+Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml

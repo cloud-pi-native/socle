@@ -1,0 +1,65 @@
+---
+keycloak_clients:
+  - clientId: "gitlab-client"
+    clientAuthenticatorType: "client-secret"
+    standardFlowEnabled: true
+    redirectUris:
+      - "https://{{ gitlab_domain }}/users/auth/openid_connect/callback"
+    webOrigins:
+      - "https://{{ gitlab_domain }}"
+    defaultClientScopes:
+      - "generic"
+  - clientId: console-frontend-client
+    standardFlowEnabled: true
+    publicClient: true
+    redirectUris: "{{ lookup('ansible.builtin.template', 'console-frontend-redirectUris.yaml') | from_yaml }}"
+    webOrigins: "{{ lookup('ansible.builtin.template', 'console-frontend-webOrigins.yaml') | from_yaml }}"
+    defaultClientScopes:
+      - generic
+  - clientId: console-backend-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ console_domain }}/*
+      - https://{{ console_domain }}/
+    webOrigins:
+      - https://{{ console_domain }}
+    defaultClientScopes:
+      - generic
+  - clientId: argo-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ argocd_domain }}/auth/callback
+      - "*"
+    webOrigins:
+      - https://{{ argocd_domain }}
+    defaultClientScopes:
+      - generic
+  - clientId: portail-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - "*"
+    webOrigins:
+      - "*"
+    defaultClientScopes:
+      - generic
+  - clientId: sonar-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ sonar_domain }}/auth/callback
+    webOrigins:
+      - https://{{ sonar_domain }}
+    defaultClientScopes:
+      - generic
+  - clientId: harbor-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ harbor_domain }}/c/oidc/callback
+    webOrigins:
+      - https://{{ harbor_domain }}
+    defaultClientScopes:
+      - generic

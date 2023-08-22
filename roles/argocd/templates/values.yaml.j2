@@ -19,7 +19,7 @@ server:
     clusterResources: "true"
     url: "https://{{ argocd_domain }}/"
     oidc.config: |
-      issuer: https://{{ keycloak_domain }}/auth/realms/dso
+      issuer: https://{{ keycloak_domain }}/realms/dso
       requestedScopes: ["openid", "generic"]
       name: Keycloak
       clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}

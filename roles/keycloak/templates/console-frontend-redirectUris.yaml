@@ -1,0 +1,5 @@
+- "https://{{ console_domain }}/*"
+{% if dsc.global.environment == 'development' %}
+- "http://dso.local/*"
+- "http://console.dso.local/*"
+{% endif %}

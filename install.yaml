@@ -25,6 +25,11 @@
         - confSyncer
         - kubed
 
+    - name: cloudnativepg
+      tags:
+        - cloudnativepg
+        - always
+
     - name: keycloak
       tags:
         - keycloak

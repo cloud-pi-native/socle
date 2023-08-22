@@ -1,0 +1,34 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-keycloak
+  namespace: {{ dsc.keycloak.namespace }}
+spec:
+  instances: 2
+  imageName: {{ dsc.keycloak.postgreSQLimageName }}
+
+  # Parameters and pg_hba configuration will be append
+  # to the default ones to make the cluster work
+  postgresql:
+    parameters:
+      max_worker_processes: "60"
+    pg_hba:
+      # To access through TCP/IP you will need to get username
+      # and password from the secret pg-cluster-keycloak-app
+      - host keycloak keycloak all md5
+
+  bootstrap:
+    initdb:
+      database: keycloak
+      owner: keycloak
+
+  # Example of rolling update strategy:
+  # - unsupervised: automated update of the primary once all
+  #                 replicas have been upgraded (default)
+  # - supervised: requires manual supervision to perform
+  #               the switchover of the primary
+  primaryUpdateStrategy: unsupervised
+
+  # Require 1Gi of space per instance using default storage class
+  storage:
+    size: 1Gi

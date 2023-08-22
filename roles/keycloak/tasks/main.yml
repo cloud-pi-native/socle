@@ -1,55 +1,117 @@
-- name: Install operator group and subscription
+- name: Create Keycloak namespace
   kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_items:
-    - operator-group.yaml.j2
-    - operator-subscription.yaml.j2
-    - realm.yaml.j2
+    name: "{{ dsc.keycloak.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
 
-- name: Launch keycloak instance
+- name: Create PostgreSQL cluster and keycloak database
   kubernetes.core.k8s:
-    template: keycloak.j2
+    template: pg-cluster-keycloak.yaml.j2
 
-- name: Wait Keycloak instance
-  block:
-    - name: Waiting for Keycloak instance
-      kubernetes.core.k8s_info:
-        kind: keycloak
-        namespace: "{{ dsc.keycloak.namespace }}"
-        name: dso-keycloak
-        api_version: keycloak.org/v1alpha1
-      register: keycloak_instance
-      failed_when: >
-        (keycloak_instance.resources[0].status.phase is defined and keycloak_instance.resources[0].status.phase == 'failing') or keycloak_instance.attempts > 28
-      until: >
-        (keycloak_instance.resources[0].status.phase is defined and keycloak_instance.resources[0].status.phase == 'reconciling') or
-        KEYCLOAK_NO_CHECK is defined
-      retries: 30
-      delay: 10
-  rescue:
-    - name: Failed start keycloak disclaimer
-      ansible.builtin.debug:
-        msg: |
-          KEYCLOAK didn't start in 5 minutes please check its status
-          "kubectl get keycloak dso-keycloak -o yaml"
-          Re-run playbook when 'status.phase' is 'reconciling' or run with "-e KEYCLOAK_NO_CHECK=" at your own risk
+- name: Wait pg-cluster-keycloak-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: pg-cluster-keycloak-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
 
-- name: Find keycloak admin password
+- name: Wait job.batch/pg-cluster-keycloak-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: pg-cluster-keycloak-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-keycloak-2-join to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: pg-cluster-keycloak-2-join
+  register: job2
+  until: job2.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Get Keycloak admin password secret
+  no_log: true
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
-    name: "{{ keycloak_instance.resources[0].status.credentialSecret }}"
-  register: kc_admin
-  until: kc_admin.resources | length > 0
-  retries: 10
+    name: "keycloak"
+  register: kc_adm_pass_secret
+
+- name: Set Keycloak admin password secret
+  when: kc_adm_pass_secret.resources | length == 0
+  no_log: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        admin-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')|b64encode }}"
+      metadata:
+        name: keycloak
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
+
+- name: Add bitnami helm repo
+  kubernetes.core.helm_repository:
+    name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+
+- name: Set Keycloak helm values
+  ansible.builtin.set_fact:
+    kc_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+
+- name: Merge with Keycloak user values
+  ansible.builtin.set_fact:
+    kc_values: "{{ kc_values | combine(dsc.keycloak['values'], recursive=True) }}"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: keycloak
+    chart_ref: bitnami/keycloak
+    chart_version: "{{ dsc.keycloak.chartVersion }}"
+    release_namespace: "{{ dsc.keycloak.namespace }}"
+    values: "{{ kc_values }}"
+
+- name: Wait Keycloak URL
+  ansible.builtin.uri:
+    url: "https://{{ keycloak_domain }}"
+    method: GET
+    status_code: [200, 202]
+    return_content: false
+  register: kc_response
+  until: kc_response is not failed
+  retries: 30
   delay: 5
 
-- name: Set admin ids facts
-  ansible.builtin.set_fact:
-    keycloak_admin_password: "{{ kc_admin.resources[0].data.ADMIN_PASSWORD | b64decode }}"
-    keycloak_admin: "{{ kc_admin.resources[0].data.ADMIN_USERNAME | b64decode }}"
+- name: Get Keycloak admin password
+  no_log: true
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.keycloak.namespace }}"
+    kind: Secret
+    name: "keycloak"
+  register: kc_adm_pass
 
-- name: Update inventory
+- name: Set Keycloak admin credentials facts
+  no_log: true
+  ansible.builtin.set_fact:
+    keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password']|b64decode }}"
+    keycloak_admin: "admin"
+
+- name: Update console inventory
+  no_log: true
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
@@ -60,22 +122,74 @@
         KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password }}"
         KEYCLOAK_ADMIN: "{{ keycloak_admin }}"
 
-- name: Generate admin password
-  ansible.builtin.set_fact:
-    admin_user_password: "{{ ansible_inventory.resources[0].data.KC_PASSWORD }}"
-  when: ansible_inventory.resources[0].data.KC_PASSWORD is defined
+- name: Get Keycloak API token
+  no_log: true
+  ansible.builtin.uri:
+    url: "https://{{ keycloak_domain }}/realms/master/protocol/openid-connect/token"
+    method: POST
+    status_code: [200, 202]
+    return_content: true
+    body: "username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli"
+  register: kc_token
 
-- name: Find dso admin password
+- name: Set kc_access_token fact
+  no_log: true
+  ansible.builtin.set_fact:
+    kc_access_token: "{{ kc_token.json.access_token }}"
+
+- name: Get keycloak realms from API
+  no_log: true
+  ansible.builtin.uri:
+    url: "https://{{ keycloak_domain }}/admin/realms"
+    method: GET
+    status_code: [200, 202]
+    return_content: true
+    body_format: json
+    headers:
+      Authorization: "bearer {{ kc_access_token }}"
+  register: kc_realms
+
+- name: Create dso realm
+  when: kc_realms.json | selectattr('realm', 'equalto', 'dso') | length == 0
+  no_log: true
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    id: dso
+    realm: dso
+    display_name: Dso Realm
+    enabled: true
+
+- name: Get keycloak dso realm users from API
+  no_log: true
+  ansible.builtin.uri:
+    url: "https://{{ keycloak_domain }}/admin/realms/dso/users"
+    method: GET
+    status_code: [200, 202]
+    return_content: true
+    body_format: json
+    headers:
+      Authorization: "bearer {{ kc_access_token }}"
+  register: kc_dso_users
+
+- name: Find dso admin secret
+  no_log: true
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
     name: dso-admin-user-secret
-  register: dso_admin
+  register: dso_admin_secret
 
-- name: Create dso admin secret
-  when: dso_admin.resources | length == 0
+- name: Create dso admin secret and user
+  when: (dso_admin_secret.resources | length == 0) or (kc_dso_users.json | selectattr('username', 'equalto', dso_admin_secret.resources[0].data.ADMIN_USER|b64decode) | length == 0)
+  no_log: true
   block:
-    - name: Generate admin password
+    - name: Generate admin user password
       ansible.builtin.set_fact:
         admin_user_password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters,digits') }}"
 
@@ -87,44 +201,48 @@
             namespace: "{{ dsc.keycloak.namespace }}"
             name: dso-admin-user-secret
           data:
-            ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"
+            ADMIN_USER: "{{ 'admin@example.com'|b64encode }}"
+            ADMIN_USER_PASSWORD: "{{ admin_user_password|b64encode }}"
           type: Opaque
 
-    - name: Create dso user
-      kubernetes.core.k8s:
-        template: keycloak-create-admin-user.yaml.j2
+    - name: Remove dso admin user
+      community.general.keycloak_user:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ keycloak_domain }}
+        auth_realm: master
+        auth_username: "{{ keycloak_admin }}"
+        auth_password: "{{ keycloak_admin_password }}"
+        state: absent
+        realm: dso
+        username: admin@example.com
 
-- name: Create alternative route
-  kubernetes.core.k8s:
-    template: keycloak-ingress.yaml.j2
-
-- name: Wait Keycloak URL
-  ansible.builtin.uri:
-    url: "https://{{ keycloak_domain }}"
-    method: GET
-    status_code: [200, 202]
-    return_content: false
-  register: kc_response
-  until: kc_response is not failed
-  retries: 15
-  delay: 5
-
-- name: Get Keycloak API token
-  ansible.builtin.uri:
-    url: "https://{{ keycloak_domain }}/auth/realms/master/protocol/openid-connect/token"
-    method: POST
-    status_code: [200, 202]
-    return_content: true
-    body: "username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli"
-  register: kc_token
-
-- name: Set kc_access_token fact
-  ansible.builtin.set_fact:
-    kc_access_token: "{{ kc_token.json.access_token }}"
+    - name: Create dso admin user
+      community.general.keycloak_user:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ keycloak_domain }}
+        auth_realm: master
+        auth_username: "{{ keycloak_admin }}"
+        auth_password: "{{ keycloak_admin_password }}"
+        state: present
+        realm: dso
+        credentials:
+            - temporary: false
+              type: password
+              value: "{{ admin_user_password }}"
+        username: admin@example.com
+        first_name: Admin
+        last_name: Admin
+        email: admin@example.com
+        enabled: true
+        email_verified: true
+#        force: true  ## Ne fontionne pas quand user supprimé via la GUI et tâche relancée.
 
 - name: Get dso keycloak client scopes from API
+  no_log: true
   ansible.builtin.uri:
-    url: "https://{{ keycloak_domain }}/auth/admin/realms/dso/client-scopes"
+    url: "https://{{ keycloak_domain }}/admin/realms/dso/client-scopes"
     method: GET
     status_code: [200, 202]
     return_content: true
@@ -135,10 +253,11 @@
 
 - name: Create generic keycloak client scope
   when: kc_client_scopes.json | selectattr('name', 'equalto', 'generic') | length == 0
+  no_log: true
   community.general.keycloak_clientscope:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}/auth
+    auth_keycloak_url: https://{{ keycloak_domain }}
     auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
@@ -151,174 +270,69 @@
       display.on.consent.screen: true
       gui.order: ''
       consent.screen.text: ''
-    protocolMappers:
-      - id: e0491f43-3e4c-4649-b16e-3c0e47bbc2c0
-        name: family name
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-property-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: lastName
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: family_name
-          jsonType.label: String
-      - id: 000f3a6c-bec3-40dd-8397-0c45019df7e0
-        name: given name
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-property-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: firstName
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: given_name
-          jsonType.label: String
-      - id: 2acd698c-03d2-4d0b-99a4-db00ed08f25d
-        name: name
-        protocol: openid-connect
-        protocolMapper: oidc-full-name-mapper
-        config:
-          id.token.claim: true
-          access.token.claim: true
-          userinfo.token.claim: true
-      - id: 13e8d53a-415f-4f98-a133-8795e0173efd
-        name: phone number
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-attribute-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: phoneNumber
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: phone_number
-          jsonType.label: String
-      - id: 5a8652b6-9a42-48e5-819f-59259c349883
-        name: acr loa level
-        protocol: openid-connect
-        protocolMapper: oidc-acr-mapper
-        config:
-          id.token.claim: true
-          access.token.claim: true
-      - id: 9d090281-1d17-4283-8fb7-183e1b536328
-        name: nickname
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-attribute-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: nickname
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: nickname
-          jsonType.label: String
-      - id: 79bccac1-d0f1-4c28-a040-e0e640889e52
-        name: username
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-property-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: username
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: preferred_username
-          jsonType.label: String
-      - id: 7d976f67-441d-4491-a1fe-f17343a03120
-        name: full name
-        protocol: openid-connect
-        protocolMapper: oidc-full-name-mapper
-        config:
-          id.token.claim: true
-          access.token.claim: true
-          userinfo.token.claim: true
-      - id: 5ca2ebe3-ef32-4f62-bcad-e764c70d20e6
-        name: locale
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-attribute-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: locale
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: locale
-          jsonType.label: String
-      - id: 84629e2c-c129-4d49-bb04-a03a5124ed47
-        name: email verified
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-property-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: emailVerified
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: email_verified
-          jsonType.label: boolean
-      - id: bb8a7b6e-2f1a-46b2-91e1-8d027dabe93d
-        name: updated at
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-attribute-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: updatedAt
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: updated_at
-          jsonType.label: long
-      - id: f5c4b940-47ad-4734-8712-4f53357cff1c
-        name: middle name
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-attribute-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: middleName
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: middle_name
-          jsonType.label: String
-      - id: e1e82435-1b52-4b41-aa0e-14a3e9779670
-        name: groups
-        protocol: openid-connect
-        protocolMapper: oidc-group-membership-mapper
-        config:
-          full.path: true
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: groups
-          userinfo.token.claim: true
-      - id: c3803e56-b542-45e3-a780-0fb70841dd5c
-        name: email
-        protocol: openid-connect
-        protocolMapper: oidc-usermodel-property-mapper
-        config:
-          userinfo.token.claim: true
-          user.attribute: email
-          id.token.claim: true
-          access.token.claim: true
-          claim.name: email
-          jsonType.label: String
+    protocolMappers: "{{ lookup('ansible.builtin.file', 'generic-client-scope-protocolMappers.yaml') | from_yaml }}"
 
-- name: Create clients
-  kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_items:
-    - keycloak-gitlab-client.yaml.j2
-    - keycloak-console-frontend-client.yaml.j2
-    - keycloak-console-backend-client.yaml.j2
-    - keycloak-argo-client.yaml.j2
-    - keycloak-portail-client.yaml.j2
-    - keycloak-sonar-client.yaml.j2
-    - keycloak-harbor-client.yaml.j2
-
-- name: Create base admins groups
-  community.general.keycloak_group:
+- name: Create Keycloak clients
+  community.general.keycloak_client:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    name: "{{ item }}"
-    realm: dso
-    state: present
+    auth_client_id: "admin-cli"
+    auth_keycloak_url: "https://{{ keycloak_domain }}"
+    auth_realm: "master"
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: "present"
+    realm: "dso"
+    clientId: "{{ item.clientId }}"
+    clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
+    standardFlowEnabled: "{{ item.standardFlowEnabled }}"
+    publicClient: "{{ item.publicClient | default(omit) }}"
+    redirectUris: "{{ item.redirectUris }}"
+    webOrigins: "{{ item.webOrigins }}"
+    defaultClientScopes: "{{ item.defaultClientScopes }}"
+  loop: "{{ keycloak_clients }}"
+
+- name: Get clients secrets from Keycloak
+  no_log: true
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}/auth
+    auth_keycloak_url: https://{{ keycloak_domain }}
     auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: "{{ item.clientId }}"
+  loop: "{{ keycloak_clients }}"
+  register: kc_clients_secrets
+
+- name: Set Keycloak clients secrets in Keycloak namespace
+  no_log: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ item.clientId|b64encode }}"
+        CLIENT_SECRET: "{{ kc_clients_secrets.results | selectattr('invocation.module_args.clientId', 'equalto', item.clientId) | selectattr('clientsecret_info.value', 'defined') | map(attribute='clientsecret_info.value') | default(' ', true) | join('') | b64encode }}"
+      metadata:
+        name: "keycloak-client-secret-{{ item.clientId }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
+  loop: "{{ keycloak_clients }}"
+
+- name: Create base admins groups
+  no_log: true
+  community.general.keycloak_group:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    name: "{{ item }}"
   with_items:
     - admin
     - ArgoCDAdmins

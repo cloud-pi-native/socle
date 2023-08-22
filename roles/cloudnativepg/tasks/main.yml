@@ -1,0 +1,50 @@
+- name: Get cluster infos
+  kubernetes.core.k8s_cluster_info:
+  register: cluster_infos
+
+- name: Check if CloudNativePG operator api exists
+  ansible.builtin.set_fact:
+    cnpg_api: "{{ cluster_infos.apis['postgresql.cnpg.io/v1'] | default('absent') }}"
+
+- name: Chek if cnpg-mutating-webhook-configuration exists
+  kubernetes.core.k8s_info:
+    kind: MutatingWebhookConfiguration
+    name: cnpg-mutating-webhook-configuration
+  register: cnpg_mwhc
+
+- name: Install CloudNativePG operator
+  when: (cnpg_api == 'absent') or (cnpg_mwhc.resources | length == 0)
+  block:
+    - name: Create CloudNativePG namespace
+      kubernetes.core.k8s:
+        name: "{{ dsc.cloudnativepg.namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Add CloudNativePG helm repo
+      kubernetes.core.helm_repository:
+        name: cnpg
+        repo_url: https://cloudnative-pg.github.io/charts
+
+    - name: Set CloudNativePG helm values
+      ansible.builtin.set_fact:
+        cnpg_values: "{{ lookup('template', 'cnpg-values.yaml.j2') | from_yaml }}"
+
+    - name: Deploy CloudNativePG helm
+      kubernetes.core.helm:
+        name: cloudnative-pg
+        chart_ref: cnpg/cloudnative-pg
+        chart_version: "{{ dsc.cloudnativepg.chartVersion }}"
+        release_namespace: "{{ dsc.cloudnativepg.namespace }}"
+        values: "{{ cnpg_values }}"
+
+    - name: Wait cnpg-webhook-service endpoint
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: "{{ dsc.cloudnativepg.namespace }}"
+        name: cnpg-webhook-service
+      register: endpoint
+      until: endpoint.resources[0].subsets[0].addresses[0] is defined
+      retries: 15
+      delay: 5

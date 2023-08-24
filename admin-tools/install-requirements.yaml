@@ -1,0 +1,102 @@
+---
+- name: Install Cloud Pi Native DSO socle requirements
+  hosts: localhost
+  gather_facts: true
+
+  vars:
+    python_modules:
+      - pyyaml
+      - kubernetes
+      - python-gitlab
+
+  tasks:
+
+    - name: Install pip
+      become: yes
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
+
+    - name: Install Python modules
+      ansible.builtin.pip:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ python_modules }}"
+
+    - name: Install collection kubernetes.core
+      community.general.ansible_galaxy_install:
+        type: collection
+        name: kubernetes.core
+
+    - name: Install kubectl and helm on Debian family distributions
+      when: ansible_facts['os_family'] == 'Debian'
+      become: true
+      block:
+        - name: Create /etc/apt/keyrings directory
+          ansible.builtin.file:
+            path: /etc/apt/keyrings
+            state: directory
+            mode: '0755'
+            owner: root
+            group: root
+
+        - name: Add Apt signing key for Kubernetes package repositories
+          ansible.builtin.apt_key:
+            url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key 
+            keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+            state: present
+
+        - name: Add Kubernetes apt repository
+          ansible.builtin.lineinfile:
+            path: /etc/apt/sources.list.d/kubernetes.list
+            line: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /'
+            create: yes
+
+        - name: Add Apt signing key for Helm package repositories
+          ansible.builtin.apt_key:
+            url: https://baltocdn.com/helm/signing.asc
+            keyring: /etc/apt/keyrings/helm.gpg
+            state: present
+
+        - name: Add Helm apt repository
+          ansible.builtin.lineinfile:
+            path: /etc/apt/sources.list.d/helm-stable-debian.list
+            line: "deb [signed-by=/etc/apt/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"
+            create: yes
+
+        - name: Update apt package index
+          ansible.builtin.apt:
+            update_cache: true
+
+        - name: Install kubectl and helm packages
+          ansible.builtin.apt:
+            name:
+              - kubectl
+              - helm
+            state: present
+
+    - name: Install Snap package manager on Debian family distributions
+      when: ansible_facts['os_family'] == 'Debian'
+      become: true
+      block:
+        - name: Update apt package index
+          ansible.builtin.apt:
+            update_cache: true
+
+        - name: Install snapd package
+          ansible.builtin.apt:
+            name:
+              - snapd
+
+    - name: Install yq snap
+      become: true
+      community.general.snap:
+        name:
+          - yq
+
+    - name: Install age encryption tool
+      become: yes
+      ansible.builtin.package:
+        name: age
+        state: present
+

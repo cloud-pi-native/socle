@@ -28,7 +28,7 @@
         type: collection
         name: kubernetes.core
 
-    - name: Install kubectl and helm on Debian family distributions
+    - name: "Install kubectl, helm and snapd on Debian family distributions"
       when: ansible_facts['os_family'] == 'Debian'
       become: true
       block:
@@ -68,35 +68,29 @@
           ansible.builtin.apt:
             update_cache: true
 
-        - name: Install kubectl and helm packages
+        - name: "Install kubectl, helm and snapd packages"
           ansible.builtin.apt:
             name:
               - kubectl
               - helm
-            state: present
-
-    - name: Install Snap package manager on Debian family distributions
-      when: ansible_facts['os_family'] == 'Debian'
-      become: true
-      block:
-        - name: Update apt package index
-          ansible.builtin.apt:
-            update_cache: true
-
-        - name: Install snapd package
-          ansible.builtin.apt:
-            name:
               - snapd
+            state: present
 
     - name: Install yq snap
       become: true
       community.general.snap:
+        channel: "latest/stable"
+        classic: true
+        state: "present"
         name:
           - yq
+      register: yq_install
+      retries: 3
+      delay: 5
+      until: "yq_install is not failed"
 
     - name: Install age encryption tool
-      become: yes
+      become: true
       ansible.builtin.package:
         name: age
         state: present
-

@@ -100,6 +100,8 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
 
 - La commande [helm](https://helm.sh/docs/intro/install/).
 
+- Le gestionnaire de paquets [Snap](https://snapcraft.io/docs/installing-snapd) pour l'installation de la commande `yq`.
+
 - La commande [yq](https://github.com/mikefarah/yq/#install) (facultative mais utile pour debug).
 
 - L'outil d'encryption [age](https://github.com/FiloSottile/age#installation), qui fournit les commandes `age` et `age-keygen` nécessaires pour l'installation de SOPS.

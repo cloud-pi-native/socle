@@ -1,0 +1,88 @@
+---
+- name: "Install Cloud Pi Native DSO socle requirements"
+  hosts: localhost
+  gather_facts: true
+
+  vars:
+    packages:
+      - git
+      - python3-pip
+      - ruby
+      - tar
+    python_modules:
+      - pyyaml
+      - kubernetes
+      - python-gitlab
+    apps:
+      - kubectl
+      - helm
+      - yq
+      - age
+
+  tasks:
+
+    - name: "Install some required packages"
+      become: yes
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages  }}"
+
+    - name: "Install Python modules"
+      ansible.builtin.pip:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ python_modules }}"
+
+    - name: "Install collection kubernetes.core"
+      community.general.ansible_galaxy_install:
+        type: collection
+        name: kubernetes.core
+
+    - name: "Check if Homebrew is already installed"
+      ansible.builtin.stat:
+        path: /home/linuxbrew/.linuxbrew
+      register: homebrew
+
+    - name: "Install Homebrew"
+      when: not homebrew.stat.exists
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  
+    - name: Get Homebrew shellenv
+      ansible.builtin.shell:
+        cmd: "/home/linuxbrew/.linuxbrew/bin/brew shellenv"
+      register: homebrew_shellenv
+      changed_when: false
+
+    - name: "Check if user .bash_profile exists"
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.bash_profile"
+      register: user_bash_profile
+
+    - name: "Check if user .profile exists"
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.profile"
+      register: user_profile
+
+    - name: "Add Homebrew shellenv lines to user .bash_profile"
+      when: (user_bash_profile.stat.exists) and (homebrew_shellenv.stdout | length > 0)
+      ansible.builtin.blockinfile:
+        path: "{{ user_bash_profile.stat.path }}"
+        block: |
+          {{ homebrew_shellenv.stdout }}
+
+    - name: "Add Homebrew shellenv lines to user .profile"
+      when: (user_profile.stat.exists) and (homebrew_shellenv.stdout | length > 0)
+      ansible.builtin.blockinfile:
+        path: "{{ user_profile.stat.path }}"
+        block: | 
+          {{ homebrew_shellenv.stdout }}
+
+    - name: "Install final requirements with Homebrew"
+      community.general.homebrew:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ apps }}"
+      

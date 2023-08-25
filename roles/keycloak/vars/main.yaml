@@ -49,7 +49,7 @@ keycloak_clients:
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
-      - https://{{ sonar_domain }}/auth/callback
+      - https://{{ sonar_domain }}/*
     webOrigins:
       - https://{{ sonar_domain }}
     defaultClientScopes:

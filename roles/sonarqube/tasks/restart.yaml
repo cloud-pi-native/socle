@@ -1,0 +1,10 @@
+- name: Restart sonarqube
+  ansible.builtin.uri:
+    url: "https://{{ sonar_domain }}/api/system/restart"
+    user: "{{ token_pass }}"
+    force_basic_auth: true
+    method: POST
+
+- name: Post-install configuration
+  ansible.builtin.include_tasks:
+    file: wait_ready.yaml

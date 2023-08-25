@@ -132,3 +132,12 @@
     - name: Reset password disclaimer
       ansible.builtin.debug:
         msg: /!\ PLEASE ENSURE YOU RESET ADMIN PASSWORD /!\
+
+- name: Set fact sonar token
+  when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is defined
+  ansible.builtin.set_fact:  
+    token_pass: "{{ ansible_inventory.resources[0].data.SONAR_API_TOKEN }}"
+
+- name: Post-install configuration
+  ansible.builtin.include_tasks:
+    file: setup.yaml

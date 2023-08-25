@@ -104,15 +104,13 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
 
 - Collection Ansible [kubernetes.core](https://github.com/ansible-collections/kubernetes.core) si elle n'est pas déjà présente.
 
-- Gestionnaire de paquets [Homebrew](https://brew.sh/) pour une installation simplifiée des prérequis restants sur la plupart des distributions GNU/Linux utilisables en production. Testé sous Debian, Ubuntu, Red Hat et Rocky Linux.
+- Gestionnaire de paquets [Homebrew](https://brew.sh/) pour une installation simplifiée des prérequis restants sur la plupart des distributions GNU/Linux utilisables en production. Testé sous Debian, Ubuntu, Red Hat Enterprise Linux et Rocky Linux.
 
-- Commande [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/), installée avec Homebrew.
-
-- Commande [helm](https://helm.sh/docs/intro/install/), installée avec Homebrew.
-
-- La commande [yq](https://github.com/mikefarah/yq/#install), facultative mais utile pour debug, installée avec Homebrew.
-
-- L'outil d'encryption [age](https://github.com/FiloSottile/age#installation), installé avec Homebrew. Il fournit les commandes `age` et `age-keygen` nécessaires pour l'installation de SOPS.
+- Commandes installées avec Homebrew :
+  - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+  - [helm](https://helm.sh/docs/intro/install/)
+  - [yq](https://github.com/mikefarah/yq/#install), facultative mais utile pour debug.
+  - [age](https://github.com/FiloSottile/age#installation), outil de chiffrement qui fournit les commandes `age` et `age-keygen` nécessaires pour l'installation de SOPS.
 
 ## Configuration
 

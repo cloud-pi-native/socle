@@ -74,7 +74,7 @@ Toujours sur votre environnement de déploiement, vous devrez :
 - Clôner le présent [dépôt](https://github.com/cloud-pi-native/socle).
 - Disposer d'un fichier de configuration ```~/.kube/config``` paramétré avec les accès administrateur, pour l'appel à l'API du cluster (section users du fichier en question).
 
-L'installation de la suite des prérequis **sur l'environnement de déploiement'** s'effectue à l'aide du playbook nommé `install-requirements.yaml`. Il est mis à disposition dans le répertoire `admin-tools` du dépôt socle que vous aurez clôné.
+L'installation de la suite des prérequis **sur l'environnement de déploiement** s'effectue à l'aide du playbook nommé `install-requirements.yaml`. Il est mis à disposition dans le répertoire `admin-tools` du dépôt socle que vous aurez clôné.
 
 Si l'utilisateur avec lequel vous exécutez ce playbook dispose des droits sudo sans mot de passe (option NOPASSWD du fichier sudoers), vous pourrez le lancer directement sans options :
 

@@ -1,96 +1,88 @@
 ---
-- name: Install Cloud Pi Native DSO socle requirements
+- name: "Install Cloud Pi Native DSO socle requirements"
   hosts: localhost
   gather_facts: true
 
   vars:
+    packages:
+      - git
+      - python3-pip
+      - ruby
+      - tar
     python_modules:
       - pyyaml
       - kubernetes
       - python-gitlab
+    apps:
+      - kubectl
+      - helm
+      - yq
+      - age
 
   tasks:
 
-    - name: Install pip
+    - name: "Install some required packages"
       become: yes
       ansible.builtin.package:
-        name: python3-pip
+        name: "{{ item }}"
         state: present
+      loop: "{{ packages  }}"
 
-    - name: Install Python modules
+    - name: "Install Python modules"
       ansible.builtin.pip:
         name: "{{ item }}"
         state: present
       loop: "{{ python_modules }}"
 
-    - name: Install collection kubernetes.core
+    - name: "Install collection kubernetes.core"
       community.general.ansible_galaxy_install:
         type: collection
         name: kubernetes.core
 
-    - name: "Install kubectl, helm and snapd on Debian family distributions"
-      when: ansible_facts['os_family'] == 'Debian'
-      become: true
-      block:
-        - name: Create /etc/apt/keyrings directory
-          ansible.builtin.file:
-            path: /etc/apt/keyrings
-            state: directory
-            mode: '0755'
-            owner: root
-            group: root
+    - name: "Check if Homebrew is already installed"
+      ansible.builtin.stat:
+        path: /home/linuxbrew/.linuxbrew
+      register: homebrew
 
-        - name: Add Apt signing key for Kubernetes package repositories
-          ansible.builtin.apt_key:
-            url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key 
-            keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-            state: present
+    - name: "Install Homebrew"
+      when: not homebrew.stat.exists
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  
+    - name: Get Homebrew shellenv
+      ansible.builtin.shell:
+        cmd: "/home/linuxbrew/.linuxbrew/bin/brew shellenv"
+      register: homebrew_shellenv
+      changed_when: false
 
-        - name: Add Kubernetes apt repository
-          ansible.builtin.lineinfile:
-            path: /etc/apt/sources.list.d/kubernetes.list
-            line: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /'
-            create: yes
+    - name: "Check if user .bash_profile exists"
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.bash_profile"
+      register: user_bash_profile
 
-        - name: Add Apt signing key for Helm package repositories
-          ansible.builtin.apt_key:
-            url: https://baltocdn.com/helm/signing.asc
-            keyring: /etc/apt/keyrings/helm.gpg
-            state: present
+    - name: "Check if user .profile exists"
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.profile"
+      register: user_profile
 
-        - name: Add Helm apt repository
-          ansible.builtin.lineinfile:
-            path: /etc/apt/sources.list.d/helm-stable-debian.list
-            line: "deb [signed-by=/etc/apt/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"
-            create: yes
+    - name: "Add Homebrew shellenv lines to user .bash_profile"
+      when: (user_bash_profile.stat.exists) and (homebrew_shellenv.stdout | length > 0)
+      ansible.builtin.blockinfile:
+        path: "{{ user_bash_profile.stat.path }}"
+        block: |
+          {{ homebrew_shellenv.stdout }}
 
-        - name: Update apt package index
-          ansible.builtin.apt:
-            update_cache: true
+    - name: "Add Homebrew shellenv lines to user .profile"
+      when: (user_profile.stat.exists) and (homebrew_shellenv.stdout | length > 0)
+      ansible.builtin.blockinfile:
+        path: "{{ user_profile.stat.path }}"
+        block: | 
+          {{ homebrew_shellenv.stdout }}
 
-        - name: "Install kubectl, helm and snapd packages"
-          ansible.builtin.apt:
-            name:
-              - kubectl
-              - helm
-              - snapd
-            state: present
-
-    - name: Install yq snap
-      become: true
-      community.general.snap:
-        channel: "latest/stable"
-        classic: true
-        state: "present"
-        name:
-          - yq
-      register: yq_install
-      retries: 3
-      delay: 5
-      until: "yq_install is not failed"
-
-    - name: Install age encryption tool
-      become: true
-      ansible.builtin.package:
-        name: age
+    - name: "Install final requirements with Homebrew"
+      community.general.homebrew:
+        name: "{{ item }}"
         state: present
+      loop: "{{ apps }}"
+      

@@ -1,6 +1,7 @@
 - name: Restart sonarqube
   ansible.builtin.uri:
     url: "https://{{ sonar_domain }}/api/system/restart"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     user: "{{ token_pass }}"
     force_basic_auth: true
     method: POST

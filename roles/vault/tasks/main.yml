@@ -99,6 +99,7 @@
   ansible.builtin.uri:
     url: "https://{{ vault_domain }}"
     method: GET
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     status_code: [200, 202]
     return_content: false
   register: vault_response

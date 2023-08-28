@@ -2,6 +2,7 @@
   ansible.builtin.uri:
     url: "https://{{ sonar_domain }}/api/plugins/pending"
     return_content: true
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     user: "{{ token_pass }}"
     force_basic_auth: true
   register: plugins_pending
@@ -15,6 +16,7 @@
   ansible.builtin.uri:
     url: "https://{{ sonar_domain }}/api/plugins/installed"
     return_content: true
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     user: "{{ token_pass }}"
     force_basic_auth: true
   register: plugins_installed
@@ -27,6 +29,7 @@
         url: "https://{{ sonar_domain }}/api/plugins/install?key=authoidc"
         return_content: true
         user: "{{ token_pass }}"
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         force_basic_auth: true
         method: POST
         status_code: 204

@@ -9,14 +9,16 @@ keycloak_clients:
       - "https://{{ gitlab_domain }}"
     defaultClientScopes:
       - "generic"
-  - clientId: console-frontend-client
+
+  - clientId: console-frontend
     standardFlowEnabled: true
     publicClient: true
     redirectUris: "{{ lookup('ansible.builtin.template', 'console-frontend-redirectUris.yaml') | from_yaml }}"
     webOrigins: "{{ lookup('ansible.builtin.template', 'console-frontend-webOrigins.yaml') | from_yaml }}"
     defaultClientScopes:
       - generic
-  - clientId: console-backend-client
+
+  - clientId: console-backend
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
@@ -26,6 +28,7 @@ keycloak_clients:
       - https://{{ console_domain }}
     defaultClientScopes:
       - generic
+
   - clientId: argo-client
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
@@ -36,6 +39,7 @@ keycloak_clients:
       - https://{{ argocd_domain }}
     defaultClientScopes:
       - generic
+
   - clientId: portail-client
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
@@ -45,6 +49,7 @@ keycloak_clients:
       - "*"
     defaultClientScopes:
       - generic
+
   - clientId: sonar-client
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
@@ -54,6 +59,7 @@ keycloak_clients:
       - https://{{ sonar_domain }}
     defaultClientScopes:
       - generic
+
   - clientId: harbor-client
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true

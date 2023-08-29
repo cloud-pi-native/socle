@@ -168,6 +168,7 @@ spec:
                     type: string
                 required:
                 - chartVersion
+                - namespace
                 type: object
               console:
                 description: Configuration for the console.
@@ -540,6 +541,7 @@ spec:
             - ingress
             - proxy
             - certmanager
+            - cloudnativepg
             - console
             - sonarqube
             - vault

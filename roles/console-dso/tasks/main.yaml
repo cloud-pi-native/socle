@@ -6,7 +6,7 @@
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ dsc.keycloak.namespace }}"
-    name: keycloak-client-secret-console-frontend-client
+    name: keycloak-client-secret-console-frontend
   register: console_frontend_secret
   failed_when: console_frontend_secret.resources | length == 0
 
@@ -14,7 +14,7 @@
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ dsc.keycloak.namespace }}"
-    name: keycloak-client-secret-console-backend-client
+    name: keycloak-client-secret-console-backend
   register: console_backend_secret
   failed_when: console_backend_secret.resources | length == 0
 

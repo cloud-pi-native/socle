@@ -3,6 +3,7 @@
     url: "https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}"
     user: "{{ token_pass }}"
     force_basic_auth: true
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: post
     status_code: 204
   with_items:
@@ -30,6 +31,7 @@
     url: "https://{{ sonar_domain }}/api/settings/values"
     return_content: true
     user: "{{ token_pass }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
   register: current_sonar_settings
 
@@ -43,6 +45,7 @@
     user: "{{ token_pass }}"
     force_basic_auth: true
     method: POST
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     status_code: 204
   with_items: "{{ to_update_settings  }}"
 
@@ -56,6 +59,7 @@
     url: "https://{{ sonar_domain }}/api/settings/values"
     return_content: true
     user: "{{ token_pass }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
   register: current_sonar_settings
 
@@ -87,6 +91,7 @@
   ansible.builtin.uri:
     url: "https://{{ sonar_domain }}/api/settings/set?{{ item }}"
     user: "{{ token_pass }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
     method: POST
     status_code: 204

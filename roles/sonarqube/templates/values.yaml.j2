@@ -8,6 +8,8 @@ OpenShift:
 
 image:
   pullPolicy: IfNotPresent
+  tag: {{ dsc.sonarqube.tag }}
+  repository: docker.io/sonarqube
 
 securityContext:
   fsGroup: 1000
@@ -23,6 +25,7 @@ ingress:
   hosts:
     - name: "{{ sonar_domain }}"
       pathType: Prefix
+      path: "/"
   annotations:
     route.openshift.io/termination: "edge"
 {% for key, val in dsc.ingress.annotations.items() %}

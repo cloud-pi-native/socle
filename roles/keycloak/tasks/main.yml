@@ -42,7 +42,6 @@
   delay: 5
 
 - name: Get Keycloak admin password secret
-  no_log: true
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
@@ -51,7 +50,6 @@
 
 - name: Set Keycloak admin password secret
   when: kc_adm_pass_secret.resources | length == 0
-  no_log: true
   kubernetes.core.k8s:
     state: present
     definition:
@@ -98,7 +96,6 @@
   delay: 5
 
 - name: Get Keycloak admin password
-  no_log: true
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
@@ -106,13 +103,11 @@
   register: kc_adm_pass
 
 - name: Set Keycloak admin credentials facts
-  no_log: true
   ansible.builtin.set_fact:
     keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password']|b64decode }}"
     keycloak_admin: "admin"
 
 - name: Update console inventory
-  no_log: true
   kubernetes.core.k8s:
     kind: ConfigMap
     name: dso-config
@@ -124,7 +119,6 @@
         KEYCLOAK_ADMIN: "{{ keycloak_admin }}"
 
 - name: Get Keycloak API token
-  no_log: true
   ansible.builtin.uri:
     url: "https://{{ keycloak_domain }}/realms/master/protocol/openid-connect/token"
     method: POST
@@ -135,12 +129,10 @@
   register: kc_token
 
 - name: Set kc_access_token fact
-  no_log: true
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
 
 - name: Get keycloak realms from API
-  no_log: true
   ansible.builtin.uri:
     url: "https://{{ keycloak_domain }}/admin/realms"
     method: GET
@@ -154,7 +146,6 @@
 
 - name: Create dso realm
   when: kc_realms.json | selectattr('realm', 'equalto', 'dso') | length == 0
-  no_log: true
   community.general.keycloak_realm:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
@@ -169,7 +160,6 @@
     enabled: true
 
 - name: Get keycloak dso realm users from API
-  no_log: true
   ansible.builtin.uri:
     url: "https://{{ keycloak_domain }}/admin/realms/dso/users"
     method: GET
@@ -182,7 +172,6 @@
   register: kc_dso_users
 
 - name: Find dso admin secret
-  no_log: true
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
@@ -191,7 +180,6 @@
 
 - name: Create dso admin secret and user
   when: (dso_admin_secret.resources | length == 0) or (kc_dso_users.json | selectattr('username', 'equalto', dso_admin_secret.resources[0].data.ADMIN_USER|b64decode) | length == 0)
-  no_log: true
   block:
     - name: Generate admin user password
       ansible.builtin.set_fact:
@@ -244,7 +232,6 @@
 #        force: true  ## Ne fontionne pas quand user supprimé via la GUI et tâche relancée.
 
 - name: Get dso keycloak client scopes from API
-  no_log: true
   ansible.builtin.uri:
     url: "https://{{ keycloak_domain }}/admin/realms/dso/client-scopes"
     method: GET
@@ -258,7 +245,6 @@
 
 - name: Create generic keycloak client scope
   when: kc_client_scopes.json | selectattr('name', 'equalto', 'generic') | length == 0
-  no_log: true
   community.general.keycloak_clientscope:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
@@ -282,7 +268,6 @@
   with_items: "{{ keycloak_clients }}"
 
 - name: Create base admins groups
-  no_log: true
   community.general.keycloak_group:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli

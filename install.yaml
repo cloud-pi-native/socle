@@ -18,7 +18,7 @@
     - name: cert-manager
       tags:
         - cert-manager
-        - always
+        - cm
 
     - name: confSyncer
       tags:
@@ -28,11 +28,12 @@
     - name: cloudnativepg
       tags:
         - cloudnativepg
-        - always
+        - cnpg
 
     - name: keycloak
       tags:
         - keycloak
+        - sso
 
     - name: nexus
       tags:
@@ -41,6 +42,7 @@
     - name: sonarqube
       tags:
         - sonarqube
+        - sonar
 
     - name: gitlab
       tags:
@@ -49,9 +51,11 @@
     - name: gitlab-catalog
       tags:
         - catalog
+        - gitlab-catalog
 
     - name: gitlab-runner
       tags:
+        - runner
         - gitlab-runner
 
     - name: vault
@@ -66,6 +70,7 @@
       tags:
         - gitops
         - argocd
+        - argo
 
     - name: harbor
       tags:
@@ -76,3 +81,9 @@
       tags:
         - console
         - console-dso
+
+  post_tasks:
+    - debug:
+        msg: "{{ dsc | get_debug_messages }}"
+      tags:
+        - always

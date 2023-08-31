@@ -4,8 +4,8 @@ metadata:
   name: pg-cluster-sonar
   namespace: {{ dsc.sonarqube.namespace }}
 spec:
-  instances: 1
-  imageName: {{ dsc.sonarqube.postgreSQLimageName }}
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:15.4
 
   # Parameters and pg_hba configuration will be append
   # to the default ones to make the cluster work
@@ -31,5 +31,5 @@ spec:
 
   # Require 1Gi of space per instance using default storage class
   storage:
-    size: {{ dsc.sonarqube.postgreSQLvolumeSize }}
+    size: 5Gi
 

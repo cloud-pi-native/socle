@@ -5,7 +5,7 @@ metadata:
   namespace: {{ dsc.keycloak.namespace }}
 spec:
   instances: 2
-  imageName: {{ dsc.keycloak.postgreSQLimageName }}
+  imageName: ghcr.io/cloudnative-pg/postgresql:15.3
 
   # Parameters and pg_hba configuration will be append
   # to the default ones to make the cluster work

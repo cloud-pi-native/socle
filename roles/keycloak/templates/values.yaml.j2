@@ -1,4 +1,5 @@
 image:
+  registry: docker.io
   pullPolicy: "IfNotPresent"
 
 auth:
@@ -15,15 +16,11 @@ proxy: "edge"
 
 httpRelativePath: "/"
 
-initContainers: "[]"
-
 configuration: ""
 
 existingConfigmap: ""
 
 extraStartupArgs: ""
-
-initdbScripts: ""
 
 initdbScriptsConfigMap: ""
 
@@ -60,7 +57,7 @@ podSecurityContext:
 containerSecurityContext:
   enabled: false
 
-  resources:
+resources:
   limits:
     memory: "2048Mi"
   requests:
@@ -123,19 +120,21 @@ ingress:
   servicePort: "http"
   annotations:
     route.openshift.io/termination: "edge"
-{% for key, val in dsc.ingress.annotations.items() %}
-    {{ key }}: "{{ val }}"
-{% endfor %}
   labels: 
     app: "keycloak"
 {% for key, val in dsc.ingress.labels.items() %}
     {{ key }}: "{{ val }}"
 {% endfor %}
   tls: true
+{% if dsc.ingress.tls.type == "tlsSecret" %}
   selfSigned: false
   extraHosts: []
   extraPaths: []
-  extraTls: []
+  extraTls:
+    - hosts:
+       - "{{ keycloak_domain }}"
+      secretName: "{{ dsc.ingress.tls.tlsSecret.name }}"
+{% endif %}
   secrets: []
   extraRules: []
 

@@ -149,7 +149,8 @@
         command: >
           bash -c "echo 'PersonalAccessToken.create!(user_id: 1
           , name: \"ANSIBLE-DSO\"
-          , scopes: [:api, :read_repository, :write_repository]).token' | gitlab-rails console"
+          , scopes: [:api, :read_repository, :write_repository]
+          , expires_at: 365.days.from_now).token' | gitlab-rails console"
       register: token
 
     - name: Set new gitlab token

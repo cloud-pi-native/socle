@@ -6,9 +6,9 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: post
     status_code: 204
-  with_items:
-    - scan
-    - provisioning
+  with_items: []
+#    - scan
+#    - provisioning
 
 - name: Get Sonar client secret
   kubernetes.core.k8s_info:

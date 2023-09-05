@@ -8,13 +8,13 @@
     auth_password: "{{ keycloak_admin_password }}"
     state: "present"
     realm: "dso"
-    clientId: "{{ item.clientId }}"
-    clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
-    standardFlowEnabled: "{{ item.standardFlowEnabled }}"
-    publicClient: "{{ item.publicClient | default(omit) }}"
-    redirectUris: "{{ item.redirectUris }}"
-    webOrigins: "{{ item.webOrigins }}"
-    defaultClientScopes: "{{ item.defaultClientScopes }}"
+    client_id: "{{ item.clientId }}"
+    client_authenticator_type: "{{ item.clientAuthenticatorType | default(omit) }}"
+    standard_flow_enabled: "{{ item.standardFlowEnabled }}"
+    public_client: "{{ item.publicClient | default(omit) }}"
+    redirect_uris: "{{ item.redirectUris }}"
+    web_origins: "{{ item.webOrigins }}"
+    default_client_scopes: "{{ item.defaultClientScopes }}"
 
 - name: Get clients secrets from Keycloak
   when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'
@@ -26,10 +26,9 @@
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     realm: dso
-    clientId: "{{ item.clientId }}"
+    client_id: "{{ item.clientId }}"
   register: kc_clients_secrets
 
-- debug: var=kc_clients_secrets
 - name: Set Keycloak clients secrets in Keycloak namespace
   when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'
   kubernetes.core.k8s:

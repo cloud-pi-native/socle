@@ -8,22 +8,31 @@
   delay: 5
   until: vault_health.json is defined
 
-- name: Set vault_status to OK
-  ansible.builtin.set_fact:
-    vault_status: OK
-  when: vault_health.json.initialized == true and vault_health.json.sealed == false
-
-- name: Set vault_status to "not init"
-  ansible.builtin.set_fact:
-    vault_status: not init
-  when: vault_health.json.initialized == false
-
 - name: Set vault_status to unavailable
   ansible.builtin.set_fact:
     vault_status: unavailable
   when: vault_health.status == 503
 
-- name: Set vault_status to sealed
-  ansible.builtin.set_fact:
-    vault_status: sealed
-  when: vault_health.json.initialized == false and vault_health.json.sealed == true
+- name: If Vault json is defined
+  when: vault_health.json is defined
+  block:
+    - name: Set vault_status to sealed
+      ansible.builtin.set_fact:
+        vault_status: sealed
+      when: vault_health.json.sealed
+      
+    - name: Set vault_status to "not init"
+      ansible.builtin.set_fact:
+        vault_status: not init
+      when: not vault_health.json.initialized
+      
+    - name: Set vault_status to OK
+      ansible.builtin.set_fact:
+        vault_status: OK
+      when: vault_health.json.initialized and not vault_health.json.sealed
+
+
+
+
+
+

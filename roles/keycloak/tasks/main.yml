@@ -60,7 +60,7 @@
       data:
         admin-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')|b64encode }}"
       metadata:
-        name: keycloak
+        name: keycloak-bkp
         namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque
 

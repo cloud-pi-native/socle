@@ -1,6 +1,7 @@
 # Installation de la plateforme DSO
 
 ## Sommaire
+
 - [Installation de la plateforme DSO](#installation-de-la-plateforme-dso)
   - [Sommaire](#sommaire)
   - [Introduction](#introduction)
@@ -38,6 +39,9 @@
       - [Gel de l'image](#gel-de-limage-2)
     - [Vault](#vault)
       - [Gel des images](#gel-des-images-1)
+    - [Les commandes de l'application](#les-commandes-de-lapplication)
+  - [Conventions](#conventions)
+  - [Contributions](#contributions)
 
 ## Introduction
 
@@ -47,21 +51,22 @@ Les éléments déployés seront les suivants :
 
 | Outil                       | Site officiel                                                                |
 | --------------------------- | ---------------------------------------------------------------------------- |
-| Argo CD                     | https://argo-cd.readthedocs.io                                               |
-| Cert-manager                | https://cert-manager.io                                                      |
-| Console Cloud π Native      | https://github.com/cloud-pi-native/console                                   |
-| CloudNativePG               | https://cloudnative-pg.io                                                    |
-| GitLab                      | https://about.gitlab.com                                                     |
-| GitLab Runner               | https://docs.gitlab.com/runner                                               |
-| Harbor                      | https://goharbor.io                                                          |
-| Keycloak                    | https://www.keycloak.org                                                     |
-| Kubed                       | https://appscode.com/products/kubed                                          |
-| Sonatype Nexus Repository   | https://www.sonatype.com/products/sonatype-nexus-repository                  |
-| SonarQube Community Edition | https://www.sonarsource.com/open-source-editions/sonarqube-community-edition |
-| SOPS                        | https://github.com/isindir/sops-secrets-operator                             |
-| HashiCorp Vault             | https://www.vaultproject.io                                                  |
+| Argo CD                     | <https://argo-cd.readthedocs.io>                                               |
+| Cert-manager                | <https://cert-manager.io>                                                      |
+| Console Cloud π Native      | <https://github.com/cloud-pi-native/console>                                   |
+| CloudNativePG               | <https://cloudnative-pg.io>                                                    |
+| GitLab                      | <https://about.gitlab.com>                                                     |
+| GitLab Runner               | <https://docs.gitlab.com/runner>                                               |
+| Harbor                      | <https://goharbor.io>                                                          |
+| Keycloak                    | <https://www.keycloak.org>                                                     |
+| Kubed                       | <https://appscode.com/products/kubed>                                          |
+| Sonatype Nexus Repository   | <https://www.sonatype.com/products/sonatype-nexus-repository>                  |
+| SonarQube Community Edition | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
+| SOPS                        | <https://github.com/isindir/sops-secrets-operator>                             |
+| HashiCorp Vault             | <https://www.vaultproject.io>                                                  |
 
 Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
+
 ## Prérequis
 
 Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.
@@ -71,6 +76,7 @@ Vous devrez disposer d'un **accès administrateur au cluster**.
 Vous aurez besoin d'une machine distincte du cluster, tournant sous GNU/Linux avec une distribution de la famille Debian ou Red Hat. Cette machine vous servira en tant qu'**environnement de déploiement** [Ansible control node](https://docs.ansible.com/ansible/latest/network/getting_started/basic_concepts.html#control-node). Elle nécessitera donc l'installation d'[Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html), et plus précisément du paquet **ansible**, pour disposer au moins de la commande `ansible-playbook` ainsi que de la collection [community.general](https://github.com/ansible-collections/community.general).
 
 Toujours sur votre environnement de déploiement, vous devrez :
+
 - Clôner le présent [dépôt](https://github.com/cloud-pi-native/socle).
 - Disposer d'un fichier de configuration ```~/.kube/config``` paramétré avec les accès administrateur, pour l'appel à l'API du cluster (section users du fichier en question).
 
@@ -87,6 +93,7 @@ Sinon vous devrez utiliser l'option `-K` (abréviation de l'option `--ask-become
 ```bash
 ansible-playbook -K admin-tools/install-requirements.yaml
 ```
+
 Pour information, le playbook `install-requirements.yaml` vous installera les éléments suivants **sur l'environnement de déploiement** :
 
 - Paquet requis pour l'installation des modules python :
@@ -309,6 +316,7 @@ spec:
 ```
 
 Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec argocd :
+
 ```
 kubectl explain dsc.spec.argocd
 ```
@@ -331,6 +339,7 @@ Voici les liens vers les documentations de chart helm pour les outils concernés
 ## Installation
 
 ### Lancement
+
 Dès que votre [configuration](#configuration) est prête, c'est à dire que la ressource `dsc` par défaut  `conf-dso` a bien été mise à jour, relancez la commande suivante :
 
 ```bash
@@ -377,13 +386,14 @@ kubectl get dsc ma-dsc -o yaml
 
 Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO  dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
 
-Par exemple, si votre nouvelle ressource `dsc` se nomme `ma-dsc`, alors vous lancerez l'installation correspondante comme ceci : 
+Par exemple, si votre nouvelle ressource `dsc` se nomme `ma-dsc`, alors vous lancerez l'installation correspondante comme ceci :
 
 ```bash
 ansible-playbook install.yaml -e dsc_cr=ma-dsc
 ```
 
 ## Récupération des secrets
+
 Au moment de leur initialisation, certains outils stockent des secrets qui ne sont en principe plus disponibles ultérieurement.
 
 **Attention !** Pour garantir l'[idempotence](https://fr.wikipedia.org/wiki/Idempotence), ces secrets sont stockés dans plusieurs ressources du cluster. Supprimer ces ressources **indique à ansible qu'il doit réinitialiser les composants**.
@@ -417,7 +427,9 @@ ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf -t keycloak,
 **Remarque importante** : Il est **vivement encouragé** de conserver les valeurs qui vous sont fournies par le playbook « get-credentials.yaml ». Par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden. Il est toutefois important de **ne pas les modifier ou les supprimer** sous peine de voir certains composants, par exemple Vault, être réinitialisés.
 
 ## Debug
+
 ### Réinstallation
+
 Si vous rencontrez des problèmes lors de l'éxécution du playbook, vous voudrez certainement relancer l'installation d'un ou plusieurs composants plutôt que d'avoir à tout réinstaller.
 
 Pour cela, vous pouvez utiliser les tags associés aux rôles dans le fichier « install.yaml ».
@@ -439,6 +451,7 @@ ansible-playbook install.yaml -e dsc_cr=ma-dsc -t keycloak,console
 La BDD PostgreSQL du composant Keycloak est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/), via le role "cloudnativepg".
 
 Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement que cet opérateur n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
+
 - L'API "postgresql.cnpg.io/v1".
 - La "MutatingWebhookConfiguration" nommée "cnpg-mutating-webhook-configuration".
 
@@ -475,6 +488,7 @@ watch "kubectl get ns | grep 'mynamespace-'"
 ```
 
 **Remarques importantes** :
+
 - Par défaut le playbook de désinstallation, s'il est lancé sans aucun tag, ne supprimera pas les ressources suivantes :
   - **Kubed** déployé dans le namespace `openshift-infra`.
   - **Cert-manager** déployé dans le namespace `cert-manager`.
@@ -515,8 +529,9 @@ Ceci est géré par divers paramètres que vous pourrez spécifier dans la resso
 Les sections suivantes détaillent comment procéder, outil par outil.
 
 **Remarques importantes** :
- * Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée.
- * Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
+
+- Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée.
+- Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
 
 ### Argo CD
 
@@ -524,7 +539,7 @@ Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par d�
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` d'Argo CD, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante :
 
 ```bash
 helm search repo argo-cd
@@ -551,7 +566,7 @@ helm search repo argo-cd
 
 Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
-Pour connaître la liste des versions de charts helm d'Argo CD que vous pouvez maintenant installer, utilisez la commande suivante : 
+Pour connaître la liste des versions de charts helm d'Argo CD que vous pouvez maintenant installer, utilisez la commande suivante :
 
 ```bash
 helm search repo -l argo-cd
@@ -582,11 +597,12 @@ Puis de relancer l'installation d'Argo CD, laquelle mettra à jour la version du
 ```bash
 ansible-playbook install.yaml -t argocd
 ```
+
 #### Gel de l'image
 
-En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image d'Argo CD de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**). 
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image d'Argo CD de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**).
 
-Les différents tags utilisables pour l'image d'Argo CD sont disponibles ici : https://hub.docker.com/r/bitnami/argo-cd/tags
+Les différents tags utilisables pour l'image d'Argo CD sont disponibles ici : <https://hub.docker.com/r/bitnami/argo-cd/tags>
 
 Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "2.7.6-debian-11-r2" est un tag immutable.
 
@@ -620,16 +636,17 @@ Puis relancer l'installation avec le tag `argocd` pour procéder au remplacement
 ansible-playbook install.yaml -t argocd
 ```
 
-Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml
+Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml>
 
-Les releases d'Argo CD et leurs changelogs se trouvent ici : https://github.com/argoproj/argo-cd/releases
+Les releases d'Argo CD et leurs changelogs se trouvent ici : <https://github.com/argoproj/argo-cd/releases>
+
 ### Cert-manager
 
 **Attention !** Cert-manager est déployé dans le namespace "cert-manager", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
 
 Le composant cert-manager est déployé directement via son manifest, téléchargé sur GitHub.
 
-La liste des versions ("releases") est disponible ici : https://github.com/cert-manager/cert-manager/releases
+La liste des versions ("releases") est disponible ici : <https://github.com/cert-manager/cert-manager/releases>
 
 Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est la release "v1.11.0" qui sera déployée.
 
@@ -639,11 +656,13 @@ Pour déployer une autre version, il suffira d'éditer cette même `dsc`, de pr�
   certmanager:
     version: v1.11.1
 ```
+
 Il vous faudra ensuite appliquer le changement de configuration en utisant votre fichier de définition, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
+
 Puis relancer l'installation de cert-manager, laquelle procédera à la mise à jour de version sans coupure de service :
 
 ```bash
@@ -658,7 +677,7 @@ Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par d�
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` de CloudNativePG, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante :
 
 ```bash
 helm search repo cloudnative-pg
@@ -685,7 +704,7 @@ helm search repo cloudnative-pg
 
 Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
-Pour connaître la liste des versions de charts helm de CloudNativePG que vous pouvez maintenant installer, utilisez la commande suivante : 
+Pour connaître la liste des versions de charts helm de CloudNativePG que vous pouvez maintenant installer, utilisez la commande suivante :
 
 ```bash
 helm search repo -l cloudnative-pg
@@ -712,6 +731,7 @@ Puis de relancer l'installation de CloudNativePG, laquelle mettra à jour la ver
 ```bash
 ansible-playbook install.yaml -t cloudnativepg
 ```
+
 #### Gel de l'image
 
 Il existe une correspondance biunivoque entre la version de chart utilisée et la version d'application ("APP VERSION") de l'opérateur.
@@ -730,7 +750,7 @@ Le gel d'image de conteneur PostgreSQL est géré par l'installation du socle DS
 
 Le composant console est déployé directement via son manifest, téléchargé sur GitHub.
 
-La liste des versions ("releases") est disponible ici : https://github.com/cloud-pi-native/console/releases
+La liste des versions ("releases") est disponible ici : <https://github.com/cloud-pi-native/console/releases>
 
 Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est la release "v4.1.0" qui sera déployée.
 
@@ -749,11 +769,13 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
+
 Et relancer l'installation de la console, laquelle procédera à la mise à jour de version sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t console
 ```
+
 ### GitLab
 
 Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle gitlab déploiera la dernière version **stable** de l'[opérateur GitLab](https://operatorhub.io/operator/gitlab-operator-kubernetes).
@@ -775,12 +797,12 @@ Via cet opérateur, le rôle tentera de déployer par défaut la version 6.11.10
 La version de GitLab installée est donc déjà figée via la version du chart utilisée, car il existe une correspondance biunivoque entre les deux.
 
 Les correspondances entre versions du chart et versions de GitLab sont fournies ici :
-https://docs.gitlab.com/charts/installation/version_mappings.html
+<https://docs.gitlab.com/charts/installation/version_mappings.html>
 
 L'opérateur sera en capacité de proposer différentes versions du chart à l'installation.
 
 Pour connaître les versions de chart **utilisables**, il sera possible de se référer à la page suivante, exemple avec la branche 0.21 stable de l'opérateur :
-https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/0-21-stable/CHART_VERSIONS
+<https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/0-21-stable/CHART_VERSIONS>
 
 Ces versions de charts proposées par l'opérateur évolueront dans le temps, afin de tenir compte notamment des mises à jour de sécurité.
 
@@ -798,7 +820,7 @@ Dans l'exemple ci-dessus, nous avons tenté une installation de GitLab avec la v
 Il nous faudra donc spécifier une version valide, en l'occurence 6.11.10 si nous voulons rester sur la branche 15.11 de GitLab au moment de l'installation, ou bien l'une des deux autres version supérieures proposées.
 
 Rappel : les correspondances entre versions du chart et versions de GitLab sont fournies ici :
-https://docs.gitlab.com/charts/installation/version_mappings.html
+<https://docs.gitlab.com/charts/installation/version_mappings.html>
 
 Si vous souhaitez changer la version du chart helm utilisé, il vous suffira de relever le **numéro de version du chart** désiré **parmi ceux supportés par l'opérateur**, puis l'indiquer dans votre ressource `dsc` de configuration.
 
@@ -830,7 +852,7 @@ Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par d�
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` de Harbor, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante :
 
 ```bash
 helm search repo harbor/harbor
@@ -857,7 +879,7 @@ helm search repo harbor/harbor
 
 Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
-Pour connaître la liste des versions de charts helm Harbor que vous pouvez maintenant installer, utilisez la commande suivante : 
+Pour connaître la liste des versions de charts helm Harbor que vous pouvez maintenant installer, utilisez la commande suivante :
 
 ```bash
 helm search repo -l harbor/harbor
@@ -880,11 +902,13 @@ Il vous suffit alors de mettre à jour votre configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
+
 **Remarques importantes** :
-* Il est fortement recommnandé de **sauvegarder votre base de données** avant de poursuivre, sauf s'il s'agit d'une première installation de Harbor, ou d'une [suppression complète](#un-ou-plusieurs-outils) suivie d'une réinstallation sans persistance des données.
-* S'il s'agit d'un **upgrade** de version sans désinstallation préalable, il est également plutôt recommandé de réaliser cet upgrade **vers une version directement supérieure** et ainsi de suite, jusqu'à parvenir à la version désirée. Par exemple de "1.12.0" vers "1.12.1" puis vers "1.12.2".
-* Le **downgrade** par mise à jour de la version du chart est source de problèmes. Il est susceptible de mal se passer et n'est donc pas recommandé. Mieux vaut désinstaller Harbor (cf. [désinstallation](#un-ou-plusieurs-outils)), puis procéder à sa réinstallation en spécifiant le numéro de version du chart souhaité, puis en important vos données sauvegardées.
-* Fixer le numéro de version du chart Helm sera normalement suffisant pour fixer aussi le numéro de version des images associées. Le numéro de version de ces images sera celui visible dans la colonne "APP VERSION" de la commande `helm search repo -l harbor/harbor`.
+
+- Il est fortement recommnandé de **sauvegarder votre base de données** avant de poursuivre, sauf s'il s'agit d'une première installation de Harbor, ou d'une [suppression complète](#un-ou-plusieurs-outils) suivie d'une réinstallation sans persistance des données.
+- S'il s'agit d'un **upgrade** de version sans désinstallation préalable, il est également plutôt recommandé de réaliser cet upgrade **vers une version directement supérieure** et ainsi de suite, jusqu'à parvenir à la version désirée. Par exemple de "1.12.0" vers "1.12.1" puis vers "1.12.2".
+- Le **downgrade** par mise à jour de la version du chart est source de problèmes. Il est susceptible de mal se passer et n'est donc pas recommandé. Mieux vaut désinstaller Harbor (cf. [désinstallation](#un-ou-plusieurs-outils)), puis procéder à sa réinstallation en spécifiant le numéro de version du chart souhaité, puis en important vos données sauvegardées.
+- Fixer le numéro de version du chart Helm sera normalement suffisant pour fixer aussi le numéro de version des images associées. Le numéro de version de ces images sera celui visible dans la colonne "APP VERSION" de la commande `helm search repo -l harbor/harbor`.
 
 Si vous avez bien pris connaissance des avertissements ci-dessus, vous pouvez maintenant relancer l'installation de Harbor, laquelle mettra à jour la version du chart et de l'application **avec coupure de service** :
 
@@ -898,23 +922,24 @@ Pour fixer les versions d'images, voir ci-dessous.
 
 #### Gel des images
 
-En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer les versions d'images de Harbor de façon plus fine (**recommandé en production**). 
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer les versions d'images de Harbor de façon plus fine (**recommandé en production**).
 
 Il sera ainsi possible de fixer l'image de chacun des composants.
 
 Les différents tags utilisables sont disponibles ici :
-* nginx : https://hub.docker.com/r/goharbor/nginx-photon/tags
-* portal : https://hub.docker.com/r/goharbor/harbor-portal/tags
-* core : https://hub.docker.com/r/goharbor/harbor-core/tags
-* jobservice : https://hub.docker.com/r/goharbor/harbor-jobservice/tags
-* registry (registry) : https://hub.docker.com/r/goharbor/registry-photon/tags
-* registry (controller) : https://hub.docker.com/r/goharbor/harbor-registryctl/tags
-* trivy : https://hub.docker.com/r/goharbor/trivy-adapter-photon/tags
-* notary (server) : https://hub.docker.com/r/goharbor/notary-server-photon/tags
-* notary (signer) : https://hub.docker.com/r/goharbor/notary-signer-photon/tags
-* database : https://hub.docker.com/r/goharbor/harbor-db/tags
-* redis : https://hub.docker.com/r/goharbor/redis-photon/tags
-* exporter : https://hub.docker.com/r/goharbor/harbor-exporter/tags
+
+- nginx : <https://hub.docker.com/r/goharbor/nginx-photon/tags>
+- portal : <https://hub.docker.com/r/goharbor/harbor-portal/tags>
+- core : <https://hub.docker.com/r/goharbor/harbor-core/tags>
+- jobservice : <https://hub.docker.com/r/goharbor/harbor-jobservice/tags>
+- registry (registry) : <https://hub.docker.com/r/goharbor/registry-photon/tags>
+- registry (controller) : <https://hub.docker.com/r/goharbor/harbor-registryctl/tags>
+- trivy : <https://hub.docker.com/r/goharbor/trivy-adapter-photon/tags>
+- notary (server) : <https://hub.docker.com/r/goharbor/notary-server-photon/tags>
+- notary (signer) : <https://hub.docker.com/r/goharbor/notary-signer-photon/tags>
+- database : <https://hub.docker.com/r/goharbor/harbor-db/tags>
+- redis : <https://hub.docker.com/r/goharbor/redis-photon/tags>
+- exporter : <https://hub.docker.com/r/goharbor/harbor-exporter/tags>
 
 **Rappel** : Il est néanmoins recommandé, si possible, de positionner des tags d'images en adéquation avec la version du chart Helm utilisé, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor` vue précédemment.
 
@@ -985,7 +1010,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
           tag: v2.8.2
 ```
 
-Pour mémoire, les values utilisables sont disponibles et documentées ici : https://github.com/goharbor/harbor-helm/tree/master
+Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/goharbor/harbor-helm/tree/master>
 
 Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
 
@@ -1013,7 +1038,7 @@ Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par d�
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` de Keycloak, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante :
 
 ```bash
 helm search repo bitnami/keycloak
@@ -1040,7 +1065,7 @@ helm search repo bitnami/keycloak
 
 Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
-Pour connaître la liste des versions de charts helm de Keycloak que vous pouvez maintenant installer, utilisez la commande suivante : 
+Pour connaître la liste des versions de charts helm de Keycloak que vous pouvez maintenant installer, utilisez la commande suivante :
 
 ```bash
 helm search repo -l bitnami/keycloak
@@ -1068,11 +1093,12 @@ Puis de relancer l'installation de Keycloak, laquelle mettra à jour la version 
 ```bash
 ansible-playbook install.yaml -t keycloak
 ```
+
 #### Gel de l'image Keycloak
 
 En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de Keycloak de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/apps/keycloak/configuration/understand-rolling-immutable-tags/)" (**recommandé en production**).
 
-Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : https://hub.docker.com/r/bitnami/keycloak/tags
+Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : <https://hub.docker.com/r/bitnami/keycloak/tags>
 
 Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "19.0.3-debian-11-r22" est un tag immutable.
 
@@ -1102,9 +1128,10 @@ Puis relancer l'installation avec le tag `keycloak` pour procéder au remplaceme
 ansible-playbook install.yaml -t keycloak
 ```
 
-Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml>
 
-Les release notes de Keycloak se trouvent ici : https://github.com/keycloak/keycloak/releases
+Les release notes de Keycloak se trouvent ici : <https://github.com/keycloak/keycloak/releases>
+
 #### Gel de l'image PostgreSQL pour Keycloak
 
 Tel qu'il est déployé, Keycloak s'appuie sur un cluster de base de donnée PostgreSQL géré par l'opérateur CloudNativePG.
@@ -1117,7 +1144,7 @@ Il est toutefois possible et **recommandé en production** de fixer la version d
 
 Pour cela, nous utiliserons l'un des tags d'image immutables proposés par CloudNativePG.
 
-Les tags en question sont disponibles ici : https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql
+Les tags en question sont disponibles ici : <https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql>
 
 Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et d'indiquer le tag souhaité au niveau du paramètre `postgreSQLimageName`. Exemple :
 
@@ -1152,11 +1179,11 @@ ansible-playbook install.yaml -t keycloak
 
 **Attention !** Kubed est déployé dans le namespace "openshift-infra", **commun à toutes les instances de la chaîne DSO**. Si vous modifiez sa version, ceci affectera toutes les instances DSO installées dans un même cluster. Ce n'est pas forcément génant, car un retour arrière sur la version est toujours possible, mais l'impact est à évaluer si votre cluster héberge un environnement de production.
 
-Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle confSyncer qui sert à installer Kubed déploie par défaut la dernière version du [chart helm ](https://github.com/appscode/charts/tree/master/stable/kubed) disponible dans le cache des dépôts helm de l'utilisateur.
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle confSyncer qui sert à installer Kubed déploie par défaut la dernière version du [chart helm](https://github.com/appscode/charts/tree/master/stable/kubed) disponible dans le cache des dépôts helm de l'utilisateur.
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` de Kubed, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante :
 
 ```bash
 helm search repo kubed
@@ -1183,7 +1210,7 @@ helm search repo kubed
 
 Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
-Pour connaître la liste des versions de charts helm de Kubed que vous pouvez maintenant installer, utilisez la commande suivante : 
+Pour connaître la liste des versions de charts helm de Kubed que vous pouvez maintenant installer, utilisez la commande suivante :
 
 ```bash
 helm search repo -l kubed
@@ -1209,6 +1236,7 @@ Puis de relancer l'installation de Kubed, laquelle mettra à jour la version du 
 ```bash
 ansible-playbook install.yaml -t kubed
 ```
+
 **Remarque importante** : Le numéro de version du chart Helm est corrélé à celui de l'image utilisée pour l'application, de sorte que fixer ce numéro de version fixe aussi celui de l'image.
 
 ### Sonatype Nexus Repository
@@ -1217,7 +1245,7 @@ Le composant nexus est installé directement via le manifest de deployment "nexu
 
 Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est l'image "3.56.0" qui sera déployée.
 
-Les tags d'images utilisables sont disponibles ici : https://hub.docker.com/r/sonatype/nexus3/tags
+Les tags d'images utilisables sont disponibles ici : <https://hub.docker.com/r/sonatype/nexus3/tags>
 
 Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageTag**. Exemple :
 
@@ -1234,6 +1262,7 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
+
 Et relancer l'installation de nexus, laquelle procédera à la mise à jour de version, **avec coupure de service** :
 
 ```bash
@@ -1246,7 +1275,7 @@ Le composant sonarqube est installé directement via le manifest de deployment "
 
 Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est l'image "9.9-community" qui sera déployée.
 
-Les tags d'images utilisables pour l'édition community sont disponibles ici : https://hub.docker.com/_/sonarqube/tags?name=community
+Les tags d'images utilisables pour l'édition community sont disponibles ici : <https://hub.docker.com/_/sonarqube/tags?name=community>
 
 Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageTag**. Exemple :
 
@@ -1262,6 +1291,7 @@ Puis appliquer le changement de configuration, exemple :
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
+
 Et relancer l'installation de sonarqube, laquelle procédera à la mise à jour de version **avec coupure de service** :
 
 ```bash
@@ -1274,7 +1304,7 @@ Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par d�
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` de SOPS, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante :
 
 ```bash
 helm search repo sops/sops-secrets-operator
@@ -1301,7 +1331,7 @@ helm search repo sops/sops-secrets-operator
 
 Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
-Pour connaître la liste des versions de charts helm de SOPS que vous pouvez maintenant installer, utilisez la commande suivante : 
+Pour connaître la liste des versions de charts helm de SOPS que vous pouvez maintenant installer, utilisez la commande suivante :
 
 ```bash
 helm search repo -l sops/sops-secrets-operator
@@ -1333,7 +1363,7 @@ Pour fixer la version d'image, voir ci-dessous.
 
 #### Gel de l'image
 
-En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de SOPS de façon plus fine (**recommandé en production**). 
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de SOPS de façon plus fine (**recommandé en production**).
 
 Pour spécifier cette version d'image, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
 
@@ -1346,9 +1376,9 @@ Pour spécifier cette version d'image, il nous suffira d'éditer la ressource `d
         tag: 0.9.1
 ```
 
-Pour mémoire, les values utilisables sont disponibles et documentées ici : https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator
+Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator>
 
-Les numéros de version de chart Helm et d'image se trouvent ici : https://github.com/isindir/sops-secrets-operator/blob/master/README.md#versioning
+Les numéros de version de chart Helm et d'image se trouvent ici : <https://github.com/isindir/sops-secrets-operator/blob/master/README.md#versioning>
 
 S'agissant de l'image, ces numéros correspondent à la colonne "Operator".
 
@@ -1365,6 +1395,7 @@ Lorsque vos values ont été actualisées, avec la version d'image désirée, ap
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
+
 Puis relancez l'installation avec le tag `sops` pour procéder à la mise à jour et au gel de l'image :
 
 ```bash
@@ -1379,7 +1410,7 @@ Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par d�
 
 Ceci est lié au fait que le paramètre de configuration `chartVersion` de Vault, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante :
 
 ```bash
 helm search repo hashicorp/vault
@@ -1406,7 +1437,7 @@ helm search repo hashicorp/vault
 
 Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
 
-Pour connaître la liste des versions de charts helm de Vault que vous pouvez maintenant installer, utilisez la commande suivante : 
+Pour connaître la liste des versions de charts helm de Vault que vous pouvez maintenant installer, utilisez la commande suivante :
 
 ```bash
 helm search repo -l hashicorp/vault
@@ -1441,15 +1472,17 @@ Pour fixer les versions d'images, voir ci-dessous.
 
 #### Gel des images
 
-En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer les versions d'images de Vault de façon plus fine (**recommandé en production**). 
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer les versions d'images de Vault de façon plus fine (**recommandé en production**).
 
 Il sera ainsi possible de fixer l'image :
-* du Vault Agent Sidecar Injector (via le repository hashicorp/vault-k8s),
-* du Vault Agent (via le repository hashicorp/vault).
+
+- du Vault Agent Sidecar Injector (via le repository hashicorp/vault-k8s),
+- du Vault Agent (via le repository hashicorp/vault).
 
 Les différents tags d'images utilisables sont disponibles ici :
-* Pour le Vault Agent Sidecar Injector : https://hub.docker.com/r/hashicorp/vault-k8s/tags
-* Pour le Vault Agent : https://hub.docker.com/r/hashicorp/vault/tags
+
+- Pour le Vault Agent Sidecar Injector : <https://hub.docker.com/r/hashicorp/vault-k8s/tags>
+- Pour le Vault Agent : <https://hub.docker.com/r/hashicorp/vault/tags>
 
 Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
 
@@ -1477,7 +1510,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 **Remarque importante** : Dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse se mettre à jour avec le tag que vous avez indiqué.
 
-Pour mémoire, les values utilisables sont disponibles et documentées ici : https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration
+Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://developer.hashicorp.com/vault/docs/platform/k8s/helm/configuration>
 
 Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
 
@@ -1508,3 +1541,23 @@ ansible-playbook install.yaml -t vault
 ```
 
 Puis revérifiez l'état du vault-0 qui devrait maintenant être déployé comme attendu.
+
+### Les commandes de l'application
+
+```shell
+# Lancer la vérification syntaxique
+pnpm install && pnpm run lint
+
+# Lancer le formattage du code
+pnpm install && pnpm run format
+```
+
+## Conventions
+
+Cf. [Conventions - MIOM Fabrique Numérique](https://projets-ts-fabnum.netlify.app/conventions/nommage.html).
+
+## Contributions
+
+Les commits doivent suivre la spécification des [Commits Conventionnels](https://www.conventionalcommits.org/en/v1.0.0/), il est possible d'ajouter l'[extension VSCode](https://github.com/vivaxy/vscode-conventional-commits) pour faciliter la création des commits.
+
+Une PR doit être faite avec une branche à jour avec la branche `develop` en rebase (et sans merge) avant demande de fusion, et la fusion doit être demandée dans `develop`.

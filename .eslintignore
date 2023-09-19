@@ -1,0 +1,29 @@
+# code
+.vscode/*
+
+# modules
+node_modules
+**/node_modules
+
+# package
+package.json
+
+# doc
+README.md
+
+# github actions
+!.github
+
+# TODO : Fix later
+# socle/roles/harbor/templates/ca-cm.yaml
+#   8:1  error  Parsing error: Plain value cannot start with directive indicator character %
+
+# socle/roles/keycloak/templates/console-frontend-redirectUris.yaml
+#   2:0  error  Parsing error: Unexpected flow-map-start at node end
+
+# socle/roles/keycloak/templates/console-frontend-webOrigins.yaml
+#   2:0  error  Parsing error: Unexpected flow-map-start at node end
+
+roles/harbor/templates/ca-cm.yaml
+roles/keycloak/templates/console-frontend-redirectUris.yaml
+roles/keycloak/templates/console-frontend-webOrigins.yaml

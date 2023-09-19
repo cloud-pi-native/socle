@@ -1,0 +1,15 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  NAMESPACE: "${{ github.repository }}"
+  PLATFORM: "linux/amd64,linux/arm64"
+
+jobs:
+  release:
+    uses: ./.github/workflows/release.yml

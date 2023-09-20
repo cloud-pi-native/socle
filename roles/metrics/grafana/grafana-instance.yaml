@@ -18,5 +18,5 @@ spec:
       admin_user: admin-dso
   ingress:
     enabled: true
-  #previousServiceName: grafana-service
+  # previousServiceName: grafana-service
 

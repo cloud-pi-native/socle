@@ -21,12 +21,12 @@ spec:
   targetNamespaces:
     - openshift-logging
 ---
-#apiVersion: operators.coreos.com/v1
-#kind: OperatorGroup
-#metadata:
+# apiVersion: operators.coreos.com/v1
+# kind: OperatorGroup
+# metadata:
 #  name: openshift-operators-redhat-group
 #  namespace: openshift-operators-redhat
-#---
+# ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -38,7 +38,7 @@ spec:
   name: cluster-logging
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  #startingCSV: cluster-logging.5.5.4
+  # startingCSV: cluster-logging.5.5.4
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -51,6 +51,6 @@ spec:
   name: elasticsearch-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  #startingCSV: elasticsearch-operator.5.5.4
+  # startingCSV: elasticsearch-operator.5.5.4
 
 

@@ -93,7 +93,7 @@
 
     - name: Generate random password
       ansible.builtin.set_fact:
-        admin: '{{ admin_account.stdout | from_json }}'
+        admin: "{{ admin_account.stdout | from_json }}"
         token_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
 
     - name: Get sha384sum of token

@@ -75,3 +75,6 @@ extraDeploy:
     metadata:
       name: argocd-rbac-cm
       namespace: {{ dsc.argocd.namespace }}
+applicationSet:
+  enabled: true
+  replicaCount: 2

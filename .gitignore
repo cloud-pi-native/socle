@@ -3,3 +3,6 @@ vars.yaml
 
 # compiled filter_plugins
 **/__pycache__/*
+
+# node modules
+node_modules

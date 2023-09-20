@@ -7,7 +7,7 @@
     kind: dsc
     name: conf-dso
     api_version: cloud-pi-native.fr/v1alpha
-#  register: socle_config_default
+  #  register: socle_config_default
   register: socle_config
 
 - name: Get socle config from dsc_cr extra var when defined

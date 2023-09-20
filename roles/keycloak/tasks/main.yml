@@ -232,9 +232,9 @@
         state: present
         realm: dso
         credentials:
-            - temporary: false
-              type: password
-              value: "{{ admin_user_password }}"
+          - temporary: false
+            type: password
+            value: "{{ admin_user_password }}"
         username: admin@example.com
         first_name: Admin
         last_name: Admin
@@ -273,8 +273,8 @@
     attributes:
       include.in.token.scope: true
       display.on.consent.screen: true
-      gui.order: ''
-      consent.screen.text: ''
+      gui.order: ""
+      consent.screen.text: ""
     protocolMappers: "{{ lookup('ansible.builtin.file', 'generic-client-scope-protocolMappers.yaml') | from_yaml }}"
 
 - ansible.builtin.include_tasks:

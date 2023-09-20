@@ -1,0 +1,18 @@
+{
+  "name": "dso-socle",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "format": "eslint ./ --ext .js,.yaml,.yml --fix",
+    "lint": "eslint ./ --ext .js,.yaml,.yml"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "eslint": "^8.49.0",
+    "eslint-plugin-yml": "^1.9.0",
+    "yaml-eslint-parser": "^1.2.2"
+  }
+}

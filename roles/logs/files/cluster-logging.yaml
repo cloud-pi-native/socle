@@ -20,10 +20,10 @@ spec:
         storageClassName: "ocs-storagecluster-ceph-rbd"
         size: 50G
       resources: 
-          limits:
-            memory: "4Gi"
-          requests:
-            memory: "4Gi"
+        limits:
+          memory: "4Gi"
+        requests:
+          memory: "4Gi"
       proxy: 
         resources:
           limits:

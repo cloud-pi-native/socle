@@ -53,7 +53,7 @@
         cmd: "curl {{ dsc.exposedCA.url }} -s | openssl x509"
       changed_when: false
       register: exposed_ca_resource
-      tags: ['skip_ansible_lint']
+      tags: ["skip_ansible_lint"]
 
     - name: Extract key
       ansible.builtin.set_fact:

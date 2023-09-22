@@ -43,9 +43,9 @@ persistence:
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
 {% if dsc.proxy.enabled %}
 proxy:
-  http_proxy: {{ dsc.proxy.http_proxy }}
-  https_proxy: {{ dsc.proxy.https_proxy }}
-  no_proxy: {{ dsc.proxy.no_proxy }},.local,.internal
+  httpProxy: {{ dsc.proxy.http_proxy }}
+  httpsProxy: {{ dsc.proxy.https_proxy }}
+  noProxy: {{ dsc.proxy.no_proxy }},.local,.internal
   components:
     - nginx
     - portal

@@ -39,6 +39,14 @@ spec:
           value: "{{ keycloak_domain }}"
         - name: keycloak.realm
           value: dso
+{% if dsc.proxy.enabled %}
+        - name: server.container.env.HTTP_PROXY
+          value: {{ dsc.proxy.http_proxy }}
+        - name: server.container.env.HTTPS_PROXY
+          value: {{ dsc.proxy.https_proxy }}
+        - name: server.container.env.NO_PROXY
+          value: {{ dsc.proxy.no_proxy }}
+{% endif %}
 {% if dsc.exposedCA.type != 'none' %}
         - name: server.extraCa.name
           value: bundle

@@ -11,18 +11,18 @@ spec:
   argocd:
     chartVersion: ""
   certmanager:
-    version: v1.11.0
+    version: ""
   cloudnativepg:
     chartVersion: ""
+    namespace: ""
   console:
     dbPassword: myAwesomePassword
   gitlab:
-    chartVersion: "6.11.10"
+    chartVersion: ""
   global:
-    projectsRootDir:
-      - forge
-    rootDomain:
-      .example.com
+    environment: ""
+    projectsRootDir: []
+    rootDomain: ""
   harbor:
     adminPassword: anotherGreatPassword
     chartVersion: ""
@@ -32,12 +32,12 @@ spec:
   kubed:
     chartVersion: ""
   nexus:
-    storageSize: 25Gi
+    storageSize: ""
     imageTag: ""
   proxy:
     enabled: false
   sonarqube:
-    imageTag: ""
+    chartVersion: ""
   sops:
     chartVersion: ""
   vault:

@@ -35,6 +35,8 @@
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
+      - [Gel de l'image SonarQube](#gel-de-limage-sonarqube)
+      - [Gel de l'image PostgreSQL pour SonarQube](#gel-de-limage-postgresql-pour-sonarqube)
     - [SOPS](#sops)
       - [Gel de l'image](#gel-de-limage-2)
     - [Vault](#vault)
@@ -174,7 +176,7 @@ spec:
   certmanager:
     version: v1.11.0
   cloudnativepg:
-    namespace: mynamespace-cloudnativepg
+    namespace: cnpg-system
     chartVersion: 0.18.2
   console:
     dbPassword: AnotherPassBitesTheDust
@@ -285,9 +287,15 @@ spec:
     no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
     port: "3128"
   sonarqube:
-    namespace: mynamespace-sonarqube
-    subDomain: sonarqube
-    imageTag: 9.9-community
+    chartVersion: 3.3.0
+    namespace: mynamespace-sonar
+    postgreSQLimageName: ghcr.io/cloudnative-pg/postgresql:15.4
+    subDomain: sonar
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/sonarqube
+        tag: 9.9.1-debian-11-r101
   sops:
     namespace: mynamespace-sops
     chartVersion: "0.15.1"
@@ -333,6 +341,7 @@ Voici les liens vers les documentations de chart helm pour les outils concernés
 - [GitLab](https://docs.gitlab.com/charts)
 - [Harbor](https://github.com/goharbor/harbor-helm)
 - [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
+- [SonarQube](https://github.com/bitnami/charts/tree/main/bitnami/sonarqube)
 - [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
@@ -1268,36 +1277,144 @@ Et relancer l'installation de nexus, laquelle procédera à la mise à jour de v
 ```bash
 ansible-playbook install.yaml -t nexus
 ```
-
 ### SonarQube Community Edition
 
-Le composant sonarqube est installé directement via le manifest de deployment "sonar-deployment.yaml.j2" intégré au role associé.
+Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle sonarqube déploiera la dernière version du [chart helm Bitnami SonarQube](https://bitnami.com/stack/sonarqube/helm) disponible dans le cache des dépôts helm de l'utilisateur.
 
-Si vous utilisez la `dsc` par défaut nommée `conf-dso` c'est l'image "9.9-community" qui sera déployée.
+Ceci est lié au fait que le paramètre de configuration `chartVersion` de SonarQube, présent dans la `dsc` par défaut `conf-dso`, est laissé vide (`chartVersion: ""`).
 
-Les tags d'images utilisables pour l'édition community sont disponibles ici : <https://hub.docker.com/_/sonarqube/tags?name=community>
+Pour connaître la dernière version du chart helm et de l'application actuellement disponibles dans votre cache local, utilisez la commande suivante : 
 
-Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageTag**. Exemple :
+```bash
+helm search repo bitnami/sonarqube
+```
+
+Exemple de sortie avec un cache de dépôts qui n'est pas à jour :
+
+```
+NAME                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+bitnami/sonarqube       3.2.8           10.1.0          SonarQube(TM) is an open source quality managem...
+```
+
+Pour mettre à jour votre cache de dépôts helm, et obtenir ainsi la dernière version du chart et de l'application :
+
+```bash
+helm repo update
+```
+
+Relancer immédiatement la commande de recherche :
+
+```bash
+helm search repo bitnami/sonarqube
+```
+
+Si votre cache n'était pas déjà à jour, la sortie doit alors vous indiquer des versions plus récentes.
+
+Pour connaître la liste des versions de charts helm de SonarQube que vous pouvez maintenant installer, utilisez la commande suivante : 
+
+```bash
+helm search repo -l bitnami/sonarqube
+```
+
+Si vous souhaitez fixer la version du chart helm, et donc celle de SonarQube, il vous suffira de relever le **numéro de version du chart** désiré, puis l'indiquer dans votre ressource `dsc` de configuration.
+
+Par exemple, si vous utilisez la `dsc` par défaut nommée `conf-dso`, vous pourrez éditer le fichier YAML que vous aviez utilisé pour la paramétrer lors de l'installation, puis adapter la section suivante en y spécifiant le numéro souhaité au niveau du paramètre **chartVersion**. Exemple :
 
 ```yaml
   sonarqube:
-    namespace: mynamespace-sonarqube
-    subDomain: sonarqube
-    imageTag: 9.9.1-community
+    chartVersion: 3.3.0
+    namespace: mynamespace-sonar
+    subDomain: sonar
 ```
 
-Puis appliquer le changement de configuration, exemple :
+Il vous suffit alors de mettre à jour votre configuration, exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Et relancer l'installation de sonarqube, laquelle procédera à la mise à jour de version **avec coupure de service** :
+Puis de relancer l'installation de SonarQube, laquelle mettra à jour la version du chart et l'image associée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t sonarqube
+```
+#### Gel de l'image SonarQube
+
+En complément de l'usage du paramètre `chartVersion`, il est également possible de fixer la version d'image de SonarQube de façon plus fine, en utilisant un tag dit "[immutable](https://docs.bitnami.com/kubernetes/apps/sonarqube/configuration/understand-rolling-immutable-tags/)" (**recommandé en production**).
+
+Les différents tags utilisables pour l'image de SonarQube sont disponibles ici : https://hub.docker.com/r/bitnami/sonarqube/tags
+
+Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "9.9.1-debian-11-r101" est un tag immutable.
+
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart helm, en ajoutant celles dont nous avons besoin. Exemple :
+
+```yaml
+  sonarqube:
+    chartVersion: 3.3.0
+    namespace: mynamespace-sonar
+    subDomain: sonar
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/sonarqube
+        tag: 9.9.1-debian-11-r101
+```
+
+Appliquer le changement en utilisant votre fichier de définition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancer l'installation avec le tag `sonarqube` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
 
 ```bash
 ansible-playbook install.yaml -t sonarqube
 ```
 
+Pour mémoire, les values utilisables sont disponibles ici : https://github.com/bitnami/charts/blob/main/bitnami/sonarqube/values.yaml
+#### Gel de l'image PostgreSQL pour SonarQube
+
+Tel qu'il est déployé, SonarQube s'appuie sur un cluster de base de donnée PostgreSQL géré par l'opérateur CloudNativePG.
+
+Comme indiqué dans sa [documentation officielle](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster), par défaut CloudNativePG installera la dernière version mineure disponible de la dernière version majeure de PostgreSQL au moment de la publication de l'opérateur.
+
+De plus, comme l'indique la [FAQ officielle](https://cloudnative-pg.io/documentation/1.20/faq/), CloudNativePG utilise des conteneurs d'application immutables. Cela signifie que le conteneur ne sera pas modifié durant tout son cycle de vie (aucun patch, aucune mise à jour ni changement de configuration).
+
+Il est toutefois possible et **recommandé en production** de fixer la version d'image de BDD pour SonarQube.
+
+Pour cela, nous utiliserons l'un des tags d'image immutables proposés par CloudNativePG.
+
+Les tags en question sont disponibles ici : https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql
+
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et d'indiquer le tag souhaité au niveau du paramètre `postgreSQLimageName`. Exemple :
+
+```yaml
+  sonarqube:
+    chartVersion: 3.3.0
+    namespace: mynamespace-sonar
+    postgreSQLimageName: ghcr.io/cloudnative-pg/postgresql:15.4
+    subDomain: sonar
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/sonarqube
+        tag: 9.9.1-debian-11-r101
+```
+
+**Attention !** : Comme indiqué dans la [documentation officielle de CloudNativePG](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster) il ne faudra **jamais** utiliser en production de tag tel que `latest` ou juste `15` (sans numéro de version mineure).
+
+Appliquer le changement en utilisant votre fichier de définition, exemple :
+
+```bash
+kubectl apply -f ma-conf-dso.yaml
+```
+
+Puis relancer l'installation avec le tag `sonarqube` pour procéder au remplacement par l'image spécifiée, sans coupure de service :
+
+```bash
+ansible-playbook install.yaml -t sonarqube
+```
 ### SOPS
 
 Tel qu'il est conçu, et s'il est utilisé avec la `dsc` de configuration par défaut sans modification, le rôle sops déploiera la dernière version du [chart helm SOPS](https://github.com/isindir/sops-secrets-operator) disponible dans le cache des dépôts helm de l'utilisateur.

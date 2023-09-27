@@ -1,0 +1,162 @@
+deploymentType: "StatefulSet"
+
+replicaCount: 1
+
+OpenShift:
+  enabled: true
+  createSCC: true
+
+image:
+  pullPolicy: IfNotPresent
+
+securityContext:
+  fsGroup: 1000
+
+containerSecurityContext:
+  runAsUser: 1000
+
+sonarWebContext: /
+
+ingress:
+  enabled: true
+  # Used to create an Ingress record.
+  hosts:
+    - name: "{{ sonar_domain }}"
+      pathType: Prefix
+  annotations:
+    route.openshift.io/termination: "edge"
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: "{{ val }}"
+{% endfor %}
+  # This property allows for reports up to a certain size to be uploaded to SonarQube
+    nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+  ingressClassName: ""
+  labels:
+    app: "sonar"
+{% if not dsc.ingress.tls.type == 'none' %}
+  tls:
+    - hosts:
+        - {{ sonar_domain }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+      secretName: sonar-tls-secret
+{% endif %}
+{% endif %}
+
+caCerts:
+  enabled: false
+
+initSysctl:
+  enabled: true
+  vmMaxMapCount: 524288
+  fsFileMax: 131072
+  nofile: 131072
+  nproc: 8192
+  # image: busybox:1.32
+  securityContext:
+    privileged: true
+  # resources: {}
+
+initFs:
+  enabled: true
+  # image: busybox:1.36
+  securityContext:
+    privileged: true
+
+prometheusExporter:
+  enabled: false
+
+prometheusMonitoring:
+  podMonitor:
+    enabled: false
+
+plugins:
+  install: []
+  # For use behind a corporate proxy when downloading plugins
+{% if dsc.proxy.enabled %}
+  httpProxy: "{{ dsc.proxy.http_proxy }}"
+  httpsProxy: "{{ dsc.proxy.https_proxy }}"
+  noProxy: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
+  # image: curlimages/curl:8.2.0
+  # resources: {}
+  # .netrc secret file with a key "netrc" to use basic auth while downloading plugins
+  # netrcCreds: ""
+  # Set to true to not validate the server's certificate to download plugin
+  noCheckCertificate: false
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+
+sonar.web.javaOpts: ""
+sonar.ce.javaOpts: ""
+
+## a monitoring passcode needs to be defined in order to get reasonable probe results
+# not setting the monitoring passcode will result in a deployment that will never be ready
+monitoringPasscodeSecretName: "sonar-monitoring-password"
+monitoringPasscodeSecretKey: "monitoring-password"
+
+env:
+{% if dsc.proxy.enabled %}
+  - name: http_proxy
+    value: "{{ dsc.proxy.http_proxy }}"
+  - name: https_proxy
+    value: "{{ dsc.proxy.https_proxy }}"
+  - name: no_proxy
+    value: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
+
+## We usually don't make specific ressource recommandations, as they are heavily dependend on
+## The usage of SonarQube and the surrounding infrastructure.
+## Adjust these values to your needs, but make sure that the memory limit is never under 4 GB
+resources:
+  limits:
+    cpu: 800m
+    memory: 4Gi
+  requests:
+    cpu: 400m
+    memory: 2Gi
+
+persistence:
+  enabled: false
+
+## Override JDBC values
+## for external Databases
+jdbcOverwrite:
+  # If enable the JDBC Overwrite, make sure to set `postgresql.enabled=false`
+  enable: true
+  jdbcUrl: "jdbc:postgresql://pg-cluster-sonar-rw/sonardb?socketTimeout=1500"
+  jdbcUsername: "dso_admin"
+  jdbcSecretName: "pg-cluster-sonar-app"
+  jdbcSecretPasswordKey: "password"
+
+postgresql:
+  enabled: false
+
+sonarqubeFolder: /opt/sonarqube
+
+# For OpenShift set create=true to ensure service account is created.
+serviceAccount:
+  create: true
+  # name:
+  # automountToken: false # default
+  ## Annotations for the Service Account
+  annotations: {}
+
+account:
+#  adminPassword: admin
+#  currentAdminPassword: admin
+  adminPasswordSecretName: "sonarqube"
+  securityContext: {}
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+curlContainerImage: curlimages/curl:8.2.1
+adminJobAnnotations: {}
+
+terminationGracePeriodSeconds: 60

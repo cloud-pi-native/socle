@@ -174,6 +174,11 @@ spec:
                     subDomain:
                       description: The subdomain for console.
                       type: string
+                    values:
+                      description: Extra helm values for console
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   required:
                     - dbPassword
                   type: object

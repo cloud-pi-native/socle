@@ -119,6 +119,9 @@ ingress:
   path: /
   servicePort: "http"
   annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: "{{ val }}"
+{% endfor %}
     route.openshift.io/termination: "edge"
   labels: 
     app: "keycloak"
@@ -126,13 +129,13 @@ ingress:
     {{ key }}: "{{ val }}"
 {% endfor %}
   tls: true
-{% if dsc.ingress.tls.type == "tlsSecret" %}
   selfSigned: false
   extraHosts: []
   extraPaths: []
+{% if dsc.ingress.tls.type == "tlsSecret" %}
   extraTls:
     - hosts:
-       - "{{ keycloak_domain }}"
+      - "{{ keycloak_domain }}"
       secretName: "{{ dsc.ingress.tls.tlsSecret.name }}"
 {% endif %}
   secrets: []

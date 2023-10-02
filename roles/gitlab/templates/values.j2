@@ -1,7 +1,10 @@
 certmanager:
-  install: true
+  install: false
 
 registry:
+  enabled: false
+
+nginx-ingress:
   enabled: false
 
 {% if dsc.ingress.tls.type != 'tlsSecret' %}
@@ -41,6 +44,10 @@ minio:
     tls: {}
 {% endif %}
 global:
+  serviceAccount:
+    enabled: true
+    create: true
+
   registry:
     enabled: false
   certificates:
@@ -115,3 +122,19 @@ global:
       autoLinkUser: ["openid_connect"]
       providers:
         - secret: openid-connect
+  securityContext:
+    runAsUser: null
+    fsGroup: null
+  application:
+    allowClusterRoles: false
+gitlab-runner:
+  install: false
+
+upgradeCheck:
+  securityContext:
+    runAsUser: null
+    fsGroup: null
+shared-secrets:
+  securityContext:
+    runAsUser: null
+    fsGroup: null

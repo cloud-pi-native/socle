@@ -4,22 +4,72 @@
     npm_file: "{{ lookup('file', '{{ playbook_dir }}/roles/gitlab/npm_file') }}"
     mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
 
-- name: Install gitlab subscription
+- name: Create gitlab Namespace
   kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_items:
-    - operator-group.yaml.j2
-    - operator-subscription.yaml.j2
+    definition:
+      kind: Namespace
+      metadata:
+        name: "{{ dsc.gitlab.namespace }}"
 
-- name: Wait Gitlab CRD exist
-  kubernetes.core.k8s_info:
-    api_version: apps.gitlab.com/v1beta1
-    kind: GitLab
-    namespace: "{{ dsc.gitlab.namespace }}"
-  register: gitlab_kind
-  until: gitlab_kind.api_found
-  retries: 15
-  delay: 5
+- name: Argo crb
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        creationTimestamp: null
+        name: gitlab-crb
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:openshift:scc:privileged
+      subjects:
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-gitlab-exporter
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-gitlab-shell
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-kas
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-prometheus-server
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-sidekiq
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-toolbox
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-webservice
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: default
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-gitaly
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-redis
+        - kind: ServiceAccount
+          namespace: "{{ dsc.gitlab.namespace }}"
+          name: gitlab-migrations
+
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: gitlab
+    repo_url: https://charts.gitlab.io/
+
+- name: Set gitlab helm values
+  ansible.builtin.set_fact:
+    gitlab_values: "{{ lookup('template', 'values.j2') | from_yaml }}"
+
+- name: Merge with gitlab user values
+  ansible.builtin.set_fact:
+    gitlab_values: "{{ gitlab_values | combine(dsc.gitlab['values'], recursive=True) }}"
 
 - name: Get Gitlab client secret
   kubernetes.core.k8s_info:
@@ -69,36 +119,13 @@
       data:
         tls.crt: "{{ exposed_ca_pem | b64encode }}"
 
-- name: Prepare Gitlab helm values
-  ansible.builtin.set_fact:
-    gitlab_values: "{{ lookup('template', 'gitlab-instance.yaml.j2') | from_yaml }}"
-
-- name: Merge with gitlab user values
-  ansible.builtin.set_fact:
-    gitlab_values: "{{ gitlab_values | combine(dsc.gitlab['values'], recursive=True) }}"
-
-- name: Install gitlab instance
-  kubernetes.core.k8s:
-    api_version: apps.gitlab.com/v1beta1
-    kind: GitLab
+- name: Deploy helm
+  kubernetes.core.helm:
     name: gitlab
-    namespace: "{{ dsc.gitlab.namespace }}"
-    definition:
-      spec:
-        chart:
-          version: "{{ dsc.gitlab.chartVersion }}"
-          values: "{{ gitlab_values }}"
-
-  # - name: Wait gitlab instance to be 'Running'
-  #  kubernetes.core.k8s_info:
-  #    api_version: apps.gitlab.com/v1beta1
-  #    kind: GitLab
-  #    namespace: "{{ dsc.gitlab.namespace }}"
-  #    name: gitlab
-  #  register: gitlab_instance
-  #  until: gitlab_instance.resources[0] is defined and gitlab_instance.resources[0].status is defined and gitlab_instance.resources[0].status.phase == 'Running'
-  #  retries: 45
-  #  delay: 20
+    chart_ref: gitlab/gitlab
+    chart_version: "{{ dsc.gitlab.chartVersion }}"
+    release_namespace: "{{ dsc.gitlab.namespace }}"
+    values: "{{ gitlab_values }}"
 
 - name: Wait Gitlab webservice endpoint to be available
   kubernetes.core.k8s_info:

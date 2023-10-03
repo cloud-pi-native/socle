@@ -1,44 +1,39 @@
 ---
-# https://kubernetes.io/docs/concepts/configuration/configmap/
 kind: DsoSocleConfig
 apiVersion: cloud-pi-native.fr/v1alpha
 metadata:
   name: conf-dso
 spec:
+  certmanager: {}
   additionalsCA: []
   exposedCA:
     type: none
   argocd:
-    chartVersion: ""
-  certmanager:
-    version: ""
-  cloudnativepg:
-    chartVersion: ""
-    namespace: ""
+    admin:
+      enabled: false
+  cloudnativepg: {}
   console:
     dbPassword: myAwesomePassword
-  gitlab:
-    chartVersion: ""
+    values: {}
+  gitlab: {}
   global:
-    environment: ""
-    projectsRootDir: []
-    rootDomain: ""
+    environment: production
+    projectsRootDir:
+      - forge
+    rootDomain:
+      .example.com
   harbor:
     adminPassword: anotherGreatPassword
-    chartVersion: ""
-  ingress: {}
-  keycloak:
-    chartVersion: ""
-  kubed:
-    chartVersion: ""
+    pvcRegistrySize: 20Gi
+  ingress:
+    tls:
+      type: none
+  kubed: {}
+  keycloak: {}
   nexus:
-    storageSize: ""
-    imageTag: ""
+    storageSize: 25Gi
   proxy:
     enabled: false
-  sonarqube:
-    chartVersion: ""
-  sops:
-    chartVersion: ""
-  vault:
-    chartVersion: ""
+  sonarqube: {}
+  sops: {}
+  vault: {}

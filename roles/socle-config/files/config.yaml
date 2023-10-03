@@ -1,0 +1,38 @@
+---
+# https://kubernetes.io/docs/concepts/configuration/configmap/
+kind: DsoSocleConfig
+apiVersion: cloud-pi-native.fr/v1alpha
+metadata:
+  name: conf-dso
+spec:
+  argocd:
+    namespace: dso-argocd
+    subDomain: argocd
+  cloudnativepg:
+    namespace: dso-cloudnativepg
+  console:
+    namespace: dso-console
+    subDomain: console
+  gitlab:
+    namespace: dso-gitlab
+    subDomain: gitlab
+    insecureCI: false
+  harbor:
+    namespace: dso-harbor
+    subDomain: harbor
+  nexus:
+    namespace: dso-nexus
+    subDomain: nexus
+  keycloak:
+    namespace: dso-keycloak
+    subDomain: keycloak
+    postgresPvcSize: 1Gi
+  sonarqube:
+    namespace: dso-sonarqube
+    subDomain: sonar
+    postgresPvcSize: 5Gi
+  vault:
+    namespace: dso-vault
+    subDomain: vault
+  sops:
+    namespace: dso-sops

@@ -1,0 +1,42 @@
+kind: DsoSocleConfig
+apiVersion: cloud-pi-native.fr/v1alpha
+metadata:
+  name: conf-dso
+spec:
+  argocd:
+    # https://artifacthub.io/packages/helm/bitnami/argo-cd
+    chartVersion: 4.7.19
+  certmanager:
+    # https://github.com/cert-manager/cert-manager/releases
+    version: v1.11.0
+  cloudnativepg:
+    # https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
+    chartVersion: 0.18.2
+  console:
+    # https://github.com/cloud-pi-native/console/releases
+    release: "5.9.1"
+  gitlab:
+    # https://artifacthub.io/packages/helm/gitlab/gitlab
+    chartVersion: "7.3.4"
+  harbor:
+    # https://artifacthub.io/packages/helm/harbor/harbor
+    chartVersion: 1.12.2
+  keycloak:
+    # https://artifacthub.io/packages/helm/bitnami/keycloak
+    chartVersion: 16.1.5
+  kubed:
+    # https://artifacthub.io/packages/helm/appscode/kubed
+    chartVersion: 0.13.2
+  nexus:
+    # https://hub.docker.com/r/sonatype/nexus3/
+    imageTag: 3.56.0
+  sonarqube:
+    # https://artifacthub.io/packages/helm/sonarqube/sonarqube
+    chartVersion: 10.2.1+800
+    tag: 9.9.2-community
+  sops:
+    # https://artifacthub.io/packages/helm/sops-secrets-operator/sops-secrets-operator
+    chartVersion: 0.17.0
+  vault:
+    # https://artifacthub.io/packages/helm/hashicorp/vault
+    chartVersion: 0.25.0

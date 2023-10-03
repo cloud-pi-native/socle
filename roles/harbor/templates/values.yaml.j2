@@ -2,6 +2,9 @@ expose:
   imagePullPolicy: IfNotPresent
   type: ingress
   tls:
+{% if dsc.ingress.tls.type == 'none' %}
+    enabled: false
+{% else %}
     enabled: true
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
     certSource: secret
@@ -13,6 +16,7 @@ expose:
     secret:
       secretName: harbor-ingress
       notarySecretName: harbor-ingress-notary
+{% endif %}
 {% endif %}
   ingress:
     hosts:
@@ -40,12 +44,15 @@ externalURL: https://{{ harbor_domain }}
 persistence:
   enabled: true
   resourcePolicy: keep
+  persistentVolumeClaim:
+    registry:
+      size: "{{ dsc.harbor.pvcRegistrySize }}"
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
 {% if dsc.proxy.enabled %}
 proxy:
-  http_proxy: {{ dsc.proxy.http_proxy }}
-  https_proxy: {{ dsc.proxy.https_proxy }}
-  no_proxy: {{ dsc.proxy.no_proxy }},.local,.internal
+  httpProxy: {{ dsc.proxy.http_proxy }}
+  httpsProxy: {{ dsc.proxy.https_proxy }}
+  noProxy: {{ dsc.proxy.no_proxy }},.local,.internal
   components:
     - nginx
     - portal

@@ -1,3 +1,9 @@
+- ansible.builtin.set_fact:
+    vault_auth_path: "jwt"
+    vault_auth_role: "default-ci"
+    npm_file: "{{ lookup('file', '{{ playbook_dir }}/roles/gitlab/npm_file') }}"
+    mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
+
 - name: Install gitlab subscription
   kubernetes.core.k8s:
     template: "{{ item }}"
@@ -149,7 +155,8 @@
         command: >
           bash -c "echo 'PersonalAccessToken.create!(user_id: 1
           , name: \"ANSIBLE-DSO\"
-          , scopes: [:api, :read_repository, :write_repository]).token' | gitlab-rails console"
+          , scopes: [:api, :read_repository, :write_repository]
+          , expires_at: 365.days.from_now).token' | gitlab-rails console"
       register: token
 
     - name: Set new gitlab token
@@ -244,21 +251,21 @@
     state: "{{ dsc.proxy.enabled | ternary('present', 'absent') }}"
     variables:
       - name: "HTTP_PROXY"
-        value: "{{ dsc.proxy.http_proxy }}"
+        value: "{{ dsc.proxy.http_proxy | default ('') }}"
       - name: "HTTPS_PROXY"
-        value: "{{ dsc.proxy.https_proxy }}"
+        value: "{{ dsc.proxy.https_proxy | default ('') }}"
       - name: "NO_PROXY"
-        value: "{{ dsc.proxy.no_proxy }}"
+        value: "{{ dsc.proxy.no_proxy | default ('') }}"
       - name: "PROXY_HOST"
-        value: "{{ dsc.proxy.host }}"
+        value: "{{ dsc.proxy.host | default ('') }}"
       - name: "PROXY_PORT"
-        value: "{{ dsc.proxy.port }}"
+        value: "{{ dsc.proxy.port | default ('') }}"
       - name: "http_proxy"
-        value: "{{ dsc.proxy.http_proxy }}"
+        value: "{{ dsc.proxy.http_proxy | default ('') }}"
       - name: "https_proxy"
-        value: "{{ dsc.proxy.https_proxy }}"
+        value: "{{ dsc.proxy.https_proxy | default ('') }}"
       - name: "no_proxy"
-        value: "{{ dsc.proxy.no_proxy }}"
+        value: "{{ dsc.proxy.no_proxy | default ('') }}"
 
 - name: "Set or update CA_BUNDLE variable"
   community.general.gitlab_group_variable:

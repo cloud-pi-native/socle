@@ -47,91 +47,6 @@ spec:
                       - name
                     type: object
                   type: array
-                argocd:
-                  description: Configuration for ArgoCD.
-                  properties:
-                    admin:
-                      description: Configuration for the ArgoCD admin user.
-                      properties:
-                        # TO DO
-                        enabled:
-                          default: false
-                          description: Specifies whether the ArgoCD admin user is enabled.
-                          type: boolean
-                        password:
-                          description: The password for the ArgoCD admin user.
-                          type: string
-                      required:
-                        - enabled
-                      type: object
-                    namespace:
-                      default: dso-argocd
-                      description: The namespace for ArgoCD.
-                      type: string
-                    subDomain:
-                      default: argocd
-                      description: The subdomain for ArgoCD.
-                      type: string
-                    chartVersion:
-                      default: 4.7.13
-                      description: ArgoCD Bitnami helm chart version (e.g., "4.7.13").
-                      type: string
-                    values:
-                      description: |
-                        You can merge customs values for argocd, it will be merged with roles/argocd/tasks/main.yaml
-                        See https://github.com/bitnami/charts/tree/main/bitnami/argo-cd
-                      type: object
-                      default: {}
-                      x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - chartVersion
-                  type: object
-                certmanager:
-                  description: Configuration for Cert Manager.
-                  properties:
-                    version:
-                      default: v1.11.1
-                      description: Specifies the version of Cert Manager to use.
-                      type: string
-                  required:
-                    - version
-                  type: object
-                cloudnativepg:
-                  description: Configuration for CloudNativePG.
-                  properties:
-                    namespace:
-                      default: cnpg-system
-                      description: The namespace for cloudnativepg.
-                      type: string
-                    chartVersion:
-                      default: 0.18.2
-                      description: CloudNativePG helm chart version (e.g., "0.18.2").
-                      type: string
-                  required:
-                    - chartVersion
-                    - namespace
-                  type: object
-                console:
-                  description: Configuration for the console.
-                  properties:
-                    dbPassword:
-                      description: The password for the console's database.
-                      type: string
-                    namespace:
-                      default: dso-console
-                      description: The namespace for console.
-                      type: string
-                    release:
-                      default: 5.6.0
-                      description: Console version (e.g., "5.6.0").
-                      type: string
-                    subDomain:
-                      default: console
-                      description: The subdomain for console.
-                      type: string
-                  required:
-                    - dbPassword
-                  type: object
                 exposedCA:
                   description: Private CA cert needed to validate HTTPS traffic between tools.
                   type: object
@@ -191,20 +106,93 @@ spec:
                         - url
                         - certmanager
                       default: none
+                argocd:
+                  description: Configuration for ArgoCD.
+                  properties:
+                    admin:
+                      description: Configuration for the ArgoCD admin user.
+                      properties:
+                        # TO DO
+                        enabled:
+                          default: false
+                          description: Specifies whether the ArgoCD admin user is enabled.
+                          type: boolean
+                        password:
+                          description: The password for the ArgoCD admin user.
+                          type: string
+                      required:
+                        - enabled
+                      type: object
+                    namespace:
+                      description: The namespace for ArgoCD.
+                      type: string
+                    subDomain:
+                      description: The subdomain for ArgoCD.
+                      type: string
+                    chartVersion:
+                      description: ArgoCD Bitnami helm chart version (e.g., "4.7.13").
+                      type: string
+                    values:
+                      description: |
+                        You can merge customs values for argocd, it will be merged with roles/argocd/tasks/main.yaml
+                        See https://github.com/bitnami/charts/tree/main/bitnami/argo-cd
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - admin
+                  type: object
+                certmanager:
+                  description: Configuration for Cert Manager.
+                  properties:
+                    version:
+                      description: Specifies the version of Cert Manager to use.
+                      type: string
+                  type: object
+                cloudnativepg:
+                  description: Configuration for CloudNativePG.
+                  properties:
+                    namespace:
+                      description: The namespace for cloudnativepg.
+                      type: string
+                    chartVersion:
+                      description: CloudNativePG helm chart version (e.g., "0.18.2").
+                      type: string
+                  type: object
+                console:
+                  description: Configuration for the console.
+                  properties:
+                    dbPassword:
+                      description: The password for the console's database.
+                      type: string
+                    namespace:
+                      description: The namespace for console.
+                      type: string
+                    release:
+                      description: Console version (e.g., "4.1.0").
+                      type: string
+                    subDomain:
+                      description: The subdomain for console.
+                      type: string
+                    values:
+                      description: Extra helm values for console
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - dbPassword
+                  type: object
                 gitlab:
                   description: Configuration for GitLab.
                   properties:
                     namespace:
-                      default: dso-gitlab
                       description: The namespace for GitLab.
                       type: string
                     subDomain:
-                      default: gitlab
                       description: The subdomain for GitLab.
                       type: string
                     chartVersion:
-                      default: 7.0.8
-                      description: GitLab chart version (e.g., "7.0.8").
+                      description: GitLab chart version (e.g., "6.11.10").
                       type: string
                     values:
                       description: |
@@ -219,9 +207,6 @@ spec:
                         If you use a private CA in exposed_ca, you should set it to true.
                         Configuring tools in pipelines container is not an easy job.
                       type: boolean
-                      default: false
-                  required:
-                    - chartVersion
                   type: object
                 global:
                   description: Global configuration not specific to one service
@@ -262,16 +247,17 @@ spec:
                       description: Administrator password for Harbor.
                       type: string
                     namespace:
-                      default: dso-harbor
                       description: The namespace for Harbor.
                       type: string
                     subDomain:
-                      default: harbor
                       description: The subdomain for Harbor.
                       type: string
                     chartVersion:
-                      default: 1.12.2
                       description: Harbor helm chart version (e.g., "1.12.2").
+                      type: string
+                    pvcRegistrySize:
+                      description: "Size for registry, default: 50Gi"
+                      default: 50Gi
                       type: string
                     values:
                       description: |
@@ -282,7 +268,7 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                   required:
                     - adminPassword
-                    - chartVersion
+                    - pvcRegistrySize
                   type: object
                 ingress:
                   description: General configuration for ingress.
@@ -373,30 +359,16 @@ spec:
                   description: Configuration for Keycloak.
                   properties:
                     namespace:
-                      default: dso-keycloak
                       description: The namespace for Keycloak.
                       type: string
                     subDomain:
-                      default: keycloak
                       description: The subdomain for Keycloak.
                       type: string
                     chartVersion:
-                      default: 16.0.3
                       description: Keycloak chart version (e.g., "16.0.3").
                       type: string
-                    postgreSQLimageName:
-                      default: ""
-                      description: |
-                        PostgreSQL image name that will be installed by CNPG operator.
-                        By default, the operator will install the latest available minor version of the latest major version of PostgreSQL when the operator was released.
-                        See : https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster
-                        You can override this by setting the postgreSQLimageName here.
-                        In example, you could set the value to "ghcr.io/cloudnative-pg/postgresql:14.9".
-                        Remember you should NEVER use tags like "latest" or just "14" in a production environment.
-                        More about container image requirements here :
-                        https://cloudnative-pg.io/documentation/1.20/container_images/
-                        You can browse available image tags here :
-                        https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
                       type: string
                     values:
                       description: |
@@ -406,28 +378,21 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - chartVersion
                   type: object
                 kubed:
                   description: Configuration for Kubed (config-syncer).
                   properties:
                     chartVersion:
-                      default: v0.13.2
                       description: Kubed helm chart version (e.g., "v0.13.2").
                       type: string
-                  required:
-                    - chartVersion
                   type: object
                 nexus:
                   description: Configuration for Nexus.
                   properties:
                     namespace:
-                      default: dso-nexus
                       description: The namespace for Nexus.
                       type: string
                     subDomain:
-                      default: nexus
                       description: The subdomain for Nexus.
                       type: string
                     storageSize:
@@ -437,12 +402,10 @@ spec:
                       type: string
                       default: 25Gi
                     imageTag:
-                      default: 3.56.0
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
                   required:
                     - storageSize
-                    - imageTag
                   type: object
                 proxy:
                   description: Proxy configuration for tools.
@@ -466,7 +429,6 @@ spec:
                         so easy to configure. \nExample: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain\n"
                       type: string
                     port:
-                      default: "3128"
                       description: Distant proxy port listenning
                       type: string
                   required:
@@ -476,37 +438,17 @@ spec:
                   description: Configuration for SonarQube.
                   properties:
                     namespace:
-                      default: dso-sonarqube
                       description: The namespace for SonarQube.
                       type: string
                     subDomain:
-                      default: sonarqube
                       description: The subdomain for SonarQube.
                       type: string
                     chartVersion:
-                      default: 3.2.10
                       description: SonarQube Bitnami helm chart version (e.g., "3.2.10").
                       type: string
-                    postgreSQLimageName:
-                      default: ""
-                      description: |
-                        PostgreSQL image name that will be installed by CNPG operator.
-                        By default, the operator will install the latest available minor version of the latest major version of PostgreSQL when the operator was released.
-                        See : https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster
-                        You can override this by setting the postgreSQLimageName here.
-                        In example, you could set the value to "ghcr.io/cloudnative-pg/postgresql:14.9".
-                        Remember you should NEVER use tags like "latest" or just "14" in a production environment.
-                        More about container image requirements here :
-                        https://cloudnative-pg.io/documentation/1.20/container_images/
-                        You can browse available image tags here :
-                        https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
                       type: string
-                    postgreSQLvolumeSize:
-                      description: |
-                        The storage size for SonarQube PostgreSQL PVC.
-                        Must comply with Kubernetes size definitions (i.e 25Gi).
-                      type: string
-                      default: 25Gi
                     values:
                       description: |
                         You can merge customs values for sonarqube, it will be merged with roles/sonarqube/tasks/main.yaml
@@ -514,43 +456,33 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - chartVersion
-                    - postgreSQLvolumeSize
                   type: object
                 sops:
                   properties:
                     namespace:
-                      default: dso-sops
                       description: Namespace for SOPS.
                       type: string
                     chartVersion:
-                      default: 0.15.1
                       description: SOPS helm chart version (e.g., "0.15.1").
                       type: string
                     values:
+                      default: {}
                       description: |
                         You can merge customs values for sops, it will be merged with roles/sops/tasks/main.yaml
                         See https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator
                       type: object
-                      default: {}
                       x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - chartVersion
                   type: object
                 vault:
                   description: Configuration for Vault.
                   properties:
                     namespace:
-                      default: dso-vault
                       description: The namespace for Vault.
                       type: string
                     subDomain:
-                      default: vault
                       description: The subdomain for Vault.
                       type: string
                     chartVersion:
-                      default: 0.25.0
                       description: Hashicorp Vault helm chart version (e.g., "0.25.0").
                       type: string
                     values:
@@ -560,8 +492,6 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - chartVersion
                   type: object
               required:
                 - additionalsCA

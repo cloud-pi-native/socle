@@ -26,9 +26,11 @@ spec:
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
+    postgresPvcSize: 1Gi
   sonarqube:
     namespace: dso-sonarqube
     subDomain: sonar
+    postgresPvcSize: 5Gi
   vault:
     namespace: dso-vault
     subDomain: vault

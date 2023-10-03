@@ -367,6 +367,9 @@ spec:
                     chartVersion:
                       description: Keycloak chart version (e.g., "16.0.3").
                       type: string
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
+                      type: string
                     values:
                       description: |
                         You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values.j2
@@ -442,6 +445,9 @@ spec:
                       type: string
                     chartVersion:
                       description: SonarQube Bitnami helm chart version (e.g., "3.2.10").
+                      type: string
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
                       type: string
                     values:
                       description: |

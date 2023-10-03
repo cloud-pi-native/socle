@@ -31,4 +31,4 @@ spec:
 
   # Require 1Gi of space per instance using default storage class
   storage:
-    size: 1Gi
+    size: {{ dsc.keycloak.postgresPvcSize }}

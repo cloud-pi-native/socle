@@ -47,6 +47,15 @@ persistence:
   persistentVolumeClaim:
     registry:
       size: "{{ dsc.harbor.pvcRegistrySize }}"
+    jobservice:
+      jobLog:
+        size: 5Gi
+    database:
+      size: 10Gi
+    redis:
+      size: 5Gi
+    trivy:
+      size: 10Gi
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
 {% if dsc.proxy.enabled %}
 proxy:

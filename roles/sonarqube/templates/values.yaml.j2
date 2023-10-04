@@ -33,7 +33,7 @@ ingress:
 {% endfor %}
   # This property allows for reports up to a certain size to be uploaded to SonarQube
     nginx.ingress.kubernetes.io/proxy-body-size: "64m"
-  ingressClassName: ""
+  ingressClassName: {{ dsc.ingress.className }}
   labels:
     app: "sonar"
 {% if not dsc.ingress.tls.type == 'none' %}

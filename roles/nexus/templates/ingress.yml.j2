@@ -23,6 +23,7 @@ spec:
     secretName: nexus-tls-secret
 {% endif %}
 {% endif %}
+  ingressClassName: {{ dsc.ingress.className }}
   rules:
     - host: {{ nexus_domain }}
       http:

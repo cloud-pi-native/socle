@@ -19,6 +19,7 @@ expose:
 {% endif %}
 {% endif %}
   ingress:
+    className: {{ dsc.ingress.className }}
     hosts:
       core: {{ harbor_domain }}
       notary: {{ dsc.harbor.subDomain }}-notary{{ root_domain }}

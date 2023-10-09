@@ -278,6 +278,9 @@ spec:
                       default: {}
                       description: Additionals annotations to add to all tools' ingresses
                       type: object
+                    className:
+                      description: Ingress class name to use for all ingresses
+                      type: string
                     labels:
                       x-kubernetes-preserve-unknown-fields: true
                       default: {}

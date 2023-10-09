@@ -70,6 +70,7 @@ global:
       name: {{ gitlab_domain }}
 {% endif %}
   ingress:
+    class: {{ dsc.ingress.className }}
     annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
       {{ key }}: {{ val }}

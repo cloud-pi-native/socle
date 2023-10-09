@@ -86,4 +86,18 @@ extraDeploy:
     kind: ConfigMap
     metadata:
       name: argocd-rbac-cm
-      namespace: {{ dsc.argocd.namespace }}
+      namespace: {{ dsc.ingress.className  }}
+applicationSet:
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className  }}
+notifications:
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className  }}
+server:
+  ingress:
+    ingressClassName: {{ dsc.ingress.className  }}
+server:
+  ingressGrpc:
+    ingressClassName: {{ dsc.ingress.className  }}

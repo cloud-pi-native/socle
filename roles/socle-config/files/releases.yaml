@@ -20,7 +20,7 @@ spec:
     chartVersion: "7.3.4"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
-    chartVersion: 1.12.2
+    chartVersion: 1.13.0
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 16.1.5

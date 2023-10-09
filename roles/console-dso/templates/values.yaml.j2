@@ -1,5 +1,5 @@
 ingress:
-  ingressClassName: {{ dsc.ingress.className }}
+  ingressClassName: {{ dsc.ingress.className | default('') }}
   hosts:
     - {{ console_domain }}
   annotations: {{ dsc.ingress.annotations }}

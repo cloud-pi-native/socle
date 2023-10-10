@@ -112,7 +112,7 @@ service:
 
 ingress:
   enabled: true
-  ingressClassName: {{ dsc.ingress.className }}
+  ingressClassName: {{ dsc.ingress.className | default('') }}
   pathType: "Prefix"
   apiVersion: ""
   hostname: "{{ keycloak_domain }}"

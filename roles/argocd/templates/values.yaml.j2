@@ -21,14 +21,17 @@ config:
 controller:
   <<: *securityContext
 dex:
-  <<: *securityContext
-  enabled: true
+  enabled: false
 server:
   <<: *securityContext
+  ingress:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
+  ingressGrpc:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
   insecure: true
   config:
     clusterResources: "true"
-    url: "https://{{ argocd_domain }}/"
+    url: "https://{{ argocd_domain }}"
     oidc.config: |
       issuer: https://{{ keycloak_domain }}/realms/dso
       requestedScopes: ["openid", "generic"]
@@ -95,9 +98,3 @@ notifications:
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
-server:
-  ingress:
-    ingressClassName: {{ dsc.ingress.className | default('') }}
-server:
-  ingressGrpc:
-    ingressClassName: {{ dsc.ingress.className | default('') }}

@@ -29,16 +29,13 @@
       "PRIVATE-TOKEN": "{{ gitlab_token }}"
     body:
       runner_type: instance_type
-      group_id: 1
-      description: Default-instance-runner
+      description: dso-runner
       platform: null
       run_untagged: true
     body_format: form-urlencoded
+    status_code: [201]
   changed_when: true
-
-- meta: end_play
-
-
+  register: default_runner
 
 - name: Add GitLab Runner helm repo
   kubernetes.core.helm_repository:

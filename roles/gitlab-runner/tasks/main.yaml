@@ -9,27 +9,50 @@
     msg: "Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant"
   when: gitlab_ns | length == 0
 
-- name: Install gitlab-runner subscription and role
-  kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_items:
-    - operator-subscription.yaml.j2
-    - gitlab-runner-auth.yaml.j2
-
-- name: Wait Gitlab Runner exists
+- name: Get dso-config inventory
   kubernetes.core.k8s_info:
-    api_version: apps.gitlab.com/v1beta2
-    kind: Runner
+    namespace: "{{ dsc.console.namespace }}"
+    kind: ConfigMap
+    name: dso-config
+  register: ansible_inventory
+
+- name: Get gitlab token
+  ansible.builtin.set_fact:
+    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
+
+- name: Initiate a runner in GitLab instance
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ gitlab_domain }}/api/v4/user/runners"
+    method: POST
+    headers:
+      "PRIVATE-TOKEN": "{{ gitlab_token }}"
+    body:
+      runner_type: instance_type
+      group_id: 1
+      description: Default-instance-runner
+      platform: null
+      run_untagged: true
+    body_format: form-urlencoded
+  changed_when: true
+
+- meta: end_play
+
+
+
+- name: Add GitLab Runner helm repo
+  kubernetes.core.helm_repository:
+    name: gitlab
+    repo_url: https://charts.gitlab.io
+
+- name: Set GitLab Runner helm values
+  ansible.builtin.set_fact:
+    runner_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+
+- name: Deploy GitLab Runner helm
+  kubernetes.core.helm:
     name: gitlab-runner
-    namespace: "{{ dsc.gitlab.namespace }}"
-  register: runner_kind
-  until: runner_kind.api_found
-  retries: 5
-
-- name: Add custom env
-  kubernetes.core.k8s:
-    template: custom-env.yaml.j2
-
-- name: Install gitlab instance
-  kubernetes.core.k8s:
-    template: gitlab-runner-instance.yaml.j2
+    chart_ref: gitlab/gitlab-runner
+    chart_version: "{{ dsc.gitlabRunner.chartVersion }}"
+    release_namespace: "{{ dsc.gitlab.namespace }}"
+    values: "{{ runner_values }}"

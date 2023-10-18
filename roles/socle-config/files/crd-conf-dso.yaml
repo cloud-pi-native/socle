@@ -208,6 +208,20 @@ spec:
                         Configuring tools in pipelines container is not an easy job.
                       type: boolean
                   type: object
+                gitlabOperator:
+                  description: Configuration for GitLab Operator.
+                  properties:
+                    chartVersion:
+                      description: GitLab Operator release version (e.g., "0.24.1").
+                      type: string
+                  type: object
+                gitlabRunner:
+                  description: Configuration for GitLab Runner.
+                  properties:
+                    chartVersion:
+                      description: GitLab Runner chart version (e.g., "0.57.0").
+                      type: string
+                  type: object
                 global:
                   description: Global configuration not specific to one service
                   properties:
@@ -504,6 +518,7 @@ spec:
                 - console
                 - exposedCA
                 - gitlab
+                - gitlabOperator
                 - global
                 - harbor
                 - ingress

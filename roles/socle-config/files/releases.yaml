@@ -14,10 +14,16 @@ spec:
     chartVersion: 0.18.2
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "5.9.1"
+    release: "5.10.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "7.3.4"
+  gitlabOperator:
+    # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
+    chartVersion: "0.24.0"
+  gitlabRunner:
+    # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
+    chartVersion: "0.57.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.13.0

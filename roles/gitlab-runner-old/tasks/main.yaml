@@ -1,0 +1,35 @@
+- name: Get Gitlab namespace
+  kubernetes.core.k8s_info:
+    kind: Namespace
+    name: "{{ dsc.gitlab.namespace }}"
+  register: gitlab_ns
+
+- name: Fail if Gitlab namespace is not present
+  ansible.builtin.fail:
+    msg: "Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant"
+  when: gitlab_ns | length == 0
+
+- name: Install gitlab-runner subscription and role
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - operator-subscription.yaml.j2
+    - gitlab-runner-auth.yaml.j2
+
+- name: Wait Gitlab Runner exists
+  kubernetes.core.k8s_info:
+    api_version: apps.gitlab.com/v1beta2
+    kind: Runner
+    name: gitlab-runner
+    namespace: "{{ dsc.gitlab.namespace }}"
+  register: runner_kind
+  until: runner_kind.api_found
+  retries: 5
+
+- name: Add custom env
+  kubernetes.core.k8s:
+    template: custom-env.yaml.j2
+
+- name: Install gitlab instance
+  kubernetes.core.k8s:
+    template: gitlab-runner-instance.yaml.j2

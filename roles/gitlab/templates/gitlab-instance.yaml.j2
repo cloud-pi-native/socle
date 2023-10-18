@@ -21,7 +21,7 @@ gitlab:
 minio:
   ingress:
     tls:
-      secretName: gitlab-minio
+      secretName: gitlab-minio-secret
 {% else %}
 gitlab:
   webservice:
@@ -40,6 +40,7 @@ minio:
   ingress:
     tls: {}
 {% endif %}
+
 global:
   registry:
     enabled: false

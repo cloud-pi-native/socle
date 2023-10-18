@@ -1,0 +1,160 @@
+image:
+  registry: registry.gitlab.com
+  image: gitlab-org/gitlab-runner
+  # tag: alpine-v11.6.0
+
+imagePullPolicy: IfNotPresent
+
+replicas: 1
+
+## How many old ReplicaSets for this Deployment you want to retain
+revisionHistoryLimit: 2
+
+gitlabUrl: https://{{ gitlab_domain }}/
+
+runnerRegistrationToken: "MIdOlHo6WN9yAP07v7EM15JR8wLBrK2J6aiOxyw0jWfwAYtyO3zMdrqP3a2dGDx1"
+
+runnerToken: ""
+
+terminationGracePeriodSeconds: 3600
+
+## Set the certsSecretName in order to pass custom certficates for GitLab Runner to use
+## Provide resource name for a Kubernetes Secret Object in the same namespace,
+## this is used to populate the /home/gitlab-runner/.gitlab-runner/certs/ directory
+## ref: https://docs.gitlab.com/runner/configuration/tls-self-signed.html#supported-options-for-self-signed-certificates-targeting-the-gitlab-server
+
+##
+certsSecretName: gitlab-wildcard-tls-chain
+
+concurrent: 10
+
+checkInterval: 30
+
+rbac:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["pods", "secrets", "configmaps"]
+      verbs: ["list", "get", "watch", "create", "delete", "update"]
+    - apiGroups: [""]
+      resources: ["pods/exec", "pods/attach"]
+      verbs: ["create"]
+    - apiGroups: [""]
+      resources: ["pods/log"]
+      verbs: ["get"]
+  clusterWideAccess: false
+
+## Configuration for the Pods that the runner launches for each new job
+##
+runners:
+  # runner configuration, where the multi line strings is evaluated as
+  # template so you can specify helm values inside of it.
+  #
+  # tpl: https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
+  # runner configuration: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+  config: |
+    [[runners]]
+      [runners.kubernetes]
+        namespace = "{{ dsc.gitlab.namespace }}"
+        image = "ubuntu:22.04"
+
+  ## Absolute path for an existing runner configuration file
+  ## Can be used alongside "volumes" and "volumeMounts" to use an external config file
+  ## Active if runners.config is empty or null
+  configPath: ""
+
+  ## Which executor should be used
+  ##
+  # executor: kubernetes
+
+  ## Specify the name for the runner.
+  ##
+  name: gitlab-runner
+
+  ## The name of the secret containing runner-token and runner-registration-token
+  secret: gitlab-runner-secret
+
+  cache: {}
+
+## Configure securitycontext for the main container
+## ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/ 
+##
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  privileged: false
+  capabilities:
+    drop: ["ALL"]
+
+## Configure securitycontext valid for the whole pod
+## ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/ 
+##
+podSecurityContext:
+  runAsUser: null
+  fsGroup: null
+
+## Configure resource requests and limits
+## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+##
+resources: {}
+  # limits:
+  #   memory: 256Mi
+  #   cpu: 200m
+  # requests:
+  #   memory: 128Mi
+  #   cpu: 100m
+
+## Configure environment variables that will be present when the registration command runs
+## This provides further control over the registration process and the config.toml file
+## ref: `gitlab-runner register --help`
+## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+##
+envVars:
+  - name: RUNNER_EXECUTOR
+    value: kubernetes
+{% if dsc.proxy.enabled %}
+  - name: HTTP_PROXY
+    value: "{{ dsc.proxy.http_proxy }}"
+  - name: HTTPS_PROXY
+    value: "{{ dsc.proxy.https_proxy }}"
+  - name: NO_PROXY
+    value: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
+
+## Annotations to be added to deployment
+##
+deploymentAnnotations: {}
+  # Example:
+  # downscaler/uptime: <my_uptime_period>
+
+## Labels to be added to deployment
+##
+deploymentLabels: {}
+  # Example:
+  # owner.team: <my_cool_team>
+
+## Annotations to be added to manager pod
+##
+podAnnotations: {}
+  # Example:
+  # iam.amazonaws.com/role: <my_role_arn>
+
+## Labels to be added to manager pod
+##
+podLabels: {}
+  # Example:
+  # owner.team: <my_cool_team>
+
+## Configure priorityClassName for manager pod. See k8s docs for more info on how pod priority works:
+##  https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+priorityClassName: ""
+
+volumeMounts:
+  - name: root-gitlab-runner
+    mountPath: /.gitlab-runner
+
+volumes:
+  - name: root-gitlab-runner
+    emptyDir:
+      medium: "Memory"

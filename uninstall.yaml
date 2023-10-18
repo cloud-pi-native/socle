@@ -69,7 +69,6 @@
       tags:
         - always
 
-<<<<<<< HEAD
     - name: "Déclaration des facts config et releases"
       ansible.builtin.set_fact:
         dsc_default_config: "{{ lookup('ansible.builtin.file', './roles/socle-config/files/config.yaml') | from_yaml }}"
@@ -79,7 +78,7 @@
 
     - name: "Combinaison des nouveaux facts avec le fact dsc"
       ansible.builtin.set_fact:
-        dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
+        dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True)}}"
       tags:
         - always
 
@@ -89,6 +88,7 @@
       tags:
         - always
 
+<<<<<<< HEAD
     - name: Suppression de cert-manager
       kubernetes.core.helm:
         name: cert-manager
@@ -101,6 +101,8 @@
 
     - name: "Suppression du namespace cert-manager"
 =======
+=======
+>>>>>>> 11588de (refactor: :recycle: adaptation du playbook de désinstallation)
     - name: Suppression de cert-manager
       kubernetes.core.helm:
         name: cert-manager
@@ -111,8 +113,7 @@
         - never
         - cert-manager
 
-    - name: Suppression du namespace cert-manager
->>>>>>> d339b26 (refactor: :recycle: installation cert-manager via helm chart)
+    - name: "Suppression du namespace cert-manager"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace

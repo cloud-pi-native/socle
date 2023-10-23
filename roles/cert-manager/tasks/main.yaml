@@ -1,33 +1,29 @@
-- name: Check cert-manager deployment
-  kubernetes.core.k8s_info:
-    kind: Deployment
-    namespace: cert-manager
-    name: cert-manager-webhook
-  register: cert_manager_webhook
+- name: Add cert-manager helm repo
+  kubernetes.core.helm_repository:
+    name: jetstack
+    repo_url: https://charts.jetstack.io
 
-- name: Download cert-manager
-  ansible.builtin.uri:
-    url: "https://github.com/cert-manager/cert-manager/releases/download/{{ dsc.certmanager.version }}/cert-manager.yaml"
-    return_content: true
-  register: cert_manifest
-
-- name: Edit manifest
-  ansible.builtin.set_fact:
-    manifest: "{{ cert_manifest.content | from_yaml_all | custom_cert_manager(envs) }}"
-  vars:
-    envs:
-      - name: http_proxy
-        value: "{{ dsc.proxy.http_proxy }}"
-      - name: https_proxy
-        value: "{{ dsc.proxy.https_proxy }}"
-      - name: no_proxy
-        value: "{{ dsc.proxy.no_proxy }}"
-  when: dsc.proxy.enabled
-
-- name: Apply cert-manager
+# Installation des CRDs indépendamment du chart helm.
+# Recommandé en production.
+# Voir : https://cert-manager.io/docs/installation/helm
+- name: Apply CRDs
   kubernetes.core.k8s:
     state: present
-    definition: "{{ manifest | default(cert_manifest.content | from_yaml_all) }}"
+    src: "https://github.com/cert-manager/cert-manager/releases/download/{{ dsc.certmanager.chartVersion }}/cert-manager.crds.yaml"
+
+- name: Set cert-manager helm values
+  ansible.builtin.set_fact:
+    cm_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    #    force: true
+    name: cert-manager
+    chart_ref: jetstack/cert-manager
+    chart_version: "{{ dsc.certmanager.chartVersion }}"
+    release_namespace: cert-manager
+    create_namespace: true
+    values: "{{ cm_values }}"
 
 - name: Wait cert-manager to initialize
   kubernetes.core.k8s_info:

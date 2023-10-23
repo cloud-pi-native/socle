@@ -8,7 +8,7 @@ spec:
     chartVersion: 4.7.19
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
-    version: v1.11.0
+    chartVersion: v1.13.1
   cloudnativepg:
     # https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
     chartVersion: 0.18.2

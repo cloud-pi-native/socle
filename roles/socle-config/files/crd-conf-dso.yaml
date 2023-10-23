@@ -145,8 +145,8 @@ spec:
                 certmanager:
                   description: Configuration for Cert Manager.
                   properties:
-                    version:
-                      description: Specifies the version of Cert Manager to use.
+                    chartVersion:
+                      description: Cert-manager helm chart version (e.g., "v1.13.1").
                       type: string
                   type: object
                 cloudnativepg:

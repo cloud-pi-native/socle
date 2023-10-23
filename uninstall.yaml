@@ -69,6 +69,16 @@
       tags:
         - always
 
+    - name: Suppression de cert-manager
+      kubernetes.core.helm:
+        name: cert-manager
+        release_namespace: cert-manager
+        state: absent
+        wait: true
+      tags:
+        - never
+        - cert-manager
+
     - name: Suppression du namespace cert-manager
       kubernetes.core.k8s:
         state: absent

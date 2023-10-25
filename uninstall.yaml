@@ -78,7 +78,7 @@
 
     - name: "Combinaison des nouveaux facts avec le fact dsc"
       ansible.builtin.set_fact:
-        dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True)}}"
+        dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
       tags:
         - always
 

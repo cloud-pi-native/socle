@@ -88,21 +88,6 @@
       tags:
         - always
 
-<<<<<<< HEAD
-    - name: Suppression de cert-manager
-      kubernetes.core.helm:
-        name: cert-manager
-        release_namespace: cert-manager
-        state: absent
-        wait: true
-      tags:
-        - never
-        - cert-manager
-
-    - name: "Suppression du namespace cert-manager"
-=======
-=======
->>>>>>> 11588de (refactor: :recycle: adaptation du playbook de désinstallation)
     - name: Suppression de cert-manager
       kubernetes.core.helm:
         name: cert-manager

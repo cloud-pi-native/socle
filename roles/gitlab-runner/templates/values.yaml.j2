@@ -31,16 +31,26 @@ checkInterval: 30
 rbac:
   create: true
   rules:
+#    - apiGroups: [""]
+#      resources: ["pods", "secrets", "configmaps"]
+#      verbs: ["list", "get", "watch", "create", "delete", "update"]
+#    - apiGroups: [""]
+#      resources: ["pods/exec", "pods/attach"]
+#      verbs: ["create"]
+#    - apiGroups: [""]
+#      resources: ["pods/log"]
+#      verbs: ["get"]
+    - resources: ["configmaps", "events", "pods", "pods/attach", "pods/exec", "secrets", "services"]
+      verbs: ["get", "list", "watch", "create", "patch", "update", "delete"]
     - apiGroups: [""]
-      resources: ["pods", "secrets", "configmaps"]
-      verbs: ["list", "get", "watch", "create", "delete", "update"]
-    - apiGroups: [""]
-      resources: ["pods/exec", "pods/attach"]
-      verbs: ["create"]
-    - apiGroups: [""]
-      resources: ["pods/log"]
-      verbs: ["get"]
+      resources: ["pods/exec"]
+      verbs: ["create", "patch", "delete"]
   clusterWideAccess: false
+  serviceAccountName: gitlab-runner
+  podSecurityPolicy:
+    enabled: true
+    resourceNames:
+    - gitlab-runner
 
 ## Configuration for the Pods that the runner launches for each new job
 ##
@@ -89,8 +99,8 @@ securityContext:
 ## ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/ 
 ##
 podSecurityContext:
-  runAsUser: null
-  fsGroup: null
+  runAsUser: 100
+  fsGroup: 65533
 
 ## Configure resource requests and limits
 ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/

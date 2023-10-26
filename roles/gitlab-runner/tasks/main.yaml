@@ -46,6 +46,10 @@
   ansible.builtin.set_fact:
     runner_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
+- name: Create gitlab-runner role
+  kubernetes.core.k8s:
+    template: gitlab-runner-auth.yaml.j2
+
 - name: Deploy GitLab Runner helm
   kubernetes.core.helm:
     name: gitlab-runner

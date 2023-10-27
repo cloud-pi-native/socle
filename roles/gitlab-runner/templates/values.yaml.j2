@@ -22,7 +22,10 @@ terminationGracePeriodSeconds: 3600
 ## ref: https://docs.gitlab.com/runner/configuration/tls-self-signed.html#supported-options-for-self-signed-certificates-targeting-the-gitlab-server
 
 ##
-certsSecretName: gitlab-wildcard-tls-chain
+#certsSecretName: gitlab-wildcard-tls-chain
+{% if dsc.exposedCA != 'none' %}
+certsSecretName: exposed-ca
+{% endif %}
 
 concurrent: 10
 

@@ -173,16 +173,16 @@
       tags:
         - sonarqube
 
-#    - name: Suppression du gitlab runner
-#      kubernetes.core.k8s:
-#        state: absent
-#        api_version: apps.gitlab.com/v1beta2
-#        kind: Runner
-#        name: gitlab-runner
-#        namespace: "{{ dsc.gitlab.namespace }}"
-#      tags:
-#        - gitlab-runner
-#        - gitlab
+    # - name: Suppression du gitlab runner
+    #   kubernetes.core.k8s:
+    #     state: absent
+    #     api_version: apps.gitlab.com/v1beta2
+    #     kind: Runner
+    #     name: gitlab-runner
+    #     namespace: "{{ dsc.gitlab.namespace }}"
+    #   tags:
+    #     - gitlab-runner
+    #     - gitlab
 
     - name: "Suppression du GitLab Runner"
       kubernetes.core.helm:

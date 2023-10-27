@@ -16,6 +16,7 @@ spec:
     dbPassword: myAwesomePassword
     values: {}
   gitlab: {}
+  gitlabOperator: {}
   global:
     environment: production
     projectsRootDir:

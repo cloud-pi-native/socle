@@ -4,7 +4,7 @@
 
   tasks:
 
-    - name: "Get socle config from conf-dso dsc (default)"
+    - name: "Récupération de la conf socle à partir de la dsc conf-dso (défaut)"
       kubernetes.core.k8s_info:
         kind: dsc
         name: conf-dso
@@ -13,7 +13,7 @@
       tags:
         - always
 
-    - name: Get socle config from dsc_cr extra var when defined
+    - name: "Récupération de la conf socle à partir de l'extra var dsc_cr quand définie"
       kubernetes.core.k8s_info:
         kind: dsc
         name: "{{ dsc_cr }}"
@@ -23,7 +23,7 @@
       tags:
         - always
 
-    - name: Check socle_config_custom and exit if empty
+    - name: "Vérification de socle_config_custom et arrêt si vide"
       when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
       tags:
         - always
@@ -50,22 +50,41 @@
         - name: Exit playbook
           ansible.builtin.meta: end_play
 
-    - name: Set socle_config fact when dsc_cr defined and not empty
+    - name: "Déclaration du fact socle_config quand dsc_cr est définie et non vide"
       ansible.builtin.set_fact:
         socle_config: "{{ socle_config_custom }}"
       when: (socle_config_custom is not skipped) and (socle_config_custom.resources | length > 0)
       tags:
         - always
 
-    - name: Set DSC Name fact
+    - name: "Déclaration du fact dsc_name"
       ansible.builtin.set_fact:
         dsc_name: "{{ socle_config.resources[0].metadata.name }}"
       tags:
         - always
 
-    - name: Set DSC fact
+    - name: "Déclaration du fact dsc"
       ansible.builtin.set_fact:
         dsc: "{{ socle_config.resources[0].spec }}"
+      tags:
+        - always
+
+    - name: "Déclaration des facts config et releases"
+      ansible.builtin.set_fact:
+        dsc_default_config: "{{ lookup('ansible.builtin.file', './roles/socle-config/files/config.yaml') | from_yaml }}"
+        dsc_default_releases: "{{ lookup('ansible.builtin.file', './roles/socle-config/files/releases.yaml') | from_yaml }}"
+      tags:
+        - always
+
+    - name: "Combinaison des nouveaux facts avec le fact dsc"
+      ansible.builtin.set_fact:
+        dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
+      tags:
+        - always
+
+    - name: "Mise à jour du fact dsc"
+      ansible.builtin.set_fact:
+        dsc: "{{ dsc.spec }}"
       tags:
         - always
 
@@ -79,7 +98,7 @@
         - never
         - cert-manager
 
-    - name: Suppression du namespace cert-manager
+    - name: "Suppression du namespace cert-manager"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -88,7 +107,7 @@
         - never
         - cert-manager
 
-    - name: Désinstallation de Kubed
+    - name: "Désinstallation de Kubed"
       kubernetes.core.helm:
         name: kubed
         chart_ref: appscode/kubed
@@ -100,18 +119,18 @@
         - confSyncer
         - kubed
 
-    - name: Suppression de l'instance CloudNativePG
+    - name: "Suppression de l'instance CloudNativePG"
       kubernetes.core.helm:
         name: cloudnative-pg
         release_namespace: "{{ dsc.cloudnativepg.namespace }}"
-        state: absent
+        release_state: absent
         wait: true
       tags:
         - never
         - cnpg
         - cloudnativepg
 
-    - name: Suppression du namespace CloudNativePG
+    - name: "Suppression du namespace CloudNativePG"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -121,7 +140,7 @@
         - cnpg
         - cloudnativepg
 
-    - name: Suppression de l'instance Keycloak
+    - name: "Suppression de l'instance Keycloak"
       kubernetes.core.helm:
         name: keycloak
         release_namespace: "{{ dsc.keycloak.namespace }}"
@@ -130,7 +149,7 @@
       tags:
         - keycloak
 
-    - name: Suppression du namespace Keycloak
+    - name: "Suppression du namespace Keycloak"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -138,7 +157,7 @@
       tags:
         - keycloak
 
-    - name: Suppression du namespace Nexus
+    - name: "Suppression du namespace Nexus"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -146,7 +165,7 @@
       tags:
         - nexus
 
-    - name: Suppression du namespace Sonarqube
+    - name: "Suppression du namespace Sonarqube"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -154,18 +173,28 @@
       tags:
         - sonarqube
 
-    - name: Suppression du gitlab runner
-      kubernetes.core.k8s:
-        state: absent
-        api_version: apps.gitlab.com/v1beta2
-        kind: Runner
+    - name: "Suppression du GitLab Runner"
+      kubernetes.core.helm:
         name: gitlab-runner
-        namespace: "{{ dsc.gitlab.namespace }}"
+        release_namespace: "{{ dsc.gitlab.namespace }}"
+        release_state: absent
+        wait: true
       tags:
         - gitlab-runner
         - gitlab
 
-    - name: Suppression du namespace GitLab
+    - name: "Suppression de l'instance GitLab"
+      kubernetes.core.k8s:
+        state: absent
+        api_version: apps.gitlab.com/v1beta1
+        kind: GitLab
+        name: gitlab
+        namespace: "{{ dsc.gitlab.namespace }}"
+        wait: true
+      tags:
+        - gitlab
+
+    - name: "Suppression du namespace GitLab"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -173,7 +202,7 @@
       tags:
         - gitlab
 
-    - name: Suppression du namespace Vault
+    - name: "Suppression du namespace Vault"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -181,7 +210,7 @@
       tags:
         - vault
 
-    - name: Suppression du namespace SOPS
+    - name: "Suppression du namespace SOPS"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -189,7 +218,7 @@
       tags:
         - sops
 
-    - name: Suppression du namespace ArgoCD
+    - name: "Suppression du namespace ArgoCD"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -199,7 +228,7 @@
         - argo
         - gitops
 
-    - name: Suppression du namespace Harbor
+    - name: "Suppression du namespace Harbor"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
@@ -208,7 +237,7 @@
         - harbor
         - registry
 
-    - name: Suppression du namespace Console
+    - name: "Suppression du namespace Console"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace

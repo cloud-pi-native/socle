@@ -1,21 +1,4 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: gitlab-runner
-  namespace: {{ dsc.gitlab.namespace }}
-rules:
-  - apiGroups: [""]
-    resources: ["pods", "secrets", "configmaps"]
-    verbs: ["list", "get", "watch", "create", "delete", "update"]
-  - apiGroups: [""]
-    resources: ["pods/exec", "pods/attach"]
-    verbs: ["create"]
-  - apiGroups: [""]
-    resources: ["pods/log"]
-    verbs: ["get"]
-
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: "RoleBinding"
 metadata:
   name: gitlab-runner-gitlab-runner
@@ -26,7 +9,7 @@ roleRef:
   name: gitlab-runner
 subjects:
   - kind: ServiceAccount
-    name: gitlab-runner-sa
+    name: gitlab-runner
     namespace: {{ dsc.gitlab.namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -41,5 +24,5 @@ roleRef:
   name: system:openshift:scc:anyuid
 subjects:
 - kind: ServiceAccount
-  name: gitlab-runner-sa
+  name: gitlab-runner
   namespace: {{ dsc.gitlab.namespace }}

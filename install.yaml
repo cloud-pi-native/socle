@@ -19,6 +19,7 @@
       tags:
         - cert-manager
         - cm
+        - always
 
     - name: confSyncer
       tags:
@@ -62,9 +63,9 @@
       tags:
         - vault
 
-    - name: sops
-      tags:
-        - sops
+    # - name: sops
+    #   tags:
+    #     - sops
 
     - name: argocd
       tags:

@@ -156,7 +156,8 @@
       ansible.builtin.set_fact:
         tb_pod: "{{ toolbox_pods.resources[0].metadata.name }}"
 
-    - name: Create Token
+    - name: Create Token for 7.2.0 chart version and higher
+      when: dsc.gitlab.chartVersion is version('7.2.0', operator='ge', version_type='loose')
       kubernetes.core.k8s_exec:
         pod: "{{ tb_pod }}"
         namespace: "{{ dsc.gitlab.namespace }}"
@@ -164,6 +165,18 @@
           bash -c "echo 'PersonalAccessToken.create!(user_id: 1
           , name: \"ANSIBLE-DSO\"
           , scopes: [:api, :read_repository, :write_repository, :create_runner]
+          , expires_at: 365.days.from_now).token' | gitlab-rails console"
+      register: token
+
+    - name: Create Token for chart versions lower than 7.2.0
+      when: dsc.gitlab.chartVersion is version('7.2.0', operator='lt', version_type='loose')
+      kubernetes.core.k8s_exec:
+        pod: "{{ tb_pod }}"
+        namespace: "{{ dsc.gitlab.namespace }}"
+        command: >
+          bash -c "echo 'PersonalAccessToken.create!(user_id: 1
+          , name: \"ANSIBLE-DSO\"
+          , scopes: [:api, :read_repository, :write_repository]
           , expires_at: 365.days.from_now).token' | gitlab-rails console"
       register: token
 

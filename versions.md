@@ -1,0 +1,16 @@
+| Outil | Version | Source |
+| ----- | ------- | ------ |
+| argocd | 4.7.19 | [argocd](https://artifacthub.io/packages/helm/bitnami/argo-cd) |
+| certmanager | v1.13.1 | [certmanager](https://github.com/cert-manager/cert-manager/releases) |
+| cloudnativepg | 0.18.2 | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg) |
+| console | 5.11.0 | [console](https://github.com/cloud-pi-native/console/releases) |
+| gitlab | 7.3.4 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
+| gitlabOperator | 0.24.0 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
+| gitlabRunner | 0.57.0 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
+| harbor | 1.13.0 | [harbor](https://artifacthub.io/packages/helm/harbor/harbor) |
+| keycloak | 16.1.5 | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak) |
+| kubed | 0.13.2 | [kubed](https://artifacthub.io/packages/helm/appscode/kubed) |
+| nexus | 3.56.0 | [nexus](https://hub.docker.com/r/sonatype/nexus3/) |
+| sonarqube | 10.2.1+800 | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube) |
+| sops | 0.17.0 | [sops](https://artifacthub.io/packages/helm/sops-secrets-operator/sops-secrets-operator) |
+| vault | 0.25.0 | [vault](https://artifacthub.io/packages/helm/hashicorp/vault) |

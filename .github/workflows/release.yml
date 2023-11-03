@@ -4,7 +4,7 @@ on:
   workflow_call:
     outputs:
       release-created:
-        description: Has the releease been created
+        description: Has the release been created
         value: ${{ jobs.release.outputs.release-created }}
       major-tag:
         description: Major version tag

@@ -295,3 +295,17 @@
         value: "-c http.sslVerify=false"
       - name: "EXTRA_VAULT_ARGS"
         value: "-tls-skip-verify"
+
+- name: "Set or update additional CI/CD variables"
+  community.general.gitlab_group_variable:
+    api_url: "https://{{ gitlab_domain }}"
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    purge: false
+    variables:
+      - name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        masked: "{{ item.masked }}"
+        protected: "{{ item.protected }}"
+  with_items: "{{ dsc.gitlab.extraCIVars }}"

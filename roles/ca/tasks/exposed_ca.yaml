@@ -22,14 +22,14 @@
   block:
     - name: Get secret
       kubernetes.core.k8s_info:
-        name: "{{ dsc.exposedCA.configmap.name }}"
-        namespace: "{{ dsc.exposedCA.configmap.namespace }}"
+        name: "{{ dsc.exposedCA.secret.name }}"
+        namespace: "{{ dsc.exposedCA.secret.namespace }}"
         kind: Secret
       register: exposed_ca_resource
 
     - name: Extract key
       ansible.builtin.set_fact:
-        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[dsc.exposedCA.configmap.key] | b64decode }}"
+        exposed_ca_pem: "{{ exposed_ca_resource.resources[0].data[dsc.exposedCA.secret.key] | b64decode }}"
 
 - name: Exposed_ca (certmanager)
   when: dsc.exposedCA.type == 'certmanager'
@@ -53,7 +53,7 @@
         cmd: "curl {{ dsc.exposedCA.url }} -s | openssl x509"
       changed_when: false
       register: exposed_ca_resource
-      tags: ['skip_ansible_lint']
+      tags: ["skip_ansible_lint"]
 
     - name: Extract key
       ansible.builtin.set_fact:

@@ -1,19 +1,44 @@
-- name: Install gitlab subscription
-  kubernetes.core.k8s:
-    template: "{{ item }}"
-  with_items:
-    - operator-group.yaml.j2
-    - operator-subscription.yaml.j2
+- ansible.builtin.set_fact:
+    vault_auth_path: "jwt"
+    vault_auth_role: "default-ci"
+    npm_file: "{{ lookup('file', '{{ playbook_dir }}/roles/gitlab/npm_file') }}"
+    mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
 
-- name: Wait Gitlab CRD exist
-  kubernetes.core.k8s_info:
-    api_version: apps.gitlab.com/v1beta1
-    kind: GitLab
-    namespace: "{{ dsc.gitlab.namespace }}"
-  register: gitlab_kind
-  until: gitlab_kind.api_found
-  retries: 15
-  delay: 5
+- name: Install GitLab Operator
+  block:
+    - name: Create GitLab namespace
+      kubernetes.core.k8s:
+        name: "{{ dsc.gitlab.namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Add GitLab Operator helm repo
+      kubernetes.core.helm_repository:
+        name: gitlab-operator
+        repo_url: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+
+    - name: Set GitLab Operator helm values
+      ansible.builtin.set_fact:
+        operator_values: "{{ lookup('template', 'operator-values.yaml.j2') | from_yaml }}"
+
+    - name: Deploy GitLab Operator helm
+      kubernetes.core.helm:
+        name: gitlab-operator
+        chart_ref: gitlab-operator/gitlab-operator
+        chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
+        release_namespace: "{{ dsc.gitlab.namespace }}"
+        values: "{{ operator_values }}"
+
+    - name: Wait gitlab-webhook-service endpoint
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: "{{ dsc.gitlab.namespace }}"
+        name: gitlab-webhook-service
+      register: endpoint
+      until: endpoint.resources[0].subsets[0].addresses[0] is defined
+      retries: 15
+      delay: 5
 
 - name: Get Gitlab client secret
   kubernetes.core.k8s_info:
@@ -83,17 +108,6 @@
           version: "{{ dsc.gitlab.chartVersion }}"
           values: "{{ gitlab_values }}"
 
- #- name: Wait gitlab instance to be 'Running'
- #  kubernetes.core.k8s_info:
- #    api_version: apps.gitlab.com/v1beta1
- #    kind: GitLab
- #    namespace: "{{ dsc.gitlab.namespace }}"
- #    name: gitlab
- #  register: gitlab_instance
- #  until: gitlab_instance.resources[0] is defined and gitlab_instance.resources[0].status is defined and gitlab_instance.resources[0].status.phase == 'Running'
- #  retries: 45
- #  delay: 20
-
 - name: Wait Gitlab webservice endpoint to be available
   kubernetes.core.k8s_info:
     kind: Endpoints
@@ -142,20 +156,13 @@
       ansible.builtin.set_fact:
         tb_pod: "{{ toolbox_pods.resources[0].metadata.name }}"
 
-    - name: Create Token
-      kubernetes.core.k8s_exec:
-        pod: "{{ tb_pod }}"
-        namespace: "{{ dsc.gitlab.namespace }}"
-        command: >
-          bash -c "echo 'PersonalAccessToken.create!(user_id: 1
-          , name: \"ANSIBLE-DSO\"
-          , scopes: [:api, :read_repository, :write_repository]).token' | gitlab-rails console"
-      register: token
+    - name: Create token
+      ansible.builtin.include_tasks:
+        file: "{{ dsc.gitlab.chartVersion is version('7.2.0', operator='lt', version_type='loose') | ternary('create-token-7.2.0-.yaml', 'create-token-7.2.0+.yaml') }}"
 
     - name: Set new gitlab token
       ansible.builtin.set_fact:
         gitlab_token: "{{ token.stdout_lines[-2][1:-1] }}"
-    #      when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined
 
     - name: Update inventory
       kubernetes.core.k8s:
@@ -244,21 +251,21 @@
     state: "{{ dsc.proxy.enabled | ternary('present', 'absent') }}"
     variables:
       - name: "HTTP_PROXY"
-        value: "{{ dsc.proxy.http_proxy }}"
+        value: "{{ dsc.proxy.http_proxy | default ('') }}"
       - name: "HTTPS_PROXY"
-        value: "{{ dsc.proxy.https_proxy }}"
+        value: "{{ dsc.proxy.https_proxy | default ('') }}"
       - name: "NO_PROXY"
-        value: "{{ dsc.proxy.no_proxy }}"
+        value: "{{ dsc.proxy.no_proxy | default ('') }}"
       - name: "PROXY_HOST"
-        value: "{{ dsc.proxy.host }}"
+        value: "{{ dsc.proxy.host | default ('') }}"
       - name: "PROXY_PORT"
-        value: "{{ dsc.proxy.port }}"
+        value: "{{ dsc.proxy.port | default ('') }}"
       - name: "http_proxy"
-        value: "{{ dsc.proxy.http_proxy }}"
+        value: "{{ dsc.proxy.http_proxy | default ('') }}"
       - name: "https_proxy"
-        value: "{{ dsc.proxy.https_proxy }}"
+        value: "{{ dsc.proxy.https_proxy | default ('') }}"
       - name: "no_proxy"
-        value: "{{ dsc.proxy.no_proxy }}"
+        value: "{{ dsc.proxy.no_proxy | default ('') }}"
 
 - name: "Set or update CA_BUNDLE variable"
   community.general.gitlab_group_variable:

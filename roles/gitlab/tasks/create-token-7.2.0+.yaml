@@ -1,0 +1,10 @@
+- name: Create Token for 7.2.0 chart version and higher
+  kubernetes.core.k8s_exec:
+    pod: "{{ tb_pod }}"
+    namespace: "{{ dsc.gitlab.namespace }}"
+    command: >
+      bash -c "echo 'PersonalAccessToken.create!(user_id: 1
+      , name: \"ANSIBLE-DSO\"
+      , scopes: [:api, :read_repository, :write_repository, :create_runner]
+      , expires_at: 365.days.from_now).token' | gitlab-rails console"
+  register: token

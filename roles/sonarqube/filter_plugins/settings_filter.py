@@ -20,7 +20,6 @@ def to_query_string(queries):
             '&value='+
             urllib.parse.quote_plus(query['value'])
         )
-    print(queries_strings)
     return queries_strings
 
 def plugins_includes(sonar_plugins_list, key_to_search):

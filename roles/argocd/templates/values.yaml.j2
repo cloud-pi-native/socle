@@ -1,23 +1,37 @@
+securityContext: &securityContext
+  containerSecurityContext:
+    runAsUser: null
+  podSecurityContext:
+    fsGroup: null
 # TODO variabilize openshift boolean
 openshift:
   enabled: true
 image:
   PullPolicy: IfNotPresent
 config:
+{% if dsc.argocd.admin.enabled %}
   secret:
     argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
+{% endif %}
 {% if dsc.exposedCA != 'none' %}
   tlsCerts:
     {{ gitlab_domain }}: |
       {{ exposed_ca_pem | indent(width=6, first=False) }}
 {% endif %}
+controller:
+  <<: *securityContext
 dex:
-  enabled: true
+  enabled: false
 server:
+  <<: *securityContext
+  ingress:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
+  ingressGrpc:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
   insecure: true
   config:
     clusterResources: "true"
-    url: "https://{{ argocd_domain }}/"
+    url: "https://{{ argocd_domain }}"
     oidc.config: |
       issuer: https://{{ keycloak_domain }}/realms/dso
       requestedScopes: ["openid", "generic"]
@@ -29,7 +43,7 @@ server:
         {{ exposed_ca_pem | indent(width=8, first=False) }}
 {% endif %}
     users.anonymous.enabled: "false"
-    admin.enabled: "false" # TODO variabilize
+    admin.enabled: "{{ dsc.argocd.admin.enabled }}"
     kustomize.buildOptions: "--enable-helm"
     resource.exclusions: |
       - apiGroups:
@@ -49,6 +63,7 @@ server:
       value: "{{ dsc.proxy.no_proxy }},argo-argo-cd-repo-server"
 {% endif %}
 repoServer:
+  <<: *securityContext
   extraEnvVars:
 {% if dsc.proxy.enabled %}
     - name: HTTP_PROXY
@@ -75,3 +90,11 @@ extraDeploy:
     metadata:
       name: argocd-rbac-cm
       namespace: {{ dsc.argocd.namespace }}
+applicationSet:
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className | default('') }}
+notifications:
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className | default('') }}

@@ -29,7 +29,6 @@
     clientId: "{{ item.clientId }}"
   register: kc_clients_secrets
 
-- debug: var=kc_clients_secrets
 - name: Set Keycloak clients secrets in Keycloak namespace
   when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'
   kubernetes.core.k8s:

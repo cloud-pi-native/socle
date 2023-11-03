@@ -16,47 +16,9 @@ spec:
     targetRevision: v{{ dsc.console.release }}
     releaseName: console-pi
     helm:
-      parameters:
-        - name: ingress.hosts[0]
-          value: {{ console_domain }}
-        - name: postgres.container.db
-          value: dso-console-db
-        - name: postgres.container.user
-          value: dso
-        - name: postgres.container.pass
-          value: {{ dsc.console.dbPassword }}
-        - name: keycloak.clientIdBackend
-          value: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
-        - name: keycloak.clientSecretBackend
-          value: {{ console_backend_secret.resources[0].data.CLIENT_SECRET | b64decode }}
-        - name: keycloak.clientIdFrontend
-          value: {{ console_frontend_secret.resources[0].data.CLIENT_ID | b64decode }}
-        - name: keycloak.redirectUri
-          value: https://{{ console_domain }}
-        - name: keycloak.sessionSecret
-          value: {{ session_secret }}
-        - name: keycloak.domain
-          value: "{{ keycloak_domain }}"
-        - name: keycloak.realm
-          value: dso
-{% if dsc.exposedCA.type != 'none' %}
-        - name: server.extraCa.name
-          value: bundle
-        - name: server.extraCa.key
-          value: ca.pem
-{% endif %}
-{% for key, val in dsc.ingress.annotations.items() %}
-        - name: ingress.annotations.{{ key | regex_escape }}
-          value: {{ val }}
-{% endfor %}
-{% for key, val in dsc.ingress.labels.items() %}
-        - name: ingress.labels.{{ key | regex_escape }}
-          value: {{ val }}
-{% endfor %}
-{% if dsc.ingress.tls.type == 'tlsSecret' %}
-        - name: ingress.tls.secretName
-          value: {{ dsc.ingress.tls.tlsSecret.name }}
-{% endif %}
+      parameters: []
+      values: |
+{{ console_values | indent(8, true) }}
   syncPolicy:
     automated: {}
     syncOptions:

@@ -1,0 +1,38 @@
+ingress:
+  ingressClassName: {{ dsc.ingress.className | default('') }}
+  hosts:
+    - {{ console_domain }}
+  annotations: {{ dsc.ingress.annotations }}
+  labels: {{ dsc.ingress.labels }}
+  tls:
+    enabled: {{ dsc.ingress.tls.type != 'none' }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% endif %}
+
+postgres:
+  container:
+    db: dso-console-db
+    user: dso
+    pass: {{ dsc.console.dbPassword }}
+keycloak:
+  clientIdBackend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
+  clientSecretBackend: {{ console_backend_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+  clientIdFrontend: {{ console_frontend_secret.resources[0].data.CLIENT_ID | b64decode }}
+  redirectUri: https://{{ console_domain }}
+  sessionSecret: {{ session_secret }}
+  domain: "{{ keycloak_domain }}"
+  realm: dso
+server:
+  container:
+    env:
+{% if dsc.proxy.enabled %}
+      HTTP_PROXY: {{ dsc.proxy.http_proxy }}
+      HTTPS_PROXY: {{ dsc.proxy.https_proxy }}
+      NO_PROXY: {{ dsc.proxy.no_proxy }}
+{% endif %}
+{% if dsc.exposedCA.type != 'none' %}
+  extraCa:
+    name: bundle
+    key: ca.pem
+{% endif %}

@@ -23,6 +23,7 @@ spec:
       secretName: vault-tls-secret
 {% endif %}
 {% endif %}
+  ingressClassName: {{ dsc.ingress.className | default('') }}
   rules:
     - host: {{ vault_domain }}
       http:

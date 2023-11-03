@@ -7,7 +7,7 @@
     kind: dsc
     name: conf-dso
     api_version: cloud-pi-native.fr/v1alpha
-#  register: socle_config_default
+  #  register: socle_config_default
   register: socle_config
 
 - name: Get socle config from dsc_cr extra var when defined
@@ -93,7 +93,16 @@
 
 - name: Set DSC fact
   ansible.builtin.set_fact:
-    dsc: "{{ socle_config.resources[0].spec }}"
+    dsc: "{{ socle_config.resources[0] }}"
+
+- ansible.builtin.set_fact:
+    dsc_default_config: "{{ lookup('ansible.builtin.file', 'config.yaml') | from_yaml }}"
+    dsc_default_releases: "{{ lookup('ansible.builtin.file', 'releases.yaml') | from_yaml }}"
+
+- ansible.builtin.set_fact:
+    dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True)}}"
+- ansible.builtin.set_fact:
+    dsc: "{{ dsc.spec }}"
 
 - name: Set root_domain fact
   ansible.builtin.set_fact:

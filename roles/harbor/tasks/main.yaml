@@ -87,7 +87,7 @@
     harbor_config:
       "auth_mode": "oidc_auth"
       "notification_enable": true
-      "oidc_admin_group": "admin"
+      "oidc_admin_group": "/admin"
       "oidc_auto_onboard": true
       "oidc_client_id": "{{ harbor_secret.resources[0].data.CLIENT_ID | b64decode }}"
       "oidc_endpoint": "https://{{ keycloak_domain }}/realms/dso"
@@ -95,7 +95,7 @@
       "oidc_group_filter": ""
       "oidc_groups_claim": "groups"
       "oidc_name": "keycloak"
-      "oidc_scope": "openid"
+      "oidc_scope": "openid,generic"
       "oidc_user_claim": "email"
       "oidc_verify_cert": "{{ dsc.exposedCA.type == 'none' }}"
       "project_creation_restriction": "adminonly"

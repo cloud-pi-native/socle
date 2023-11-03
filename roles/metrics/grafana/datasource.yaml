@@ -6,14 +6,14 @@ metadata:
 spec:
   datasources:
     - access: proxy
-      #jsonData:
+      # jsonData:
       #  tlsSkipVerify: true  
       basicAuth: true
       basicAuthPassword: mysupersecretpasswd
       basicAuthUser: grafana-user
-      #isDefault: true
+      # isDefault: true
       editable: true
       name: prometheus-internal
       type: prometheus
-      url: 'https://prometheus-k8s.openshift-monitoring.svc:9091'
+      url: "https://prometheus-k8s.openshift-monitoring.svc:9091"
   name: prometheus-internal

@@ -1,0 +1,73 @@
+watchCluster: false
+
+image:
+  registry: registry.gitlab.com
+  repository: gitlab-org/cloud-native
+  name: gitlab-operator
+  tag: {{ dsc.gitlabOperator.chartVersion }}
+  # digest:
+  pullPolicy: IfNotPresent
+  # pullSecrets: []
+  prepend: "false"
+
+nameOverride: "gitlab"
+fullnameOverride: ""
+
+extraEnvs: []
+
+podAnnotations: {}
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 300Mi
+  requests:
+    cpu: 200m
+    memory: 100Mi
+
+affinity: {}
+nodeSelector: {}
+tolerations: []
+
+manager:
+  debug:
+    enabled: true
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the name template
+    # name:
+  webhook:
+    selfSignedCert:
+      # Specifies whether CertManager Issuer and Certificate should be created
+      # to generate a self-signed certificate for the Manager's webhook.
+      create: true
+
+app:
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the name template
+    # name:
+
+nginx-ingress:
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the name template
+    # name:
+
+scc: {}
+#  apiVersion: ""
+
+cert-manager:
+  install: false

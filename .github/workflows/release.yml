@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  workflow_call:
+    outputs:
+      release-created:
+        description: Has the release been created
+        value: ${{ jobs.release.outputs.release-created }}
+      major-tag:
+        description: Major version tag
+        value: ${{ jobs.release.outputs.major-tag }}
+      minor-tag:
+        description: Minor version tag
+        value: ${{ jobs.release.outputs.minor-tag }}
+      patch-tag:
+        description: Patch version tag
+        value: ${{ jobs.release.outputs.patch-tag }}
+
+jobs:
+  release:
+    name: Create new release
+    runs-on: ubuntu-latest
+    outputs:
+      release-created: ${{ steps.release.outputs.release_created }}
+      major-tag: ${{ steps.release.outputs.major }}
+      minor-tag: ${{ steps.release.outputs.minor }}
+      patch-tag: ${{ steps.release.outputs.patch }}
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v3
+
+      - name: Pre release new version
+        uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          package-name: socle
+          release-type: node
+          default-branch: main
+          group-pull-request-title-pattern: release v${version}
+          token: ${{ secrets.GITHUB_TOKEN }}

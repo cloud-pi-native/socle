@@ -21,7 +21,7 @@ gitlab:
 minio:
   ingress:
     tls:
-      secretName: gitlab-minio
+      secretName: gitlab-minio-secret
 {% else %}
 gitlab:
   webservice:
@@ -40,6 +40,7 @@ minio:
   ingress:
     tls: {}
 {% endif %}
+
 global:
   registry:
     enabled: false
@@ -70,6 +71,7 @@ global:
       name: {{ gitlab_domain }}
 {% endif %}
   ingress:
+    class: {{ dsc.ingress.className | default('') }}
     annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
       {{ key }}: {{ val }}
@@ -80,10 +82,15 @@ global:
 {% endfor %}
     class: none
     configureCertmanager: false
+{% if dsc.ingress.tls.type == 'none' %}
+    tls:
+      enabled: false
+{% else %}
     tls:
       enabled: true
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
       secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% endif %}
 {% endif %}
   extraEnv:
 {% if dsc.proxy.enabled %}

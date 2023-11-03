@@ -69,6 +69,8 @@ Les éléments déployés seront les suivants :
 
 Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
 
+Vous pouvez trouvez la version des outils installé [ici](versions.md)
+
 ## Prérequis
 
 Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.

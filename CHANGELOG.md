@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/cloud-pi-native/socle/compare/v1.0.0...v1.0.1) (2023-11-04)
+
+
+### Bug Fixes
+
+* :arrow_up: upgrade harbor ([cc42d17](https://github.com/cloud-pi-native/socle/commit/cc42d17bc80a23957cbe49b93f7328ac0be7d3c3))
+
 ## 1.0.0 (2023-11-03)
 
 

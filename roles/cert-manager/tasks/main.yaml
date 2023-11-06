@@ -6,10 +6,16 @@
 # Installation des CRDs indépendamment du chart helm.
 # Recommandé en production.
 # Voir : https://cert-manager.io/docs/installation/helm
+- name: Download cert-manager CRDs
+  ansible.builtin.get_url:
+    url: https://github.com/cert-manager/cert-manager/releases/download/{{ dsc.certmanager.chartVersion }}/cert-manager.crds.yaml
+  register: cert_manager_crds
+
+
 - name: Apply CRDs
   kubernetes.core.k8s:
     state: present
-    src: "https://github.com/cert-manager/cert-manager/releases/download/{{ dsc.certmanager.chartVersion }}/cert-manager.crds.yaml"
+    definition: "{{ cert_manager_crds.content | from_yaml_all }}"
 
 - name: Set cert-manager helm values
   ansible.builtin.set_fact:

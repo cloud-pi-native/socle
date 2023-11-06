@@ -122,20 +122,6 @@
     nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
   register: get_nx_pass
 
-#- name: Get available realms
-#  ansible.builtin.uri:
-#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-#    force_basic_auth: true
-#    url: "https://{{ nexus_domain }}/service/rest/v1/security/realms/available"
-#    method: GET
-#    user: admin
-#    password: "{{ nexus_admin_password }}"
-#    status_code: [200]
-#  register: realms
-#
-#- debug:
-#    msg: "{{ realms }}"
-
 - name: Get anonymous access settings
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"

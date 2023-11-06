@@ -211,6 +211,7 @@ spec:
                       description: |
                         A key value object to inject additional variables into gitlab root group for CI/CD pipelines
                       type: array
+                      default: []
                       items:
                         properties:
                           name:
@@ -227,7 +228,10 @@ spec:
                             description: Should the Gitlab CI var be protected.
                             type: boolean
                             default: false
-                      default: []
+                        type: object
+                        required:
+                          - name
+                          - value
                   type: object
                 gitlabOperator:
                   description: Configuration for GitLab Operator.

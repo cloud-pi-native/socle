@@ -165,6 +165,18 @@
       tags:
         - nexus
 
+    - name: "Suppression de l'ancien mot de passe Nexus"
+      kubernetes.core.k8s:
+        kind: ConfigMap
+        name: dso-config
+        namespace: "{{ dsc.console.namespace }}"
+        state: patched
+        definition:
+          data:
+            NEXUS_ADMIN_PASSWORD:
+      tags:
+        - nexus
+
     - name: "Suppression du namespace Sonarqube"
       kubernetes.core.k8s:
         state: absent

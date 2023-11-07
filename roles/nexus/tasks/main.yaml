@@ -122,19 +122,7 @@
     nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
   register: get_nx_pass
 
-- name: Get anonymous access settings
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: "https://{{ nexus_domain }}/service/rest/v1/security/anonymous"
-    method: GET
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    status_code: [200]
-  register: anon_access
-
 - name: Enable Anonymous access
-  when: anon_access.json.enabled
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
@@ -148,6 +136,7 @@
       realmName: "NexusAuthorizingRealm"
     body_format: json
     status_code: [200]
+  register: anon_enabled
 
 - name: Check if new-anon role already exists
   ansible.builtin.uri:
@@ -161,7 +150,7 @@
   register: new_anon_role
 
 - name: Create new-anon role
-  when: (anon_access.json.enabled) and (new_anon_role.status == 404)
+  when: new_anon_role.status == 404
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
@@ -193,7 +182,7 @@
   register: anon_user
 
 - name: Update anonymous user with new-anon role
-  when: (anon_access.json.enabled) and (create_role is not failed) and not (anon_user.json[0].roles | regex_search('new-anon', multiline=True))
+  when: (create_role is not failed) and not (anon_user.json[0].roles | regex_search('new-anon', multiline=True))
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true

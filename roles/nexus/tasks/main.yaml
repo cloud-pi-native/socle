@@ -136,7 +136,6 @@
       realmName: "NexusAuthorizingRealm"
     body_format: json
     status_code: [200]
-  register: anon_enabled
 
 - name: Check if new-anon role already exists
   ansible.builtin.uri:

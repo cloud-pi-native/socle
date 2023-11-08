@@ -7,7 +7,7 @@
 | gitlab | 7.3.4 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
 | gitlabOperator | 0.24.0 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
 | gitlabRunner | 0.57.0 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
-| harbor | 1.13.0 | [harbor](https://artifacthub.io/packages/helm/harbor/harbor) |
+| harbor | 1.13.1 | [harbor](https://artifacthub.io/packages/helm/harbor/harbor) |
 | keycloak | 16.1.5 | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak) |
 | kubed | 0.13.2 | [kubed](https://artifacthub.io/packages/helm/appscode/kubed) |
 | nexus | 3.56.0 | [nexus](https://hub.docker.com/r/sonatype/nexus3/) |

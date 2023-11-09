@@ -15,7 +15,7 @@
   - [CloudNativePG](#cloudnativepg)
 - [Désinstallation](#désinstallation)
   - [Chaîne complète](#chaîne-complète)
-  - [Un ou plusieurs outils](#un-ou-plusieurs-outils)
+  - [Désinstaller un ou plusieurs outils](#désinstaller-un-ou-plusieurs-outils)
 - [Gel des versions](#gel-des-versions)
   - [Introduction](#introduction-1)
   - [Modification des versions de charts](#modification-des-versions-de-charts)
@@ -130,13 +130,13 @@ Elle vous signalera que vous n'avez encore jamais installé le socle sur votre c
 kubectl edit dsc conf-dso
 ```
 
-Vous pourrez procéder ainsi si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition, vous préférerez peut être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
+Vous pourrez procéder ainsi si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition vous préférerez peut être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau du "rootDomain" (votre domaine principal précédé d'un point), des mots de passe de certains outils, du proxy ainsi que des sections CA et ingress :
+Voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau du champ "global.rootDomain" (votre domaine principal précédé d'un point), des mots de passe de certains outils, du proxy ainsi que des sections CA et ingress :
 
 ```yaml
 ---
@@ -317,7 +317,7 @@ S'agissant du gel des versions de charts ou d'images pour les outils en question
 
 ### Lancement
 
-Dès que votre [configuration](#configuration) est prête, c'est à dire que la ressource `dsc` par défaut  `conf-dso` a bien été mise à jour, relancez la commande suivante :
+Dès que votre [configuration](#configuration) est prête, c'est à dire que la ressource `dsc` par défaut  `conf-dso` a bien été mise à jour avec les éléments nécessaires et souhaités, relancez la commande suivante :
 
 ```bash
 ansible-playbook install.yaml
@@ -325,7 +325,7 @@ ansible-playbook install.yaml
 
 Patientez …
 
-Pendant l'installation, vous pourrez surveiller l'arrivée des namespaces correspondants dans le cluster, vial a commande suivante :
+Pendant l'installation, vous pourrez surveiller l'arrivée des namespaces correspondants dans le cluster, via la commande suivante :
 
 ```bash
 watch "kubectl get ns | grep 'dso-'"
@@ -361,7 +361,7 @@ Exemple pour Argo CD :
         tag: 2.7.6-debian-11-r2
 ```
 
-Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la première installation du socle, peuvent être listés en se positionnant préalablement dans le répertoire socle, et en affichant le fichier « config.yaml » du role socle-config :
+Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la première installation du socle, peuvent être listés en se positionnant préalablement dans le répertoire socle, puis en affichant le fichier « config.yaml » du role socle-config :
 
 ```bash
 cat ./roles/socle-config/files/config.yaml
@@ -427,7 +427,7 @@ Ce playbook permet également de cibler un outil en particulier, grâce à l'uti
 ansible-playbook admin-tools/get-credentials.yaml -t keycloak
 ```
 
-Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`, exemple avec la chaîne utilisant la `dsc` nommée `ma-conf` :
+Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même cluster, il permet de cibler la chaîne DSO voulue via l'utilisation de l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`, exemple avec une chaîne utilisant la `dsc` nommée `ma-conf` :
 
 ```bash
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf
@@ -447,7 +447,7 @@ ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf -t keycloak,
 
 Si vous rencontrez des problèmes lors de l'éxécution du playbook, vous voudrez certainement relancer l'installation d'un ou plusieurs composants plutôt que d'avoir à tout réinstaller.
 
-Pour cela, vous pouvez utiliser les tags associés aux rôles dans le fichier « install.yaml ».
+Pour cela, vous pouvez utiliser les tags qui sont associés aux rôles dans le fichier « install.yaml ».
 
 Voici par exemple comment réinstaller uniquement les composants keycloak et console, dans la chaîne DSO paramétrée avec la `dsc` par défaut (`conf-dso`), via les tags correspondants :
 
@@ -472,7 +472,7 @@ Le playbook d'installation, en s'appuyant sur le role en question, s'assurera pr
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur CloudNativePG n'est pas installé. Le rôle associé procédera donc à son installation.
 
-**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux éléments vérifiés par le role soient toujours présents. Dans ce cas de figure, l'installation de Keycloak ou de SonarQube échouera car l'opérateur CloudNativePG n'aura pas été installé par le role.  
+**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Keycloak ou de SonarQube échouera car l'opérateur CloudNativePG n'aura pas été installé par le role.  
 
 ## Désinstallation
 
@@ -486,6 +486,12 @@ Pour le lancer, en vue de désinstaller la chaîne DSO qui utilise la `dsc` par 
 
 ```bash
 ansible-playbook uninstall.yaml
+```
+
+Vous pourrez ensuite surveiller la déinstallation des namespaces par défaut via la commande suivante :
+
+```bash
+watch "kubectl get ns | grep 'dso-'"
 ```
 
 **Attention !** Si vous souhaitez plutôt désinstaller une autre chaîne, déployée en utilisant votre propre ressource de type `dsc`, alors vous devrez utiliser l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`, comme ceci (exemple avec une `dsc` nommée `ma-dsc`) :
@@ -519,7 +525,7 @@ watch "kubectl get ns | grep '\-mynamespace'"
   - Pour Cert-manager : `-t cert-manager`.
   - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`).
 
-### Un ou plusieurs outils
+### Désinstaller un ou plusieurs outils
 
 Le playbook de désinstallation peut aussi être utilisé pour supprimer un ou plusieurs outils **de manière ciblée**, via les tags associés.
 
@@ -545,7 +551,7 @@ ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 
 Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier dans un environnement de production**, vous voudrez certainement pouvoir geler (freeze) les versions d'outils ou composants utilisés.
 
-Les numéros de version de charts sont gelés par défaut.
+Pour chaque version du socle DSO, les numéros de version de charts utilisés sont gelés par défaut.
 
 Ils peuvent être consultés dans le fichier [versions.md](versions.md), situé à la racine du présent dépôt socle que vous avez initialement cloné.
 
@@ -617,7 +623,7 @@ Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus f
 
 Lorsque vous gelez vos images dans la `dsc`, il est **fortement recommandé** d'utiliser un tag d'image en adéquation avec la version de chart utilisée, tel que fourni par la commande `helm search repo -l nom-de-mon-outil-ici --version version-de-chart-ici`.
 
-Lorsque vos values sont à jour pour tous les outils concernés, avec les versions d'images désirées, appliquez le changement en utilisant votre fichier de définition. Exemple :
+Lorsque vos values sont à jour **pour tous les outils concernés**, avec les versions d'images désirées, appliquez le changement en utilisant votre fichier de définition. Exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -628,6 +634,8 @@ Puis relancez l'[Installation](#installation).
 Les sections suivantes détaillent la façon de procéder au gel de version d'image pour chaque outil.
 
 #### Argo CD
+
+Le composant Argo CD est installé à l'aide du chart Helm Bitnami.
 
 Nous utiliserons un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**).
 
@@ -798,6 +806,8 @@ Pour mémoire, les values utilisables sont disponibles et documentées ici : <ht
 
 #### Keycloak
 
+Le composant Keycloak est installé à l'aide du chart Helm Bitnami.
+
 Nous utiliserons un tag dit "[immutable](https://docs.bitnami.com/kubernetes/apps/keycloak/configuration/understand-rolling-immutable-tags/)" (**recommandé en production**).
 
 Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : <https://hub.docker.com/r/bitnami/keycloak/tags>
@@ -827,7 +837,7 @@ Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez
 
 #### Sonatype Nexus Repository
 
-Le composant nexus est installé directement via le manifest de deployment "nexus.yml.j2" intégré au role associé.
+Le composant nexus est installé directement via le manifest de deployment "« nexus.yml.j2 » intégré au role associé.
 
 L'image utilisée est déjà gelée. Son numéro de version est spécifié dans le fichier [versions.md](versions.md) situé à la racine du socle.
 
@@ -931,7 +941,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
         updateStrategyType: "RollingUpdate"
 ```
 
-**Remarque importante** : En cas de tentative de mise à jour des versions d'images, dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse se mettre à jour avec le tag que vous avez indiqué.
+**Remarque importante** : En cas de tentative de mise à jour des versions d'images, dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse éventuellement se mettre à jour avec le tag que vous avez indiqué.
 
 ## Les commandes de l'application
 

@@ -7,10 +7,10 @@
 # Recommandé en production.
 # Voir : https://cert-manager.io/docs/installation/helm
 - name: Download cert-manager CRDs
-  ansible.builtin.get_url:
+  ansible.builtin.uri:
     url: https://github.com/cert-manager/cert-manager/releases/download/{{ dsc.certmanager.chartVersion }}/cert-manager.crds.yaml
+    return_content: true
   register: cert_manager_crds
-
 
 - name: Apply CRDs
   kubernetes.core.k8s:

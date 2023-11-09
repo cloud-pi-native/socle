@@ -33,7 +33,7 @@
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [SOPS](#sops)
     - [Vault](#vault)
-  - [Les commandes de l'application](#les-commandes-de-lapplication)
+- [Les commandes de l'application](#les-commandes-de-lapplication)
 - [Conventions](#conventions)
 - [Contributions](#contributions)
 
@@ -43,13 +43,14 @@ L'installation de la forge DSO (DevSecOps) s'effectue de manière automatisée a
 
 Les éléments déployés seront les suivants :
 
-| Outil                       | Site officiel                                                                |
-| --------------------------- | ---------------------------------------------------------------------------- |
+| Outil                       | Site officiel                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------ |
 | Argo CD                     | <https://argo-cd.readthedocs.io>                                               |
 | Cert-manager                | <https://cert-manager.io>                                                      |
 | Console Cloud π Native      | <https://github.com/cloud-pi-native/console>                                   |
 | CloudNativePG               | <https://cloudnative-pg.io>                                                    |
 | GitLab                      | <https://about.gitlab.com>                                                     |
+| gitLab-ci-catalog           | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                         |
 | GitLab Runner               | <https://docs.gitlab.com/runner>                                               |
 | Harbor                      | <https://goharbor.io>                                                          |
 | Keycloak                    | <https://www.keycloak.org>                                                     |
@@ -61,7 +62,7 @@ Les éléments déployés seront les suivants :
 
 Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
 
-Vous pouvez trouver la version des outils installés [ici](versions.md)
+Vous pouvez trouver la version des outils installés [versions.md](versions.md).
 
 ## Prérequis
 
@@ -129,15 +130,13 @@ Elle vous signalera que vous n'avez encore jamais installé le socle sur votre c
 kubectl edit dsc conf-dso
 ```
 
-Si vous souhaitez procéder ainsi, lancez la commande ci-dessus pour éditer la ressource indiquée.
-
-Alternativement, et comme précisé, vous pourrez aussi déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
+Vous pourrez procéder ainsi si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition, vous préférerez peut être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau du "rootDomain" (votre domaine principal précédé d'un point), des mots de passe, des numéros de versions et des namespaces :
+Voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau du "rootDomain" (votre domaine principal précédé d'un point), des mots de passe de certains outils, du proxy ainsi que des sections CA et ingress :
 
 ```yaml
 ---
@@ -312,6 +311,8 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
+S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.  
+
 ## Installation
 
 ### Lancement
@@ -336,21 +337,37 @@ Par défaut, ils sont en effet tous préfixés « dso- ».
 
 Suite à une première installation réussie et selon vos besoins, il est possible d'installer dans un même cluster une ou plusieurs autres forges DSO, en parallèle de celle installée par défaut.
 
-Pour cela, vous devrez tout d'abord **modifier le fichier « config.yaml »** du role `socle-config` afin d'adapter les noms des **namespaces** (par exemple en modifiant leur préfixe), ainsi que les valeurs des champs **subDomain**, et si besoin certains paramètres complémentaires spécifiques à quelques outils.
-
-Une fois que nous sommes positionnés dans le répertoire socle, le chemin de ce fichier est le suivant :
-
-```bash
-./roles/socle-config/files/config.yaml
-```
-
-Ensuite il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui pour rappel se nomme `conf-dso`, et en y modifiant les éléments souhaités.
+Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui pour rappel se nomme `conf-dso`, et en y modifiant les éléments souhaités.
 
 Comme vu plus haut dans la section [Configuration](#configuration), déclarez votre ressource de type `dsc` personnalisée **dans un fichier YAML**.
 
 Il s'agira simplement de **modifier le nom de la ressource dsc** (section `metadata`, champ `name`) puis **adapter les paramètres souhaités** (mots de passe, ingress, CA, proxy, values …).
 
-Lorsque celle-ci est prête, et déclarée par exemple dans le fichier « ma-conf-perso.yaml », créez-là dans le cluster comme ceci :
+Pensez également à déclarer pour chaque outil **un `namespace` et un `subDomain` différents** de ceux déjà déclarés lors de la première installation du socle DSO.
+
+Exemple pour Argo CD :
+
+```yaml
+  argocd:
+    namespace: mynamespace-argocd
+    subDomain: argocd-perso
+    admin:
+      enabled: true
+      password: PasswordForEveryone
+    values:
+      image:
+        registry: docker.io
+        repository: bitnami/argo-cd
+        tag: 2.7.6-debian-11-r2
+```
+
+Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la première installation du socle, peuvent être listés en se positionnant préalablement dans le répertoire socle, et en affichant le fichier « config.yaml » du role socle-config :
+
+```bash
+cat ./roles/socle-config/files/config.yaml
+```
+
+Lorsque votre nouvelle configuration est prête, et déclarée par exemple dans le fichier « ma-conf-perso.yaml », créez-là dans le cluster comme ceci :
 
 ```bash
 kubectl apply -f ma-conf-perso.yaml
@@ -416,13 +433,13 @@ Enfin, dans le cas où plusieurs chaînes DSO sont déployées dans le même clu
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf
 ```
 
-Et bien sûr cibler un ou plusieurs outils en même temps, via les tags, exemple :
+Et bien sûr cibler un ou plusieurs outils en même temps, via les tags. Exemple :
 
 ```bash
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf -t keycloak,argocd
 ```
 
-**Remarque importante** : Il est **vivement encouragé** de **conserver les valeurs** qui vous sont fournies par le playbook « get-credentials.yaml ». Par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden. Il est toutefois important de **ne pas les modifier ou les supprimer** sous peine de voir certains composants, par exemple Vault, être réinitialisés.
+**Remarque importante** : Il est **vivement encouragé** de **sauvegarder les valeurs** qui vous sont fournies par le playbook « get-credentials.yaml ». Par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden. Il est toutefois important de **ne pas les modifier ou les supprimer** sous peine de voir certains composants, par exemple Vault, être réinitialisés.
 
 ## Debug
 
@@ -450,8 +467,8 @@ La BDD PostgreSQL des composants Keycloak et SonarQube est installée à l'aide 
 
 Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement que cet opérateur n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
 
-- L'API "postgresql.cnpg.io/v1".
-- La "MutatingWebhookConfiguration" nommée "cnpg-mutating-webhook-configuration".
+- L'API `postgresql.cnpg.io/v1`.
+- La `MutatingWebhookConfiguration` nommée `cnpg-mutating-webhook-configuration`.
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur CloudNativePG n'est pas installé. Le rôle associé procédera donc à son installation.
 
@@ -479,19 +496,25 @@ ansible-playbook uninstall.yaml -e dsc_cr=ma-dsc
 
 Selon les performances ou la charge de votre cluster, la désinstallation de certains composants (par exemple GitLab) pourra prendre un peu de temps.
 
-Pour surveiller l'état d'une désinstallation en cours il sera possible, si vous avez correctement préfixé ou suffixé vos namespaces dans votre configuration, de vous appuyer sur la commande suivante (exemple avec le préfixe « mynamespace- ») :
+Pour surveiller l'état d'une désinstallation en cours il sera possible, si vous avez correctement préfixé ou suffixé vos namespaces dans votre configuration, de vous appuyer sur la commande suivante. Exemple avec le préfixe « mynamespace- » :
 
 ```bash
 watch "kubectl get ns | grep 'mynamespace-'"
+```
+
+Même exemple, mais avec le suffixe « -mynamespace » :
+
+```bash
+watch "kubectl get ns | grep '\-mynamespace'"
 ```
 
 **Remarques importantes** :
 
 - Par défaut le playbook de désinstallation, s'il est lancé sans aucun tag, ne supprimera pas les ressources suivantes :
   - **Cert-manager** déployé dans le namespace `cert-manager`.
-  - **CloudNativePG** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config` utilisé lors de l'installation.
+  - **CloudNativePG** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Kubed** déployé dans le namespace `openshift-infra`.
-- Les trois composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un des ces trois outils, vous pourrez le faire via l'utilisation des tags correspondants :
+- Les trois composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces trois outils, vous pourrez le faire via l'utilisation des tags correspondants :
   - Pour Kubed : `-t kubed` (ou bien `-t confSyncer`).
   - Pour Cert-manager : `-t cert-manager`.
   - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`).
@@ -504,17 +527,17 @@ L'idée est de faciliter leur réinstallation complète, en utilisant ensuite le
 
 Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configurés avec la `dsc` par défaut (`conf-dso`), la commande sera la suivante :
 
-````
+```bash
 ansible-playbook uninstall.yaml -t keycloak,argocd
-````
+```
 
 Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre configuration (via une `dsc` nommée `ma-dsc`), vous rajouterez là encore l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr`. Exemple :
 
-````
+```bash
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
-````
+```
 
-**Remarque importante** : Si vous désinstallez la resource **console** via le tag approprié, et que vous souhaitez ensuite la réinstaller, vous devrez impérativement **relancer une installation complète** du socle DSO (sans tags) plutôt que de réinstaller la console seule. En effet, la configmap `dso-config` qui lui est associée est alimentée par les autres outils à mesure de l'installation.
+**Remarque importante** : Si vous désinstallez la ressource **console** via le tag approprié, et que vous souhaitez ensuite la réinstaller, vous devrez impérativement **relancer une installation complète** du socle DSO (sans tags) plutôt que de réinstaller la console seule. En effet, la configmap `dso-config` qui lui est associée est alimentée par les autres outils à mesure de l'installation.
 
 ## Gel des versions
 
@@ -524,7 +547,7 @@ Selon le type d'infrastructure dans laquelle vous déployez, et **en particulier
 
 Les numéros de version de charts sont gelés par défaut.
 
-Ils peuvent être consultés dans le fichier « versions.md », situé à la racine du présent dépôt socle que vous avez initialement cloné.
+Ils peuvent être consultés dans le fichier [versions.md](versions.md), situé à la racine du présent dépôt socle que vous avez initialement cloné.
 
 Vous pouvez également geler les version d'images utilisées par les charts Helm de chaque outil.
 
@@ -541,13 +564,15 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 
 Techniquement, la modification des versions de charts utilisés est possible mais elle **n'est pas recommandée**.
 
-Ceci parce que la version de la Console Cloud π Native, qui s'interface avec tous les outils de la chaîne, a été testée et développée avec les versions d'outils telles qu'elles sont fixées au moment de sa sortie.
+Ceci parce que la version de la Console Cloud π Native, composant central qui s'interface avec tous les outils de la chaîne, a été testée et développée avec les versions d'outils telles qu'elles sont fixées au moment de sa sortie.
 
 Aussi, **nous ne pouvons garantir le bon fonctionnement** de la forge DSO dans un contexte où les versions de charts seraient modifiées.
 
 De plus, et comme indiqué plus haut, les outils cert-manager, Kubed et CloudNativePG seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
 
-Si malgré tout vous souhaitez tenter une modification de version d'un chart en particulier, pensez à effectuer au moins un backup du namespace et des resources cluster scoped associées.
+Si malgré tout vous souhaitez tenter une modification de version d'un chart en particulier, Vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
+
+Pensez également à effectuer au moins un backup du namespace et des ressources cluster scoped associées.
 
 Vous devrez ensuite **afficher le fichier « releases.yaml »** du role `socle-config` afin de connaître le nom du champ à insérer dans la `dsc` et le numéro de version de chart par défaut pour l'outil concerné.
 
@@ -573,7 +598,7 @@ Pour une liste détaillée de toutes les versions disponlbles, ajouter l'option 
 helm search repo -l argo-cd
 ```
 
-Pour fixer une version de chart dans la resource `dsc`, il vous suffira d'ajouter la ligne que vous aurez trouvée dans le fichier « releases.yaml » vu plus haut, au niveau de l'outil concerné, exemple pour Argo CD :
+Pour fixer une version de chart dans la ressource `dsc`, il vous suffira d'ajouter la ligne que vous aurez trouvée dans le fichier « releases.yaml » vu plus haut, au niveau de l'outil concerné, exemple pour Argo CD :
 
 ```yaml
   argocd:
@@ -586,15 +611,21 @@ Comme indiqué précédemment, le gel des version d'images est géré par le cha
 
 Ce champ correspond rigoureusement à ce qui est utilisable pour une version donnée du chart Helm de l'outil en question.
 
-Il est **fortement recommandé** d'utiliser un tag d'image en adéquation avec la version de chart utilisée, tel que fourni par la commande `helm search repo -l nom-de-mon-outil-ici --version version-de-chart-ici`.
+Lors d'une **première installation du socle**, nous vous recommandons de **ne pas geler immédiatement vos version d'images dans la `dsc`**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil et utiliseront la version d'image qui correspond à la version du chart définie par défaut.
 
-Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
+Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions d'images disponibles et à quelles versions de charts elles sont associées.
+
+Lorsque vous gelez vos images dans la `dsc`, il est **fortement recommandé** d'utiliser un tag d'image en adéquation avec la version de chart utilisée, tel que fourni par la commande `helm search repo -l nom-de-mon-outil-ici --version version-de-chart-ici`.
+
+Lorsque vos values sont à jour pour tous les outils concernés, avec les versions d'images désirées, appliquez le changement en utilisant votre fichier de définition. Exemple :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Puis relancez l'installation.
+Puis relancez l'[Installation](#installation).
+
+Les sections suivantes détaillent la façon de procéder au gel de version d'image pour chaque outil.
 
 #### Argo CD
 
@@ -618,14 +649,6 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         tag: 2.7.6-debian-11-r2
         imagePullPolicy: IfNotPresent
 ```
-
-Appliquer le changement en utilisant votre fichier de définition, exemple :
-
-```bash
-kubectl apply -f ma-conf-dso.yaml
-```
-
-Puis relancer l'installation.
 
 Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml>
 
@@ -673,7 +696,7 @@ La correspondance entre versions de charts GitLab et versions d'instances Gitlab
 
 https://docs.gitlab.com/charts/installation/version_mappings.html
 
-Il est donc recommandé de ne pas modifier les versions de charts déjà fixées au moment de la sortie du socle, sauf si vous savez ce que vous faites. Dans le cas où vous souhaiteriez les modifier, gardez à l'esprit les correspondances signalées précédemment, entre version du chart de l'opérateur et versions de chart GitLab installables.
+Il est donc recommandé de ne pas modifier les versions de charts déjà fixées au moment de la sortie du socle, sauf si vous savez ce que vous faites. Dans le cas où vous souhaiteriez les modifier, gardez à l'esprit les correspondances signalées précédemment, entre version du chart de l'opérateur et versions de chart GitLab qu'il peut installer.
 
 #### GitLab Runner
 
@@ -708,7 +731,7 @@ Les différents tags utilisables sont disponibles ici :
 - redis : <https://hub.docker.com/r/goharbor/redis-photon/tags>
 - exporter : <https://hub.docker.com/r/goharbor/harbor-exporter/tags>
 
-**Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier « versions.md », situé à la racine du socle, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
+**Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
 
 Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.13.1 du chart :
 
@@ -791,6 +814,7 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         repository: bitnami/keycloak
         tag: 19.0.3-debian-11-r22
 ```
+
 Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml>
 
 Les release notes de Keycloak se trouvent ici : <https://github.com/keycloak/keycloak/releases>
@@ -805,7 +829,7 @@ Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez
 
 Le composant nexus est installé directement via le manifest de deployment "nexus.yml.j2" intégré au role associé.
 
-L'image utilisée est déjà gelée et son numéro de version spécifié dans le fichier « versions.md » situé à la racine du socle.
+L'image utilisée est déjà gelée. Son numéro de version est spécifié dans le fichier [versions.md](versions.md) situé à la racine du socle.
 
 Il est recommandé de ne pas modifier cette version, sauf si vous savez ce que vous faites.
 
@@ -818,14 +842,6 @@ Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence
     storageSize: 25Gi
     imageTag: 3.56.0
 ```
-
-Puis appliquer le changement de configuration, exemple :
-
-```bash
-kubectl apply -f ma-conf-dso.yaml
-```
-
-Et relancer l'installation.
 
 #### SonarQube Community Edition
 
@@ -851,14 +867,6 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         edition: community
         tag: 9.9.2-{{ .Values.edition }}
 ```
-
-Appliquer le changement en utilisant votre fichier de définition, exemple :
-
-```bash
-kubectl apply -f ma-conf-dso.yaml
-```
-
-Puis relancer l'installation
 
 #### SOPS
 
@@ -887,14 +895,6 @@ helm search repo -l sops/sops-secrets-operator
 ```
 
 Ceci à condition que vos dépôts soient à jour.
-
-Lorsque vos values ont été actualisées, avec la version d'image désirée, appliquez le changement en utilisant votre fichier de définition, exemple :
-
-```bash
-kubectl apply -f ma-conf-dso.yaml
-```
-
-Puis relancez l'installation.
 
 #### Vault
 
@@ -933,15 +933,7 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 **Remarque importante** : En cas de tentative de mise à jour des versions d'images, dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse se mettre à jour avec le tag que vous avez indiqué.
 
-Lorsque vos values sont à jour avec les versions désirées, appliquez le changement en utilisant votre fichier de définition, exemple :
-
-```bash
-kubectl apply -f ma-conf-dso.yaml
-```
-
-Puis relancez l'installation.
-
-### Les commandes de l'application
+## Les commandes de l'application
 
 ```shell
 # Lancer la vérification syntaxique

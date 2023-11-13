@@ -25,8 +25,8 @@ def to_query_string(queries):
 def plugins_includes(sonar_plugins_list, key_to_search):
     for plugin in sonar_plugins_list:
         if (plugin['key'] == key_to_search):
-          return 'yes'
-    return 'no'
+          return True
+    return False
 
 class FilterModule(object):
     def filters(self):

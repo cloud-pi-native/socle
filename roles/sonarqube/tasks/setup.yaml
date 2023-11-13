@@ -82,6 +82,9 @@
         value: "{{ keycloak_client }}"
       - key: sonar.auth.oidc.clientSecret.secured
         value: "{{ keycloak_secret }}"
+      # Don't ask me why but issuerUri doesn't appear in current_sonar_settings so we'll force update it
+      - key: sonar.auth.oidc.issuerUri
+        value: "https://{{ keycloak_domain }}/realms/dso"
 
 - name: Filter oidc need update setting
   set_fact:

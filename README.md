@@ -617,7 +617,7 @@ Comme indiqué précédemment, le gel des version d'images est géré par le cha
 
 Ce champ correspond rigoureusement à ce qui est utilisable pour une version donnée du chart Helm de l'outil en question.
 
-Lors d'une **première installation du socle**, nous vous recommandons de **ne pas geler immédiatement vos version d'images dans la `dsc`**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil et utiliseront la version d'image qui correspond à la version du chart définie par défaut.
+Lors d'une **première installation du socle**, nous vous recommandons de **ne pas geler immédiatement vos versions d'images dans la `dsc`**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil et utiliseront la version d'image qui correspond à la version du chart définie par défaut.
 
 Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions d'images disponibles et à quelles versions de charts elles sont associées.
 
@@ -631,7 +631,20 @@ kubectl apply -f ma-conf-dso.yaml
 
 Puis relancez l'[Installation](#installation).
 
-Les sections suivantes détaillent la façon de procéder au gel de version d'image pour chaque outil.
+Les sections suivantes détaillent la façon de procéder au gel de version d'image pour chaque outil :
+  - [Argo CD](#argo-cd)
+  - [Cert-manager](#cert-manager)
+  - [CloudNativePG](#cloudnativepg-1)
+  - [Console Cloud π Native](#console-cloud-π-native)
+  - [GitLab](#gitlab)
+  - [GitLab Runner](#gitlab-runner)
+  - [Harbor](#harbor)
+  - [Keycloak](#keycloak)
+  - [Kubed (config-syncer)](#kubed-config-syncer)
+  - [Sonatype Nexus Repository](#sonatype-nexus-repository)
+  - [SonarQube Community Edition](#sonarqube-community-edition)
+  - [SOPS](#sops)
+  - [Vault](#vault)
 
 #### Argo CD
 
@@ -837,7 +850,7 @@ Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez
 
 #### Sonatype Nexus Repository
 
-Le composant nexus est installé directement via le manifest de deployment "« nexus.yml.j2 » intégré au role associé.
+Le composant nexus est installé directement via le manifest de deployment « nexus.yml.j2 » intégré au role associé.
 
 L'image utilisée est déjà gelée. Son numéro de version est spécifié dans le fichier [versions.md](versions.md) situé à la racine du socle.
 

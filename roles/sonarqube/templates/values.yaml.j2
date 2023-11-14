@@ -27,12 +27,15 @@ sonarProperties:
 plugins:
   install:
   - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
+  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.14.0/sonarqube-community-branch-plugin-1.14.0.jar
 {% if dsc.proxy.enabled %}
   httpProxy: "{{ dsc.proxy.http_proxy }}"
   httpsProxy: "{{ dsc.proxy.https_proxy }}"
   noProxy: "{{ dsc.proxy.no_proxy }}"
 {% endif %}
 
+jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=web"
+jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=ce"
 ingress:
   enabled: true
   # Used to create an Ingress record.

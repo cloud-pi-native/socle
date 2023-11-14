@@ -1,24 +1,41 @@
-deploymentType: "StatefulSet"
-
-replicaCount: 1
 
 OpenShift:
   enabled: true
-  createSCC: true
 
 image:
   pullPolicy: IfNotPresent
   tag: {{ dsc.sonarqube.tag }}
   repository: docker.io/sonarqube
 
-securityContext:
-  fsGroup: 1000
-
-containerSecurityContext:
-  runAsUser: 1000
-
 sonarWebContext: /
 
+sonarProperties:
+  sonar.auth.oidc.enabled: "true"
+  sonar.auth.oidc.allowUsersToSignUp: "true"
+  sonar.auth.oidc.autoLogin: "false"
+  sonar.auth.oidc.groupsSync.claimName: "groups"
+  sonar.auth.oidc.loginStrategy: "Email"
+  sonar.auth.oidc.groupsSync: "true"
+  sonar.auth.oidc.scopes: "openid generic"
+  sonar.auth.oidc.loginStrategy.customClaim.name: "upn"
+  sonar.auth.oidc.clientId.secured: "{{ keycloak_client }}"
+  sonar.auth.oidc.clientSecret.secured: "{{ keycloak_secret }}"
+  sonar.auth.oidc.issuerUri: "https://{{ keycloak_domain }}/realms/dso"
+  sonar.core.serverBaseURL: https://{{ sonar_domain }}
+  sonar.plugins.risk.consent: "ACCEPTED"
+
+plugins:
+  install:
+  - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
+  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.14.0/sonarqube-community-branch-plugin-1.14.0.jar
+{% if dsc.proxy.enabled %}
+  httpProxy: "{{ dsc.proxy.http_proxy }}"
+  httpsProxy: "{{ dsc.proxy.https_proxy }}"
+  noProxy: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
+
+jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=web"
+jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=ce"
 ingress:
   enabled: true
   # Used to create an Ingress record.
@@ -47,53 +64,9 @@ ingress:
 {% endif %}
 {% endif %}
 
-caCerts:
-  enabled: false
-
-initSysctl:
-  enabled: true
-  vmMaxMapCount: 524288
-  fsFileMax: 131072
-  nofile: 131072
-  nproc: 8192
-  # image: busybox:1.32
-  securityContext:
-    privileged: true
-  # resources: {}
-
 initFs:
-  enabled: true
-  # image: busybox:1.36
   securityContext:
     privileged: true
-
-prometheusExporter:
-  enabled: false
-
-prometheusMonitoring:
-  podMonitor:
-    enabled: false
-
-plugins:
-  install: []
-  # For use behind a corporate proxy when downloading plugins
-{% if dsc.proxy.enabled %}
-  httpProxy: "{{ dsc.proxy.http_proxy }}"
-  httpsProxy: "{{ dsc.proxy.https_proxy }}"
-  noProxy: "{{ dsc.proxy.no_proxy }}"
-{% endif %}
-  # image: curlimages/curl:8.2.0
-  # resources: {}
-  # .netrc secret file with a key "netrc" to use basic auth while downloading plugins
-  # netrcCreds: ""
-  # Set to true to not validate the server's certificate to download plugin
-  noCheckCertificate: false
-  securityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-
-sonar.web.javaOpts: ""
-sonar.ce.javaOpts: ""
 
 ## a monitoring passcode needs to be defined in order to get reasonable probe results
 # not setting the monitoring passcode will result in a deployment that will never be ready
@@ -109,20 +82,6 @@ env:
   - name: no_proxy
     value: "{{ dsc.proxy.no_proxy }}"
 {% endif %}
-
-## We usually don't make specific ressource recommandations, as they are heavily dependend on
-## The usage of SonarQube and the surrounding infrastructure.
-## Adjust these values to your needs, but make sure that the memory limit is never under 4 GB
-resources:
-  limits:
-    cpu: 800m
-    memory: 4Gi
-  requests:
-    cpu: 400m
-    memory: 2Gi
-
-persistence:
-  enabled: false
 
 ## Override JDBC values
 ## for external Databases
@@ -142,10 +101,6 @@ sonarqubeFolder: /opt/sonarqube
 # For OpenShift set create=true to ensure service account is created.
 serviceAccount:
   create: true
-  # name:
-  # automountToken: false # default
-  ## Annotations for the Service Account
-  annotations: {}
 
 account:
 #  adminPassword: admin

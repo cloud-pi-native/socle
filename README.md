@@ -33,9 +33,9 @@
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [SOPS](#sops)
     - [Vault](#vault)
-- [Les commandes de l'application](#les-commandes-de-lapplication)
-- [Conventions](#conventions)
 - [Contributions](#contributions)
+  - [Les commandes de l'application](#les-commandes-de-lapplication)
+  - [Conventions](#conventions)
 
 ## Introduction
 
@@ -956,7 +956,9 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 
 **Remarque importante** : En cas de tentative de mise à jour des versions d'images, dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse éventuellement se mettre à jour avec le tag que vous avez indiqué.
 
-## Les commandes de l'application
+## Contributions
+
+### Les commandes de l'application
 
 ```shell
 # Lancer la vérification syntaxique
@@ -966,11 +968,9 @@ pnpm install && pnpm run lint
 pnpm install && pnpm run format
 ```
 
-## Conventions
+### Conventions
 
 Cf. [Conventions - MIOM Fabrique Numérique](https://projets-ts-fabnum.netlify.app/conventions/nommage.html).
-
-## Contributions
 
 Les commits doivent suivre la spécification des [Commits Conventionnels](https://www.conventionalcommits.org/en/v1.0.0/), il est possible d'ajouter l'[extension VSCode](https://github.com/vivaxy/vscode-conventional-commits) pour faciliter la création des commits.
 

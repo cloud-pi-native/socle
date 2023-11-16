@@ -161,6 +161,21 @@
     password_policy: length(8) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and passwordHistory(1) and notUsername() and forceExpiredPasswordChange(365)
     enabled: true
 
+- name: Create base admins groups
+  community.general.keycloak_group:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    name: "{{ item }}"
+  with_items:
+    - admin
+    - ArgoCDAdmins
+
 - name: Get keycloak dso realm users from API
   ansible.builtin.uri:
     url: https://{{ keycloak_domain }}/admin/realms/dso/users
@@ -232,6 +247,11 @@
         email: admin@example.com
         enabled: true
         email_verified: true
+        groups:
+          - name: admin
+            state: present
+          - name: ArgoCDAdmins
+            state: present
 #        force: true  ## Ne fontionne pas quand user supprimé via la GUI et tâche relancée.
 
 - name: Get dso keycloak client scopes from API
@@ -271,17 +291,4 @@
     file: client.yaml
   with_items: "{{ keycloak_clients }}"
 
-- name: Create base admins groups
-  community.general.keycloak_group:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
-    auth_realm: master
-    auth_username: "{{ keycloak_admin }}"
-    auth_password: "{{ keycloak_admin_password }}"
-    state: present
-    realm: dso
-    name: "{{ item }}"
-  with_items:
-    - admin
-    - ArgoCDAdmins
+

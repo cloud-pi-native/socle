@@ -231,14 +231,6 @@
       tags:
         - vault
 
-    - name: "Suppression du namespace SOPS"
-      kubernetes.core.k8s:
-        state: absent
-        kind: Namespace
-        name: "{{ dsc.sops.namespace }}"
-      tags:
-        - sops
-
     - name: "Suppression du namespace ArgoCD"
       kubernetes.core.k8s:
         state: absent

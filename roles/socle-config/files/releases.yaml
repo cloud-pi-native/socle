@@ -40,9 +40,6 @@ spec:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.2.1+800
     tag: 9.9.2-community
-  sops:
-    # https://artifacthub.io/packages/helm/sops-secrets-operator/sops-secrets-operator
-    chartVersion: 0.17.0
   vault:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.25.0

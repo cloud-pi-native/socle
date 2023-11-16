@@ -1,3 +1,4 @@
+---
 - name: Set seal count
   ansible.builtin.set_fact:
     num: "{{ num | int + 1 }}"
@@ -5,11 +6,11 @@
 - name: Unseal Vault
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/unseal"
+    url: https://{{ vault_domain }}/v1/sys/unseal
     method: POST
     status_code: [200]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
     body:
       key: "{{ vault_keys.resources[0].data['key' + (num)] | b64decode }}"
     body_format: json

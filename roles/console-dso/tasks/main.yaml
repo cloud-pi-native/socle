@@ -1,3 +1,4 @@
+---
 - name: Apply project
   kubernetes.core.k8s:
     template: project.j2
@@ -49,11 +50,12 @@
 - name: Merge with proxy settings
   when: dsc.proxy.enabled
   block:
-  - ansible.builtin.set_fact:
-      console_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-  - name: Merge with console proxy values
-    ansible.builtin.set_fact:
-      console_values: "{{ console_values | combine(console_proxy_values, recursive=True, list_merge='append') }}"
+    - name: Generate proxy values
+      ansible.builtin.set_fact:
+        console_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+    - name: Merge with console proxy values
+      ansible.builtin.set_fact:
+        console_values: "{{ console_values | combine(console_proxy_values, recursive=True, list_merge='append') }}"
 
 - name: Merge with console user values
   ansible.builtin.set_fact:

@@ -1,3 +1,4 @@
+---
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: appscode

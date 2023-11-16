@@ -1,3 +1,4 @@
+---
 - name: Create harbor Namespace
   kubernetes.core.k8s:
     definition:
@@ -19,7 +20,7 @@
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
       metadata:
-        creationTimestamp: null
+        creationTimestamp:
         name: system:openshift:scc:privileged-harbor
       roleRef:
         apiGroup: rbac.authorization.k8s.io
@@ -42,11 +43,12 @@
 - name: Merge with proxy settings
   when: dsc.proxy.enabled
   block:
-  - ansible.builtin.set_fact:
-      harbor_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-  - name: Merge with harbor proxy values
-    ansible.builtin.set_fact:
-      harbor_values: "{{ harbor_values | combine(harbor_proxy_values, recursive=True, list_merge='append') }}"
+    - name: Generate proxy values
+      ansible.builtin.set_fact:
+        harbor_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+    - name: Merge with harbor proxy values
+      ansible.builtin.set_fact:
+        harbor_values: "{{ harbor_values | combine(harbor_proxy_values, recursive=True, list_merge='append') }}"
 
 - name: Merge with harbor user values
   ansible.builtin.set_fact:
@@ -94,25 +96,25 @@
 - name: Set Harbor config
   ansible.builtin.set_fact:
     harbor_config:
-      "auth_mode": "oidc_auth"
-      "notification_enable": true
-      "oidc_admin_group": "/admin"
-      "oidc_auto_onboard": true
-      "oidc_client_id": "{{ harbor_secret.resources[0].data.CLIENT_ID | b64decode }}"
-      "oidc_endpoint": "https://{{ keycloak_domain }}/realms/dso"
-      "oidc_extra_redirect_parms": "{}"
-      "oidc_group_filter": ""
-      "oidc_groups_claim": "groups"
-      "oidc_name": "keycloak"
-      "oidc_scope": "openid,generic"
-      "oidc_user_claim": "email"
-      "oidc_verify_cert": "{{ dsc.exposedCA.type == 'none' }}"
-      "project_creation_restriction": "adminonly"
-      "quota_per_project_enable": true
-      "read_only": false
-      "robot_name_prefix": "robot$"
-      "robot_token_duration": 30
-      "self_registration": false
+      auth_mode: oidc_auth
+      notification_enable: true
+      oidc_admin_group: /admin
+      oidc_auto_onboard: true
+      oidc_client_id: "{{ harbor_secret.resources[0].data.CLIENT_ID | b64decode }}"
+      oidc_endpoint: https://{{ keycloak_domain }}/realms/dso
+      oidc_extra_redirect_parms: "{}"
+      oidc_group_filter: ""
+      oidc_groups_claim: groups
+      oidc_name: keycloak
+      oidc_scope: openid,generic
+      oidc_user_claim: email
+      oidc_verify_cert: "{{ dsc.exposedCA.type == 'none' }}"
+      project_creation_restriction: adminonly
+      quota_per_project_enable: true
+      read_only: false
+      robot_name_prefix: robot$
+      robot_token_duration: 30
+      self_registration: false
 
 - name: Assert element
   ansible.builtin.assert:

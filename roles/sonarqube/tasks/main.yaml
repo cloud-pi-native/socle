@@ -1,3 +1,4 @@
+---
 - name: Create Sonarqube namespace
   kubernetes.core.k8s:
     kind: Namespace
@@ -49,8 +50,8 @@
       apiVersion: v1
       kind: Secret
       data:
-        password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')|b64encode }}"
-        currentPassword: "{{ 'admin'|b64encode }}"
+        password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
+        currentPassword: "{{ 'admin' | b64encode }}"
       metadata:
         name: sonarqube
         namespace: "{{ dsc.sonarqube.namespace }}"
@@ -61,7 +62,7 @@
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.sonarqube.namespace }}"
     kind: Secret
-    name: "sonar-monitoring-password"
+    name: sonar-monitoring-password
   register: sonar_monitoring_secret
 
 - name: Set SonarQube monitoring password secret
@@ -73,7 +74,7 @@
       apiVersion: v1
       kind: Secret
       data:
-        monitoring-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')|b64encode }}"
+        monitoring-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
       metadata:
         name: sonar-monitoring-password
         namespace: "{{ dsc.sonarqube.namespace }}"
@@ -88,7 +89,7 @@
   failed_when: sonar_secret.resources | length == 0
 
 - name: Set settings fact
-  set_fact:
+  ansible.builtin.set_fact:
     keycloak_secret: "{{ sonar_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
     keycloak_client: "{{ sonar_secret.resources[0].data.CLIENT_ID | b64decode }}"
 
@@ -99,11 +100,12 @@
 - name: Merge with proxy settings
   when: dsc.proxy.enabled
   block:
-  - ansible.builtin.set_fact:
-      sonar_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-  - name: Merge with sonar proxy values
-    ansible.builtin.set_fact:
-      sonar_values: "{{ sonar_values | combine(sonar_proxy_values, recursive=True, list_merge='append') }}"
+    - name: Generate proxy values
+      ansible.builtin.set_fact:
+        sonar_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+    - name: Merge with sonar proxy values
+      ansible.builtin.set_fact:
+        sonar_values: "{{ sonar_values | combine(sonar_proxy_values, recursive=True, list_merge='append') }}"
 
 - name: Merge with sonarqube user values
   ansible.builtin.set_fact:
@@ -138,7 +140,7 @@
 
 - name: Get SonarQube version
   ansible.builtin.uri:
-    url: "https://{{ sonar_domain }}/api/server/version"
+    url: https://{{ sonar_domain }}/api/server/version
     method: GET
     return_content: true
   register: sonar_version
@@ -150,13 +152,13 @@
 
 - name: Set fact sonar token
   when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is defined
-  ansible.builtin.set_fact:  
+  ansible.builtin.set_fact:
     token_pass: "{{ ansible_inventory.resources[0].data.SONAR_API_TOKEN }}"
   no_log: true
 
 - name: Remove permissions for sonar-users
   ansible.builtin.uri:
-    url: "https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}"
+    url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
     user: "{{ token_pass }}"
     force_basic_auth: true
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"

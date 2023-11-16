@@ -1,3 +1,4 @@
+---
 - name: Create Vault namespace
   kubernetes.core.k8s:
     state: present
@@ -17,11 +18,12 @@
 - name: Merge with proxy settings
   when: dsc.proxy.enabled
   block:
-  - ansible.builtin.set_fact:
-      vault_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-  - name: Merge with vault proxy values
-    ansible.builtin.set_fact:
-      vault_values: "{{ vault_values | combine(vault_proxy_values, recursive=True, list_merge='append') }}"
+    - name: Generate proxy values
+      ansible.builtin.set_fact:
+        vault_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+    - name: Merge with vault proxy values
+      ansible.builtin.set_fact:
+        vault_values: "{{ vault_values | combine(vault_proxy_values, recursive=True, list_merge='append') }}"
 
 - name: Merge with Vault user values
   ansible.builtin.set_fact:
@@ -64,7 +66,7 @@
 
 - name: Wait Vault URL
   ansible.builtin.uri:
-    url: "https://{{ vault_domain }}"
+    url: https://{{ vault_domain }}
     method: GET
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     status_code: [200, 202]
@@ -83,9 +85,9 @@
     that:
       - ((vault_status in ['sealed', 'OK']) and (vault_keys.resources | length > 0)) or ((vault_status == 'not init') and (vault_keys.resources | length == 0))
     fail_msg:
-      - "Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-keys dans {{ dsc.vault.namespace }}"
-      - "Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation"
-      - "Soit le vault est initialisé mais vous n'avez pas de secret vault-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !"
+      - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-keys dans {{ dsc.vault.namespace }}
+      - Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation
+      - Soit le vault est initialisé mais vous n'avez pas de secret vault-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !
 
 - name: Init vault
   kubernetes.core.k8s_exec:
@@ -95,7 +97,7 @@
     command: vault operator init -key-shares=3 -key-threshold=2
   when: vault_status == 'not init'
   register: init
-  until: "init is not failed"
+  until: init is not failed
   retries: 1
   delay: 10
 
@@ -153,17 +155,18 @@
     kind: Pod
     name: "{{ dsc_name }}-vault-0"
   register: vault_pod
-  until: (vault_pod.resources[0].status.conditions is defined) and (vault_pod.resources[0].status.conditions | selectattr('status', 'equalto', 'True') | selectattr('type', 'equalto', 'Ready'))
+  until: (vault_pod.resources[0].status.conditions is defined) and (vault_pod.resources[0].status.conditions | selectattr('status', 'equalto', 'True') | selectattr('type',
+    'equalto', 'Ready'))
   retries: 15
   delay: 5
 
 - name: "Config: get auth method"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/jwt"
+    url: https://{{ vault_domain }}/v1/sys/auth/jwt
     status_code: [200, 400]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
   register: jwt_state
   retries: 5
 
@@ -171,11 +174,11 @@
   when: jwt_state.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/jwt"
+    url: https://{{ vault_domain }}/v1/sys/auth/jwt
     method: POST
     status_code: [204]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
     body:
       type: jwt
       description: Login for Gitlab-ci
@@ -184,11 +187,11 @@
 - name: "Config: add role default-ci"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/auth/jwt/role/default-ci"
+    url: https://{{ vault_domain }}/v1/auth/jwt/role/default-ci
     method: POST
     status_code: [204]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
       Content-Type: application/json
     body:
       role_type: jwt
@@ -209,13 +212,13 @@
 - name: "Config: set jwt config"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/auth/jwt/config"
+    url: https://{{ vault_domain }}/v1/auth/jwt/config
     method: POST
     status_code: [204]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
     body:
-      oidc_discovery_url: "https://{{ gitlab_domain }}"
+      oidc_discovery_url: https://{{ gitlab_domain }}
       oidc_discovery_ca_pem: "{{ exposed_ca_pem }}"
       default_role: default-ci
       namespace_in_state: false
@@ -224,20 +227,20 @@
 - name: "Config: get accessor jwt config"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/jwt"
+    url: https://{{ vault_domain }}/v1/sys/auth/jwt
     status_code: [200]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
   register: get_accessor
 
 - name: "Config: create policy"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/policy/default-ci"
+    url: https://{{ vault_domain }}/v1/sys/policy/default-ci
     method: POST
     status_code: [204]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
     body:
       policy: |
         path "forge-dso/+/{{ '{{' }}identity.entity.aliases.{{ get_accessor.json.accessor }}.metadata.namespace_path{{ '}}' }}/*" {
@@ -251,21 +254,21 @@
 - name: "Config: get kv engines"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/mounts/forge-dso"
+    url: https://{{ vault_domain }}/v1/sys/mounts/forge-dso
     status_code: [200, 400]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
   register: get_engines
 
 - name: "Config: create kv engine"
   when: get_engines.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/mounts/forge-dso"
+    url: https://{{ vault_domain }}/v1/sys/mounts/forge-dso
     method: POST
     status_code: [204]
     headers:
-      "X-Vault-Token": "{{ root_token }}"
+      X-Vault-Token: "{{ root_token }}"
     body:
       type: kv
       options:

@@ -1,10 +1,11 @@
+---
 - name: Create nexus Namespace
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
       kind: Namespace
       metadata:
-        creationTimestamp: null
+        creationTimestamp:
         name: "{{ dsc.nexus.namespace }}"
 
 - name: Create nexus Service Account
@@ -86,7 +87,7 @@
       ansible.builtin.uri:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         force_basic_auth: true
-        url: "https://{{ nexus_domain }}/service/rest/v1/security/users/admin/change-password"
+        url: https://{{ nexus_domain }}/service/rest/v1/security/users/admin/change-password
         method: PUT
         user: admin
         password: "{{ nexus_admin_password }}"
@@ -126,14 +127,14 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: "https://{{ nexus_domain }}/service/rest/v1/security/anonymous"
+    url: https://{{ nexus_domain }}/service/rest/v1/security/anonymous
     method: PUT
     user: admin
     password: "{{ nexus_admin_password }}"
     body:
       enabled: true
-      userId: "anonymous"
-      realmName: "NexusAuthorizingRealm"
+      userId: anonymous
+      realmName: NexusAuthorizingRealm
     body_format: json
     status_code: [200]
 
@@ -141,7 +142,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: "https://{{ nexus_domain }}/service/rest/v1/security/roles/new-anon"
+    url: https://{{ nexus_domain }}/service/rest/v1/security/roles/new-anon
     method: GET
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -153,14 +154,14 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: "https://{{ nexus_domain }}/service/rest/v1/security/roles"
+    url: https://{{ nexus_domain }}/service/rest/v1/security/roles
     method: POST
     user: admin
     password: "{{ nexus_admin_password }}"
     body:
-      id: "new-anon"
-      name: "new-anon"
-      description: "new-anon"
+      id: new-anon
+      name: new-anon
+      description: new-anon
       privileges:
         - nx-repository-view-docker-*-browse
         - nx-repository-view-docker-*-read
@@ -173,7 +174,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: "https://{{ nexus_domain }}/service/rest/v1/security/users?userId=anonymous&source=default"
+    url: https://{{ nexus_domain }}/service/rest/v1/security/users?userId=anonymous&source=default
     method: GET
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -185,17 +186,17 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: "https://{{ nexus_domain }}/service/rest/v1/security/users/anonymous"
+    url: https://{{ nexus_domain }}/service/rest/v1/security/users/anonymous
     method: PUT
     user: admin
     password: "{{ nexus_admin_password }}"
     body:
-      userId: "anonymous"
-      firstName: "Anonymous"
-      lastName: "User"
-      emailAddress: "anonymous@example.org"
-      source: "default"
-      status: "active"
+      userId: anonymous
+      firstName: Anonymous
+      lastName: User
+      emailAddress: anonymous@example.org
+      source: default
+      status: active
       readOnly: true
       roles:
         - new-anon

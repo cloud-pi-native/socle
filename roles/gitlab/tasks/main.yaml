@@ -1,6 +1,8 @@
-- ansible.builtin.set_fact:
-    vault_auth_path: "jwt"
-    vault_auth_role: "default-ci"
+---
+- name: Set some facts
+  ansible.builtin.set_fact:
+    vault_auth_path: jwt
+    vault_auth_role: default-ci
     npm_file: "{{ lookup('ansible.builtin.template', 'npm_file.j2') }}"
     mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
 
@@ -95,11 +97,12 @@
 - name: Merge with proxy settings
   when: dsc.proxy.enabled
   block:
-  - ansible.builtin.set_fact:
-      gitlab_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-  - name: Merge with gitlab proxy values
-    ansible.builtin.set_fact:
-      gitlab_values: "{{ gitlab_values | combine(gitlab_proxy_values, recursive=True, list_merge='append') }}"
+    - name: Generate proxy values
+      ansible.builtin.set_fact:
+        gitlab_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+    - name: Merge with gitlab proxy values
+      ansible.builtin.set_fact:
+        gitlab_values: "{{ gitlab_values | combine(gitlab_proxy_values, recursive=True, list_merge='append') }}"
 
 - name: Merge with gitlab user values
   ansible.builtin.set_fact:
@@ -144,9 +147,9 @@
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ gitlab_domain }}/api/v4/admin/ci/variables"
+    url: https://{{ gitlab_domain }}/api/v4/admin/ci/variables
     headers:
-      "PRIVATE-TOKEN": "{{ gitlab_token }}"
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
   register: test_token
   ignore_errors: true
 
@@ -167,7 +170,8 @@
 
     - name: Create token
       ansible.builtin.include_tasks:
-        file: "{{ dsc.gitlab.chartVersion is version('7.2.0', operator='lt', version_type='loose') | ternary('create-token-7.2.0-.yaml', 'create-token-7.2.0+.yaml') }}"
+        file: "{{ dsc.gitlab.chartVersion is version('7.2.0', operator='lt', version_type='loose') | ternary('create-token-7.2.0-.yaml', 'create-token-7.2.0+.yaml')
+          }}"
 
     - name: Set new gitlab token
       ansible.builtin.set_fact:
@@ -186,19 +190,19 @@
 - name: Get settings
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ gitlab_domain }}/api/v4/application/settings"
+    url: https://{{ gitlab_domain }}/api/v4/application/settings
     headers:
-      "PRIVATE-TOKEN": "{{ gitlab_token }}"
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
   register: get_settings
   ignore_errors: true
 
 - name: Set some parameters
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ gitlab_domain }}/api/v4/application/settings"
+    url: https://{{ gitlab_domain }}/api/v4/application/settings
     method: PUT
     headers:
-      "PRIVATE-TOKEN": "{{ gitlab_token }}"
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
     body:
       signup_enabled: false
       outbound_local_requests_allowlist_raw: "0.0.0.0/0"
@@ -217,9 +221,9 @@
   ansible.builtin.include_tasks:
     file: create-group.yaml
 
-- name: "Set or update some CI/CD variables"
+- name: Set or update some CI/CD variables
   community.general.gitlab_group_variable:
-    api_url: "https://{{ gitlab_domain }}"
+    api_url: https://{{ gitlab_domain }}
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
@@ -231,83 +235,83 @@
         value: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
       - name: PROJECTS_ROOT_DIR
         value: "{{ dsc.global.projectsRootDir | join('/') }}"
-      - name: "NEXUS_HOST_URL"
-        value: "https://{{ nexus_domain }}"
-      - name: "NEXUS_HOSTNAME"
+      - name: NEXUS_HOST_URL
+        value: https://{{ nexus_domain }}
+      - name: NEXUS_HOSTNAME
         value: "{{ nexus_domain }}"
-      - name: "SONAR_HOST_URL"
-        value: "https://{{ sonar_domain }}"
-      - name: "VAULT_AUTH_PATH"
+      - name: SONAR_HOST_URL
+        value: https://{{ sonar_domain }}
+      - name: VAULT_AUTH_PATH
         value: "{{ vault_auth_path }}"
-      - name: "VAULT_AUTH_ROLE"
+      - name: VAULT_AUTH_ROLE
         value: "{{ vault_auth_role }}"
-      - name: "VAULT_SERVER_URL"
-        value: "https://{{ vault_domain }}"
-      - name: "MVN_CONFIG_FILE"
-        variable_type: "file"
+      - name: VAULT_SERVER_URL
+        value: https://{{ vault_domain }}
+      - name: MVN_CONFIG_FILE
+        variable_type: file
         value: "{{ mvn_config_file }}"
-      - name: "NPM_FILE"
-        variable_type: "file"
+      - name: NPM_FILE
+        variable_type: file
         value: "{{ npm_file }}"
 
-- name: "Set or update proxy CI/CD variables"
+- name: Set or update proxy CI/CD variables
   community.general.gitlab_group_variable:
-    api_url: "https://{{ gitlab_domain }}"
+    api_url: https://{{ gitlab_domain }}
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     state: "{{ dsc.proxy.enabled | ternary('present', 'absent') }}"
     variables:
-      - name: "HTTP_PROXY"
-        value: "{{ dsc.proxy.http_proxy | default ('') }}"
-      - name: "HTTPS_PROXY"
-        value: "{{ dsc.proxy.https_proxy | default ('') }}"
-      - name: "NO_PROXY"
-        value: "{{ dsc.proxy.no_proxy | default ('') }}"
-      - name: "PROXY_HOST"
-        value: "{{ dsc.proxy.host | default ('') }}"
-      - name: "PROXY_PORT"
-        value: "{{ dsc.proxy.port | default ('') }}"
-      - name: "http_proxy"
-        value: "{{ dsc.proxy.http_proxy | default ('') }}"
-      - name: "https_proxy"
-        value: "{{ dsc.proxy.https_proxy | default ('') }}"
-      - name: "no_proxy"
-        value: "{{ dsc.proxy.no_proxy | default ('') }}"
+      - name: HTTP_PROXY
+        value: "{{ dsc.proxy.http_proxy | default('') }}"
+      - name: HTTPS_PROXY
+        value: "{{ dsc.proxy.https_proxy | default('') }}"
+      - name: NO_PROXY
+        value: "{{ dsc.proxy.no_proxy | default('') }}"
+      - name: PROXY_HOST
+        value: "{{ dsc.proxy.host | default('') }}"
+      - name: PROXY_PORT
+        value: "{{ dsc.proxy.port | default('') }}"
+      - name: http_proxy
+        value: "{{ dsc.proxy.http_proxy | default('') }}"
+      - name: https_proxy
+        value: "{{ dsc.proxy.https_proxy | default('') }}"
+      - name: no_proxy
+        value: "{{ dsc.proxy.no_proxy | default('') }}"
 
-- name: "Set or update CA_BUNDLE variable"
+- name: Set or update CA_BUNDLE variable
   community.general.gitlab_group_variable:
-    api_url: "https://{{ gitlab_domain }}"
+    api_url: https://{{ gitlab_domain }}
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     state: "{{ dsc.additionalsCA | ternary('present', 'absent') }}"
     variables:
-      - name: "CA_BUNDLE"
+      - name: CA_BUNDLE
         value: "{{ [additionals_ca_pem, exposed_ca_pem] | join('\n') }}"
         variable_type: file
 
-- name: "Set or update insecure args variables"
+- name: Set or update insecure args variables
   community.general.gitlab_group_variable:
-    api_url: "https://{{ gitlab_domain }}"
+    api_url: https://{{ gitlab_domain }}
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     state: "{{ dsc.gitlab.insecureCI | ternary('present', 'absent') }}"
     variables:
-      - name: "EXTRA_KANIKO_ARGS"
-        value: "--skip-tls-verify"
-      - name: "EXTRA_GIT_ARGS"
-        value: "-c http.sslVerify=false"
-      - name: "EXTRA_VAULT_ARGS"
-        value: "-tls-skip-verify"
+      - name: EXTRA_KANIKO_ARGS
+        value: --skip-tls-verify
+      - name: EXTRA_GIT_ARGS
+        value: -c http.sslVerify=false
+      - name: EXTRA_VAULT_ARGS
+        value: -tls-skip-verify
 
-- name: "Set or update additional CI/CD variables"
+- name: Set or update additional CI/CD variables
   community.general.gitlab_group_variable:
-    api_url: "https://{{ gitlab_domain }}"
+    api_url: https://{{ gitlab_domain }}
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"

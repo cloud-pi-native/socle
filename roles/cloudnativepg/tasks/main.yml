@@ -1,3 +1,4 @@
+---
 - name: Get cluster infos
   kubernetes.core.k8s_cluster_info:
   register: cluster_infos

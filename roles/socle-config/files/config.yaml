@@ -34,5 +34,3 @@ spec:
   vault:
     namespace: dso-vault
     subDomain: vault
-  sops:
-    namespace: dso-sops

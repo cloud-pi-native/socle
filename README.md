@@ -31,7 +31,6 @@
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
-    - [SOPS](#sops)
     - [Vault](#vault)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
@@ -57,7 +56,6 @@ Les éléments déployés seront les suivants :
 | Kubed                       | <https://appscode.com/products/kubed>                                          |
 | Sonatype Nexus Repository   | <https://www.sonatype.com/products/sonatype-nexus-repository>                  |
 | SonarQube Community Edition | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
-| SOPS                        | <https://github.com/isindir/sops-secrets-operator>                             |
 | HashiCorp Vault             | <https://www.vaultproject.io>                                                  |
 
 Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
@@ -114,7 +112,6 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
   - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
   - [helm](https://helm.sh/docs/intro/install/)
   - [yq](https://github.com/mikefarah/yq/#install), facultative mais utile pour debug.
-  - [age](https://github.com/FiloSottile/age#installation), outil de chiffrement qui fournit les commandes `age` et `age-keygen` nécessaires pour l'installation de SOPS.
 
 ## Configuration
 
@@ -266,10 +263,6 @@ spec:
         repository: sonarqube
         edition: community
         tag: 9.9.2-{{ .Values.edition }}
-  sops:
-    values:
-      image:
-        tag: 0.11.0
   vault:
     values:
       injector:
@@ -308,7 +301,6 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [Harbor](https://github.com/goharbor/harbor-helm)
 - [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
 - [SonarQube](https://github.com/bitnami/charts/tree/main/bitnami/sonarqube)
-- [SOPS](https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
 S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.  
@@ -643,7 +635,6 @@ Les sections suivantes détaillent la façon de procéder au gel de version d'im
   - [Kubed (config-syncer)](#kubed-config-syncer)
   - [Sonatype Nexus Repository](#sonatype-nexus-repository)
   - [SonarQube Community Edition](#sonarqube-community-edition)
-  - [SOPS](#sops)
   - [Vault](#vault)
 
 #### Argo CD
@@ -890,34 +881,6 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         edition: community
         tag: 9.9.2-{{ .Values.edition }}
 ```
-
-#### SOPS
-
-Fixer la version d'image de SOPS sera **recommandé en production**.
-
-Pour spécifier cette version d'image, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
-
-```yaml
-  sops:
-    namespace: mynamespace-sops
-    values:
-      image:
-        tag: 0.11.0
-```
-
-Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator>
-
-Les numéros de version de chart Helm et d'image se trouvent ici : <https://github.com/isindir/sops-secrets-operator/blob/master/README.md#versioning>
-
-S'agissant de l'image, ces numéros correspondent à la colonne "Operator".
-
-Il est également possible de les retrouver via la commande de recherche dans vos dépôts Helm vue précédemment :
-
-```bash
-helm search repo -l sops/sops-secrets-operator
-```
-
-Ceci à condition que vos dépôts soient à jour.
 
 #### Vault
 

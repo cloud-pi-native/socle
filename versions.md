@@ -12,5 +12,4 @@
 | kubed | 0.13.2 | [kubed](https://artifacthub.io/packages/helm/appscode/kubed) |
 | nexus | 3.56.0 | [nexus](https://hub.docker.com/r/sonatype/nexus3/) |
 | sonarqube | 10.2.1+800 | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube) |
-| sops | 0.17.0 | [sops](https://artifacthub.io/packages/helm/sops-secrets-operator/sops-secrets-operator) |
 | vault | 0.25.0 | [vault](https://artifacthub.io/packages/helm/hashicorp/vault) |

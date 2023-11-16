@@ -17,12 +17,11 @@
       - kubectl
       - helm
       - yq
-      - age
 
   tasks:
 
     - name: "Install some required packages"
-      become: yes
+      become: true
       ansible.builtin.package:
         name: "{{ item }}"
         state: present
@@ -49,7 +48,7 @@
       ansible.builtin.shell:
         executable: /bin/bash
         cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  
+
     - name: Get Homebrew shellenv
       ansible.builtin.shell:
         cmd: "/home/linuxbrew/.linuxbrew/bin/brew shellenv"
@@ -85,4 +84,3 @@
         name: "{{ item }}"
         state: present
       loop: "{{ apps }}"
-      

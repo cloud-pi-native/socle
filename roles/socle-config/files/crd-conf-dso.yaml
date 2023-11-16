@@ -499,22 +499,6 @@ spec:
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
-                sops:
-                  properties:
-                    namespace:
-                      description: Namespace for SOPS.
-                      type: string
-                    chartVersion:
-                      description: SOPS helm chart version (e.g., "0.15.1").
-                      type: string
-                    values:
-                      default: {}
-                      description: |
-                        You can merge customs values for sops, it will be merged with roles/sops/tasks/main.yaml
-                        See https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator
-                      type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                  type: object
                 vault:
                   description: Configuration for Vault.
                   properties:
@@ -552,7 +536,6 @@ spec:
                 - nexus
                 - proxy
                 - sonarqube
-                - sops
                 - vault
               type: object
           required:

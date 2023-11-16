@@ -1,3 +1,4 @@
+---
 - name: No exposed_ca
   when: dsc.exposedCA.type == 'none'
   ansible.builtin.set_fact:
@@ -37,7 +38,7 @@
     - name: Get certmanager secret
       kubernetes.core.k8s_info:
         name: "{{ dsc.ingress.tls.ca.secretName }}"
-        namespace: "cert-manager"
+        namespace: cert-manager
         kind: Secret
       register: exposed_ca_resource
 
@@ -50,10 +51,10 @@
   block:
     - name: Get url
       ansible.builtin.shell:
-        cmd: "curl {{ dsc.exposedCA.url }} -s | openssl x509"
+        cmd: curl {{ dsc.exposedCA.url }} -s | openssl x509
       changed_when: false
       register: exposed_ca_resource
-      tags: ["skip_ansible_lint"]
+      tags: [skip_ansible_lint]
 
     - name: Extract key
       ansible.builtin.set_fact:

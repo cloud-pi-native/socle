@@ -1,13 +1,14 @@
+---
 - name: Create Keycloak clients
   community.general.keycloak_client:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    auth_client_id: "admin-cli"
-    auth_keycloak_url: "https://{{ keycloak_domain }}"
-    auth_realm: "master"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
-    state: "present"
-    realm: "dso"
+    state: present
+    realm: dso
     clientId: "{{ item.clientId }}"
     clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
     standardFlowEnabled: "{{ item.standardFlowEnabled }}"
@@ -37,10 +38,10 @@
       apiVersion: v1
       kind: Secret
       data:
-        CLIENT_ID: "{{ item.clientId|b64encode }}"
-        CLIENT_SECRET: "{{ kc_clients_secrets.clientsecret_info.value|b64encode }}"
+        CLIENT_ID: "{{ item.clientId | b64encode }}"
+        CLIENT_SECRET: "{{ kc_clients_secrets.clientsecret_info.value | b64encode }}"
       metadata:
-        name: "keycloak-client-secret-{{ item.clientId }}"
+        name: keycloak-client-secret-{{ item.clientId }}
         namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque
 
@@ -52,8 +53,8 @@
       apiVersion: v1
       kind: Secret
       data:
-        CLIENT_ID: "{{ item.clientId|b64encode }}"
+        CLIENT_ID: "{{ item.clientId | b64encode }}"
       metadata:
-        name: "keycloak-client-secret-{{ item.clientId }}"
+        name: keycloak-client-secret-{{ item.clientId }}
         namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque

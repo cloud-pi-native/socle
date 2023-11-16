@@ -1,3 +1,4 @@
+---
 - name: Get cluster infos
   kubernetes.core.k8s_cluster_info:
   register: cluster_infos
@@ -29,7 +30,7 @@
 
     - name: Set CloudNativePG helm values
       ansible.builtin.set_fact:
-        cnpg_values: "{{ lookup('template', 'cnpg-values.yaml.j2') | from_yaml }}"
+        cnpg_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
     - name: Deploy CloudNativePG helm
       kubernetes.core.helm:

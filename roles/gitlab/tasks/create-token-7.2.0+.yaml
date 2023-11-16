@@ -1,3 +1,4 @@
+---
 - name: Create Token for 7.2.0 chart version and higher
   kubernetes.core.k8s_exec:
     pod: "{{ tb_pod }}"

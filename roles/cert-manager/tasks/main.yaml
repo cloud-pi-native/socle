@@ -1,3 +1,4 @@
+---
 - name: Add cert-manager helm repo
   kubernetes.core.helm_repository:
     name: jetstack
@@ -19,7 +20,17 @@
 
 - name: Set cert-manager helm values
   ansible.builtin.set_fact:
-    cm_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    cm_values: {}
+
+- name: Merge with proxy settings
+  when: dsc.proxy.enabled
+  block:
+    - name: Generate proxy values
+      ansible.builtin.set_fact:
+        cm_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+    - name: Merge with cm proxy values
+      ansible.builtin.set_fact:
+        cm_values: "{{ cm_values | combine(cm_proxy_values, recursive=True, list_merge='append') }}"
 
 - name: Deploy helm
   kubernetes.core.helm:

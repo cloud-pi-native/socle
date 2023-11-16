@@ -1,3 +1,4 @@
+---
 - name: Get Gitlab namespace
   kubernetes.core.k8s_info:
     kind: Namespace
@@ -6,7 +7,7 @@
 
 - name: Fail if Gitlab namespace is not present
   ansible.builtin.fail:
-    msg: "Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant"
+    msg: Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant
   when: gitlab_ns | length == 0
 
 - name: Get dso-config inventory
@@ -23,14 +24,14 @@
 - name: Initiate a runner in GitLab instance
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ gitlab_domain }}/api/v4/user/runners"
+    url: https://{{ gitlab_domain }}/api/v4/user/runners
     method: POST
     headers:
-      "PRIVATE-TOKEN": "{{ gitlab_token }}"
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
     body:
       runner_type: instance_type
       description: dso-runner
-      platform: null
+      platform:
       run_untagged: true
     body_format: form-urlencoded
     status_code: [201]
@@ -42,13 +43,27 @@
     name: gitlab
     repo_url: https://charts.gitlab.io
 
+- name: Create gitlab-runner role
+  kubernetes.core.k8s:
+    template: gitlab-runner-auth.yaml.j2
+
 - name: Set GitLab Runner helm values
   ansible.builtin.set_fact:
     runner_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
-- name: Create gitlab-runner role
-  kubernetes.core.k8s:
-    template: gitlab-runner-auth.yaml.j2
+- name: Merge with proxy settings
+  when: dsc.proxy.enabled
+  block:
+    - name: Generate proxy values
+      ansible.builtin.set_fact:
+        runner_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+    - name: Merge with runner proxy values
+      ansible.builtin.set_fact:
+        runner_values: "{{ runner_values | combine(runner_proxy_values, recursive=True, list_merge='append') }}"
+
+- name: Merge with runner user values
+  ansible.builtin.set_fact:
+    gitlab_values: "{{ gitlab_values | combine(dsc.gitlab['values'], recursive=True, list_merge='append') }}"
 
 - name: Deploy GitLab Runner helm
   kubernetes.core.helm:

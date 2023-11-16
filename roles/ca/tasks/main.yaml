@@ -1,3 +1,4 @@
+---
 - name: Additionals_ca tasks
   ansible.builtin.include_tasks:
     file: additionals_ca.yaml

@@ -1,3 +1,4 @@
+---
 - name: Installation du socle DSO
   hosts: localhost
   gather_facts: false
@@ -84,7 +85,8 @@
         - console-dso
 
   post_tasks:
-    - debug:
+    - name: Post-Install Disclaimer
+      ansible.builtin.debug:
         msg: "{{ dsc | get_debug_messages }}"
       tags:
         - always

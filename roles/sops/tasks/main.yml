@@ -43,7 +43,7 @@
 
 - name: Merge with SOPS user values
   ansible.builtin.set_fact:
-    sops_values: "{{ sops_values | combine(dsc.sops['values'], recursive=True) }}"
+    sops_values: "{{ sops_values | combine(dsc.sops['values'], recursive=True, list_merge='append') }}"
 
 - name: Deploy helm
   kubernetes.core.helm:

@@ -1,3 +1,4 @@
+---
 - name: Set empty ca fact
   ansible.builtin.set_fact:
     additionals_ca_pem_array: []

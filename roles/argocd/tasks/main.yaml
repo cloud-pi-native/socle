@@ -34,13 +34,22 @@
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
 
-- name: Set extra env vars
+- name: Set argo_values
   ansible.builtin.set_fact:
     argo_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
+- name: Merge with proxy settings
+  when: dsc.proxy.enabled
+  block:
+  - ansible.builtin.set_fact:
+      argo_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+  - name: Merge with argo proxy values
+    ansible.builtin.set_fact:
+      argo_values: "{{ argo_values | combine(argo_proxy_values, recursive=True, list_merge='append') }}"
+
 - name: Merge with argo user values
   ansible.builtin.set_fact:
-    argo_values: "{{ argo_values | combine(dsc.argocd['values'], recursive=True) }}"
+    argo_values: "{{ argo_values | combine(dsc.argocd['values'], recursive=True, list_merge='append') }}"
 
 - name: Deploy helm
   kubernetes.core.helm:

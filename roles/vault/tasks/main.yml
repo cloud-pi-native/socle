@@ -10,55 +10,22 @@
     name: hashicorp
     repo_url: https://helm.releases.hashicorp.com
 
-- name: Set values
+- name: Set Vault helm values
   ansible.builtin.set_fact:
-    values:
-      global:
-        openshift: true
-      injector:
-        image:
-          repository: docker.io/hashicorp/vault-k8s
-        agentImage:
-          repository: docker.io/hashicorp/vault
-      server:
-        route:
-          enabled: false
-        ha:
-          enabled: false
-        standalone:
-          enabled: true
-        auditStorage:
-          enable: true
-        dataStorage:
-          enable: true
-          size: 23Gi
-        image:
-          repository: docker.io/hashicorp/vault
-      csi:
-        image:
-          repository: docker.io/hashicorp/vault-csi-provider
-        agent:
-          image:
-            repository: docker.io/hashicorp/vault
+    vault_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
-- name: Set proxy_fact
-  ansible.builtin.set_fact:
-    proxy_fact:
-      server:
-        extraEnvironmentVars:
-          HTTP_PROXY: "{{ dsc.proxy.http_proxy }}"
-          HTTPS_PROXY: "{{ dsc.proxy.https_proxy }}"
-          NO_PROXY: "{{ dsc.proxy.no_proxy }}"
+- name: Merge with proxy settings
   when: dsc.proxy.enabled
+  block:
+  - ansible.builtin.set_fact:
+      vault_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+  - name: Merge with vault proxy values
+    ansible.builtin.set_fact:
+      vault_values: "{{ vault_values | combine(vault_proxy_values, recursive=True, list_merge='append') }}"
 
-- name: Set extraEnv
-  when: dsc.proxy.enabled
+- name: Merge with Vault user values
   ansible.builtin.set_fact:
-    values: "{{ values | combine(proxy_fact, recursive=True) }}"
-
-- name: Set Vault values
-  ansible.builtin.set_fact:
-    values: "{{ values | combine(dsc.vault['values'], recursive=True) }}"
+    vault_values: "{{ vault_values | combine(dsc.vault['values'], recursive=True, list_merge='append') }}"
 
 - name: Deploy helm
   kubernetes.core.helm:
@@ -67,7 +34,7 @@
     chart_version: "{{ dsc.vault.chartVersion }}"
     release_namespace: "{{ dsc.vault.namespace }}"
     create_namespace: true
-    values: "{{ values }}"
+    values: "{{ vault_values }}"
 
 - name: Create route and certs
   kubernetes.core.k8s:

@@ -42,13 +42,26 @@
     name: gitlab
     repo_url: https://charts.gitlab.io
 
+- name: Create gitlab-runner role
+  kubernetes.core.k8s:
+    template: gitlab-runner-auth.yaml.j2
+
 - name: Set GitLab Runner helm values
   ansible.builtin.set_fact:
     runner_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
-- name: Create gitlab-runner role
-  kubernetes.core.k8s:
-    template: gitlab-runner-auth.yaml.j2
+- name: Merge with proxy settings
+  when: dsc.proxy.enabled
+  block:
+  - ansible.builtin.set_fact:
+      runner_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+  - name: Merge with runner proxy values
+    ansible.builtin.set_fact:
+      runner_values: "{{ runner_values | combine(runner_proxy_values, recursive=True, list_merge='append') }}"
+
+- name: Merge with runner user values
+  ansible.builtin.set_fact:
+    gitlab_values: "{{ gitlab_values | combine(dsc.gitlab['values'], recursive=True, list_merge='append') }}"
 
 - name: Deploy GitLab Runner helm
   kubernetes.core.helm:

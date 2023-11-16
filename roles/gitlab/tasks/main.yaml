@@ -90,11 +90,20 @@
 
 - name: Prepare Gitlab helm values
   ansible.builtin.set_fact:
-    gitlab_values: "{{ lookup('template', 'gitlab-instance.yaml.j2') | from_yaml }}"
+    gitlab_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+
+- name: Merge with proxy settings
+  when: dsc.proxy.enabled
+  block:
+  - ansible.builtin.set_fact:
+      gitlab_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+  - name: Merge with gitlab proxy values
+    ansible.builtin.set_fact:
+      gitlab_values: "{{ gitlab_values | combine(gitlab_proxy_values, recursive=True, list_merge='append') }}"
 
 - name: Merge with gitlab user values
   ansible.builtin.set_fact:
-    gitlab_values: "{{ gitlab_values | combine(dsc.gitlab['values'], recursive=True) }}"
+    gitlab_values: "{{ gitlab_values | combine(dsc.gitlab['values'], recursive=True, list_merge='append') }}"
 
 - name: Install gitlab instance
   kubernetes.core.k8s:

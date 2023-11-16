@@ -23,15 +23,9 @@ keycloak:
   sessionSecret: {{ session_secret }}
   domain: "{{ keycloak_domain }}"
   realm: dso
-server:
-  container:
-    env:
-{% if dsc.proxy.enabled %}
-      HTTP_PROXY: {{ dsc.proxy.http_proxy }}
-      HTTPS_PROXY: {{ dsc.proxy.https_proxy }}
-      NO_PROXY: {{ dsc.proxy.no_proxy }}
-{% endif %}
+
 {% if dsc.exposedCA.type != 'none' %}
+server:
   extraCa:
     name: bundle
     key: ca.pem

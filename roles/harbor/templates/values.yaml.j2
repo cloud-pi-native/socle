@@ -58,22 +58,6 @@ persistence:
     trivy:
       size: 10Gi
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
-{% if dsc.proxy.enabled %}
-proxy:
-  httpProxy: {{ dsc.proxy.http_proxy }}
-  httpsProxy: {{ dsc.proxy.https_proxy }}
-  noProxy: {{ dsc.proxy.no_proxy }},.local,.internal
-  components:
-    - nginx
-    - portal
-    - core
-    - jobservice
-    - registry
-    - trivy
-    - database
-    - redis
-    - exporter
-{% endif %}
 nginx:
   serviceAccountName: harbor-sa
   image:

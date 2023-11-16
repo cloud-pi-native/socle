@@ -73,7 +73,7 @@
 
 - name: Merge with Keycloak user values
   ansible.builtin.set_fact:
-    kc_values: "{{ kc_values | combine(dsc.keycloak['values'], recursive=True) }}"
+    kc_values: "{{ kc_values | combine(dsc.keycloak['values'], recursive=True, list_merge='append') }}"
 
 - name: Deploy helm
   kubernetes.core.helm:

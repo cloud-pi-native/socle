@@ -42,13 +42,22 @@
           {{ exposed_ca_pem }}
   when: dsc.exposedCA.type != 'none'
 
-- name: Set extra env vars
+- name: Prepare console helm values
   ansible.builtin.set_fact:
     console_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
-- name: Merge with argo user values
+- name: Merge with proxy settings
+  when: dsc.proxy.enabled
+  block:
+  - ansible.builtin.set_fact:
+      console_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+  - name: Merge with console proxy values
+    ansible.builtin.set_fact:
+      console_values: "{{ console_values | combine(console_proxy_values, recursive=True, list_merge='append') }}"
+
+- name: Merge with console user values
   ansible.builtin.set_fact:
-    console_values: "{{ console_values | combine(dsc.console['values'], recursive=True) | to_yaml }}"
+    console_values: "{{ console_values | combine(dsc.console['values'], recursive=True, list_merge='append') }}"
 
 - name: Apply app
   kubernetes.core.k8s:

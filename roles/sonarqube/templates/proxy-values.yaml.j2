@@ -1,0 +1,12 @@
+plugins:
+  httpProxy: "{{ dsc.proxy.http_proxy }}"
+  httpsProxy: "{{ dsc.proxy.https_proxy }}"
+  noProxy: "{{ dsc.proxy.no_proxy }}"
+
+env:
+  - name: http_proxy
+    value: "{{ dsc.proxy.http_proxy }}"
+  - name: https_proxy
+    value: "{{ dsc.proxy.https_proxy }}"
+  - name: no_proxy
+    value: "{{ dsc.proxy.no_proxy }}"

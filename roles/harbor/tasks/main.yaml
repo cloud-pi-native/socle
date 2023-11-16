@@ -39,9 +39,18 @@
   ansible.builtin.set_fact:
     harbor_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
 
+- name: Merge with proxy settings
+  when: dsc.proxy.enabled
+  block:
+  - ansible.builtin.set_fact:
+      harbor_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
+  - name: Merge with harbor proxy values
+    ansible.builtin.set_fact:
+      harbor_values: "{{ harbor_values | combine(harbor_proxy_values, recursive=True, list_merge='append') }}"
+
 - name: Merge with harbor user values
   ansible.builtin.set_fact:
-    harbor_values: "{{ harbor_values | combine(dsc.harbor['values'], recursive=True) }}"
+    harbor_values: "{{ harbor_values | combine(dsc.harbor['values'], recursive=True, list_merge='append') }}"
 
 - name: Deploy helm
   kubernetes.core.helm:

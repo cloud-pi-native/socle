@@ -1,13 +1,23 @@
 ---
-- name: Add helm repo
-  kubernetes.core.helm_repository:
-    name: appscode
-    repo_url: https://charts.appscode.com/stable/
+- name: Get existing kubed pods
+  kubernetes.core.k8s_info:
+    kind: Pod
+    label_selectors:
+      - "app.kubernetes.io/name=kubed"
+  register: kubed_pods
 
-- name: Deploy helm
-  kubernetes.core.helm:
-    name: kubed
-    chart_ref: appscode/kubed
-    chart_version: "{{ dsc.kubed.chartVersion }}"
-    release_namespace: openshift-infra
-    create_namespace: true
+- name: Install kubed
+  when: kubed_pods.resources | length == 0
+  block:
+    - name: Add helm repo
+      kubernetes.core.helm_repository:
+        name: appscode
+        repo_url: https://charts.appscode.com/stable/
+
+    - name: Deploy helm
+      kubernetes.core.helm:
+        name: kubed
+        chart_ref: appscode/kubed
+        chart_version: "{{ dsc.kubed.chartVersion }}"
+        release_namespace: openshift-infra
+        create_namespace: true

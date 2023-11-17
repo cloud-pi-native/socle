@@ -7,7 +7,7 @@
   ansible.builtin.set_fact:
     cnpg_api: "{{ cluster_infos.apis['postgresql.cnpg.io/v1'] | default('absent') }}"
 
-- name: Chek if cnpg-mutating-webhook-configuration exists
+- name: Check if cnpg-mutating-webhook-configuration exists
   kubernetes.core.k8s_info:
     kind: MutatingWebhookConfiguration
     name: cnpg-mutating-webhook-configuration

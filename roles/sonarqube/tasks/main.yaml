@@ -93,27 +93,20 @@
     keycloak_secret: "{{ sonar_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
     keycloak_client: "{{ sonar_secret.resources[0].data.CLIENT_ID | b64decode }}"
 
-- name: Set SonarQube helm values
+- name: Set path fact
   ansible.builtin.set_fact:
-    sonar_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    path: "{{ role_path + '/templates/values' }}"
 
-- name: Merge with proxy settings
-  when: dsc.proxy.enabled
-  block:
-    - name: Generate proxy values
-      ansible.builtin.set_fact:
-        sonar_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-    - name: Merge with sonar proxy values
-      ansible.builtin.set_fact:
-        sonar_values: "{{ sonar_values | combine(sonar_proxy_values, recursive=True, list_merge='append') }}"
-
-- name: Merge with sonarqube user values
-  ansible.builtin.set_fact:
-    sonar_values: "{{ sonar_values | combine(dsc.sonarqube['values'], recursive=True, list_merge='append') }}"
+- name: Compute Sonarqube Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.sonarqube['values'] }}"
+    combine_dest_var: "sonar_values"
 
 - name: Deploy helm
   kubernetes.core.helm:
-    #    force: true
     name: sonarqube
     chart_ref: sonarqube/sonarqube
     chart_version: "{{ dsc.sonarqube.chartVersion }}"

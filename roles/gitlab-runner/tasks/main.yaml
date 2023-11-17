@@ -47,23 +47,16 @@
   kubernetes.core.k8s:
     template: gitlab-runner-auth.yaml.j2
 
-- name: Set GitLab Runner helm values
+- name: Set path fact
   ansible.builtin.set_fact:
-    runner_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    path: "{{ role_path + '/templates/values' }}"
 
-- name: Merge with proxy settings
-  when: dsc.proxy.enabled
-  block:
-    - name: Generate proxy values
-      ansible.builtin.set_fact:
-        runner_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-    - name: Merge with runner proxy values
-      ansible.builtin.set_fact:
-        runner_values: "{{ runner_values | combine(runner_proxy_values, recursive=True, list_merge='append') }}"
-
-- name: Merge with runner user values
-  ansible.builtin.set_fact:
-    gitlab_values: "{{ gitlab_values | combine(dsc.gitlab['values'], recursive=True, list_merge='append') }}"
+- name: Compute Gitlab Runner Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_dest_var: "runner_values"
 
 - name: Deploy GitLab Runner helm
   kubernetes.core.helm:

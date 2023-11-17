@@ -43,23 +43,17 @@
           {{ exposed_ca_pem }}
   when: dsc.exposedCA.type != 'none'
 
-- name: Prepare console helm values
+- name: Set path fact
   ansible.builtin.set_fact:
-    console_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    path: "{{ role_path + '/templates/values' }}"
 
-- name: Merge with proxy settings
-  when: dsc.proxy.enabled
-  block:
-    - name: Generate proxy values
-      ansible.builtin.set_fact:
-        console_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-    - name: Merge with console proxy values
-      ansible.builtin.set_fact:
-        console_values: "{{ console_values | combine(console_proxy_values, recursive=True, list_merge='append') }}"
-
-- name: Merge with console user values
-  ansible.builtin.set_fact:
-    console_values: "{{ console_values | combine(dsc.console['values'], recursive=True, list_merge='append') }}"
+- name: Compute Console Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.console['values'] }}"
+    combine_dest_var: "console_values"
 
 - name: Apply app
   kubernetes.core.k8s:

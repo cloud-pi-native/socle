@@ -3,9 +3,9 @@ ingress:
   tls:
     - hosts:
         - {{ sonar_domain }}
-  {% if dsc.ingress.tls.type == 'tlsSecret' %}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
       secretName: {{ dsc.ingress.tls.tlsSecret.name }}
-  {% else %}
+{% else %}
       secretName: sonar-tls-secret
-  {% endif %}
+{% endif %}
 {% endif %}

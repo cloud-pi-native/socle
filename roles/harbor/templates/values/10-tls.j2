@@ -4,15 +4,15 @@ expose:
     enabled: false
 {% else %}
     enabled: true
-  {% if dsc.ingress.tls.type == 'tlsSecret' %}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
     certSource: secret
     secret:
       secretName: {{ dsc.ingress.tls.tlsSecret.name }}
       notarySecretName: {{ dsc.ingress.tls.tlsSecret.name }}-notary
-  {% else %}
+{% else %}
     certSource: secret
     secret:
       secretName: harbor-ingress
       notarySecretName: harbor-ingress-notary
-  {% endif %}
+{% endif %}
 {% endif %}

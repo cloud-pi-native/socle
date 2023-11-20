@@ -168,7 +168,7 @@
 
     - name: Create token
       ansible.builtin.include_tasks:
-        file: >
+        file:
           "{{ dsc.gitlab.chartVersion is version('7.2.0', operator='lt', version_type='loose') |
           ternary('create-token-7.2.0-.yaml', 'create-token-7.2.0+.yaml') }}"
 

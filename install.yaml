@@ -20,7 +20,6 @@
       tags:
         - cert-manager
         - cm
-        - always
 
     - name: confSyncer
       tags:

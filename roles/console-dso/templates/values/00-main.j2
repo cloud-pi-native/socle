@@ -4,11 +4,7 @@ ingress:
     - {{ console_domain }}
   annotations: {{ dsc.ingress.annotations }}
   labels: {{ dsc.ingress.labels }}
-  tls:
-    enabled: {{ dsc.ingress.tls.type != 'none' }}
-{% if dsc.ingress.tls.type == 'tlsSecret' %}
-    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
-{% endif %}
+
 
 postgres:
   container:
@@ -24,9 +20,3 @@ keycloak:
   domain: "{{ keycloak_domain }}"
   realm: dso
 
-{% if dsc.exposedCA.type != 'none' %}
-server:
-  extraCa:
-    name: bundle
-    key: ca.pem
-{% endif %}

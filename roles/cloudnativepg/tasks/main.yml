@@ -28,9 +28,16 @@
         name: cnpg
         repo_url: https://cloudnative-pg.github.io/charts
 
-    - name: Set CloudNativePG helm values
+    - name: Set path fact
       ansible.builtin.set_fact:
-        cnpg_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+        path: "{{ role_path + '/templates/values' }}"
+
+    - name: Compute Gitlab Helm values
+      ansible.builtin.include_role:
+        name: combine
+      vars:
+        combine_path: "{{ path }}"
+        combine_dest_var: "cnpg_values"
 
     - name: Deploy CloudNativePG helm
       kubernetes.core.helm:

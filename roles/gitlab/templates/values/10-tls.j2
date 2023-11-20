@@ -1,0 +1,32 @@
+global:
+  ingress:
+{% if dsc.ingress.tls.type == 'none' %}
+    tls:
+      enabled: false
+{% else %}
+    tls:
+      enabled: true
+  {% if dsc.ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+  {% endif %}
+{% endif %}
+
+{% if dsc.ingress.tls.type != 'tlsSecret' %}
+gitlab:
+  webservice:
+    ingress:
+      tls:
+        secretName: gitlab-webservice
+minio:
+  ingress:
+    tls:
+      secretName: gitlab-minio-secret
+{% else %}
+gitlab:
+  webservice:
+    ingress:
+      tls: {}
+minio:
+  ingress:
+    tls: {}
+{% endif %}

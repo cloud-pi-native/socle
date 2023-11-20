@@ -1,6 +1,5 @@
-envVars:
-
 {% if dsc.proxy.enabled %}
+envVars:
   - name: HTTP_PROXY
     value: "{{ dsc.proxy.http_proxy }}"
   - name: HTTPS_PROXY

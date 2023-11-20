@@ -8,10 +8,6 @@ gitlabUrl: https://{{ gitlab_domain }}/
 
 runnerToken: "{{ default_runner.json.token }}"
 
-{% if dsc.exposedCA != 'none' %}
-certsSecretName: exposed-ca
-{% endif %}
-
 rbac:
   create: true
   rules:

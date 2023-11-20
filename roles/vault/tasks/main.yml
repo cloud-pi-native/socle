@@ -11,23 +11,17 @@
     name: hashicorp
     repo_url: https://helm.releases.hashicorp.com
 
-- name: Set Vault helm values
+- name: Set path fact
   ansible.builtin.set_fact:
-    vault_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    path: "{{ role_path + '/templates/values' }}"
 
-- name: Merge with proxy settings
-  when: dsc.proxy.enabled
-  block:
-    - name: Generate proxy values
-      ansible.builtin.set_fact:
-        vault_proxy_values: "{{ lookup('template', 'proxy-values.yaml.j2') | from_yaml }}"
-    - name: Merge with vault proxy values
-      ansible.builtin.set_fact:
-        vault_values: "{{ vault_values | combine(vault_proxy_values, recursive=True, list_merge='append') }}"
-
-- name: Merge with Vault user values
-  ansible.builtin.set_fact:
-    vault_values: "{{ vault_values | combine(dsc.vault['values'], recursive=True, list_merge='append') }}"
+- name: Compute Vault Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.vault['values'] }}"
+    combine_dest_var: "vault_values"
 
 - name: Deploy helm
   kubernetes.core.helm:
@@ -155,8 +149,9 @@
     kind: Pod
     name: "{{ dsc_name }}-vault-0"
   register: vault_pod
-  until: (vault_pod.resources[0].status.conditions is defined) and (vault_pod.resources[0].status.conditions | selectattr('status', 'equalto', 'True') | selectattr('type',
-    'equalto', 'Ready'))
+  until: >
+    (vault_pod.resources[0].status.conditions is defined) and (vault_pod.resources[0].status.conditions |
+    selectattr('status', 'equalto', 'True') | selectattr('type', 'equalto', 'Ready'))
   retries: 15
   delay: 5
 

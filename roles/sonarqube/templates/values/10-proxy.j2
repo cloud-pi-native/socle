@@ -1,3 +1,4 @@
+{% if dsc.proxy.enabled %}
 plugins:
   httpProxy: "{{ dsc.proxy.http_proxy }}"
   httpsProxy: "{{ dsc.proxy.https_proxy }}"
@@ -10,3 +11,4 @@ env:
     value: "{{ dsc.proxy.https_proxy }}"
   - name: no_proxy
     value: "{{ dsc.proxy.no_proxy }}"
+{% endif %}

@@ -68,13 +68,17 @@
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
 
-- name: Set Keycloak helm values
+- name: Set path fact
   ansible.builtin.set_fact:
-    kc_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    path: "{{ role_path + '/templates/values' }}"
 
-- name: Merge with Keycloak user values
-  ansible.builtin.set_fact:
-    kc_values: "{{ kc_values | combine(dsc.keycloak['values'], recursive=True, list_merge='append') }}"
+- name: Compute Keycloak Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.keycloak['values'] }}"
+    combine_dest_var: "kc_values"
 
 - name: Deploy helm
   kubernetes.core.helm:
@@ -158,7 +162,9 @@
     id: dso
     realm: dso
     display_name: Dso Realm
-    password_policy: length(8) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and passwordHistory(1) and notUsername() and forceExpiredPasswordChange(365)
+    password_policy: >
+      length(8) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
+      passwordHistory(1) and notUsername() and forceExpiredPasswordChange(365)
     enabled: true
 
 - name: Create base admins groups
@@ -196,8 +202,9 @@
   register: dso_admin_secret
 
 - name: Create dso admin secret and user
-  when: (dso_admin_secret.resources | length == 0) or (kc_dso_users.json | selectattr('username', 'equalto', dso_admin_secret.resources[0].data.ADMIN_USER|b64decode)
-    | length == 0)
+  when: >
+    (dso_admin_secret.resources | length == 0) or
+    (kc_dso_users.json | selectattr('username', 'equalto', dso_admin_secret.resources[0].data.ADMIN_USER|b64decode) | length == 0)
   block:
     - name: Generate admin user password
       ansible.builtin.set_fact:
@@ -290,5 +297,3 @@
   ansible.builtin.include_tasks:
     file: client.yaml
   with_items: "{{ keycloak_clients }}"
-
-

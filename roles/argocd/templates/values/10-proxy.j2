@@ -1,4 +1,4 @@
-
+{% if dsc.proxy.enabled %}
 server:
   extraEnvVars: &extraEnvVars
     - name: HTTP_PROXY
@@ -10,3 +10,4 @@ server:
 
 repoServer:
   extraEnvVars: *extraEnvVars
+{% endif %}

@@ -1,0 +1,63 @@
+certmanager:
+  install: true
+
+registry:
+  enabled: false
+
+gitlab:
+  webservice:
+    registry:
+      enabled: false
+  sidekiq:
+    registry:
+      enabled: false
+  unicorn:
+    registry:
+      enabled: false
+
+global:
+  registry:
+    enabled: false
+  certificates:
+    customCAs:
+      - configMap: openshift-service-ca.crt
+  hosts:
+    domain: {{ dsc.global.rootDomain[1:] }}
+    registry:
+      name: gitlab-registry.example.com
+    minio:
+      name: {{ dsc_name }}-minio{{ dsc.global.rootDomain }}
+    kas:
+      name: {{ dsc_name }}-kas{{ dsc.global.rootDomain }}
+    gitlab:
+      name: {{ gitlab_domain }}
+  ingress:
+    class: {{ dsc.ingress.className | default('') }}
+    annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+      {{ key }}: {{ val }}
+{% endfor %}
+    labels:
+{% for key, val in dsc.ingress.labels.items() %}
+      {{ key }}: {{ val }}
+{% endfor %}
+    class: none
+    configureCertmanager: false
+
+  appConfig:
+    defaultProjectsFeatures:
+      containerRegistry: false
+    ldap:
+      preventSignin: true
+    omniauth:
+      enabled: true
+      syncProfileAttributes: ["email"]
+      allowSingleSignOn: ["openid_connect"]
+      blockAutoCreatedUsers: false
+      autoSignInWithProvider: "openid_connect"
+      autoLinkLdapUser: false
+      autoLinkSamlUser: false
+      autoLinkUser: ["openid_connect"]
+      providers:
+        - secret: openid-connect
+

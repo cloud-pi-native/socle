@@ -1,0 +1,6 @@
+ingress:
+  tls:
+    enabled: {{ dsc.ingress.tls.type != 'none' }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% endif %}

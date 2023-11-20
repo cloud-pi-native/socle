@@ -9,11 +9,6 @@ config:
   secret:
     argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
 {% endif %}
-{% if dsc.exposedCA != 'none' %}
-  tlsCerts:
-    {{ gitlab_domain }}: |
-      {{ exposed_ca_pem | indent(width=6, first=False) }}
-{% endif %}
 controller:
   <<: *securityContext
 dex:

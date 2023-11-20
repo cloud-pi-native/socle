@@ -48,16 +48,6 @@ ingress:
   ingressClassName: {{ dsc.ingress.className | default('') }}
   labels:
     app: "sonar"
-{% if not dsc.ingress.tls.type == 'none' %}
-  tls:
-    - hosts:
-        - {{ sonar_domain }}
-{% if dsc.ingress.tls.type == 'tlsSecret' %}
-      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
-{% else %}
-      secretName: sonar-tls-secret
-{% endif %}
-{% endif %}
 
 initFs:
   securityContext:

@@ -65,7 +65,7 @@
 
     - name: "Déclaration du fact dsc"
       ansible.builtin.set_fact:
-        dsc: "{{ socle_config.resources[0].spec }}"
+        dsc: "{{ socle_config.resources[0] }}"
       tags:
         - always
 

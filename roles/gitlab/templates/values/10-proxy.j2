@@ -1,0 +1,10 @@
+{% if dsc.proxy.enabled %}
+global:
+  extraEnv:
+    http_proxy: {{ dsc.proxy.http_proxy }}
+    https_proxy: {{ dsc.proxy.https_proxy }}
+    no_proxy: {{ dsc.proxy.no_proxy }}
+    HTTP_PROXY: {{ dsc.proxy.http_proxy }}
+    HTTPS_PROXY: {{ dsc.proxy.https_proxy }}
+    NO_PROXY: {{ dsc.proxy.no_proxy }}
+{% endif %}

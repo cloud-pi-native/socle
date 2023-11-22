@@ -1,14 +1,14 @@
 ---
 keycloak_clients:
-  - clientId: "gitlab-client"
-    clientAuthenticatorType: "client-secret"
+  - clientId: gitlab-client
+    clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
-      - "https://{{ gitlab_domain }}/users/auth/openid_connect/callback"
+      - https://{{ gitlab_domain }}/users/auth/openid_connect/callback
     webOrigins:
-      - "https://{{ gitlab_domain }}"
+      - https://{{ gitlab_domain }}
     defaultClientScopes:
-      - "generic"
+      - generic
     publicClient: false
 
   - clientId: console-frontend

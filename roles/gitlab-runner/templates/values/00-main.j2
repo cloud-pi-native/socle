@@ -1,0 +1,67 @@
+
+replicas: 1
+
+## How many old ReplicaSets for this Deployment you want to retain
+revisionHistoryLimit: 2
+
+gitlabUrl: https://{{ gitlab_domain }}/
+
+runnerToken: "{{ default_runner.json.token }}"
+
+rbac:
+  create: true
+  rules:
+#    - apiGroups: [""]
+#      resources: ["pods", "secrets", "configmaps"]
+#      verbs: ["list", "get", "watch", "create", "delete", "update"]
+#    - apiGroups: [""]
+#      resources: ["pods/exec", "pods/attach"]
+#      verbs: ["create"]
+#    - apiGroups: [""]
+#      resources: ["pods/log"]
+#      verbs: ["get"]
+    - resources: ["configmaps", "events", "pods", "pods/attach", "pods/exec", "secrets", "services"]
+      verbs: ["get", "list", "watch", "create", "patch", "update", "delete"]
+    - apiGroups: [""]
+      resources: ["pods/exec"]
+      verbs: ["create", "patch", "delete"]
+  serviceAccountName: gitlab-runner
+  podSecurityPolicy:
+    enabled: true
+
+runners:
+  # runner configuration, where the multi line strings is evaluated as
+  # template so you can specify helm values inside of it.
+  #
+  # tpl: https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
+  # runner configuration: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+  config: |
+    [[runners]]
+      [runners.kubernetes]
+        namespace = "{{ dsc.gitlab.namespace }}"
+        image = "ubuntu:22.04"
+
+  ## Specify the name for the runner.
+  name: gitlab-runner
+
+  ## The name of the secret containing runner-token and runner-registration-token
+  secret: gitlab-runner-secret
+
+## Configure environment variables that will be present when the registration command runs
+## This provides further control over the registration process and the config.toml file
+## ref: `gitlab-runner register --help`
+## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+##
+envVars:
+  - name: RUNNER_EXECUTOR
+    value: kubernetes
+
+
+volumeMounts:
+  - name: root-gitlab-runner
+    mountPath: /.gitlab-runner
+
+volumes:
+  - name: root-gitlab-runner
+    emptyDir:
+      medium: "Memory"

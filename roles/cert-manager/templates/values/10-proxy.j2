@@ -1,0 +1,5 @@
+{% if dsc.proxy.enabled %}
+http_proxy: "{{ dsc.proxy.http_proxy }}"
+https_proxy: "{{ dsc.proxy.https_proxy }}"
+no_proxy: "{{ dsc.proxy.no_proxy }}"
+{% endif %}

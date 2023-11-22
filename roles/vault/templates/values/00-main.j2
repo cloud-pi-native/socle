@@ -1,0 +1,27 @@
+global:
+  openshift: true
+injector:
+  image:
+    repository: docker.io/hashicorp/vault-k8s
+  agentImage:
+    repository: docker.io/hashicorp/vault
+server:
+  route:
+    enabled: false
+  ha:
+    enabled: false
+  standalone:
+    enabled: true
+  auditStorage:
+    enable: true
+  dataStorage:
+    enable: true
+    size: 23Gi
+  image:
+    repository: docker.io/hashicorp/vault
+csi:
+  image:
+    repository: docker.io/hashicorp/vault-csi-provider
+  agent:
+    image:
+      repository: docker.io/hashicorp/vault

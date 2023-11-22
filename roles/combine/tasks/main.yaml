@@ -1,0 +1,19 @@
+- name: Find files to template
+  ansible.builtin.find:
+    paths:
+      - "{{ combine_path }}"
+  register: templates
+
+- name: Reset acc fact
+  ansible.builtin.set_fact:
+    acc: {}
+
+- name: Template and merge all files
+  ansible.builtin.set_fact:
+    acc: "{{ acc | combine((lookup('template', item.path) | from_yaml), recursive=True, list_merge='append') }}"
+  with_items: "{{ templates.files | sort(attribute='path') }}"
+
+- name: Combine with user supplied values
+  ansible.builtin.set_fact:
+    "{{ combine_dest_var }}": "{{ combine_user_values | default({}) | combine(acc, recursive=True, list_merge='prepend') }}"
+  tags: ["skip_ansible_lint"]

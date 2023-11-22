@@ -1,3 +1,4 @@
+---
 - name: Apply project
   kubernetes.core.k8s:
     template: project.j2
@@ -42,13 +43,17 @@
           {{ exposed_ca_pem }}
   when: dsc.exposedCA.type != 'none'
 
-- name: Set extra env vars
+- name: Set path fact
   ansible.builtin.set_fact:
-    console_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    path: "{{ role_path + '/templates/values' }}"
 
-- name: Merge with argo user values
-  ansible.builtin.set_fact:
-    console_values: "{{ console_values | combine(dsc.console['values'], recursive=True) | to_yaml }}"
+- name: Compute Console Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.console['values'] }}"
+    combine_dest_var: "console_values"
 
 - name: Apply app
   kubernetes.core.k8s:

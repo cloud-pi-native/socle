@@ -1,3 +1,4 @@
+---
 - name: Installation du socle DSO
   hosts: localhost
   gather_facts: false
@@ -19,7 +20,6 @@
       tags:
         - cert-manager
         - cm
-        - always
 
     - name: confSyncer
       tags:
@@ -63,10 +63,6 @@
       tags:
         - vault
 
-    # - name: sops
-    #   tags:
-    #     - sops
-
     - name: argocd
       tags:
         - gitops
@@ -84,7 +80,8 @@
         - console-dso
 
   post_tasks:
-    - debug:
+    - name: Post-Install Disclaimer
+      ansible.builtin.debug:
         msg: "{{ dsc | get_debug_messages }}"
       tags:
         - always

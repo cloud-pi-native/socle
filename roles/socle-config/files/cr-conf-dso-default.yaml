@@ -36,5 +36,4 @@ spec:
   proxy:
     enabled: false
   sonarqube: {}
-  sops: {}
   vault: {}

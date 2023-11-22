@@ -207,6 +207,31 @@ spec:
                         If you use a private CA in exposed_ca, you should set it to true.
                         Configuring tools in pipelines container is not an easy job.
                       type: boolean
+                    extraCIVars:
+                      description: |
+                        A key value object to inject additional variables into gitlab root group for CI/CD pipelines
+                      type: array
+                      default: []
+                      items:
+                        properties:
+                          name:
+                            description: Variable name of the Gitlab CI var.
+                            type: string
+                          value:
+                            description: Value of the Gitlab CI var.
+                            type: string
+                          masked:
+                            description: Should the Gitlab CI var be masked in logs.
+                            type: boolean
+                            default: true
+                          protected:
+                            description: Should the Gitlab CI var be protected.
+                            type: boolean
+                            default: false
+                        type: object
+                        required:
+                          - name
+                          - value
                   type: object
                 gitlabOperator:
                   description: Configuration for GitLab Operator.
@@ -474,22 +499,6 @@ spec:
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
-                sops:
-                  properties:
-                    namespace:
-                      description: Namespace for SOPS.
-                      type: string
-                    chartVersion:
-                      description: SOPS helm chart version (e.g., "0.15.1").
-                      type: string
-                    values:
-                      default: {}
-                      description: |
-                        You can merge customs values for sops, it will be merged with roles/sops/tasks/main.yaml
-                        See https://github.com/isindir/sops-secrets-operator/tree/master/chart/helm3/sops-secrets-operator
-                      type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                  type: object
                 vault:
                   description: Configuration for Vault.
                   properties:
@@ -527,7 +536,6 @@ spec:
                 - nexus
                 - proxy
                 - sonarqube
-                - sops
                 - vault
               type: object
           required:

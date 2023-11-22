@@ -65,7 +65,7 @@
 
     - name: "Déclaration du fact dsc"
       ansible.builtin.set_fact:
-        dsc: "{{ socle_config.resources[0].spec }}"
+        dsc: "{{ socle_config.resources[0] }}"
       tags:
         - always
 
@@ -165,6 +165,18 @@
       tags:
         - nexus
 
+    - name: "Suppression de l'ancien mot de passe Nexus"
+      kubernetes.core.k8s:
+        kind: ConfigMap
+        name: dso-config
+        namespace: "{{ dsc.console.namespace }}"
+        state: patched
+        definition:
+          data:
+            NEXUS_ADMIN_PASSWORD:
+      tags:
+        - nexus
+
     - name: "Suppression du namespace Sonarqube"
       kubernetes.core.k8s:
         state: absent
@@ -194,6 +206,15 @@
       tags:
         - gitlab
 
+    - name: "Suppression de l'opérateur GitLab"
+      kubernetes.core.helm:
+        name: gitlab-operator
+        release_namespace: "{{ dsc.gitlab.namespace }}"
+        release_state: absent
+        wait: true
+      tags:
+        - gitlab
+
     - name: "Suppression du namespace GitLab"
       kubernetes.core.k8s:
         state: absent
@@ -209,14 +230,6 @@
         name: "{{ dsc.vault.namespace }}"
       tags:
         - vault
-
-    - name: "Suppression du namespace SOPS"
-      kubernetes.core.k8s:
-        state: absent
-        kind: Namespace
-        name: "{{ dsc.sops.namespace }}"
-      tags:
-        - sops
 
     - name: "Suppression du namespace ArgoCD"
       kubernetes.core.k8s:

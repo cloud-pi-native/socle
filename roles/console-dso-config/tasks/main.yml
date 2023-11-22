@@ -1,3 +1,4 @@
+---
 - name: Create dso-console namespace
   kubernetes.core.k8s:
     name: "{{ dsc.console.namespace }}"

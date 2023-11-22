@@ -1,3 +1,4 @@
+---
 - name: Get argo client secret
   kubernetes.core.k8s_info:
     kind: Secret
@@ -12,7 +13,7 @@
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
       metadata:
-        creationTimestamp: null
+        creationTimestamp:
         name: system:openshift:scc:privileged
       roleRef:
         apiGroup: rbac.authorization.k8s.io
@@ -34,13 +35,17 @@
     name: bitnami
     repo_url: https://charts.bitnami.com/bitnami
 
-- name: Set extra env vars
+- name: Set path fact
   ansible.builtin.set_fact:
-    argo_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    path: "{{ role_path + '/templates/values' }}"
 
-- name: Merge with argo user values
-  ansible.builtin.set_fact:
-    argo_values: "{{ argo_values | combine(dsc.argocd['values'], recursive=True) }}"
+- name: Compute ArgoCD Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.argocd['values'] }}"
+    combine_dest_var: "argo_values"
 
 - name: Deploy helm
   kubernetes.core.helm:

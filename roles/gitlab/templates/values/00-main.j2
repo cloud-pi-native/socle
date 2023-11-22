@@ -4,12 +4,8 @@ certmanager:
 registry:
   enabled: false
 
-{% if dsc.ingress.tls.type != 'tlsSecret' %}
 gitlab:
   webservice:
-    ingress:
-      tls:
-        secretName: gitlab-webservice
     registry:
       enabled: false
   sidekiq:
@@ -18,28 +14,6 @@ gitlab:
   unicorn:
     registry:
       enabled: false
-minio:
-  ingress:
-    tls:
-      secretName: gitlab-minio-secret
-{% else %}
-gitlab:
-  webservice:
-    ingress:
-      tls: {}
-    registry:
-      enabled: false
-  sidekiq:
-    registry:
-      enabled: false
-  unicorn:
-    registry:
-      enabled: false
-
-minio:
-  ingress:
-    tls: {}
-{% endif %}
 
 global:
   registry:
@@ -47,17 +21,6 @@ global:
   certificates:
     customCAs:
       - configMap: openshift-service-ca.crt
-{% for item in dsc.additionalsCA %}
-{% if item.kind == 'ConfigMap' %}
-      - configMap: {{ item.name }}
-{% endif %}
-{% if item.kind == 'Secret' %}
-      - secret: {{ item.name }}
-{% endif %}
-{% endfor %}
-{% if dsc.exposedCA.type != 'none' %}
-      - secret: exposed-ca
-{% endif %}
   hosts:
     domain: {{ dsc.global.rootDomain[1:] }}
     registry:
@@ -66,10 +29,8 @@ global:
       name: {{ dsc_name }}-minio{{ dsc.global.rootDomain }}
     kas:
       name: {{ dsc_name }}-kas{{ dsc.global.rootDomain }}
-{% if gitlab_domain %}
     gitlab:
       name: {{ gitlab_domain }}
-{% endif %}
   ingress:
     class: {{ dsc.ingress.className | default('') }}
     annotations:
@@ -82,25 +43,7 @@ global:
 {% endfor %}
     class: none
     configureCertmanager: false
-{% if dsc.ingress.tls.type == 'none' %}
-    tls:
-      enabled: false
-{% else %}
-    tls:
-      enabled: true
-{% if dsc.ingress.tls.type == 'tlsSecret' %}
-      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
-{% endif %}
-{% endif %}
-  extraEnv:
-{% if dsc.proxy.enabled %}
-    http_proxy: {{ dsc.proxy.http_proxy }}
-    https_proxy: {{ dsc.proxy.https_proxy }}
-    no_proxy: {{ dsc.proxy.no_proxy }}
-    HTTP_PROXY: {{ dsc.proxy.http_proxy }}
-    HTTPS_PROXY: {{ dsc.proxy.https_proxy }}
-    NO_PROXY: {{ dsc.proxy.no_proxy }}
-{% endif %}
+
   appConfig:
     defaultProjectsFeatures:
       containerRegistry: false
@@ -117,3 +60,4 @@ global:
       autoLinkUser: ["openid_connect"]
       providers:
         - secret: openid-connect
+

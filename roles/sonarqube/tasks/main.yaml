@@ -1,3 +1,4 @@
+---
 - name: Create Sonarqube namespace
   kubernetes.core.k8s:
     kind: Namespace
@@ -49,8 +50,8 @@
       apiVersion: v1
       kind: Secret
       data:
-        password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')|b64encode }}"
-        currentPassword: "{{ 'admin'|b64encode }}"
+        password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
+        currentPassword: "{{ 'admin' | b64encode }}"
       metadata:
         name: sonarqube
         namespace: "{{ dsc.sonarqube.namespace }}"
@@ -61,7 +62,7 @@
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.sonarqube.namespace }}"
     kind: Secret
-    name: "sonar-monitoring-password"
+    name: sonar-monitoring-password
   register: sonar_monitoring_secret
 
 - name: Set SonarQube monitoring password secret
@@ -73,23 +74,39 @@
       apiVersion: v1
       kind: Secret
       data:
-        monitoring-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')|b64encode }}"
+        monitoring-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
       metadata:
         name: sonar-monitoring-password
         namespace: "{{ dsc.sonarqube.namespace }}"
       type: Opaque
 
-- name: Set SonarQube helm values
-  ansible.builtin.set_fact:
-    sonar_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+- name: Get Sonar client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: keycloak-client-secret-sonar-client
+  register: sonar_secret
+  failed_when: sonar_secret.resources | length == 0
 
-- name: Merge with sonarqube user values
+- name: Set settings fact
   ansible.builtin.set_fact:
-    sonar_values: "{{ sonar_values | combine(dsc.sonarqube['values'], recursive=True) }}"
+    keycloak_secret: "{{ sonar_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
+    keycloak_client: "{{ sonar_secret.resources[0].data.CLIENT_ID | b64decode }}"
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Compute Sonarqube Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.sonarqube['values'] }}"
+    combine_dest_var: "sonar_values"
 
 - name: Deploy helm
   kubernetes.core.helm:
-    #    force: true
     name: sonarqube
     chart_ref: sonarqube/sonarqube
     chart_version: "{{ dsc.sonarqube.chartVersion }}"
@@ -116,122 +133,30 @@
 
 - name: Get SonarQube version
   ansible.builtin.uri:
-    url: "https://{{ sonar_domain }}/api/server/version"
+    url: https://{{ sonar_domain }}/api/server/version
     method: GET
     return_content: true
   register: sonar_version
 
-- name: Reset admin token
+- name: Reset Admin Password procedure
   when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is undefined
-  block:
-    - name: Missing Token disclaimer
-      ansible.builtin.debug:
-        msg: "Impossible de retrouver le TOKEN du compte admin, initialisation en cours …"
-
-    - name: Get postgres endpoint
-      kubernetes.core.k8s_info:
-        kind: Endpoints
-        namespace: "{{ dsc.sonarqube.namespace }}"
-        name: pg-cluster-sonar-rw
-      register: pg_ep
-      until: pg_ep.resources[0].subsets[0].addresses[0] is defined
-      retries: 15
-      delay: 5
-
-    - name: Set pg_pod
-      ansible.builtin.set_fact:
-        pg_pod: "{{ pg_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
-
-    - name: Get pg-cluster-sonar-app secret
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.sonarqube.namespace }}"
-        kind: Secret
-        name: pg-cluster-sonar-app
-      register: pg_admin_secret
-
-    - name: Set pg admin facts
-      ansible.builtin.set_fact:
-        pg_admin: "{{ pg_admin_secret.resources[0].data.username|b64decode }}"
-        pg_admin_pass: "{{ pg_admin_secret.resources[0].data.password|b64decode }}"
-      no_log: true
-
-    - name: Get admin account
-      kubernetes.core.k8s_exec:
-        pod: "{{ pg_pod }}"
-        namespace: "{{ dsc.sonarqube.namespace }}"
-        command: psql postgresql://"{{ pg_admin }}":"{{ pg_admin_pass }}"@127.0.0.1:5432/sonardb -c "{{ query }}" -t
-      vars:
-        query: select row_to_json(row) from (SELECT * FROM  users WHERE login = 'admin') row;
-      register: admin_account
-      until: "admin_account is not failed"
-      retries: 10
-      delay: 5
-      no_log: true
-
-    - name: Generate random token
-      ansible.builtin.set_fact:
-        admin: "{{ admin_account.stdout | from_json }}"
-        token_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
-      no_log: true
-
-    - name: Get sha384sum of token
-      ansible.builtin.shell: "set -o pipefail && echo -n {{ token_pass }} | sha384sum | awk '{ print $1 }'"
-      args:
-        executable: /bin/bash
-      register: token_sha
-      changed_when: true
-      no_log: true
-
-    - name: Set query fact (for 10.x branch and higher)
-      when: sonar_version.content is version('10.0.0', operator='ge', version_type='loose')
-      ansible.builtin.set_fact:
-        query: >
-          INSERT INTO user_tokens
-          ("uuid", "user_uuid", "name", "token_hash", last_connection_date, created_at, "type", expiration_date, "project_uuid")
-          VALUES('mysuperuuid', '{{ admin.uuid }}', 'DSO', '{{ token_sha.stdout_lines[0] }}', null, 0, 'USER_TOKEN', null, '')
-          ON CONFLICT(uuid) DO UPDATE SET token_hash = '{{ token_sha.stdout_lines[0] }}';
-
-    - name: Set query fact (for 9.x branch and lower)
-      when: sonar_version.content is version('10.0.0', operator='lt', version_type='loose')
-      ansible.builtin.set_fact:
-        query: >
-          INSERT INTO user_tokens
-          (uuid, user_uuid, "name", token_hash, last_connection_date, created_at, project_key, "type", expiration_date)
-          VALUES('mysuperuuid', '{{ admin.uuid }}', 'DSO', '{{ token_sha.stdout_lines[0] }}', null, 0, '', 'USER_TOKEN', null)
-          ON CONFLICT(uuid) DO UPDATE SET token_hash = '{{ token_sha.stdout_lines[0] }}';
-
-    - name: Adding admin token
-      kubernetes.core.k8s_exec:
-        pod: "{{ pg_pod }}"
-        namespace: "{{ dsc.sonarqube.namespace }}"
-        command: psql postgresql://"{{ pg_admin }}":"{{ pg_admin_pass }}"@127.0.0.1:5432/sonardb -c "{{ query }}" -t
-      register: admin_token_check
-      until: "admin_token_check is not failed"
-      retries: 5
-      delay: 5
-      no_log: true
-
-    - name: Update inventory
-      kubernetes.core.k8s:
-        kind: ConfigMap
-        name: dso-config
-        namespace: "{{ dsc.console.namespace }}"
-        state: patched
-        definition:
-          data:
-            SONAR_API_TOKEN: "{{ token_pass }}"
-      no_log: true
-
-#    - name: Reset password disclaimer
-#      ansible.builtin.debug:
-#        msg: /!\ PLEASE ENSURE YOU RESET ADMIN PASSWORD /!\
+  ansible.builtin.include_tasks:
+    file: reset-admin-password.yaml
 
 - name: Set fact sonar token
   when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is defined
-  ansible.builtin.set_fact:  
+  ansible.builtin.set_fact:
     token_pass: "{{ ansible_inventory.resources[0].data.SONAR_API_TOKEN }}"
   no_log: true
 
-- name: Post-install configuration
-  ansible.builtin.include_tasks:
-    file: setup.yaml
+- name: Remove permissions for sonar-users
+  ansible.builtin.uri:
+    url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
+    user: "{{ token_pass }}"
+    force_basic_auth: true
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: post
+    status_code: 204
+  with_items:
+    - scan
+    - provisioning

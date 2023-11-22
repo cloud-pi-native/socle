@@ -1,0 +1,7 @@
+{% if dsc.ingress.tls.type == "tlsSecret" %}
+ingress:
+  extraTls:
+    - hosts:
+      - "{{ keycloak_domain }}"
+      secretName: "{{ dsc.ingress.tls.tlsSecret.name }}"
+{% endif %}

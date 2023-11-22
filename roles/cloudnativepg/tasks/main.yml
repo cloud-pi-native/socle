@@ -1,3 +1,4 @@
+---
 - name: Get cluster infos
   kubernetes.core.k8s_cluster_info:
   register: cluster_infos
@@ -6,7 +7,7 @@
   ansible.builtin.set_fact:
     cnpg_api: "{{ cluster_infos.apis['postgresql.cnpg.io/v1'] | default('absent') }}"
 
-- name: Chek if cnpg-mutating-webhook-configuration exists
+- name: Check if cnpg-mutating-webhook-configuration exists
   kubernetes.core.k8s_info:
     kind: MutatingWebhookConfiguration
     name: cnpg-mutating-webhook-configuration
@@ -27,9 +28,16 @@
         name: cnpg
         repo_url: https://cloudnative-pg.github.io/charts
 
-    - name: Set CloudNativePG helm values
+    - name: Set path fact
       ansible.builtin.set_fact:
-        cnpg_values: "{{ lookup('template', 'cnpg-values.yaml.j2') | from_yaml }}"
+        path: "{{ role_path + '/templates/values' }}"
+
+    - name: Compute Gitlab Helm values
+      ansible.builtin.include_role:
+        name: combine
+      vars:
+        combine_path: "{{ path }}"
+        combine_dest_var: "cnpg_values"
 
     - name: Deploy CloudNativePG helm
       kubernetes.core.helm:

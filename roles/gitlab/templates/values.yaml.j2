@@ -1,0 +1,110 @@
+certmanager:
+  install: true
+
+registry:
+  enabled: false
+
+{% if dsc.ingress.tls.type != 'tlsSecret' %}
+gitlab:
+  webservice:
+    ingress:
+      tls:
+        secretName: gitlab-webservice
+    registry:
+      enabled: false
+  sidekiq:
+    registry:
+      enabled: false
+  unicorn:
+    registry:
+      enabled: false
+minio:
+  ingress:
+    tls:
+      secretName: gitlab-minio-secret
+{% else %}
+gitlab:
+  webservice:
+    ingress:
+      tls: {}
+    registry:
+      enabled: false
+  sidekiq:
+    registry:
+      enabled: false
+  unicorn:
+    registry:
+      enabled: false
+
+minio:
+  ingress:
+    tls: {}
+{% endif %}
+
+global:
+  registry:
+    enabled: false
+  certificates:
+    customCAs:
+      - configMap: openshift-service-ca.crt
+{% for item in dsc.additionalsCA %}
+{% if item.kind == 'ConfigMap' %}
+      - configMap: {{ item.name }}
+{% endif %}
+{% if item.kind == 'Secret' %}
+      - secret: {{ item.name }}
+{% endif %}
+{% endfor %}
+{% if dsc.exposedCA.type != 'none' %}
+      - secret: exposed-ca
+{% endif %}
+  hosts:
+    domain: {{ dsc.global.rootDomain[1:] }}
+    registry:
+      name: gitlab-registry.example.com
+    minio:
+      name: {{ dsc_name }}-minio{{ dsc.global.rootDomain }}
+    kas:
+      name: {{ dsc_name }}-kas{{ dsc.global.rootDomain }}
+{% if gitlab_domain %}
+    gitlab:
+      name: {{ gitlab_domain }}
+{% endif %}
+  ingress:
+    class: {{ dsc.ingress.className | default('') }}
+    annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+      {{ key }}: {{ val }}
+{% endfor %}
+    labels:
+{% for key, val in dsc.ingress.labels.items() %}
+      {{ key }}: {{ val }}
+{% endfor %}
+    class: none
+    configureCertmanager: false
+{% if dsc.ingress.tls.type == 'none' %}
+    tls:
+      enabled: false
+{% else %}
+    tls:
+      enabled: true
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% endif %}
+{% endif %}
+  appConfig:
+    defaultProjectsFeatures:
+      containerRegistry: false
+    ldap:
+      preventSignin: true
+    omniauth:
+      enabled: true
+      syncProfileAttributes: ["email"]
+      allowSingleSignOn: ["openid_connect"]
+      blockAutoCreatedUsers: false
+      autoSignInWithProvider: "openid_connect"
+      autoLinkLdapUser: false
+      autoLinkSamlUser: false
+      autoLinkUser: ["openid_connect"]
+      providers:
+        - secret: openid-connect

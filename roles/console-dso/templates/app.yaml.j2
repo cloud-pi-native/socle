@@ -17,8 +17,8 @@ spec:
     releaseName: console-pi
     helm:
       parameters: []
-      values: |
-{{ console_values | indent(8, true) }}
+      values: |-
+{{ console_values | to_yaml | indent(8, true) }}
   syncPolicy:
     automated: {}
     syncOptions:

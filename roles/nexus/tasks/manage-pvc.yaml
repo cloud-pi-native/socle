@@ -1,10 +1,10 @@
+---
 - name: Get PVC info
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.nexus.namespace }}"
     name: nexus-data-claim
     kind: PersistentVolumeClaim
   register: nexus_pvc
-
 
 - name: Manage incorrect pvc size
   when: (nexus_pvc.resources | length) and (nexus_pvc.resources[0].status.capacity.storage != dsc.nexus.storageSize)

@@ -1,8 +1,9 @@
+---
 - name: Create or update DsoSocleConfig CRD
   kubernetes.core.k8s:
     definition: "{{ lookup('ansible.builtin.file', 'crd-conf-dso.yaml') | from_yaml }}"
 
-- name: "Get socle config from conf-dso dsc (default)"
+- name: Get socle config from conf-dso dsc (default)
   kubernetes.core.k8s_info:
     kind: dsc
     name: conf-dso
@@ -24,16 +25,16 @@
     - name: Warning message
       ansible.builtin.debug:
         msg:
-          - "Attention ! Vous avez lancé le playbook d'installation avec l'option '-e dsc_cr={{ dsc_cr }}'"
-          - "mais la ressource dsc nommée '{{ dsc_cr }}' est vide ou inexistante côté cluster !"
+          - Attention ! Vous avez lancé le playbook d'installation avec l'option '-e dsc_cr={{ dsc_cr }}'
+          - mais la ressource dsc nommée '{{ dsc_cr }}' est vide ou inexistante côté cluster !
           - ""
-          - "Si votre intention est bien d'utiliser votre propre configuration plutôt que 'conf-dso', ressource dsc par défaut,"
-          - "alors veuiller déclarer votre resource dsc '{{ dsc_cr }}' dans un fichier YAML"
+          - Si votre intention est bien d'utiliser votre propre configuration plutôt que 'conf-dso', ressource dsc par défaut,
+          - alors veuiller déclarer votre resource dsc '{{ dsc_cr }}' dans un fichier YAML
           - "nommé par exemple 'ma-conf-dso.yaml' et la créer via la commande suivante :"
           - ""
           - " kubectl apply -f ma-conf-dso.yaml "
           - ""
-          - "Puis relancer l'installation."
+          - Puis relancer l'installation.
 
     - name: Exit playbook
       ansible.builtin.meta: end_play
@@ -57,29 +58,29 @@
     - name: Disclaimer
       ansible.builtin.debug:
         msg:
-          - "Il semblerait que vous n'ayez jamais installé le socle sur ce cluster ou que la configuration par défaut ait été supprimée."
-          - "Veuillez modifier la resource de type dsc par défaut nommée 'conf-dso' et de scope cluster"
+          - Il semblerait que vous n'ayez jamais installé le socle sur ce cluster ou que la configuration par défaut ait été supprimée.
+          - Veuillez modifier la resource de type dsc par défaut nommée 'conf-dso' et de scope cluster
           - "via la commande suivante :"
           - ""
           - " kubectl edit dsc conf-dso "
           - ""
-          - "Puis relancer l'installation."
+          - Puis relancer l'installation.
           - ""
-          - "Attention ! Si vous relancez l'installation sans modifier la configuration par défaut, celle-ci s'appliquera telle qu'elle."
-          - "Ce n'est probablement pas ce que vous souhaitez faire."
+          - Attention ! Si vous relancez l'installation sans modifier la configuration par défaut, celle-ci s'appliquera telle qu'elle.
+          - Ce n'est probablement pas ce que vous souhaitez faire.
           - ""
-          - "Alternativement, vous pouvez aussi déclarer la resource dsc de nom conf-dso (ou tout autre nom à votre convenance)"
+          - Alternativement, vous pouvez aussi déclarer la resource dsc de nom conf-dso (ou tout autre nom à votre convenance)
           - "dans un fichier YAML nommé par exemple 'ma-conf-dso.yaml', pour ensuite la créer via la commande suivante :"
           - ""
           - " kubectl apply -f ma-conf-dso.yaml "
           - ""
-          - "Puis relancer l'installation."
+          - Puis relancer l'installation.
           - ""
           - "Si vous utilisez la resource dsc par défaut nommée conf-dso, vous relancerez le playbook d'installation comme ceci :"
           - ""
           - " ansible-playbook install.yaml "
           - ""
-          - "Si au contraire vous souhaitez utiliser un nom de resource différent, associé à une configuration différente,"
+          - Si au contraire vous souhaitez utiliser un nom de resource différent, associé à une configuration différente,
           - "alors vous devrez utiliser la commande suivante pour relancer l'installation (exemple avec une dsc nommée conf-perso) :"
           - ""
           - " ansible-playbook install.yaml -e dsc_cr=conf-perso "
@@ -95,13 +96,16 @@
   ansible.builtin.set_fact:
     dsc: "{{ socle_config.resources[0] }}"
 
-- ansible.builtin.set_fact:
+- name: Set some facts
+  ansible.builtin.set_fact:
     dsc_default_config: "{{ lookup('ansible.builtin.file', 'config.yaml') | from_yaml }}"
     dsc_default_releases: "{{ lookup('ansible.builtin.file', 'releases.yaml') | from_yaml }}"
 
-- ansible.builtin.set_fact:
-    dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True)}}"
-- ansible.builtin.set_fact:
+- name: Set some facts
+  ansible.builtin.set_fact:
+    dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
+- name: Set some facts
+  ansible.builtin.set_fact:
     dsc: "{{ dsc.spec }}"
 
 - name: Set root_domain fact

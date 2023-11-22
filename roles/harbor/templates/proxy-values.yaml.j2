@@ -1,0 +1,14 @@
+proxy:
+  httpProxy: {{ dsc.proxy.http_proxy }}
+  httpsProxy: {{ dsc.proxy.https_proxy }}
+  noProxy: {{ dsc.proxy.no_proxy }},.local,.internal
+  components:
+    - nginx
+    - portal
+    - core
+    - jobservice
+    - registry
+    - trivy
+    - database
+    - redis
+    - exporter

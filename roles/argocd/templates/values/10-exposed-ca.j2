@@ -1,0 +1,6 @@
+{% if dsc.exposedCA != 'none' %}
+config:
+  tlsCerts:
+    {{ gitlab_domain }}: |
+      {{ exposed_ca_pem | indent(width=6, first=False) }}
+{% endif %}

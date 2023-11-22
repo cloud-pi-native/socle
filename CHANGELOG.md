@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.1.0](https://github.com/cloud-pi-native/socle/compare/v1.0.1...v1.1.0) (2023-11-22)
+
+
+### Features
+
+* :sparkles: Nous évitons d'installer cert-manager si déjà présent. ([1b2bea2](https://github.com/cloud-pi-native/socle/commit/1b2bea2d88f68d104e10e899838fa3f773dd72f0))
+* :sparkles: Nous évitons d'installer kubed si déjà présent. ([eb3fe80](https://github.com/cloud-pi-native/socle/commit/eb3fe800c745861972df6850fc9a7c88ed231ebb))
+* :wrench: ability to inject additional gitlab vars ([0989614](https://github.com/cloud-pi-native/socle/commit/09896140b1a88c8bb8cfb2b9158d1650fdfedb5e))
+
+
+### Bug Fixes
+
+* :adhesive_bandage: Ajout du user dso admin dans les bons groupes ([14f9ee4](https://github.com/cloud-pi-native/socle/commit/14f9ee405abd921d8467c80588496a7959f705c5))
+* :ambulance: Correctif cert-manager sur récupération des CRDS ([c77e78b](https://github.com/cloud-pi-native/socle/commit/c77e78bc57aa31d791e5042060b4d0ef7335cd6b))
+* :ambulance: correctif du role nexus ([6763075](https://github.com/cloud-pi-native/socle/commit/67630759cd1e46f1c245f8b5784d5ed243c8e767))
+* :bug: Correctif désinstallation GitLab ([d233e61](https://github.com/cloud-pi-native/socle/commit/d233e6179177ad3c415a136240dba57579eed9d2))
+* :bug: correctif désinstallation Nexus ([ae997e3](https://github.com/cloud-pi-native/socle/commit/ae997e37973aabb55b35647af98b6293d7ba39f4))
+* :bug: Correctif double quotes pour linter. ([5a62480](https://github.com/cloud-pi-native/socle/commit/5a62480f60819a5090373122230adfcbb491fcb8))
+* :bug: Correctif fact npm_file ([bfa0deb](https://github.com/cloud-pi-native/socle/commit/bfa0debb7f89e4d492aaf48d5224d1f6476c1f10))
+* :bug: Correctif indentations dans templates jinja + task token GitLab ([117c33f](https://github.com/cloud-pi-native/socle/commit/117c33f0a79a5ffe8df39a934e66c1c99fcfa7e4))
+* :bug: Correctif playbook de désinstallation. ([0554fe7](https://github.com/cloud-pi-native/socle/commit/0554fe741a24949cc6de199d49b97e0a2139f9e4))
+* :bug: fix cert-manager crds installation ([4378ee3](https://github.com/cloud-pi-native/socle/commit/4378ee389a5c283ad549b13381d4f2182ea1af18))
+* :bug: fix extraCIVars in dsc ([953eb9f](https://github.com/cloud-pi-native/socle/commit/953eb9fb0a0b3eede7bec5306c0f5918639f774a))
+* :fire: suppression variable anon_enabled qui n'est plus utilisée ([b5dae7a](https://github.com/cloud-pi-native/socle/commit/b5dae7a773b805e4b5770ed3fc8879f3cb3e216e))
+* :sparkles: add community branch plugin ([3dcd5e1](https://github.com/cloud-pi-native/socle/commit/3dcd5e1e0d31862e9f14e4c811dc00a1837222bc))
+
+
+### Performance Improvements
+
+* :recycle: refactor helm values computation ([874b21c](https://github.com/cloud-pi-native/socle/commit/874b21c177fadafcc160cc20521715d06f70eab5))
+
 ## [1.0.1](https://github.com/cloud-pi-native/socle/compare/v1.0.0...v1.0.1) (2023-11-04)
 
 

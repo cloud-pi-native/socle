@@ -58,9 +58,9 @@ Les éléments déployés seront les suivants :
 | SonarQube Community Edition | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
 | HashiCorp Vault             | <https://www.vaultproject.io>                                                  |
 
-Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak ou GitLab.
+Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak, SonarQube ou GitLab.
 
-Vous pouvez trouver la version des outils installés [versions.md](versions.md).
+Vous pouvez trouver la version des outils installés dans le fichier [versions.md](versions.md).
 
 ## Prérequis
 

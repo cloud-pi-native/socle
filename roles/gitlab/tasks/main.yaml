@@ -6,6 +6,17 @@
     kind: Namespace
     state: present
 
+- name: Get existing GitLab Operator pods
+  kubernetes.core.k8s_info:
+    kind: Pod
+    label_selectors:
+      - "control-plane=controller-manager"
+  register: glo_pods
+
+- name: Set gitlab_operator_ns fact
+  ansible.builtin.set_fact:
+    gitlab_operator_ns: "{{ glo_pods.resources[0].metadata.namespace }}"
+
 - name: Create RBAC resources
   kubernetes.core.k8s:
     template: rbac.yaml.j2
@@ -81,7 +92,7 @@
     combine_user_values: "{{ dsc.gitlab['values'] }}"
     combine_dest_var: "gitlab_values"
 
-- name: Install gitlab instance
+- name: Install GitLab instance
   kubernetes.core.k8s:
     api_version: apps.gitlab.com/v1beta1
     kind: GitLab
@@ -103,20 +114,20 @@
   retries: 45
   delay: 20
 
-- name: Find gitlab token in inventory
+- name: Find GitLab token in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
     kind: ConfigMap
     name: dso-config
   register: ansible_inventory
 
-- name: Get gitlab token
+- name: Get GitLab token
   ansible.builtin.set_fact:
     gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
   when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
   register: set_token_inv
 
-- name: Test Gitlab token
+- name: Test GitLab token
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -126,7 +137,7 @@
   register: test_token
   ignore_errors: true
 
-- name: Initialize gitlab token
+- name: Initialize GitLab token
   when: (set_token_inv.skipped is defined and set_token_inv.skipped) or (test_token.status != 200)
   block:
     - name: Get toolbox pod name
@@ -147,7 +158,7 @@
           "{{ dsc.gitlab.chartVersion is version('7.2.0', operator='lt', version_type='loose') |
           ternary('create-token-7.2.0-.yaml', 'create-token-7.2.0+.yaml') }}"
 
-    - name: Set new gitlab token
+    - name: Set new GitLab token
       ansible.builtin.set_fact:
         gitlab_token: "{{ token.stdout_lines[-2][1:-1] }}"
 

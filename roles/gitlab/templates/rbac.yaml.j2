@@ -34,7 +34,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: gitlab-manager
-  namespace: {{ dsc.gitlabOperator.namespace }}
+  namespace: {{ gitlab_operator_ns }}
 - kind: ServiceAccount
   name: gitlab-manager
   namespace: {{ dsc.gitlab.namespace }}
@@ -50,7 +50,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: gitlab-app-anyuid
-  namespace: {{ dsc.gitlabOperator.namespace }}
+  namespace: {{ gitlab_operator_ns }}
 - kind: ServiceAccount
   name: gitlab-app-anyuid
   namespace: {{ dsc.gitlab.namespace }}
@@ -66,7 +66,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: gitlab-app-nonroot
-  namespace: {{ dsc.gitlabOperator.namespace }}
+  namespace: {{ gitlab_operator_ns }}
 - kind: ServiceAccount
   name: gitlab-app-nonroot
   namespace: {{ dsc.gitlab.namespace }}

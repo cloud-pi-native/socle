@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/cloud-pi-native/socle/compare/v1.1.0...v1.1.1) (2023-11-23)
+
+
+### Bug Fixes
+
+* :bookmark: fix console release version number ([e0f5540](https://github.com/cloud-pi-native/socle/commit/e0f5540733a1c4cd3a7f881b7f374a3123c04b92))
+
 ## [1.1.0](https://github.com/cloud-pi-native/socle/compare/v1.0.1...v1.1.0) (2023-11-22)
 
 

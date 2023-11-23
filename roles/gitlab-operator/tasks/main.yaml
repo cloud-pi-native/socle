@@ -1,34 +1,51 @@
 ---
-- name: Create GitLab Operator namespace
-  kubernetes.core.k8s:
-    name: "{{ dsc.gitlabOperator.namespace }}"
-    api_version: v1
-    kind: Namespace
-    state: present
+- name: Get cluster infos
+  kubernetes.core.k8s_cluster_info:
+  register: cluster_infos
 
-- name: Add GitLab Operator helm repo
-  kubernetes.core.helm_repository:
-    name: gitlab-operator
-    repo_url: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
-
-- name: Set GitLab Operator helm values
+- name: Check if GitLab api exists
   ansible.builtin.set_fact:
-    operator_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+    gl_api: "{{ cluster_infos.apis['apps.gitlab.com/v1beta1'] | default('absent') }}"
 
-- name: Deploy GitLab Operator helm
-  kubernetes.core.helm:
-    name: gitlab-operator
-    chart_ref: gitlab-operator/gitlab-operator
-    chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
-    release_namespace: "{{ dsc.gitlabOperator.namespace }}"
-    values: "{{ operator_values }}"
-
-- name: Wait gitlab-webhook-service endpoint
+- name: Check if gitlab-validating-webhook-configuration exists
   kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.gitlabOperator.namespace }}"
-    name: gitlab-webhook-service
-  register: endpoint
-  until: endpoint.resources[0].subsets[0].addresses[0] is defined
-  retries: 15
-  delay: 5
+    kind: ValidatingWebhookConfiguration
+    name: gitlab-validating-webhook-configuration
+  register: gl_vwhc
+
+- name: Install GitLab Operator
+  when: (gl_api == 'absent') or (gl_vwhc.resources | length == 0)
+  block:
+    - name: Create GitLab Operator namespace
+      kubernetes.core.k8s:
+        name: "{{ dsc.gitlabOperator.namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Add GitLab Operator helm repo
+      kubernetes.core.helm_repository:
+        name: gitlab-operator
+        repo_url: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+
+    - name: Set GitLab Operator helm values
+      ansible.builtin.set_fact:
+        operator_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+
+    - name: Deploy GitLab Operator helm
+      kubernetes.core.helm:
+        name: gitlab-operator
+        chart_ref: gitlab-operator/gitlab-operator
+        chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
+        release_namespace: "{{ dsc.gitlabOperator.namespace }}"
+        values: "{{ operator_values }}"
+
+    - name: Wait gitlab-webhook-service endpoint
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: "{{ dsc.gitlabOperator.namespace }}"
+        name: gitlab-webhook-service
+      register: endpoint
+      until: endpoint.resources[0].subsets[0].addresses[0] is defined
+      retries: 15
+      delay: 5

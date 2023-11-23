@@ -13,6 +13,8 @@ spec:
   console:
     namespace: dso-console
     subDomain: console
+  gitlabOperator:
+    namespace: dso-gitlab-operator
   gitlab:
     namespace: dso-gitlab
     subDomain: gitlab

@@ -1,46 +1,21 @@
 ---
+- name: Create GitLab namespace
+  kubernetes.core.k8s:
+    name: "{{ dsc.gitlab.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create RBAC resources
+  kubernetes.core.k8s:
+    template: rbac.yaml.j2
+
 - name: Set some facts
   ansible.builtin.set_fact:
     vault_auth_path: jwt
     vault_auth_role: default-ci
     npm_file: "{{ lookup('ansible.builtin.template', 'npm_file.j2') }}"
     mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
-
-- name: Install GitLab Operator
-  block:
-    - name: Create GitLab namespace
-      kubernetes.core.k8s:
-        name: "{{ dsc.gitlab.namespace }}"
-        api_version: v1
-        kind: Namespace
-        state: present
-
-    - name: Add GitLab Operator helm repo
-      kubernetes.core.helm_repository:
-        name: gitlab-operator
-        repo_url: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
-
-    - name: Set GitLab Operator helm values
-      ansible.builtin.set_fact:
-        operator_values: "{{ lookup('template', 'operator-values.yaml.j2') | from_yaml }}"
-
-    - name: Deploy GitLab Operator helm
-      kubernetes.core.helm:
-        name: gitlab-operator
-        chart_ref: gitlab-operator/gitlab-operator
-        chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
-        release_namespace: "{{ dsc.gitlab.namespace }}"
-        values: "{{ operator_values }}"
-
-    - name: Wait gitlab-webhook-service endpoint
-      kubernetes.core.k8s_info:
-        kind: Endpoints
-        namespace: "{{ dsc.gitlab.namespace }}"
-        name: gitlab-webhook-service
-      register: endpoint
-      until: endpoint.resources[0].subsets[0].addresses[0] is defined
-      retries: 15
-      delay: 5
 
 - name: Get Gitlab client secret
   kubernetes.core.k8s_info:

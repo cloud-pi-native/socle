@@ -1,4 +1,4 @@
-watchCluster: false
+watchCluster: true
 
 image:
   registry: registry.gitlab.com
@@ -66,8 +66,8 @@ nginx-ingress:
     # If not set and create is true, a name is generated using the name template
     # name:
 
-scc: {}
-#  apiVersion: ""
+scc:
+  apiVersion: security.openshift.io/v1
 
 cert-manager:
   install: false

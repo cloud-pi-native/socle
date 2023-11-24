@@ -221,6 +221,7 @@
         release_state: absent
         wait: true
       tags:
+        - never
         - gitlab-operator
 
     - name: "Suppression du namespace GitLab Operator"
@@ -229,6 +230,16 @@
         kind: Namespace
         name: "{{ dsc.gitlabOperator.namespace }}"
       tags:
+        - never
+        - gitlab-operator
+
+    - name: "Suppression gitlab-validating-webhook-configuration"
+      kubernetes.core.k8s:
+        state: absent
+        kind: ValidatingWebhookConfiguration
+        name: gitlab-validating-webhook-configuration
+      tags:
+        - never
         - gitlab-operator
 
     - name: "Suppression du namespace Vault"

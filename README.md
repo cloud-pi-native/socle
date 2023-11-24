@@ -511,6 +511,7 @@ watch "kubectl get ns | grep '\-mynamespace'"
 - Par défaut le playbook de désinstallation, s'il est lancé sans aucun tag, ne supprimera pas les ressources suivantes :
   - **Cert-manager** déployé dans le namespace `cert-manager`.
   - **CloudNativePG** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
+  - **GitLab Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Kubed** déployé dans le namespace `openshift-infra`.
 - Les trois composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces trois outils, vous pourrez le faire via l'utilisation des tags correspondants :
   - Pour Kubed : `-t kubed` (ou bien `-t confSyncer`).

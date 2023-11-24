@@ -38,6 +38,11 @@ subjects:
 - kind: ServiceAccount
   name: gitlab-manager
   namespace: {{ dsc.gitlab.namespace }}
+{% for ns in other_gitlabs_ns %}
+- kind: ServiceAccount
+  name: gitlab-manager
+  namespace: {{ ns }}
+{% endfor %}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -54,6 +59,11 @@ subjects:
 - kind: ServiceAccount
   name: gitlab-app-anyuid
   namespace: {{ dsc.gitlab.namespace }}
+{% for ns in other_gitlabs_ns %}
+- kind: ServiceAccount
+  name: gitlab-app-anyuid
+  namespace: {{ ns }}
+{% endfor %}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -70,3 +80,8 @@ subjects:
 - kind: ServiceAccount
   name: gitlab-app-nonroot
   namespace: {{ dsc.gitlab.namespace }}
+{% for ns in other_gitlabs_ns %}
+- kind: ServiceAccount
+  name: gitlab-app-nonroot
+  namespace: {{ ns }}
+{% endfor %}

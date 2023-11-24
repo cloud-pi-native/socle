@@ -17,6 +17,19 @@
   ansible.builtin.set_fact:
     gitlab_operator_ns: "{{ glo_pods.resources[0].metadata.namespace }}"
 
+- name: Get existing GitLab sidekiq deployments
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    label_selectors:
+      - "app.kubernetes.io/instance=gitlab-sidekiq"
+      - "app.kubernetes.io/managed-by=gitlab-operator"
+  register: gs_deployments
+
+- name: Set other_gitlabs_ns fact
+  ansible.builtin.set_fact:
+    other_gitlabs_ns: "{{ gs_deployments.resources | map(attribute='metadata.namespace')
+      | reject('search', dsc.gitlab.namespace) | list }}"
+
 - name: Create RBAC resources
   kubernetes.core.k8s:
     template: rbac.yaml.j2

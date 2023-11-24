@@ -95,10 +95,6 @@
       data:
         tls.crt: "{{ exposed_ca_pem | b64encode }}"
 
-#- name: Prepare Gitlab helm values
-#  ansible.builtin.set_fact:
-#    gitlab_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
-
 - name: Set path fact
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"

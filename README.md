@@ -12,7 +12,9 @@
 - [Récupération des secrets](#récupération-des-secrets)
 - [Debug](#debug)
   - [Réinstallation](#réinstallation)
+  - [Cert-manager](#cert-manager)
   - [CloudNativePG](#cloudnativepg)
+  - [GitLab Operator](#gitlab-operator)
 - [Désinstallation](#désinstallation)
   - [Chaîne complète](#chaîne-complète)
   - [Désinstaller un ou plusieurs outils](#désinstaller-un-ou-plusieurs-outils)
@@ -21,7 +23,7 @@
   - [Modification des versions de charts](#modification-des-versions-de-charts)
   - [Gel des versions d'images](#gel-des-versions-dimages)
     - [Argo CD](#argo-cd)
-    - [Cert-manager](#cert-manager)
+    - [Cert-manager](#cert-manager-1)
     - [CloudNativePG](#cloudnativepg-1)
     - [Console Cloud π Native](#console-cloud-π-native)
     - [GitLab](#gitlab)
@@ -50,6 +52,7 @@ Les éléments déployés seront les suivants :
 | CloudNativePG               | <https://cloudnative-pg.io>                                                    |
 | GitLab                      | <https://about.gitlab.com>                                                     |
 | gitLab-ci-catalog           | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                         |
+| GitLab Operator             | <https://docs.gitlab.com/operator>                                             |
 | GitLab Runner               | <https://docs.gitlab.com/runner>                                               |
 | Harbor                      | <https://goharbor.io>                                                          |
 | Keycloak                    | <https://www.keycloak.org>                                                     |
@@ -155,11 +158,6 @@ spec:
     admin:
       enabled: true
       password: WeAreThePasswords
-    values:
-      image:
-        registry: docker.io
-        repository: bitnami/argo-cd
-        tag: 2.7.6-debian-11-r2
   certmanager: {}
   cloudnativepg: {}
   console:
@@ -178,59 +176,6 @@ spec:
   harbor:
     adminPassword: WhoWantsToPassForever
     pvcRegistrySize: 50Gi
-    values:
-      nginx:
-        image:
-          repository: docker.io/goharbor/nginx-photon
-          tag: v2.9.1
-      portal:
-        image:
-          repository: docker.io/goharbor/harbor-portal
-          tag: v2.9.1
-      core:
-        image:
-          repository: docker.io/goharbor/harbor-core
-          tag: v2.9.1
-      jobservice:
-        image:
-          repository: docker.io/goharbor/harbor-jobservice
-          tag: v2.9.1
-      registry:
-        registry:
-          image:
-            repository: docker.io/goharbor/registry-photon
-            tag: v2.9.1
-        controller:
-          image:
-            repository: docker.io/goharbor/harbor-registryctl
-            tag: v2.9.1
-      trivy:
-        image:
-          repository: docker.io/goharbor/trivy-adapter-photon
-          tag: v2.9.1
-      notary:
-        server:
-          image:
-            repository: docker.io/goharbor/notary-server-photon
-            tag: v2.9.1
-        signer:
-          image:
-            repository: docker.io/goharbor/notary-signer-photon
-            tag: v2.9.1
-      database:
-        internal:
-          image:
-            repository: docker.io/goharbor/harbor-db
-            tag: v2.9.1
-      redis:
-        internal:
-          image:
-            repository: docker.io/goharbor/redis-photon
-            tag: v2.9.1
-      exporter:
-        image:
-          repository: docker.io/goharbor/harbor-exporter
-          tag: v2.9.1
   ingress:
     annotations:
       route.openshift.io/termination: "edge"
@@ -239,12 +184,7 @@ spec:
       tlsSecret:
         name: ingress-tls
         method: in-namespace
-  keycloak:
-    values:
-      image:
-        registry: docker.io
-        repository: bitnami/keycloak
-        tag: 19.0.3-debian-11-r22
+  keycloak: {}
   kubed: {}
   nexus:
     storageSize: 5Gi
@@ -257,28 +197,8 @@ spec:
     port: "3128"
   sonarqube:
     postgresPvcSize: 25Gi
-    values:
-      image:
-        registry: docker.io
-        repository: sonarqube
-        edition: community
-        tag: 9.9.2-{{ .Values.edition }}
   vault:
-    values:
-      injector:
-        image:
-          repository: "docker.io/hashicorp/vault-k8s"
-          tag: "1.2.1"
-          pullPolicy: IfNotPresent
-        agentImage:
-          repository: "docker.io/hashicorp/vault"
-          tag: "1.14.0"
-      server:
-        image:
-          repository: "docker.io/hashicorp/vault"
-          tag: "1.14.0"
-          pullPolicy: IfNotPresent
-        updateStrategyType: "RollingUpdate"
+    values: {}
 ```
 
 Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec argocd :
@@ -346,11 +266,6 @@ Exemple pour Argo CD :
     admin:
       enabled: true
       password: PasswordForEveryone
-    values:
-      image:
-        registry: docker.io
-        repository: bitnami/argo-cd
-        tag: 2.7.6-debian-11-r2
 ```
 
 Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la première installation du socle, peuvent être listés en se positionnant préalablement dans le répertoire socle, puis en affichant le fichier « config.yaml » du role socle-config :
@@ -453,6 +368,19 @@ Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votr
 ansible-playbook install.yaml -e dsc_cr=ma-dsc -t keycloak,console
 ```
 
+### Cert-manager
+
+L'outil cert-manager est installé à l'aide de son [chart helm officiel](https://cert-manager.io/docs/installation/helm), via le role `cert-manager`.
+
+Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement qu'il n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
+
+- L'API `cert-manager.io/v1`.
+- La `MutatingWebhookConfiguration` nommée `cert-manager-webhook`.
+
+Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que cert-manager n'est pas installé. Le rôle associé procédera donc à son installation.
+
+**Attention !** Assurez-vous que si une précédente instance de cert-manager a été désinstallée du cluster elle l'a été proprement. En effet, si l'outil avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, et si un ingress avec tls de type acme est déclaré dans votre ressource `dsc`, les déploiements de ressources ingress et les routes associées échoueront à se créer car cert-manager n'aura pas été installé par le role.
+
 ### CloudNativePG
 
 La BDD PostgreSQL des composants Keycloak et SonarQube est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/), via le role `cloudnativepg`.
@@ -464,7 +392,20 @@ Le playbook d'installation, en s'appuyant sur le role en question, s'assurera pr
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur CloudNativePG n'est pas installé. Le rôle associé procédera donc à son installation.
 
-**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Keycloak ou de SonarQube échouera car l'opérateur CloudNativePG n'aura pas été installé par le role.  
+**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Keycloak ou de SonarQube échouera car l'opérateur CloudNativePG n'aura pas été installé par le role.
+
+### GitLab Operator
+
+Toute instance de GitLab sera installée en s'appuyant sur l'[opérateur GitLab](https://docs.gitlab.com/operator), via le role `gitlab-operator`.
+
+Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement que cet opérateur n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
+
+- L'API `apps.gitlab.com/v1beta1`.
+- La `ValidatingWebhookConfiguration` nommée `gitlab-validating-webhook-configuration`.
+
+Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur GitLab n'est pas installé. Le rôle associé procédera donc à son installation.
+
+**Attention !** Assurez-vous que si une précédente instance de GitLab Operator a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur GitLab avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de GitLab échouera car l'opérateur associé n'aura pas été installé par le role.
 
 ## Désinstallation
 

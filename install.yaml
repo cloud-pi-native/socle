@@ -45,6 +45,10 @@
         - sonarqube
         - sonar
 
+    - name: gitlab-operator
+      tags:
+        - gitlab-operator
+
     - name: gitlab
       tags:
         - gitlab

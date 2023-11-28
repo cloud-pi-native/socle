@@ -239,6 +239,9 @@ spec:
                     chartVersion:
                       description: GitLab Operator release version (e.g., "0.24.1").
                       type: string
+                    namespace:
+                      description: The namespace for GitLab Operator.
+                      type: string
                   type: object
                 gitlabRunner:
                   description: Configuration for GitLab Runner.

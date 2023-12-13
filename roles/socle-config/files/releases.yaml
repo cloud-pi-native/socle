@@ -17,6 +17,7 @@ spec:
     release: "6.3.1"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
+<<<<<<< Updated upstream
     chartVersion: "7.3.4"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
@@ -27,6 +28,9 @@ spec:
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
     chartVersion: "v5.6.0"
+=======
+    chartVersion: "7.3.5"
+>>>>>>> Stashed changes
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.13.1

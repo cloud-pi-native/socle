@@ -14,7 +14,7 @@ spec:
     chartVersion: 0.18.2
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "6.2.0"
+    release: "6.3.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "7.3.4"

@@ -206,15 +206,6 @@
       tags:
         - gitlab
 
-    - name: "Suppression de l'opérateur GitLab"
-      kubernetes.core.helm:
-        name: gitlab-operator
-        release_namespace: "{{ dsc.gitlab.namespace }}"
-        release_state: absent
-        wait: true
-      tags:
-        - gitlab
-
     - name: "Suppression du namespace GitLab"
       kubernetes.core.k8s:
         state: absent
@@ -222,6 +213,34 @@
         name: "{{ dsc.gitlab.namespace }}"
       tags:
         - gitlab
+
+    - name: "Suppression de l'opérateur GitLab"
+      kubernetes.core.helm:
+        name: gitlab-operator
+        release_namespace: "{{ dsc.gitlabOperator.namespace }}"
+        release_state: absent
+        wait: true
+      tags:
+        - never
+        - gitlab-operator
+
+    - name: "Suppression du namespace GitLab Operator"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.gitlabOperator.namespace }}"
+      tags:
+        - never
+        - gitlab-operator
+
+    - name: "Suppression gitlab-validating-webhook-configuration"
+      kubernetes.core.k8s:
+        state: absent
+        kind: ValidatingWebhookConfiguration
+        name: gitlab-validating-webhook-configuration
+      tags:
+        - never
+        - gitlab-operator
 
     - name: "Suppression du namespace Vault"
       kubernetes.core.k8s:

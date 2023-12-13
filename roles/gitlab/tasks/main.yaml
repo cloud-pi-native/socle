@@ -1,46 +1,47 @@
 ---
+- name: Create GitLab namespace
+  kubernetes.core.k8s:
+    name: "{{ dsc.gitlab.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Get existing control-plane deployments
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    label_selectors:
+      - "control-plane=controller-manager"
+  register: cp_deployments
+
+- name: Set gitlab_operator_ns fact
+  ansible.builtin.set_fact:
+    gitlab_operator_ns: "{{ cp_deployments.resources
+      | selectattr('metadata.name', 'equalto', 'gitlab-controller-manager')
+      | map(attribute='metadata.namespace') | first }}"
+
+- name: Get existing GitLab sidekiq deployments
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    label_selectors:
+      - "app.kubernetes.io/instance=gitlab-sidekiq"
+      - "app.kubernetes.io/managed-by=gitlab-operator"
+  register: gs_deployments
+
+- name: Set other_gitlabs_ns fact
+  ansible.builtin.set_fact:
+    other_gitlabs_ns: "{{ gs_deployments.resources | map(attribute='metadata.namespace')
+      | reject('search', dsc.gitlab.namespace) | list }}"
+
+- name: Create RBAC resources
+  kubernetes.core.k8s:
+    template: rbac.yaml.j2
+
 - name: Set some facts
   ansible.builtin.set_fact:
     vault_auth_path: jwt
     vault_auth_role: default-ci
     npm_file: "{{ lookup('ansible.builtin.template', 'npm_file.j2') }}"
     mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
-
-- name: Install GitLab Operator
-  block:
-    - name: Create GitLab namespace
-      kubernetes.core.k8s:
-        name: "{{ dsc.gitlab.namespace }}"
-        api_version: v1
-        kind: Namespace
-        state: present
-
-    - name: Add GitLab Operator helm repo
-      kubernetes.core.helm_repository:
-        name: gitlab-operator
-        repo_url: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
-
-    - name: Set GitLab Operator helm values
-      ansible.builtin.set_fact:
-        operator_values: "{{ lookup('template', 'operator-values.yaml.j2') | from_yaml }}"
-
-    - name: Deploy GitLab Operator helm
-      kubernetes.core.helm:
-        name: gitlab-operator
-        chart_ref: gitlab-operator/gitlab-operator
-        chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
-        release_namespace: "{{ dsc.gitlab.namespace }}"
-        values: "{{ operator_values }}"
-
-    - name: Wait gitlab-webhook-service endpoint
-      kubernetes.core.k8s_info:
-        kind: Endpoints
-        namespace: "{{ dsc.gitlab.namespace }}"
-        name: gitlab-webhook-service
-      register: endpoint
-      until: endpoint.resources[0].subsets[0].addresses[0] is defined
-      retries: 15
-      delay: 5
 
 - name: Get Gitlab client secret
   kubernetes.core.k8s_info:
@@ -90,10 +91,6 @@
       data:
         tls.crt: "{{ exposed_ca_pem | b64encode }}"
 
-- name: Prepare Gitlab helm values
-  ansible.builtin.set_fact:
-    gitlab_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
-
 - name: Set path fact
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
@@ -106,7 +103,7 @@
     combine_user_values: "{{ dsc.gitlab['values'] }}"
     combine_dest_var: "gitlab_values"
 
-- name: Install gitlab instance
+- name: Install GitLab instance
   kubernetes.core.k8s:
     api_version: apps.gitlab.com/v1beta1
     kind: GitLab
@@ -128,20 +125,20 @@
   retries: 45
   delay: 20
 
-- name: Find gitlab token in inventory
+- name: Find GitLab token in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
     kind: ConfigMap
     name: dso-config
   register: ansible_inventory
 
-- name: Get gitlab token
+- name: Get GitLab token
   ansible.builtin.set_fact:
     gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
   when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
   register: set_token_inv
 
-- name: Test Gitlab token
+- name: Test GitLab token
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -151,7 +148,7 @@
   register: test_token
   ignore_errors: true
 
-- name: Initialize gitlab token
+- name: Initialize GitLab token
   when: (set_token_inv.skipped is defined and set_token_inv.skipped) or (test_token.status != 200)
   block:
     - name: Get toolbox pod name
@@ -172,7 +169,7 @@
           "{{ dsc.gitlab.chartVersion is version('7.2.0', operator='lt', version_type='loose') |
           ternary('create-token-7.2.0-.yaml', 'create-token-7.2.0+.yaml') }}"
 
-    - name: Set new gitlab token
+    - name: Set new GitLab token
       ansible.builtin.set_fact:
         gitlab_token: "{{ token.stdout_lines[-2][1:-1] }}"
 

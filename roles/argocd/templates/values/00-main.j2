@@ -29,7 +29,7 @@ server:
       name: Keycloak
       clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
       clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
-{% if dsc.exposedCA != 'none' %}
+{% if dsc.exposedCA.type != 'none' %}
       rootCA: |
         {{ exposed_ca_pem | indent(width=8, first=False) }}
 {% endif %}

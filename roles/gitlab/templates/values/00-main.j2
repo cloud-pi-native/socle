@@ -4,6 +4,9 @@ certmanager:
 registry:
   enabled: false
 
+nginx-ingress:
+  enabled: false
+
 gitlab:
   webservice:
     registry:
@@ -21,6 +24,17 @@ global:
   certificates:
     customCAs:
       - configMap: openshift-service-ca.crt
+{% for item in dsc.additionalsCA %}
+{% if item.kind == 'ConfigMap' %}
+      - configMap: {{ item.name }}
+{% endif %}
+{% if item.kind == 'Secret' %}
+      - secret: {{ item.name }}
+{% endif %}
+{% endfor %}
+{% if dsc.exposedCA.type != 'none' %}
+      - secret: exposed-ca
+{% endif %}
   hosts:
     domain: {{ dsc.global.rootDomain[1:] }}
     registry:
@@ -29,20 +43,10 @@ global:
       name: {{ dsc_name }}-minio{{ dsc.global.rootDomain }}
     kas:
       name: {{ dsc_name }}-kas{{ dsc.global.rootDomain }}
+{% if gitlab_domain %}
     gitlab:
       name: {{ gitlab_domain }}
-  ingress:
-    class: {{ dsc.ingress.className | default('') }}
-    annotations:
-{% for key, val in dsc.ingress.annotations.items() %}
-      {{ key }}: {{ val }}
-{% endfor %}
-    labels:
-{% for key, val in dsc.ingress.labels.items() %}
-      {{ key }}: {{ val }}
-{% endfor %}
-    class: none
-    configureCertmanager: false
+{% endif %}
 
   appConfig:
     defaultProjectsFeatures:
@@ -60,4 +64,3 @@ global:
       autoLinkUser: ["openid_connect"]
       providers:
         - secret: openid-connect
-

@@ -4,8 +4,7 @@ metadata:
   name: pg-cluster-keycloak
   namespace: {{ dsc.keycloak.namespace }}
 spec:
-  instances: 2
-  imageName: ghcr.io/cloudnative-pg/postgresql:15.3
+  instances: 3
 
   # Parameters and pg_hba configuration will be append
   # to the default ones to make the cluster work

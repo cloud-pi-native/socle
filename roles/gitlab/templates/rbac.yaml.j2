@@ -1,0 +1,87 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gitlab-app
+  namespace: {{ dsc.gitlab.namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gitlab-app-nonroot
+  namespace: {{ dsc.gitlab.namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gitlab-app-anyuid
+  namespace: {{ dsc.gitlab.namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gitlab-manager
+  namespace: {{ dsc.gitlab.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-manager-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gitlab-manager-role
+subjects:
+- kind: ServiceAccount
+  name: gitlab-manager
+  namespace: {{ gitlab_operator_ns }}
+- kind: ServiceAccount
+  name: gitlab-manager
+  namespace: {{ dsc.gitlab.namespace }}
+{% for ns in other_gitlabs_ns %}
+- kind: ServiceAccount
+  name: gitlab-manager
+  namespace: {{ ns }}
+{% endfor %}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-app-rolebinding-anyuid
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gitlab-app-role-anyuid
+subjects:
+- kind: ServiceAccount
+  name: gitlab-app-anyuid
+  namespace: {{ gitlab_operator_ns }}
+- kind: ServiceAccount
+  name: gitlab-app-anyuid
+  namespace: {{ dsc.gitlab.namespace }}
+{% for ns in other_gitlabs_ns %}
+- kind: ServiceAccount
+  name: gitlab-app-anyuid
+  namespace: {{ ns }}
+{% endfor %}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-app-rolebinding-nonroot
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gitlab-app-role-nonroot
+subjects:
+- kind: ServiceAccount
+  name: gitlab-app-nonroot
+  namespace: {{ gitlab_operator_ns }}
+- kind: ServiceAccount
+  name: gitlab-app-nonroot
+  namespace: {{ dsc.gitlab.namespace }}
+{% for ns in other_gitlabs_ns %}
+- kind: ServiceAccount
+  name: gitlab-app-nonroot
+  namespace: {{ ns }}
+{% endfor %}

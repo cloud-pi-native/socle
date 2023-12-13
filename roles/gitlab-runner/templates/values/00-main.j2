@@ -40,6 +40,9 @@ runners:
       [runners.kubernetes]
         namespace = "{{ dsc.gitlab.namespace }}"
         image = "ubuntu:22.04"
+{% if dsc.exposedCA.type != 'none' %}
+        tls-ca-file = "/home/gitlab-runner/.gitlab-runner/certs/tls.crt"
+{% endif %}
 
   ## Specify the name for the runner.
   name: gitlab-runner

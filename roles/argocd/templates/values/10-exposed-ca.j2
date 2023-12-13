@@ -1,4 +1,4 @@
-{% if dsc.exposedCA != 'none' %}
+{% if dsc.exposedCA.type != 'none' %}
 config:
   tlsCerts:
     {{ gitlab_domain }}: |

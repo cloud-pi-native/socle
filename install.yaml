@@ -16,6 +16,11 @@
       tags:
         - always
 
+    - name: grafana-operator
+      tags:
+        - grafana-operator
+        - never
+
     - name: cert-manager
       tags:
         - cert-manager

@@ -277,3 +277,22 @@
       tags:
         - console-dso
         - console
+
+    - name: "Suppression de l'opérateur Grafana"
+      kubernetes.core.helm:
+        name: grafana-operator
+        release_namespace: "{{ dsc.grafanaOperator.namespace }}"
+        release_state: absent
+        wait: true
+      tags:
+        - never
+        - grafana-operator
+
+    - name: "Suppression du namespace Grafana Operator"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.grafanaOperator.namespace }}"
+      tags:
+        - never
+        - grafana-operator

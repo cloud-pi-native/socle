@@ -16,11 +16,6 @@
       tags:
         - always
 
-    - name: grafana-operator
-      tags:
-        - grafana-operator
-        - never
-
     - name: cert-manager
       tags:
         - cert-manager
@@ -87,6 +82,10 @@
       tags:
         - console
         - console-dso
+
+    - name: grafana-operator
+      tags:
+        - grafana-operator
 
   post_tasks:
     - name: Post-Install Disclaimer

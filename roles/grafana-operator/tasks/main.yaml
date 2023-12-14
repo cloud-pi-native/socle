@@ -1,39 +1,27 @@
 ---
-#- name: Get cluster infos
-#  kubernetes.core.k8s_cluster_info:
-#  register: cluster_infos
+- name: Get cluster infos
+  kubernetes.core.k8s_cluster_info:
+  register: cluster_infos
 
-#- debug:
-#    msg: "{{ cluster_infos }}"
-#
-#- meta: end_play
+- name: Check if Grafana Operator api exists
+  ansible.builtin.set_fact:
+    grafana_op_api: "{{ cluster_infos.apis | dict2items | selectattr('key', 'contains', 'integreatly') }}"
 
-#- name: Check if Grafana Operator api exists
-#  ansible.builtin.set_fact:
-#    grafana_op_api: "{{ cluster_infos.apis | dict2items | selectattr('key', 'contains', 'integreatly') }}"
-
-#- name: Debug grafana_op_api
-##  when: grafana_op_api | length == 0
-#  debug:
-#    msg: 
-#      - "{{ grafana_op_api }}"
+- name: Check if grafana-operator-permissions ClusterRole exists
+  kubernetes.core.k8s_info:
+    kind: ClusterRole
+    name: grafana-operator-permissions
+  register: grafana_op_cr
 
 - name: Install Grafana Operator
-#  when: (gl_api == 'absent') or (gl_vwhc.resources | length == 0)
+  when: (grafana_op_api | length == 0) or (grafana_op_cr.resources | length == 0)
   block:
-#    - name: Create Grafana Operator namespace
-#      kubernetes.core.k8s:
-#        name: "{{ dsc.grafanaOperator.namespace }}"
-#        api_version: v1
-#        kind: Namespace
-#        state: present
-
-#    - name: Add Grafana Operator helm repo
-#      kubernetes.core.helm_repository:
-#        name: grafana-operator
-#        repo_url: oci://ghcr.io/grafana/helm-charts/grafana-operator
-
-#    - meta: end_play
+    - name: Create Grafana Operator namespace
+      kubernetes.core.k8s:
+        name: "{{ dsc.grafanaOperator.namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
 
     - name: Set Grafana Operator helm values
       ansible.builtin.set_fact:
@@ -48,12 +36,12 @@
         create_namespace: true
         values: "{{ operator_values }}"
 
-#    - name: Wait gitlab-webhook-service endpoint
-#      kubernetes.core.k8s_info:
-#        kind: Endpoints
-#        namespace: "{{ dsc.gitlabOperator.namespace }}"
-#        name: gitlab-webhook-service
-#      register: endpoint
-#      until: endpoint.resources[0].subsets[0].addresses[0] is defined
-#      retries: 15
-#      delay: 5
+    - name: Wait grafana-operator-metrics-service endpoint
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: "{{ dsc.grafanaOperator.namespace }}"
+        name: grafana-operator-metrics-service
+      register: endpoint
+      until: endpoint.resources[0].subsets[0].addresses[0] is defined
+      retries: 15
+      delay: 5

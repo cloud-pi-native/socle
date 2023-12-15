@@ -24,6 +24,9 @@ spec:
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
     chartVersion: "0.57.0"
+  grafanaOperator:
+    # https://github.com/grafana/grafana-operator/tags
+    chartVersion: "v5.6.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.13.1

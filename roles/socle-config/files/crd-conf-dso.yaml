@@ -282,6 +282,16 @@ spec:
                     - rootDomain
                     - environment
                   type: object
+                grafanaOperator:
+                  description: Configuration for Grafana Operator.
+                  properties:
+                    chartVersion:
+                      description: Grafana Operator release version (e.g., "v5.6.0").
+                      type: string
+                    namespace:
+                      description: The namespace for Grafana Operator.
+                      type: string
+                  type: object
                 harbor:
                   description: Configuration for Harbor.
                   properties:

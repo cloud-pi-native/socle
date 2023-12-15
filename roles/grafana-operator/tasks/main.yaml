@@ -1,0 +1,47 @@
+---
+- name: Get cluster infos
+  kubernetes.core.k8s_cluster_info:
+  register: cluster_infos
+
+- name: Check if Grafana Operator api exists
+  ansible.builtin.set_fact:
+    grafana_op_api: "{{ cluster_infos.apis | dict2items | selectattr('key', 'contains', 'integreatly') }}"
+
+- name: Check if grafana-operator-permissions ClusterRole exists
+  kubernetes.core.k8s_info:
+    kind: ClusterRole
+    name: grafana-operator-permissions
+  register: grafana_op_cr
+
+- name: Install Grafana Operator
+  when: (grafana_op_api | length == 0) or (grafana_op_cr.resources | length == 0)
+  block:
+    - name: Create Grafana Operator namespace
+      kubernetes.core.k8s:
+        name: "{{ dsc.grafanaOperator.namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Set Grafana Operator helm values
+      ansible.builtin.set_fact:
+        operator_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+
+    - name: Deploy Grafana Operator helm
+      kubernetes.core.helm:
+        name: grafana-operator
+        chart_ref: oci://ghcr.io/grafana/helm-charts/grafana-operator
+        chart_version: "{{ dsc.grafanaOperator.chartVersion }}"
+        release_namespace: "{{ dsc.grafanaOperator.namespace }}"
+        create_namespace: true
+        values: "{{ operator_values }}"
+
+    - name: Wait grafana-operator-metrics-service endpoint
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: "{{ dsc.grafanaOperator.namespace }}"
+        name: grafana-operator-metrics-service
+      register: endpoint
+      until: endpoint.resources[0].subsets[0].addresses[0] is defined
+      retries: 15
+      delay: 5

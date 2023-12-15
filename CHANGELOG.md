@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.2.0](https://github.com/cloud-pi-native/socle/compare/v1.1.1...v1.2.0) (2023-12-13)
+
+
+### Features
+
+* :sparkles: We don't install GitLab Operator when it's already here. ([a3298e4](https://github.com/cloud-pi-native/socle/commit/a3298e4f4acfa235e35c003f14603a479c67097b))
+* :zap: Update console version ([92ee57f](https://github.com/cloud-pi-native/socle/commit/92ee57fa50c59fdfe5ec5f5a787f7e67bde10d84))
+
+
+### Bug Fixes
+
+* :ambulance: Fix CNPG Clusters instances number / Remove unnecessary PG image setting ([5877d4f](https://github.com/cloud-pi-native/socle/commit/5877d4f964560467366e1137088cdcefba02ef45))
+* :bug: ([1561d78](https://github.com/cloud-pi-native/socle/commit/1561d78068db4001d83177867a7fc51e24616a1b))
+* :bug: Fix dual installation (GitLab part) ([07ce30c](https://github.com/cloud-pi-native/socle/commit/07ce30c15e97e597f85c4e44a7bd71e9b9f86868))
+* :bug: Fix Gitlab Operator uninstall and ns retrieval + GitLab values settings ([ada1f9e](https://github.com/cloud-pi-native/socle/commit/ada1f9e5ea1c0fbaf6c9b75b0c73e5270146ff8a))
+* :bug: Fix missing cert parth + condition dsc.exposedCA.type ([8a7ddc0](https://github.com/cloud-pi-native/socle/commit/8a7ddc0a9df9ee13c6c124733101ebbd496f26dc))
+* :bug: We want to use installed GitLab Operator namespace ([4049368](https://github.com/cloud-pi-native/socle/commit/404936899f3203ebfd7fc6fa3e2ef28cf7efc30b))
+
+## [1.1.1](https://github.com/cloud-pi-native/socle/compare/v1.1.0...v1.1.1) (2023-11-23)
+
+
+### Bug Fixes
+
+* :bookmark: fix console release version number ([e0f5540](https://github.com/cloud-pi-native/socle/commit/e0f5540733a1c4cd3a7f881b7f374a3123c04b92))
+
 ## [1.1.0](https://github.com/cloud-pi-native/socle/compare/v1.0.1...v1.1.0) (2023-11-22)
 
 

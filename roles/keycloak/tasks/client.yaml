@@ -12,6 +12,7 @@
     clientId: "{{ item.clientId }}"
     clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
     standardFlowEnabled: "{{ item.standardFlowEnabled }}"
+    directAccessGrantsEnabled: "{{ item.directAccessGrantsEnabled | default(omit) }}"
     publicClient: "{{ item.publicClient | default(omit) }}"
     redirectUris: "{{ item.redirectUris }}"
     webOrigins: "{{ item.webOrigins }}"

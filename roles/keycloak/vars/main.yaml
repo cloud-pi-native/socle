@@ -13,6 +13,7 @@ keycloak_clients:
 
   - clientId: console-frontend
     standardFlowEnabled: true
+    directAccessGrantsEnabled: true
     redirectUris: "{{ lookup('ansible.builtin.template', 'console-frontend-redirectUris.yaml') | from_yaml }}"
     webOrigins: "{{ lookup('ansible.builtin.template', 'console-frontend-webOrigins.yaml') | from_yaml }}"
     defaultClientScopes:

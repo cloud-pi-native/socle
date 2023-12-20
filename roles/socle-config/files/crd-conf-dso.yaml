@@ -282,6 +282,21 @@ spec:
                     - rootDomain
                     - environment
                   type: object
+                grafana:
+                  description: Configuration for Grafana instance.
+                  properties:
+                    namespace:
+                      description: The namespace for Grafana instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Grafana instance.
+                      type: string
+                    grafanaPvcSize:
+                      description: |
+                        The storage size for Grafana instance PVC.
+                        Must comply with Kubernetes size definitions (i.e 5Gi).
+                      type: string
+                  type: object
                 grafanaOperator:
                   description: Configuration for Grafana Operator.
                   properties:
@@ -542,6 +557,8 @@ spec:
                 - gitlab
                 - gitlabOperator
                 - global
+                - grafana
+                - grafanaOperator
                 - harbor
                 - ingress
                 - keycloak

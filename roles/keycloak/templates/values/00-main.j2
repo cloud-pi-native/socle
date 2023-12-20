@@ -148,7 +148,22 @@ autoscaling:
   enabled: false
 
 metrics:
-  enabled: false
+  enabled: true
+  service:
+    ports:
+      http: 8080
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8080"
+    extraPorts: []
+  serviceMonitor:
+    enabled: true
+    port: http
+    endpoints:
+      - path: '/metrics'
+      - path: '/realms/master/metrics'
+      - path: '/realms/dso/metrics'
+    namespace: ""
 
 keycloakConfigCli:
   enabled: false

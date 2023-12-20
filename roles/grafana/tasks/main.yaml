@@ -1,0 +1,42 @@
+---
+- name: Create Grafana namespace
+  kubernetes.core.k8s:
+    name: "{{ dsc.grafana.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Get Grafana credentials secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.grafana.namespace }}"
+    kind: Secret
+    name: grafana-creds
+  register: gf_creds_secret
+
+- name: Create Grafana admin credentials secret
+  when: gf_creds_secret.resources | length == 0
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      stringData:
+        GF_SECURITY_ADMIN_USER: "admin"
+        GF_SECURITY_ADMIN_PASSWORD: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
+      metadata:
+        name: grafana-creds
+        namespace: "{{ dsc.grafana.namespace }}"
+      type: Opaque
+
+- name: Deploy Grafana instance
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - grafana.yaml.j2
+    - ingress.yaml.j2
+
+# Reste à faire :
+# Création du clusterrolebinding pour le service account
+# Création du secret grafana-sa-token pour génération auto du token utilisé par le service account
+# Création de la Datasource prometheus
+

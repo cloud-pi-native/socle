@@ -88,6 +88,10 @@
         - grafana-operator
         - never
 
+    - name: grafana
+      tags:
+        - grafana
+
   post_tasks:
     - name: Post-Install Disclaimer
       ansible.builtin.debug:

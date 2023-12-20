@@ -117,6 +117,7 @@
     argocd_domain: "{{ dsc.argocd.subDomain }}{{ root_domain }}"
     console_domain: "{{ dsc.console.subDomain }}{{ root_domain }}"
     gitlab_domain: "{{ dsc.gitlab.subDomain }}{{ root_domain }}"
+    grafana_domain: "{{ dsc.grafana.subDomain }}{{ root_domain }}"
     harbor_domain: "{{ dsc.harbor.subDomain }}{{ root_domain }}"
     keycloak_domain: "{{ dsc.keycloak.subDomain }}{{ root_domain }}"
     nexus_domain: "{{ dsc.nexus.subDomain }}{{ root_domain }}"

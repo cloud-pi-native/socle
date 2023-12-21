@@ -565,6 +565,7 @@ spec:
                 - exposedCA
                 - gitlab
                 - gitlabOperator
+                - gitlabRunner
                 - global
                 - grafana
                 - grafanaDatasource

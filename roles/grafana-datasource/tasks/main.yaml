@@ -1,0 +1,33 @@
+---
+- name: Manage missing defaut datasource URL
+  when: dsc.grafanaDatasource.defaultPrometheusDatasourceUrl is not defined
+  block:
+    - name: Disclaimer
+      ansible.builtin.debug:
+        msg:
+        - Operation Cancelled.
+        - The defaultPrometheusDatasourceUrl is missing in your {{ dsc_name }} dsc custom resource.
+        - You must provide an URL for default Prometheus datasource.
+        - Please set this value and try again.
+        - "You can execute the following command to get help :"
+        - kubectl explain dsc.spec.grafanaDatasource
+
+    - name: Exit playbook
+      ansible.builtin.meta: end_play
+
+- name: Get service accounts in Grafana namespace
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    namespace: "{{ dsc.grafana.namespace }}"
+  register: gf_service_accounts
+
+- name: Get Grafana instance service account secret name
+  ansible.builtin.set_fact:
+    gf_sa_secret_name: "{{ gf_service_accounts.resources
+      | selectattr('metadata.name', 'contains', dsc.grafana.namespace + '-sa-token')
+      | map(attribute='metadata.name') | first }}"
+
+- name: Create Grafana prometheus datasource
+  kubernetes.core.k8s:
+    template: prometheus-datasource.yaml.j2

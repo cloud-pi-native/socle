@@ -297,6 +297,15 @@ spec:
                         Must comply with Kubernetes size definitions (i.e 5Gi).
                       type: string
                   type: object
+                grafanaDatasource:
+                  description: Configuration for Grafana default Datasource.
+                  properties:
+                    defaultPrometheusDatasourceUrl:
+                      description: |
+                        We provide a default Prometheus Datasource for convenience.
+                        Use this parameter to set its URL.
+                      type: string
+                  type: object
                 grafanaOperator:
                   description: Configuration for Grafana Operator.
                   properties:
@@ -558,6 +567,7 @@ spec:
                 - gitlabOperator
                 - global
                 - grafana
+                - grafanaDatasource
                 - grafanaOperator
                 - harbor
                 - ingress

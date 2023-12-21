@@ -35,8 +35,29 @@
     - grafana.yaml.j2
     - ingress.yaml.j2
 
-# Reste à faire :
-# Création du clusterrolebinding pour le service account
-# Création du secret grafana-sa-token pour génération auto du token utilisé par le service account
-# Création de la Datasource prometheus
+- name: Get Grafana ClusterRoleBinding
+  kubernetes.core.k8s_info:
+    api_version: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    field_selectors:
+      - metadata.name={{ dsc.grafana.namespace }}-view
+  register: gf_crb
+
+- name: Create Grafana ClusterRoleBinding
+  when: gf_crb.resources | length == 0
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: "{{ dsc.grafana.namespace }}-view"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: cluster-monitoring-view
+      subjects:
+      - kind: ServiceAccount
+        name: "{{ dsc.grafana.namespace }}-sa"
+        namespace: "{{ dsc.grafana.namespace }}"
 

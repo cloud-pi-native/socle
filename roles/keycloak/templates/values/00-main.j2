@@ -164,18 +164,7 @@ metrics:
       - path: '/realms/master/metrics'
       - path: '/realms/dso/metrics'
   prometheusRule:
-    enabled: true
-    groups:
-      - name: Keycloak
-        rules:
-          - alert: KeycloakInstanceNotAvailable
-            annotations:
-              message: "Keycloak instance in namespace {{ dsc.keycloak.namespace }} has not been available for 1 minute."
-            expr: |
-              absent(kube_pod_status_ready{namespace="{{ dsc.keycloak.namespace }}", condition="true"} * on (pod) kube_pod_labels{pod=~"keycloak-\\d+", namespace="{{ dsc.keycloak.namespace }}"}) != 0
-            for: 1m
-            labels:
-              severity: critical
+    enabled: false
 
 keycloakConfigCli:
   enabled: false

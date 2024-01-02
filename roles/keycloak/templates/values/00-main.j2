@@ -148,7 +148,7 @@ autoscaling:
   enabled: false
 
 metrics:
-  enabled: true
+  enabled: {{ dsc.global.metrics.enabled }}
   service:
     ports:
       http: 8080

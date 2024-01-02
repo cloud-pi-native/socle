@@ -277,10 +277,21 @@ spec:
                       type: string
                       default: .example.com
                       pattern: "^\\..*$"
+                    metrics:
+                      description: Configuration for metrics feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether metrics should be enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
                     - environment
+                    - metrics
                   type: object
                 grafana:
                   description: Configuration for Grafana instance.

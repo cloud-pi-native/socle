@@ -3,7 +3,7 @@
 | argocd | 4.7.19 | [argocd](https://artifacthub.io/packages/helm/bitnami/argo-cd) |
 | certmanager | v1.13.1 | [certmanager](https://github.com/cert-manager/cert-manager/releases) |
 | cloudnativepg | 0.18.2 | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg) |
-| console | 6.3.1 | [console](https://github.com/cloud-pi-native/console/releases) |
+| console | 6.4.0 | [console](https://github.com/cloud-pi-native/console/releases) |
 | gitlab | 7.3.4 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
 | gitlabOperator | 0.24.0 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
 | gitlabRunner | 0.57.0 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |

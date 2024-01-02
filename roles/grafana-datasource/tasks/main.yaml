@@ -19,12 +19,12 @@
     - name: Disclaimer when missing datasource URL in dsc
       ansible.builtin.debug:
         msg:
-        - Operation Cancelled.
-        - The defaultPrometheusDatasourceUrl is missing in your {{ dsc_name }} dsc custom resource.
-        - You must provide an URL for default Prometheus datasource.
-        - Please set this value and try again.
-        - "You can execute the following command to get help :"
-        - kubectl explain dsc.spec.grafanaDatasource
+          - Operation Cancelled.
+          - The defaultPrometheusDatasourceUrl is missing in your {{ dsc_name }} dsc custom resource.
+          - You must provide an URL for default Prometheus datasource.
+          - Please set this value and try again.
+          - "You can execute the following command to get help :"
+          - kubectl explain dsc.spec.grafanaDatasource
 
     - name: Exit playbook when missing datasource URL in dsc
       ansible.builtin.meta: end_play

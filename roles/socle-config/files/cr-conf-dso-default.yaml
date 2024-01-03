@@ -17,12 +17,18 @@ spec:
     values: {}
   gitlab: {}
   gitlabOperator: {}
+  gitlabRunner: {}
   global:
     environment: production
     projectsRootDir:
       - forge
     rootDomain:
       .example.com
+    metrics:
+      enabled: false
+  grafana: {}
+  grafanaDatasource: {}
+  grafanaOperator: {}
   harbor:
     adminPassword: anotherGreatPassword
     pvcRegistrySize: 20Gi

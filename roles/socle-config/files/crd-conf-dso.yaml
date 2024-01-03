@@ -277,10 +277,45 @@ spec:
                       type: string
                       default: .example.com
                       pattern: "^\\..*$"
+                    metrics:
+                      description: Configuration for metrics feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether metrics should be enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
                     - environment
+                    - metrics
+                  type: object
+                grafana:
+                  description: Configuration for Grafana instance.
+                  properties:
+                    namespace:
+                      description: The namespace for Grafana instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Grafana instance.
+                      type: string
+                    grafanaPvcSize:
+                      description: |
+                        The storage size for Grafana instance PVC.
+                        Must comply with Kubernetes size definitions (i.e 5Gi).
+                      type: string
+                  type: object
+                grafanaDatasource:
+                  description: Configuration for Grafana default Datasource.
+                  properties:
+                    defaultPrometheusDatasourceUrl:
+                      description: |
+                        We provide a default Prometheus Datasource for convenience.
+                        Use this parameter to set its URL.
+                      type: string
                   type: object
                 grafanaOperator:
                   description: Configuration for Grafana Operator.
@@ -541,7 +576,11 @@ spec:
                 - exposedCA
                 - gitlab
                 - gitlabOperator
+                - gitlabRunner
                 - global
+                - grafana
+                - grafanaDatasource
+                - grafanaOperator
                 - harbor
                 - ingress
                 - keycloak

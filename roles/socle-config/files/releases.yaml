@@ -14,7 +14,7 @@ spec:
     chartVersion: 0.18.2
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "6.3.1"
+    release: "6.4.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "7.3.4"
@@ -26,7 +26,7 @@ spec:
     chartVersion: "0.57.0"
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
-    chartVersion: "v5.6.0"
+    chartVersion: "v5.4.2"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.13.1

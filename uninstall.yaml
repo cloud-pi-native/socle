@@ -296,3 +296,30 @@
       tags:
         - never
         - grafana-operator
+
+    - name: "Suppression de la datasource Grafana prometheus par défaut"
+      kubernetes.core.k8s:
+        api_version: grafana.integreatly.org/v1beta1
+        state: absent
+        kind: GrafanaDatasource
+        namespace: "{{ dsc.grafana.namespace }}"
+        name: prometheus
+      tags:
+        - grafana-datasource
+
+    - name: "Suppression du ClusterRoleBinding pour le service account Grafana"
+      kubernetes.core.k8s:
+        api_version: rbac.authorization.k8s.io/v1
+        state: absent
+        kind: ClusterRoleBinding
+        name: "{{ dsc.grafana.namespace }}-view"
+      tags:
+        - grafana
+
+    - name: "Suppression de l'instance Grafana"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.grafana.namespace }}"
+      tags:
+        - grafana

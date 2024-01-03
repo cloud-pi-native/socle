@@ -202,3 +202,25 @@
         - new-anon
     body_format: json
     status_code: [204]
+
+- name: Activate Nexus metrics scraping
+  when: dsc.global.metrics.enabled == true
+  block:
+    - name: Create admin-creds secret
+      kubernetes.core.k8s:
+        definition:
+          kind: Secret
+          apiVersion: v1
+          data:
+            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN | b64encode }}"
+            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64encode }}"
+          metadata:
+            labels:
+              app: nexus
+            name: admin-creds
+            namespace: "{{ dsc.nexus.namespace }}"
+          type: Opaque
+
+    - name: Create nexus ServiceMonitor
+      kubernetes.core.k8s:
+        template: servicemonitor.yml.j2

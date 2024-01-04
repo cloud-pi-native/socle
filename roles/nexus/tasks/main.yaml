@@ -204,7 +204,7 @@
     status_code: [204]
 
 - name: Activate Nexus metrics scraping
-  when: dsc.global.metrics.enabled == true
+  when: dsc.global.metrics.enabled
   block:
     - name: Create admin-creds secret
       kubernetes.core.k8s:

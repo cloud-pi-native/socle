@@ -22,6 +22,8 @@ gitlab_additional_service_monitors:
   - name: kas
     port: 8151
     path: /metrics
+
+gitlab_additional_pod_monitors:
   - name: sidekiq
     port: 3807
     path: /metrics

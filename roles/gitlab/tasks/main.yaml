@@ -319,9 +319,15 @@
         protected: "{{ item.protected }}"
   with_items: "{{ dsc.gitlab.extraCIVars }}"
 
-- name: Patch some metrics resources
+- name: Configure metrics resources
   when: dsc.global.metrics.enabled
   block:
+    - name: Get GitLab namespace pods
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "{{ dsc.gitlab.namespace }}"
+      register: gitlab_pods
+
     - name: Get Gitlab ServiceMonitors
       kubernetes.core.k8s_info:
         api_version: monitoring.coreos.com/v1
@@ -335,10 +341,17 @@
         namespace: "{{ dsc.gitlab.namespace }}"
       register: endpoints
 
-    - name: Patch metrics resources
-      when: dsc.global.metrics.enabled
+    - name: Patch existing ServiceMonitors
       ansible.builtin.include_tasks:
         file: patch-servicemonitors.yaml
       loop: "{{ gitlab_service_monitors }}"
 
+    - name: Declare some additionnal ServiceMonitors
+      ansible.builtin.include_tasks:
+        file: add-servicemonitors.yaml
+      loop: "{{ gitlab_additional_service_monitors }}"
 
+    - name: Declare some additionnal PodMonitors
+      ansible.builtin.include_tasks:
+        file: add-podmonitors.yaml
+      loop: "{{ gitlab_additional_pod_monitors }}"

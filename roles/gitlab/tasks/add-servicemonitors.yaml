@@ -1,13 +1,3 @@
-#- name: Get additionnal metrics ports names
-#  ansible.builtin.set_fact:
-#    additionnal_metrics_port_name: "{{ gitlab_pods.resources
-#      | selectattr('metadata.name', 'contains', item.name)
-#      | map(attribute='spec.containers') | first
-#      | selectattr('name', 'contains', item.name)
-#      | map(attribute='ports') | first
-#      | selectattr('containerPort', 'equalto', item.port)
-#      | map(attribute='name') | first }}"
-
 - name: Get additionnal metrics endpoint port name
   ansible.builtin.set_fact:
     additionnal_metrics_port_name: "{{ endpoints.resources

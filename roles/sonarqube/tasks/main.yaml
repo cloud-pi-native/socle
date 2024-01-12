@@ -160,3 +160,34 @@
   with_items:
     - scan
     - provisioning
+
+- name: Create metrics resources
+  when: dsc.global.metrics.enabled
+  block:
+    - name: Get SonarQube pod
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        label_selectors:
+          - app=sonarqube
+          - release=sonarqube
+      register: sonarqube_pod
+
+    - name: Set metrics ports names facts
+      loop: "{{ metrics_ports_names_facts }}"
+      ansible.builtin.set_fact:
+        "{{ item.fact_name }}": "{{ sonarqube_pod.resources
+          | map(attribute='spec.containers') | first
+          | selectattr('name', 'contains', 'sonarqube')
+          | map(attribute='ports') | first
+          | selectattr('containerPort', 'equalto', item.port)
+          | map(attribute='name') | first }}"
+
+    - name: Set metrics paths facts
+      loop: "{{ metrics_paths_facts }}"
+      ansible.builtin.set_fact:
+        "{{ item.fact_name }}": "{{ item.path }}"
+
+    - name: Create PodMonitor
+      kubernetes.core.k8s:
+        template: podmonitor.yml.j2

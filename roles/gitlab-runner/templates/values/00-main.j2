@@ -29,6 +29,16 @@ rbac:
   podSecurityPolicy:
     enabled: true
 
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+## Configure a service resource e.g., to allow scraping metrics via
+## prometheus-operator serviceMonitor
+service:
+  enabled: true
+
 runners:
   # runner configuration, where the multi line strings is evaluated as
   # template so you can specify helm values inside of it.

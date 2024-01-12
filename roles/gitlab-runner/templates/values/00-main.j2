@@ -29,6 +29,7 @@ rbac:
   podSecurityPolicy:
     enabled: true
 
+{% if dsc.global.metrics.enabled %}
 metrics:
   enabled: true
   serviceMonitor:
@@ -38,6 +39,7 @@ metrics:
 ## prometheus-operator serviceMonitor
 service:
   enabled: true
+{% endif %}
 
 runners:
   # runner configuration, where the multi line strings is evaluated as

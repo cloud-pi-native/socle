@@ -1,4 +1,9 @@
 {% if dsc.proxy.enabled %}
+prometheusExporter:
+  httpProxy: "{{ dsc.proxy.http_proxy }}"
+  httpsProxy: "{{ dsc.proxy.https_proxy }}"
+  noProxy: "{{ dsc.proxy.no_proxy }}"
+
 plugins:
   httpProxy: "{{ dsc.proxy.http_proxy }}"
   httpsProxy: "{{ dsc.proxy.https_proxy }}"

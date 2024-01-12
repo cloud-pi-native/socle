@@ -34,10 +34,13 @@ initFs:
 prometheusExporter:
   enabled: {{ dsc.global.metrics.enabled }}
 
+# We do not enable podMonitor here,
+# as helm might complain about an already existing
+# "sonarqube-sonarqube-monitoring-passcode" secret.
+# We manage podMonitor creation with an ansible task instead.
 prometheusMonitoring:
   podMonitor:
-    enabled: {{ dsc.global.metrics.enabled }}
-    namespace: {{ dsc.sonarqube.namespace }}
+    enabled: false
 
 plugins:
   install:

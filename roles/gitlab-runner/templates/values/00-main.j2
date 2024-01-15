@@ -55,6 +55,8 @@ runners:
       [runners.kubernetes]
         namespace = "{{ dsc.gitlab.namespace }}"
         image = "ubuntu:22.04"
+        # multiple "always" to retry pull on fail (see. https://docs.gitlab.com/runner/executors/kubernetes.html#set-a-pull-policy)
+        pull_policy = ["always", "always"]
 
   ## Specify the name for the runner.
   name: gitlab-runner

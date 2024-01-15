@@ -4,7 +4,6 @@ OpenShift:
 
 image:
   pullPolicy: IfNotPresent
-  tag: {{ dsc.sonarqube.tag }}
   repository: docker.io/sonarqube
 
 sonarWebContext: /
@@ -45,10 +44,10 @@ prometheusMonitoring:
 plugins:
   install:
   - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
-  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.14.0/sonarqube-community-branch-plugin-1.14.0.jar
+  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.17.1/sonarqube-community-branch-plugin-1.17.1.jar
 
-jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=web"
-jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=ce"
+jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.17.1.jar=web"
+jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.17.1.jar=ce"
 
 ## a monitoring passcode needs to be defined in order to get reasonable probe results
 # not setting the monitoring passcode will result in a deployment that will never be ready

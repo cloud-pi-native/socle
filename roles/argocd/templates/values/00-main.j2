@@ -9,12 +9,16 @@ config:
   secret:
     argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
 {% endif %}
+redis:
+  architecture: replication
 controller:
   <<: *securityContext
+  replicaCount: 3
 dex:
   enabled: false
 server:
   <<: *securityContext
+  replicaCount: 3
   ingress:
     ingressClassName: {{ dsc.ingress.className | default('') }}
   ingressGrpc:
@@ -48,6 +52,7 @@ server:
 repoServer:
   <<: *securityContext
   extraEnvVars: []
+  replicaCount: 3
 extraDeploy:
   - apiVersion: v1
     data:
@@ -66,6 +71,7 @@ extraDeploy:
       name: argocd-rbac-cm
       namespace: {{ dsc.argocd.namespace }}
 applicationSet:
+  replicaCount: 3
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}

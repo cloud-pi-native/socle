@@ -42,7 +42,6 @@ spec:
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.2.1+800
-    tag: 9.9.2-community
   vault:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.25.0

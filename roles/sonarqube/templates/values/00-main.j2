@@ -4,7 +4,6 @@ OpenShift:
 
 image:
   pullPolicy: IfNotPresent
-  tag: {{ dsc.sonarqube.tag }}
   repository: docker.io/sonarqube
 
 sonarWebContext: /
@@ -69,10 +68,6 @@ sonarProperties:
   sonar.auth.oidc.issuerUri: "https://{{ keycloak_domain }}/realms/dso"
   sonar.core.serverBaseURL: https://{{ sonar_domain }}
   sonar.plugins.risk.consent: "ACCEPTED"
-  http.proxyHost: "{{ dsc.proxy.host }}"
-  http.proxyPort: "{{ dsc.proxy.port }}"
-  https.proxyHost: "{{ dsc.proxy.host }}"
-  https.proxyPort: "{{ dsc.proxy.port }}"
 
 ## Override JDBC values
 ## for external Databases

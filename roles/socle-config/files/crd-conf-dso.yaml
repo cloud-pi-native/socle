@@ -534,7 +534,7 @@ spec:
                       description: The subdomain for SonarQube.
                       type: string
                     chartVersion:
-                      description: SonarQube Bitnami helm chart version (e.g., "3.2.10").
+                      description: SonarQube helm chart version (e.g., "10.2.1+800").
                       type: string
                     postgresPvcSize:
                       description: Size for postgres' pvc

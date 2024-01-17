@@ -1,6 +1,14 @@
 global:
   openshift: true
+{% if dsc.global.metrics.enabled %}
+  serverTelemetry:
+    prometheusOperator: true
+{% endif %}
 injector:
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+{% endif %}
   image:
     repository: docker.io/hashicorp/vault-k8s
   agentImage:
@@ -12,6 +20,26 @@ server:
     enabled: false
   standalone:
     enabled: true
+{% if dsc.global.metrics.enabled %}
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        telemetry {
+          unauthenticated_metrics_access = "false"
+        }
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
+      telemetry {
+        prometheus_retention_time = "30s"
+        disable_hostname = true
+      }
+{% endif %}
   auditStorage:
     enable: true
   dataStorage:
@@ -25,3 +53,8 @@ csi:
   agent:
     image:
       repository: docker.io/hashicorp/vault
+{% if dsc.global.metrics.enabled %}
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+{% endif %}

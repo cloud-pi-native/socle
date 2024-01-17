@@ -256,7 +256,7 @@
 
 - name: Initialize conf_state fact
   ansible.builtin.set_fact:
-    conf_state: ''
+    conf_state: ""
 
 - name: Set conf_state fact
   when: (initial_vault_conf.resources[0].metadata.resourceVersion is defined)
@@ -315,7 +315,7 @@
             interval: 30s
             params:
               format:
-              - prometheus
+                - prometheus
             path: /v1/sys/metrics
             port: http
             scheme: http

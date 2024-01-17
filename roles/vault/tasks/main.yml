@@ -267,7 +267,7 @@
 
 - name: Restart and unseal Vault when config changed
   when: conf_state == 'changed'
-  block: 
+  block:
     - name: Delete Vault pod
       kubernetes.core.k8s:
         kind: Pod
@@ -297,3 +297,28 @@
     - name: Preinstall check
       ansible.builtin.include_tasks:
         file: preinstall_check.yml
+
+- name: Patch ServiceMonitor
+  when: dsc.global.metrics.enabled
+  kubernetes.core.k8s:
+    api_version: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    namespace: "{{ dsc.vault.namespace }}"
+    name: "{{ dsc_name }}-vault"
+    state: patched
+    definition:
+      spec:
+        endpoints:
+          - bearerTokenSecret:
+              key: root_token
+              name: "{{ dsc_name }}-vault-keys"
+            interval: 30s
+            params:
+              format:
+              - prometheus
+            path: /v1/sys/metrics
+            port: http
+            scheme: http
+            scrapeTimeout: 10s
+            tlsConfig:
+              insecureSkipVerify: true

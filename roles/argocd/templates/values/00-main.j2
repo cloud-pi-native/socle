@@ -10,10 +10,25 @@ config:
     argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
 {% endif %}
 redis:
+  <<: *securityContext
   architecture: replication
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: {{ dsc.argocd.namespace }}
+{% endif %}
 controller:
   <<: *securityContext
   replicaCount: 3
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: {{ dsc.argocd.namespace }}
+{% endif %}
 dex:
   enabled: false
 server:
@@ -49,10 +64,24 @@ server:
         - TaskRun
         - PipelineRun
   extraEnvVars: []
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: {{ dsc.argocd.namespace }}
+{% endif %}
 repoServer:
   <<: *securityContext
   extraEnvVars: []
   replicaCount: 3
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: {{ dsc.argocd.namespace }}
+{% endif %}
 extraDeploy:
   - apiVersion: v1
     data:
@@ -75,7 +104,21 @@ applicationSet:
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: {{ dsc.argocd.namespace }}
+{% endif %}
 notifications:
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: {{ dsc.argocd.namespace }}
+{% endif %}

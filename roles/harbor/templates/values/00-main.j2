@@ -89,3 +89,9 @@ exporter:
   replicas: 1
   image:
     repository: docker.io/goharbor/harbor-exporter
+{% if dsc.global.metrics.enabled %}
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+{% endif %}

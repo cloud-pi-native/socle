@@ -28,7 +28,7 @@
       | map(attribute='image') | first
       | split(':') | last }}"
 
-- name: Initialise needs_update fact
+- name: Initialize needs_update fact
   ansible.builtin.set_fact:
     needs_update: false
 

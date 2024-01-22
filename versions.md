@@ -4,9 +4,9 @@
 | certmanager | v1.13.1 | [certmanager](https://github.com/cert-manager/cert-manager/releases) |
 | cloudnativepg | 0.18.2 | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg) |
 | console | 6.4.0 | [console](https://github.com/cloud-pi-native/console/releases) |
-| gitlab | 7.3.4 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
-| gitlabOperator | 0.24.0 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
-| gitlabRunner | 0.57.0 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
+| gitlab | 7.5.6 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
+| gitlabOperator | 0.27.1 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
+| gitlabRunner | 0.58.2 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
 | grafanaOperator | v5.6.0 | https://github.com/grafana/grafana-operator/tags |
 | harbor | 1.13.1 | [harbor](https://artifacthub.io/packages/helm/harbor/harbor) |
 | keycloak | 16.1.5 | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak) |

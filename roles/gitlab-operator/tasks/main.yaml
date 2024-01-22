@@ -36,7 +36,7 @@
   when: glo_version is defined
   block:
     - name: Update needs_update fact
-      when: dsc.gitlabOperator.chartVersion is version(glo_version, operator='gt', version_type='loose')
+      when: dsc.gitlabOperator.chartVersion is version(glo_version, operator='ne', version_type='loose')
       ansible.builtin.set_fact:
         needs_update: true
 

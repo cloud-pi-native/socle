@@ -17,13 +17,13 @@ spec:
     release: "6.4.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "7.3.4"
+    chartVersion: "7.5.6"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "0.24.0"
+    chartVersion: "0.27.1"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.57.0"
+    chartVersion: "0.58.2"
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
     chartVersion: "v5.4.2"

@@ -1,11 +1,20 @@
 ---
+- name: Initialize grafana_label fact
+  ansible.builtin.set_fact:
+    grafana_label: "{{ dsc.grafana.namespace }}-prod"
+
+- name: Set grafana_label
+  when: dsc.global.environment != 'production'
+  ansible.builtin.set_fact:
+    grafana_label: "{{ dsc.grafana.namespace }}-horsprod"
+
 - name: Get Grafana instance
   kubernetes.core.k8s_info:
     api_version: grafana.integreatly.org/v1beta1
     namespace: "{{ dsc.grafana.namespace }}"
     kind: Grafana
     label_selectors:
-      - dashboards={{ dsc.grafana.namespace }}
+      - app={{ grafana_label }}
   register: gf_instance
 
 - name: Manage missing Grafana instance.

@@ -1,11 +1,11 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: keycloak
+  name: gitlab-ci-pipeline
   namespace: {{ dsc.grafana.namespace }}
 spec:
   datasources:
-    - inputName: "PROMETHEUS_DS"
+    - inputName: "DS_PROMETHEUS"
       datasourceName: "Prometheus"
   resyncPeriod: 30s
   instanceSelector:
@@ -15,6 +15,9 @@ spec:
 {% else %}
       app: {{ dsc.grafana.namespace }}-horsprod
 {% endif %}
+  plugins:
+    - name: grafana-polystat-panel
+      version: 2.1.5
   grafanaCom:
-    id: 14390
-    revision: 2
+    id: 10620
+    revision: 4

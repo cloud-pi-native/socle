@@ -35,3 +35,24 @@
 - name: Create Nexus dashboard
   kubernetes.core.k8s:
     template: nexus-dashboard.yaml.j2
+
+# SonarQube dashboard source :
+# https://grafana.com/grafana/dashboards/14152-sonarqube/
+
+- name: Create SonarQube dashboard
+  kubernetes.core.k8s:
+    template: sonarqube-dashboard.yaml.j2
+
+# GitLab Runner dashboard source :
+# https://grafana.com/grafana/dashboards/14016-gitlab-runner-metrics/
+
+- name: Create GitLab Runner dashboard
+  kubernetes.core.k8s:
+    template: gitlab-runner-dashboard.yaml.j2
+
+# GitLab CI Pipelines dashboard source :
+# https://grafana.com/grafana/dashboards/10620-gitlab-ci-pipelines/
+
+- name: Create GitLab CI Pipelines dashboard
+  kubernetes.core.k8s:
+    template: gitlab-ci-pipelines-dashboard.yaml.j2

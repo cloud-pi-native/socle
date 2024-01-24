@@ -12,7 +12,11 @@ spec:
           key: "token"
   instanceSelector:
     matchLabels:
-      dashboards: "{{ dsc.grafana.namespace }}"
+{% if dsc.global.environment == 'production' %}
+      app: {{ dsc.grafana.namespace }}-prod
+{% else %}
+      app: {{ dsc.grafana.namespace }}-horsprod
+{% endif %}
   datasource:
     basicAuthUser: internal
     access: proxy

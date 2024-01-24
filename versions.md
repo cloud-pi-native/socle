@@ -7,7 +7,8 @@
 | gitlab | 7.6.6 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
 | gitlabOperator | 0.28.1 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
 | gitlabRunner | 0.59.1 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
-| grafanaOperator | v5.6.0 | https://github.com/grafana/grafana-operator/tags |
+| grafana | 9.5.5 | [grafana](https://github.com/grafana/grafana/tags) |
+| grafanaOperator | v5.6.0 | [grafanaOperator](https://github.com/grafana/grafana-operator/tags) |
 | harbor | 1.13.1 | [harbor](https://artifacthub.io/packages/helm/harbor/harbor) |
 | keycloak | 16.1.5 | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak) |
 | kubed | 0.13.2 | [kubed](https://artifacthub.io/packages/helm/appscode/kubed) |

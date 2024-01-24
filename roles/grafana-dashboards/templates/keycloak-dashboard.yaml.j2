@@ -1,0 +1,13 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: keycloak
+  namespace: {{ dsc.grafana.namespace }}
+spec:
+  resyncPeriod: 30s
+  instanceSelector:
+    matchLabels:
+      dashboards: "{{ dsc.grafana.namespace }}"
+  grafanaCom:
+    id: 19659
+    revision: 1

@@ -6,27 +6,22 @@
     kind: Namespace
     state: present
 
-- name: Get Grafana credentials secret
+- name: Get Grafana client secret
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.grafana.namespace }}"
     kind: Secret
-    name: grafana-creds
-  register: gf_creds_secret
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: keycloak-client-secret-grafana-projects
+  register: grafana_secret
+  failed_when: grafana_secret.resources | length == 0
 
-- name: Create Grafana admin credentials secret
-  when: gf_creds_secret.resources | length == 0
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Secret
-      stringData:
-        GF_SECURITY_ADMIN_USER: "admin"
-        GF_SECURITY_ADMIN_PASSWORD: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
-      metadata:
-        name: grafana-creds
-        namespace: "{{ dsc.grafana.namespace }}"
-      type: Opaque
+- name: Initialize grafana_name fact
+  ansible.builtin.set_fact:
+    grafana_name: "{{ dsc.grafana.namespace }}-prod"
+
+- name: Set grafana_name
+  when: dsc.global.environment != 'production'
+  ansible.builtin.set_fact:
+    grafana_name: "{{ dsc.grafana.namespace }}-horsprod"
 
 - name: Deploy Grafana instance
   kubernetes.core.k8s:
@@ -58,5 +53,5 @@
         name: cluster-monitoring-view
       subjects:
         - kind: ServiceAccount
-          name: "{{ dsc.grafana.namespace }}-sa"
+          name: "{{ grafana_name }}-sa"
           namespace: "{{ dsc.grafana.namespace }}"

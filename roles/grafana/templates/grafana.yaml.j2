@@ -1,40 +1,40 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: Grafana
 metadata:
-  name: {{ dsc.grafana.namespace }}
+  name: {{ grafana_name }}
   namespace: {{ dsc.grafana.namespace }}
   labels:
-    dashboards: "{{ dsc.grafana.namespace }}"
+{% if dsc.global.environment == 'production' %}
+    app: {{ dsc.grafana.namespace }}-prod
+{% else %}
+    app: {{ dsc.grafana.namespace }}-horsprod
+{% endif %}
+    app.kubernetes.io/managed-by: dso-console
+    dashboards: default
 spec:
+  config:
+    auth:
+      oauth_allow_insecure_email_lookup: "true"
+    auth.generic_oauth:
+      api_url: https://{{ keycloak_domain }}/realms/dso/protocol/openid-connect/userinfo
+      auth_url: https://{{ keycloak_domain }}/realms/dso/protocol/openid-connect/auth
+      client_id: {{ grafana_secret.resources[0].data.CLIENT_ID | b64decode }}
+      client_secret: {{ grafana_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+      email_attribute_path: email
+      enabled: "true"
+      groups_attribute_path: groups
+      role_attribute_path: contains(groups[*], '/admin') && 'Admin'
+      role_attribute_strict: "true"
+      scopes: openid, generic
+      tls_skip_verify_insecure: "true"
+      token_url: https://{{ keycloak_domain }}/realms/dso/protocol/openid-connect/token
+    server:
+      root_url: https://{{ grafana_domain }}/
+      serve_from_sub_path: "true"
   deployment:
     spec:
       template:
         spec:
           containers:
-            - name: grafana
-              env:
-                - name: GF_SECURITY_ADMIN_USER
-                  valueFrom:
-                    secretKeyRef:
-                      key: GF_SECURITY_ADMIN_USER
-                      name: grafana-creds
-                - name: GF_SECURITY_ADMIN_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      key: GF_SECURITY_ADMIN_PASSWORD
-                      name: grafana-creds
-  persistentVolumeClaim:
-    metadata:
-      name: grafana-pvc
-      namespace: {{ dsc.grafana.namespace }}
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: {{ dsc.grafana.grafanaPvcSize }}
-  config:
-    log:
-      mode: "console"
-    auth:
-      disable_login_form: "false"
+          - image: grafana/grafana:{{ dsc.grafana.imageVersion }}
+            name: grafana

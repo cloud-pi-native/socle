@@ -24,6 +24,9 @@ spec:
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
     chartVersion: "0.59.1"
+  grafana:
+    # https://github.com/grafana/grafana/tags
+    imageVersion: "9.5.5"
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
     chartVersion: "v5.4.2"

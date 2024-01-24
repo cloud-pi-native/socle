@@ -28,10 +28,14 @@ spec:
     - host: {{ grafana_domain }}
       http:
         paths:
-          - path: /
-            pathType: Prefix
+          - pathType: Prefix
+            path: /
             backend:
               service:
-                name: {{ dsc.grafana.namespace }}-service
+{% if dsc.global.environment == 'production' %}
+                name: {{ dsc.grafana.namespace }}-prod-service
+{% else %}
+                name: {{ dsc.grafana.namespace }}-horsprod-service
+{% endif %}
                 port:
                   number: 3000

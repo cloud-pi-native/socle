@@ -1,0 +1,28 @@
+---
+- name: Get Grafana instance
+  kubernetes.core.k8s_info:
+    api_version: grafana.integreatly.org/v1beta1
+    namespace: "{{ dsc.grafana.namespace }}"
+    kind: Grafana
+    label_selectors:
+      - dashboards={{ dsc.grafana.namespace }}
+  register: gf_instance
+
+- name: Manage missing Grafana instance.
+  when: gf_instance.resources | length == 0
+  ansible.builtin.fail:
+    msg: "Missing Grafana instance. Please execute 'ansible-playbook install.yaml -t grafana' before trying to install the default datasource."
+
+# Keycloak dashboard source :
+# https://grafana.com/grafana/dashboards/19659-keycloak-metrics-dashboard/
+
+- name: Create Keycloak dashboard
+  kubernetes.core.k8s:
+    template: keycloak-dashboard.yaml.j2
+
+# Nexus dashboard source :
+# https://grafana.com/grafana/dashboards/16459-infra-nexus/
+
+- name: Create Nexus dashboard
+  kubernetes.core.k8s:
+    template: nexus-dashboard.yaml.j2

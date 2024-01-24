@@ -1,0 +1,49 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+{% if dsc.global.environment == 'production' %}
+  name: datasource-prom-dso-prod
+{% else %}
+  name: datasource-prom-dso-horsprod
+{% endif %}
+  namespace: {{ dsc.grafana.namespace }}
+  labels:
+    app.kubernetes.io/managed-by: dso-console
+spec:
+  datasource:
+    basicAuthUser: '${PROMETHEUS_USERNAME}'
+    access: proxy
+    editable: true
+    secureJsonData:
+      basicAuthPassword: '${PROMETHEUS_PASSWORD}'
+{% if dsc.global.environment == 'production' %}
+      httpHeaderValue1: prod-dso
+{% else %}
+      httpHeaderValue1: hprod-dso
+{% endif %}
+    name: Prometheus
+    url: "{{ dsc.grafanaDatasource.defaultPrometheusDatasourceUrl }}"
+    uid: prometheus
+    jsonData:
+      httpHeaderName1: X-Scope-OrgID
+    basicAuth: true
+    isDefault: true
+    type: prometheus
+  instanceSelector:
+    matchLabels:
+{% if dsc.global.environment == 'production' %}
+      app: {{ dsc.grafana.namespace }}-prod
+{% else %}
+      app: {{ dsc.grafana.namespace }}-horsprod
+{% endif %}
+  valuesFrom:
+    - targetPath: basicAuthUser
+      valueFrom:
+        secretKeyRef:
+          key: PROMETHEUS_USERNAME
+          name: credentials
+    - targetPath: secureJsonData.basicAuthPassword
+      valueFrom:
+        secretKeyRef:
+          key: PROMETHEUS_PASSWORD
+          name: credentials

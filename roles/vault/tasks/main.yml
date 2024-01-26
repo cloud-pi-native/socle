@@ -41,7 +41,3 @@
 # Post install
 - name: Post install
   ansible.builtin.include_tasks: post-install.yml
-
-# Setup sso
-- name: Setup SSO
-  ansible.builtin.include_tasks: sso.yml

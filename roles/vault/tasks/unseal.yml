@@ -1,22 +1,20 @@
 ---
 - name: Set seal count
   ansible.builtin.set_fact:
-    num: "{{ num | int + 1 }}"
+    unsealKeyNb: "{{ (unsealKeyNb | int) + 1 }}"
 
-- name: Unseal Vault
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ vault_domain }}/v1/sys/unseal
-    method: POST
-    status_code: [200]
-    headers:
-      X-Vault-Token: "{{ root_token }}"
-    body:
-      key: "{{ vault_keys.resources[0].data['key' + (num)] | b64decode }}"
-    body_format: json
+- name: Unseal Vault - "{{ vault_pod }}"
+  kubernetes.core.k8s_exec:
+    container: vault
+    pod: "{{ vault_pod }}"
+    namespace: "{{ vault.namespace }}"
+    command: "vault operator unseal {{ vault_keys.resources[0].data['unsealKey' + (unsealKeyNb | string)] | b64decode }}"
   register: unseal_res
+  ignore_errors: true
+
+- name: Check vault status - "{{ vault_pod }}"
+  ansible.builtin.include_tasks: check.yml
 
 - name: Rerun unseal if necessary
-  ansible.builtin.include_tasks:
-    file: unseal.yml
-  when: (unseal_res.json.progress != unseal_res.json.t) and (num | int < unseal_res.json.n)
+  ansible.builtin.include_tasks: unseal.yml
+  when: vault_status == 'sealed'

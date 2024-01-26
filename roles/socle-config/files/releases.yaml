@@ -14,16 +14,16 @@ spec:
     chartVersion: 0.18.2
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "6.4.0"
+    release: "6.5.1"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "7.5.6"
+    chartVersion: "7.6.6"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "0.27.1"
+    chartVersion: "0.28.1"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.58.2"
+    chartVersion: "0.59.1"
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
     chartVersion: "v5.4.2"

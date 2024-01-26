@@ -76,7 +76,7 @@
 - name: Set seal count - node 1
   ansible.builtin.set_fact:
     vault_pod: "{{ dsc_name }}-vault-0"
-    unsealKeyNb: "0"
+    unseal_key_index: "0"
 
 - name: Unseal vault primary - node 1
   ansible.builtin.include_tasks: unseal.yml
@@ -125,7 +125,7 @@
 - name: Set seal count - node 2
   ansible.builtin.set_fact:
     vault_pod: "{{ dsc_name }}-vault-1"
-    unsealKeyNb: "0"
+    unseal_key_index: "0"
 
 - name: Unseal vault node - node 2
   ansible.builtin.include_tasks: unseal.yml
@@ -142,7 +142,7 @@
 - name: Set seal count - node 3
   ansible.builtin.set_fact:
     vault_pod: "{{ dsc_name }}-vault-2"
-    unsealKeyNb: "0"
+    unseal_key_index: "0"
 
 - name: Unseal vault node - node 3
   ansible.builtin.include_tasks: unseal.yml
@@ -175,6 +175,142 @@
         version: 2
     body_format: json
   when: get_engines.status == 400
+
+# Oidc
+- name: Get vault client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: keycloak-client-secret-vault-client
+  register: vault_secret
+
+- name: Get auth methods
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/sys/auth/oidc"
+    method: GET
+    status_code: [200, 400]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: get_auth_method
+
+- name: Enable oidc auth method
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/sys/auth/oidc"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "type": "oidc"
+    body_format: json
+  when: get_auth_method.status == 400
+
+- name: Configue oidc auth method
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/auth/oidc/config"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "oidc_discovery_url": "https://{{ keycloak_domain }}/realms/{{ keycloak_realm }}"
+      "oidc_client_id": "{{ vault_client_id }}"
+      "oidc_client_secret": "{{ vault_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
+      "default_role": "default"
+      "type": "oidc"
+      "allowed_redirect_uris":
+        - "https://{{ vault_domain }}/ui/vault/auth/oidc/oidc/callback"
+        - "https://{{ vault_domain }}/oidc/callback"
+    body_format: json
+
+- name: Create oidc role
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/auth/oidc/role/default"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "oidc_scopes":
+        - "openid"
+        - "generic"
+      "bound_audiences":
+        - "{{ vault_client_id }}"
+      "claim_mappings":
+        "prefered_username": "username"
+        "email": "email"
+      "groups_claim": "groups"
+      "allowed_redirect_uris":
+        - "https://{{ vault_domain }}/ui/vault/auth/oidc/oidc/callback"
+        - "https://{{ vault_domain }}/oidc/callback"
+      "user_claim": "sub"
+      "token_policies":
+        - "default"
+    body_format: json
+
+- name: Create admin access policy
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/sys/policies/acl/admin"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body: "{{ lookup('ansible.builtin.template', 'superadmin-policy.json.j2') }}"
+    body_format: json
+
+- name: Create admin group
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/identity/group"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "name": "admin"
+      "type": "external"
+      "policies":
+        - "admin"
+    body_format: json
+
+- name: Get oidc accessor
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/sys/auth"
+    method: GET
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: oidc_auth
+
+- name: Get admin group id
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/identity/group/name/admin"
+    method: GET
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: user_group
+
+- name: Create admin group alias
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vault_domain }}/v1/identity/group-alias"
+    method: POST
+    status_code: [200, 400]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "name": "admin"
+      "mount_accessor": "{{ oidc_auth.json['oidc/'].accessor }}"
+      "canonical_id": "{{ user_group.json.data.id }}"
+    body_format: json
 
 # Service monitor
 - name: Patch ServiceMonitor

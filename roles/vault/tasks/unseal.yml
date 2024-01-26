@@ -1,14 +1,14 @@
 ---
 - name: Set seal count
   ansible.builtin.set_fact:
-    unsealKeyNb: "{{ (unsealKeyNb | int) + 1 }}"
+    unseal_key_index: "{{ (unseal_key_index | int) + 1 }}"
 
 - name: Unseal Vault - "{{ vault_pod }}"
   kubernetes.core.k8s_exec:
     container: vault
     pod: "{{ vault_pod }}"
     namespace: "{{ vault.namespace }}"
-    command: "vault operator unseal {{ vault_keys.resources[0].data['unsealKey' + (unsealKeyNb | string)] | b64decode }}"
+    command: "vault operator unseal {{ vault_keys.resources[0].data['unsealKey' + (unseal_key_index | string)] | b64decode }}"
   register: unseal_res
   ignore_errors: true
 

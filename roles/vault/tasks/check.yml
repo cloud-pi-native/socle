@@ -8,13 +8,21 @@
   register: vault_status
   ignore_errors: true
 
-- name: Set vault_health fact
+- name: Set vault_initialized fact
   ansible.builtin.set_fact:
-    vault_initialized: "{{ vault_status.stdout | from_json | dict2items | selectattr('key', 'eq', 'initialized') | map(attribute='value') | first }}"
+    vault_initialized: "{{ vault_status.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'initialized')
+      | map(attribute='value') | first }}"
 
 - name: Set vault_sealed fact
   ansible.builtin.set_fact:
-    vault_sealed: "{{ vault_status.stdout | from_json | dict2items | selectattr('key', 'eq', 'sealed') | map(attribute='value') | first }}"
+    vault_sealed: "{{ vault_status.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'sealed')
+      | map(attribute='value') | first }}"
 
 - name: Set vault_status to "not init"
   when: not vault_initialized

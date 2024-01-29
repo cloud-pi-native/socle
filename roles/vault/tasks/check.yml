@@ -5,20 +5,29 @@
     pod: "{{ vault_pod }}"
     namespace: "{{ dsc.vault.namespace }}"
     command: vault status -format=json
-  register: vault_health
+  register: vault_status
   ignore_errors: true
 
+- name: Set vault_health fact
+  ansible.builtin.set_fact:
+    vault_initialized: "{{ vault_status.stdout | from_json | dict2items | selectattr('key', 'eq', 'initialized') | map(attribute='value') | first }}"
+
+- name: Set vault_sealed fact
+  ansible.builtin.set_fact:
+    vault_sealed: "{{ vault_status.stdout | from_json | dict2items | selectattr('key', 'eq', 'sealed') | map(attribute='value') | first }}"
+
 - name: Set vault_status to "not init"
+  when: not vault_initialized
   ansible.builtin.set_fact:
     vault_status: not init
-  when: vault_health.stdout | from_json | json_query('initialized') == false
 
 - name: Set vault_status to sealed
+  when: (vault_initialized) and (vault_sealed)
   ansible.builtin.set_fact:
     vault_status: sealed
-  when: (vault_health.stdout | from_json | json_query('initialized') == true) and (vault_health.stdout | from_json | json_query('sealed') == true)
 
 - name: Set vault_status to OK
+  when: (vault_initialized) and (not vault_sealed)
   ansible.builtin.set_fact:
     vault_status: OK
-  when: (vault_health.stdout | from_json | json_query('initialized') == true) and (vault_health.stdout | from_json | json_query('sealed') == false)
+

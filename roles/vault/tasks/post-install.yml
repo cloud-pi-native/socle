@@ -32,6 +32,7 @@
 
 # Init vault node 1
 - name: Init vault node - node 1
+  when: vault_status == 'not init'
   kubernetes.core.k8s_exec:
     container: vault
     pod: "{{ dsc_name }}-vault-0"
@@ -41,9 +42,9 @@
   until: "init is not failed"
   retries: 3
   delay: 20
-  when: vault_status == 'not init'
 
 - name: Set unseal_keys fact
+  when: init.changed
   no_log: true
   ansible.builtin.set_fact:
     unseal_keys: "{{ init.stdout
@@ -53,6 +54,7 @@
       | map(attribute='value') | first }}"
 
 - name: Set root_token fact
+  when: init.changed
   no_log: true
   ansible.builtin.set_fact:
     root_token: "{{ init.stdout

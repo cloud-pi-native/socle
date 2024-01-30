@@ -7,8 +7,8 @@
   kubernetes.core.k8s_exec:
     container: vault
     pod: "{{ vault_pod }}"
-    namespace: "{{ vault.namespace }}"
-    command: "vault operator unseal {{ vault_keys.resources[0].data['unsealKey' + (unseal_key_index | string)] | b64decode }}"
+    namespace: "{{ dsc.vault.namespace }}"
+    command: "vault operator unseal {{ vault_keys.resources[0].data['key' + (unseal_key_index | string)] | b64decode }}"
   register: unseal_res
   ignore_errors: true
 

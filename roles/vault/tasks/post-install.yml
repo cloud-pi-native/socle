@@ -1,15 +1,12 @@
-- name: Wait vault container
-  kubernetes.core.k8s:
+- name: Wait vault pod to be running
+  kubernetes.core.k8s_info:
     kind: Pod
     name: "{{ dsc_name }}-vault-0"
     namespace: "{{ dsc.vault.namespace }}"
-    wait: true
-    wait_sleep: 10
-    wait_timeout: 600
-    wait_condition:
-      reason:
-      type: Initialized
-      status: "True"
+  register: vault_pod_check
+  until: vault_pod_check.resources[0].status.phase == 'Running'
+  retries: 15
+  delay: 5
 
 - name: Find vault keys
   kubernetes.core.k8s_info:
@@ -46,6 +43,24 @@
   delay: 20
   when: vault_status == 'not init'
 
+- name: Set unseal_keys fact
+  no_log: true
+  ansible.builtin.set_fact:
+    unseal_keys: "{{ init.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'unseal_keys_b64')
+      | map(attribute='value') | first }}"
+
+- name: Set root_token fact
+  no_log: true
+  ansible.builtin.set_fact:
+    root_token: "{{ init.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'root_token')
+      | map(attribute='value') | first }}"
+
 - name: Store vault keys
   kubernetes.core.k8s:
     definition:
@@ -54,10 +69,10 @@
         name: "{{ dsc_name }}-vault-keys"
         namespace: "{{ dsc.vault.namespace }}"
       data:
-        key1: "{{ init.stdout | from_json | json_query('unseal_keys_b64[0]') | b64encode }}"
-        key2: "{{ init.stdout | from_json | json_query('unseal_keys_b64[1]') | b64encode }}"
-        key3: "{{ init.stdout | from_json | json_query('unseal_keys_b64[2]') | b64encode }}"
-        root_token: "{{ init.stdout | from_json | json_query('root_token') | b64encode }}"
+        key1: "{{ unseal_keys[0] | b64encode }}"
+        key2: "{{ unseal_keys[1] | b64encode }}"
+        key3: "{{ unseal_keys[2] | b64encode }}"
+        root_token: "{{ root_token | b64encode }}"
         init_config: "{{ init.stdout | from_json | b64encode }}"
   when: vault_keys.resources | length == 0
 
@@ -95,7 +110,8 @@
     container: vault
     pod: "{{ dsc_name }}-vault-1"
     namespace: "{{ dsc.vault.namespace }}"
-    command: vault operator raft join http://"{{ dsc_name }}-vault-0".vault-internal:8200
+#    command: vault operator raft join http://"{{ dsc_name }}-vault-0".vault-internal:8200
+    command: vault operator raft join -address="http://{{ dsc_name }}-vault-0.{{ dsc_name }}-vault-internal:8200"
   retries: 3
   delay: 20
   when: vault_status == 'not init'

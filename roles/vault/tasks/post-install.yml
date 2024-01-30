@@ -110,7 +110,7 @@
     container: vault
     pod: "{{ dsc_name }}-vault-1"
     namespace: "{{ dsc.vault.namespace }}"
-#    command: vault operator raft join http://"{{ dsc_name }}-vault-0".vault-internal:8200
+    # command: vault operator raft join http://"{{ dsc_name }}-vault-0".vault-internal:8200
     command: vault operator raft join -address="http://{{ dsc_name }}-vault-0.{{ dsc_name }}-vault-internal:8200"
   retries: 3
   delay: 20

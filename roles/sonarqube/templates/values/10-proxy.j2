@@ -1,4 +1,9 @@
 {% if dsc.proxy.enabled %}
+prometheusExporter:
+  httpProxy: "{{ dsc.proxy.http_proxy }}"
+  httpsProxy: "{{ dsc.proxy.https_proxy }}"
+  noProxy: "{{ dsc.proxy.no_proxy }}"
+
 plugins:
   httpProxy: "{{ dsc.proxy.http_proxy }}"
   httpsProxy: "{{ dsc.proxy.https_proxy }}"
@@ -11,4 +16,10 @@ env:
     value: "{{ dsc.proxy.https_proxy }}"
   - name: no_proxy
     value: "{{ dsc.proxy.no_proxy }}"
+
+sonarProperties:
+  http.proxyHost: "{{ dsc.proxy.host }}"
+  http.proxyPort: "{{ dsc.proxy.port }}"
+  https.proxyHost: "{{ dsc.proxy.host }}"
+  https.proxyPort: "{{ dsc.proxy.port }}"
 {% endif %}

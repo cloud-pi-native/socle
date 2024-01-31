@@ -32,7 +32,7 @@ extraEnvVarsCM: ""
 
 extraEnvVarsSecret: ""
 
-replicaCount: 1
+replicaCount: 3
 
 containerPorts:
   http: 8080
@@ -148,7 +148,23 @@ autoscaling:
   enabled: false
 
 metrics:
-  enabled: false
+  enabled: {{ dsc.global.metrics.enabled }}
+  service:
+    ports:
+      http: 8080
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8080"
+    extraPorts: []
+  serviceMonitor:
+    enabled: true
+    port: http
+    endpoints:
+      - path: '/metrics'
+      - path: '/realms/master/metrics'
+      - path: '/realms/dso/metrics'
+  prometheusRule:
+    enabled: false
 
 keycloakConfigCli:
   enabled: false

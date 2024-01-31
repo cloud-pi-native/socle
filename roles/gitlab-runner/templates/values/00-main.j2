@@ -29,6 +29,18 @@ rbac:
   podSecurityPolicy:
     enabled: true
 
+{% if dsc.global.metrics.enabled %}
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+## Configure a service resource e.g., to allow scraping metrics via
+## prometheus-operator serviceMonitor
+service:
+  enabled: true
+{% endif %}
+
 runners:
   # runner configuration, where the multi line strings is evaluated as
   # template so you can specify helm values inside of it.
@@ -37,12 +49,14 @@ runners:
   # runner configuration: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
   config: |
     [[runners]]
+{% if dsc.exposedCA.type != 'none' %}
+      tls-ca-file = "/home/gitlab-runner/.gitlab-runner/certs/tls.crt"
+{% endif %}
       [runners.kubernetes]
         namespace = "{{ dsc.gitlab.namespace }}"
         image = "ubuntu:22.04"
-{% if dsc.exposedCA.type != 'none' %}
-        tls-ca-file = "/home/gitlab-runner/.gitlab-runner/certs/tls.crt"
-{% endif %}
+        # multiple "always" to retry pull on fail (see. https://docs.gitlab.com/runner/executors/kubernetes.html#set-a-pull-policy)
+        pull_policy = ["always", "always"]
 
   ## Specify the name for the runner.
   name: gitlab-runner

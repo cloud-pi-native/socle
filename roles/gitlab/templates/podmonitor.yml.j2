@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  labels:
+    app: {{ item.name }}
+  name: gitlab-{{ item.name }}
+  namespace: {{ dsc.gitlab.namespace }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.gitlab.namespace }}
+  podMetricsEndpoints:
+  - bearerTokenSecret:
+      key: ""
+    interval: 30s
+    path: {{ item.path }}
+    port: {{ additionnal_metrics_port_name }}
+  selector:
+    matchLabels:
+      app: {{ item.name }}
+      app.kubernetes.io/component: {{ item.name }}
+      app.kubernetes.io/instance: gitlab-{{ item.name }}
+      app.kubernetes.io/managed-by: gitlab-operator
+      app.kubernetes.io/name: gitlab
+      app.kubernetes.io/part-of: gitlab

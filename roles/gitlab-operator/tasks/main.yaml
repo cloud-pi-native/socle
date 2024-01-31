@@ -13,8 +13,35 @@
     name: gitlab-validating-webhook-configuration
   register: gl_vwhc
 
+- name: Get GitLab Operator deployment
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    name: gitlab-controller-manager
+    namespace: "{{ dsc.gitlabOperator.namespace }}"
+  register: glo_deploy
+
+- name: Retrieve GitLab Operator installed version
+  when: glo_deploy.resources | length > 0
+  ansible.builtin.set_fact:
+    glo_version: "{{ glo_deploy.resources[0].spec.template.spec.containers
+      | selectattr('name', 'equalto', 'manager')
+      | map(attribute='image') | first
+      | split(':') | last }}"
+
+- name: Initialize needs_update fact
+  ansible.builtin.set_fact:
+    needs_update: false
+
+- name: Manage needs_update fact
+  when: glo_version is defined
+  block:
+    - name: Update needs_update fact
+      when: dsc.gitlabOperator.chartVersion is version(glo_version, operator='ne', version_type='loose')
+      ansible.builtin.set_fact:
+        needs_update: true
+
 - name: Install GitLab Operator
-  when: (gl_api == 'absent') or (gl_vwhc.resources | length == 0)
+  when: (gl_api == 'absent') or (gl_vwhc.resources | length == 0) or (needs_update)
   block:
     - name: Create GitLab Operator namespace
       kubernetes.core.k8s:

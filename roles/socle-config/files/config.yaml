@@ -19,6 +19,12 @@ spec:
     namespace: dso-gitlab
     subDomain: gitlab
     insecureCI: false
+  grafana:
+    namespace: dso-grafana
+    subDomain: grafana
+    grafanaPvcSize: 5Gi
+  grafanaOperator:
+    namespace: dso-grafana-operator
   harbor:
     namespace: dso-harbor
     subDomain: harbor

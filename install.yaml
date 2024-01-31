@@ -83,6 +83,21 @@
         - console
         - console-dso
 
+    - name: grafana-operator
+      tags:
+        - grafana-operator
+        - never
+
+    - name: grafana
+      tags:
+        - grafana
+        - never
+
+    - name: grafana-datasource
+      tags:
+        - grafana-datasource
+        - never
+
   post_tasks:
     - name: Post-Install Disclaimer
       ansible.builtin.debug:

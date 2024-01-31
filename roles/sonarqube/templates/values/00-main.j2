@@ -4,33 +4,10 @@ OpenShift:
 
 image:
   pullPolicy: IfNotPresent
-  tag: {{ dsc.sonarqube.tag }}
   repository: docker.io/sonarqube
 
 sonarWebContext: /
 
-sonarProperties:
-  sonar.auth.oidc.enabled: "true"
-  sonar.auth.oidc.allowUsersToSignUp: "true"
-  sonar.auth.oidc.autoLogin: "false"
-  sonar.auth.oidc.groupsSync.claimName: "groups"
-  sonar.auth.oidc.loginStrategy: "Email"
-  sonar.auth.oidc.groupsSync: "true"
-  sonar.auth.oidc.scopes: "openid generic"
-  sonar.auth.oidc.loginStrategy.customClaim.name: "upn"
-  sonar.auth.oidc.clientId.secured: "{{ keycloak_client }}"
-  sonar.auth.oidc.clientSecret.secured: "{{ keycloak_secret }}"
-  sonar.auth.oidc.issuerUri: "https://{{ keycloak_domain }}/realms/dso"
-  sonar.core.serverBaseURL: https://{{ sonar_domain }}
-  sonar.plugins.risk.consent: "ACCEPTED"
-
-plugins:
-  install:
-  - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
-  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.14.0/sonarqube-community-branch-plugin-1.14.0.jar
-
-jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=web"
-jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.14.0.jar=ce"
 ingress:
   enabled: true
   # Used to create an Ingress record.
@@ -53,10 +30,44 @@ initFs:
   securityContext:
     privileged: true
 
+prometheusExporter:
+  enabled: {{ dsc.global.metrics.enabled }}
+
+# We do not enable podMonitor here,
+# as helm might complain about an already existing
+# "sonarqube-sonarqube-monitoring-passcode" secret.
+# We manage podMonitor creation with an ansible task instead.
+prometheusMonitoring:
+  podMonitor:
+    enabled: false
+
+plugins:
+  install:
+  - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
+  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.17.1/sonarqube-community-branch-plugin-1.17.1.jar
+
+jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.17.1.jar=web"
+jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.17.1.jar=ce"
+
 ## a monitoring passcode needs to be defined in order to get reasonable probe results
 # not setting the monitoring passcode will result in a deployment that will never be ready
 monitoringPasscodeSecretName: "sonar-monitoring-password"
 monitoringPasscodeSecretKey: "monitoring-password"
+
+sonarProperties:
+  sonar.auth.oidc.enabled: "true"
+  sonar.auth.oidc.allowUsersToSignUp: "true"
+  sonar.auth.oidc.autoLogin: "false"
+  sonar.auth.oidc.groupsSync.claimName: "groups"
+  sonar.auth.oidc.loginStrategy: "Email"
+  sonar.auth.oidc.groupsSync: "true"
+  sonar.auth.oidc.scopes: "openid generic"
+  sonar.auth.oidc.loginStrategy.customClaim.name: "upn"
+  sonar.auth.oidc.clientId.secured: "{{ keycloak_client }}"
+  sonar.auth.oidc.clientSecret.secured: "{{ keycloak_secret }}"
+  sonar.auth.oidc.issuerUri: "https://{{ keycloak_domain }}/realms/dso"
+  sonar.core.serverBaseURL: https://{{ sonar_domain }}
+  sonar.plugins.risk.consent: "ACCEPTED"
 
 ## Override JDBC values
 ## for external Databases

@@ -42,22 +42,27 @@ persistence:
       size: 10Gi
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
 nginx:
+  replicas: 2
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/nginx-photon
 portal:
+  replicas: 2
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/harbor-portal
 core:
+  replicas: 3
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/harbor-core
 jobservice:
+  replicas: 2
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/harbor-jobservice
 registry:
+  replicas: 3
   serviceAccountName: harbor-sa
   registry:
     image:
@@ -66,14 +71,10 @@ registry:
     image:
       repository: docker.io/goharbor/harbor-registryctl
 trivy:
+  replicas: 2
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/trivy-adapter-photon
-notary:
-  server:
-    serviceAccountName: harbor-sa
-  signer:
-    serviceAccountName: harbor-sa
 database:
   internal:
     serviceAccountName: harbor-sa
@@ -85,5 +86,12 @@ redis:
     image:
       repository: docker.io/goharbor/redis-photon
 exporter:
+  replicas: 1
   image:
     repository: docker.io/goharbor/harbor-exporter
+{% if dsc.global.metrics.enabled %}
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+{% endif %}

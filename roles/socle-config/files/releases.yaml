@@ -14,16 +14,19 @@ spec:
     chartVersion: 0.18.2
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "6.3.1"
+    release: "6.5.1"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "7.3.4"
+    chartVersion: "7.6.6"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "0.24.0"
+    chartVersion: "0.28.1"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.57.0"
+    chartVersion: "0.59.1"
+  grafanaOperator:
+    # https://github.com/grafana/grafana-operator/tags
+    chartVersion: "v5.4.2"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.13.1
@@ -39,7 +42,6 @@ spec:
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.2.1+800
-    tag: 9.9.2-community
   vault:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.25.0

@@ -277,10 +277,55 @@ spec:
                       type: string
                       default: .example.com
                       pattern: "^\\..*$"
+                    metrics:
+                      description: Configuration for metrics feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether metrics should be enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
                     - environment
+                    - metrics
+                  type: object
+                grafana:
+                  description: Configuration for Grafana instance.
+                  properties:
+                    namespace:
+                      description: The namespace for Grafana instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Grafana instance.
+                      type: string
+                    grafanaPvcSize:
+                      description: |
+                        The storage size for Grafana instance PVC.
+                        Must comply with Kubernetes size definitions (i.e 5Gi).
+                      type: string
+                  type: object
+                grafanaDatasource:
+                  description: Configuration for Grafana default Datasource.
+                  properties:
+                    defaultPrometheusDatasourceUrl:
+                      description: |
+                        We provide a default Prometheus Datasource for convenience.
+                        Use this parameter to set its URL.
+                      type: string
+                  type: object
+                grafanaOperator:
+                  description: Configuration for Grafana Operator.
+                  properties:
+                    chartVersion:
+                      description: Grafana Operator release version (e.g., "v5.6.0").
+                      type: string
+                    namespace:
+                      description: The namespace for Grafana Operator.
+                      type: string
                   type: object
                 harbor:
                   description: Configuration for Harbor.
@@ -489,7 +534,7 @@ spec:
                       description: The subdomain for SonarQube.
                       type: string
                     chartVersion:
-                      description: SonarQube Bitnami helm chart version (e.g., "3.2.10").
+                      description: SonarQube helm chart version (e.g., "10.2.1+800").
                       type: string
                     postgresPvcSize:
                       description: Size for postgres' pvc
@@ -531,7 +576,11 @@ spec:
                 - exposedCA
                 - gitlab
                 - gitlabOperator
+                - gitlabRunner
                 - global
+                - grafana
+                - grafanaDatasource
+                - grafanaOperator
                 - harbor
                 - ingress
                 - keycloak

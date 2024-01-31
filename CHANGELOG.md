@@ -1,5 +1,67 @@
 # Changelog
 
+## [1.3.0](https://github.com/cloud-pi-native/socle/compare/v1.2.0...v1.3.0) (2024-01-31)
+
+
+### Features
+
+* :bookmark: Update Console version ([7a07b69](https://github.com/cloud-pi-native/socle/commit/7a07b69803d0913fea842689c77e4fa9a7f1979d))
+* :lock: force images pull on gitlab runner to prevent cache abuse ([bbe1480](https://github.com/cloud-pi-native/socle/commit/bbe14807f8434c5cd11600ea1603a01e5029ec4b))
+* :lock: force images pull on gitlab runner to prevent cache abuse ([62c701c](https://github.com/cloud-pi-native/socle/commit/62c701c206bbce54dae091a04631e38770037348))
+* :sparkles: ([9487622](https://github.com/cloud-pi-native/socle/commit/94876223048655cf4420842a1fc2db8f3714c6c7))
+* :sparkles: Activate keycloak basic metrics ([e7630fd](https://github.com/cloud-pi-native/socle/commit/e7630fd158fb4e12e9f8f98bc4724cef91645cb2))
+* :sparkles: Activate metrics when dsc.global.metric.enabled ([49e91f8](https://github.com/cloud-pi-native/socle/commit/49e91f82a1447e1b38e8f633bab669f8cda8f7a1))
+* :sparkles: Activate monitoring  for additionnal resources + refactor ([9c9f979](https://github.com/cloud-pi-native/socle/commit/9c9f979b05e23a0130371cecc02d216570664de5))
+* :sparkles: Activate monitoring + small refactor ([255bb56](https://github.com/cloud-pi-native/socle/commit/255bb5657ad3dded213e8aa055c42f5b03b65f22))
+* :sparkles: Activate Nexus metrics scraping ([0e53610](https://github.com/cloud-pi-native/socle/commit/0e53610ce121caa244e868154a67a5f8db3eaa28))
+* :sparkles: Activate Vault metrics ([63ade45](https://github.com/cloud-pi-native/socle/commit/63ade457c10c5553df35ed08c097d87d01c7c5fb))
+* :sparkles: Add checks + uninstall feature ([9d8c218](https://github.com/cloud-pi-native/socle/commit/9d8c218014c8fc97218ca1e4830313d464cf112d))
+* :sparkles: Add directAccessGrantsEnabled to console-frontend client ([cc85b8b](https://github.com/cloud-pi-native/socle/commit/cc85b8bf6ddb5aaa0c79e0322bbbf6554a4abfc2))
+* :sparkles: Add global metrics parameter ([7e0a919](https://github.com/cloud-pi-native/socle/commit/7e0a91912fe6f44e5ed5aa23f61c80fa0f191896))
+* :sparkles: Add Grafana credentials retrieval and default datasource ([7fd54be](https://github.com/cloud-pi-native/socle/commit/7fd54beefc0cf0c12de9e0bd47d71e80935581bf))
+* :sparkles: Add never tag for grafana + some SonarQube credentials ([26827dc](https://github.com/cloud-pi-native/socle/commit/26827dc851366d1bf6078ba418ec47a1446b0d05))
+* :sparkles: Added the never tag so the role in only played on demand. ([738eff0](https://github.com/cloud-pi-native/socle/commit/738eff08be0250905488df622d958dedbfdb3e5a))
+* :sparkles: Check Grafana instance before installing datasource ([a8da5e6](https://github.com/cloud-pi-native/socle/commit/a8da5e6a30c33e5ac48bf1c4266166681cf3f5f3))
+* :sparkles: Conditionnal metrics enablement ([46f27c6](https://github.com/cloud-pi-native/socle/commit/46f27c6784b63f6f5973f7e65a66d466c62ab2c6))
+* :sparkles: Enable GitLab Runner metrics, Service and ServiceMonitor ([2706849](https://github.com/cloud-pi-native/socle/commit/2706849496eb73474f6c06444dc9927853d7bf7b))
+* :sparkles: Install Grafana instance + enable Keycloak metrics ([9ac6ff8](https://github.com/cloud-pi-native/socle/commit/9ac6ff8e197f652de8b1731be6611066cb711f82))
+* :sparkles: Manage sealed Vault and configmap changes ([3d2033b](https://github.com/cloud-pi-native/socle/commit/3d2033bd3cc2a416f021177f97f0936b66640834))
+* :sparkles: Metrics activated if enabled in dsc ([987f110](https://github.com/cloud-pi-native/socle/commit/987f110410b42a3e2265aee77e8329bfe726b20d))
+* :sparkles: Metrics authentication enabled + patch ServiceMonitor ([8195910](https://github.com/cloud-pi-native/socle/commit/8195910dd94a52da1e918067935ee90b09a3b43b))
+* :sparkles: Uninstall Grafana instance and/or its defaults datasource ([835a74b](https://github.com/cloud-pi-native/socle/commit/835a74b7ee2781a67b9801a4a76af57c5fb8a917))
+* :zap: Update console version ([bac4144](https://github.com/cloud-pi-native/socle/commit/bac4144296bb3ea6b4f1c547f175ce9bf1ae49ae))
+* :zap: Update GitLab chart version ([f5bc072](https://github.com/cloud-pi-native/socle/commit/f5bc0721ba8821a781a39452240167060bcf5af7))
+* :zap: Update GitLab chart version ([f640320](https://github.com/cloud-pi-native/socle/commit/f640320154bfe47ceebfe49a2a53bc4863af658f))
+* :zap: update keycloak replication to 3 containers ([7cca65f](https://github.com/cloud-pi-native/socle/commit/7cca65f7332577b746f3c2d499701823f4a6f0cd))
+* :zap: update keycloak replication to 3 containers ([7e6ba96](https://github.com/cloud-pi-native/socle/commit/7e6ba96a1f7f30118979f1517bc30eb5ab2f9b65))
+
+
+### Bug Fixes
+
+* :ambulance: Move harbor values file ([fff3276](https://github.com/cloud-pi-native/socle/commit/fff32766d37caa71c7036ae88b29791038ed4d29))
+* :bug: bad tls runner toml ([db5cea5](https://github.com/cloud-pi-native/socle/commit/db5cea550deadf27d2133d3aa2934bad2f2d6ac4))
+* :bug: bad tls runner toml ([aba354c](https://github.com/cloud-pi-native/socle/commit/aba354c20bb5aaef75cf22101d56fa1bd1ef76b7))
+* :bug: CRD and some values ([84fdcfd](https://github.com/cloud-pi-native/socle/commit/84fdcfd73aefa9d02e6b81bb043a7b117fa3ae4e))
+* :bug: CRD and some values ([c4f9666](https://github.com/cloud-pi-native/socle/commit/c4f9666fed75944ecf40f4041d2b5e823029cd5b))
+* :bug: Fix missing cert parth + condition dsc.exposedCA.type ([a25713e](https://github.com/cloud-pi-native/socle/commit/a25713eec6793ee1d75791f44820beee568942ea))
+* :bug: Fix missing gitlabRunner as a dsc crd requirement ([672c96d](https://github.com/cloud-pi-native/socle/commit/672c96dcea0476b5c2665d8650c914c921b45581))
+* :bug: Fix releases file ([5885825](https://github.com/cloud-pi-native/socle/commit/58858257d79f3fbdd6ebbbfb443326018c0faee6))
+* :bug: Fix releases file ([6d0cd75](https://github.com/cloud-pi-native/socle/commit/6d0cd75cef9467b2959e734a4269a89889131cea))
+* :bug: fix sonarqube deployment ([01c2442](https://github.com/cloud-pi-native/socle/commit/01c2442eeadfde45d43bcfced065aebbc5a41ad0))
+* :bug: fix sonarqube deployment ([a753094](https://github.com/cloud-pi-native/socle/commit/a7530947cc0a86872202005845a66e4f39cbb862))
+* :bug: Indentations ([b353fab](https://github.com/cloud-pi-native/socle/commit/b353fab0d7ea7c4d711c7df18b3759e4c5a93ffd))
+* :bug: Prevent failure on PodMonitor creation ([f1ce65d](https://github.com/cloud-pi-native/socle/commit/f1ce65d770281df5f8bffaabec18a3fedd5cf9e6))
+* :bug: We should allow downgrading too ([067e1e9](https://github.com/cloud-pi-native/socle/commit/067e1e9d03632da5cc7aa1e48447f2676ee08eee))
+* :fire: We do not enable prometheus rules from helm chart ([40097c9](https://github.com/cloud-pi-native/socle/commit/40097c9c2b92c35b9e93365bf3eb657dc1bc97d1))
+
+
+### Performance Improvements
+
+* :zap: enable argocd replication ([a037b80](https://github.com/cloud-pi-native/socle/commit/a037b8008f9c5815e28ee10da93f9fac7a3a7603))
+* :zap: enable argocd replication ([a09440c](https://github.com/cloud-pi-native/socle/commit/a09440c36f06b9e83ea0db9f2e79150a19688ca7))
+* :zap: enable harbor replication ([558f2c2](https://github.com/cloud-pi-native/socle/commit/558f2c29670b7546ac7c4254f73972abe7b290dc))
+* :zap: enable harbor replication ([954920c](https://github.com/cloud-pi-native/socle/commit/954920c77053d6f8a6798eb5c2a23c7795a9aad5))
+
 ## [1.2.0](https://github.com/cloud-pi-native/socle/compare/v1.1.1...v1.2.0) (2023-12-13)
 
 

@@ -1,0 +1,20 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: argo-cd
+  namespace: {{ dsc.grafana.namespace }}
+spec:
+  datasources:
+    - inputName: "datasource"
+      datasourceName: "Prometheus"
+  resyncPeriod: 30s
+  instanceSelector:
+    matchLabels:
+{% if dsc.global.environment == 'production' %}
+      app: {{ dsc.grafana.namespace }}-prod
+{% else %}
+      app: {{ dsc.grafana.namespace }}-horsprod
+{% endif %}
+  grafanaCom:
+    id: 14584
+    revision: 1

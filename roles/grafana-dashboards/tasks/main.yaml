@@ -23,36 +23,55 @@
     msg: "Missing Grafana instance. Please execute 'ansible-playbook install.yaml -t grafana' before trying to install the default datasource."
 
 # Keycloak dashboard source :
-# https://grafana.com/grafana/dashboards/19659-keycloak-metrics-dashboard/
-
+# https://grafana.com/grafana/dashboards/19659-keycloak-metrics-dashboard
 - name: Create Keycloak dashboard
   kubernetes.core.k8s:
     template: keycloak-dashboard.yaml.j2
 
 # Nexus dashboard source :
-# https://grafana.com/grafana/dashboards/16459-infra-nexus/
-
+# https://grafana.com/grafana/dashboards/16459-infra-nexus
 - name: Create Nexus dashboard
   kubernetes.core.k8s:
     template: nexus-dashboard.yaml.j2
 
 # SonarQube dashboard source :
-# https://grafana.com/grafana/dashboards/14152-sonarqube/
-
+# https://grafana.com/grafana/dashboards/14152-sonarqube
 - name: Create SonarQube dashboard
   kubernetes.core.k8s:
     template: sonarqube-dashboard.yaml.j2
 
 # GitLab Runner dashboard source :
-# https://grafana.com/grafana/dashboards/14016-gitlab-runner-metrics/
-
+# https://grafana.com/grafana/dashboards/14016-gitlab-runner-metrics
 - name: Create GitLab Runner dashboard
   kubernetes.core.k8s:
     template: gitlab-runner-dashboard.yaml.j2
 
 # GitLab CI Pipelines dashboard source :
-# https://grafana.com/grafana/dashboards/10620-gitlab-ci-pipelines/
-
+# https://grafana.com/grafana/dashboards/10620-gitlab-ci-pipelines
 - name: Create GitLab CI Pipelines dashboard
   kubernetes.core.k8s:
     template: gitlab-ci-pipelines-dashboard.yaml.j2
+
+# GitLab Gitaly dashboard source :
+# https://grafana.com/grafana/dashboards/9123-gitaly
+- name: Create GitLab Gitaly dashboard
+  kubernetes.core.k8s:
+    template: gitlab-gitaly-dashboard.yaml.j2
+
+# Hashicorp Vault dashboard source :
+# https://grafana.com/grafana/dashboards/12904-hashicorp-vault
+- name: Create Vault dashboard
+  kubernetes.core.k8s:
+    template: vault-dashboard.yaml.j2
+
+# Argo CD dashboard source :
+# https://grafana.com/grafana/dashboards/14584-argocd
+- name: Create Argo CD dashboard
+  kubernetes.core.k8s:
+    template: argo-cd-dashboard.yaml.j2
+
+# Harbor dashboard source :
+# https://grafana.com/grafana/dashboards/14075-harbor
+- name: Create Harbor dashboard
+  kubernetes.core.k8s:
+    template: harbor-dashboard.yaml.j2

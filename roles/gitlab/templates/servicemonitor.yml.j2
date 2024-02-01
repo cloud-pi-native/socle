@@ -13,7 +13,6 @@ spec:
   namespaceSelector: {}
   selector:
     matchLabels:
-      app: {{ item.name }}
       app.kubernetes.io/component: {{ item.name }}
       app.kubernetes.io/instance: gitlab-{{ item.name }}
       app.kubernetes.io/managed-by: gitlab-operator

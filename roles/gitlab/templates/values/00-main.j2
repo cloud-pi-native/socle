@@ -11,12 +11,40 @@ gitlab:
   webservice:
     registry:
       enabled: false
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% endif %}
   sidekiq:
     registry:
       enabled: false
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      podMonitor:
+        enabled: true
+{% endif %}
   unicorn:
     registry:
       enabled: false
+  gitaly:
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% endif %}
+  gitlab-exporter:
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% endif %}
+  kas:
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% endif %}
 
 global:
   registry:

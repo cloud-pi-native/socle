@@ -351,7 +351,3 @@
         file: add-servicemonitors.yaml
       loop: "{{ gitlab_additional_service_monitors }}"
 
-    - name: Declare some additionnal PodMonitors
-      ansible.builtin.include_tasks:
-        file: add-podmonitors.yaml
-      loop: "{{ gitlab_additional_pod_monitors }}"

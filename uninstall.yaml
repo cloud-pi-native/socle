@@ -365,9 +365,6 @@
       tags:
         - grafana
 
-
-
-
     - name: "Suppression de l'opérateur Grafana"
       kubernetes.core.helm:
         name: grafana-operator

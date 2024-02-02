@@ -236,8 +236,7 @@
     - name: "Suppression gitlab-validating-webhook-configuration"
       kubernetes.core.k8s:
         state: absent
-        kind: 
-        
+        kind: ValidatingWebhookConfiguration
         name: gitlab-validating-webhook-configuration
       tags:
         - never

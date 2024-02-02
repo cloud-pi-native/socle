@@ -345,6 +345,16 @@
       tags:
         - grafana
 
+    - name: "Suppression de l'ingress Grafana"
+      kubernetes.core.k8s:
+        api_version: networking.k8s.io/v1
+        state: absent
+        kind: Ingress
+        name: "{{ grafana_name }}"
+        namespace: "{{ dsc.grafana.namespace }}"
+      tags:
+        - grafana
+
     - name: "Suppression de l'instance Grafana"
       kubernetes.core.k8s:
         api_version: grafana.integreatly.org/v1beta1
@@ -354,6 +364,9 @@
         namespace: "{{ dsc.grafana.namespace }}"
       tags:
         - grafana
+
+
+
 
     - name: "Suppression de l'opérateur Grafana"
       kubernetes.core.helm:

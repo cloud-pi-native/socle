@@ -128,7 +128,9 @@
   ansible.builtin.debug:
     msg:
       - "argocd_domain: {{ argocd_domain }}"
+      - "console_domain: {{ console_domain }}"
       - "gitlab_domain: {{ gitlab_domain }}"
+      - "grafana_domain: {{ grafana_domain }}"
       - "harbor_domain: {{ harbor_domain }}"
       - "keycloak_domain: {{ keycloak_domain }}"
       - "nexus_domain: {{ nexus_domain }}"

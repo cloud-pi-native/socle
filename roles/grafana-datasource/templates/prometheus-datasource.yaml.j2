@@ -1,7 +1,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
-  name: prometheus
+  name: datasource-prom-{{ grafana_label }}
   namespace: {{ dsc.grafana.namespace }}
 spec:
   valuesFrom:
@@ -12,11 +12,7 @@ spec:
           key: "token"
   instanceSelector:
     matchLabels:
-{% if dsc.global.environment == 'production' %}
-      app: {{ dsc.grafana.namespace }}-prod
-{% else %}
-      app: {{ dsc.grafana.namespace }}-horsprod
-{% endif %}
+      app: {{ grafana_label }}
   datasource:
     basicAuthUser: internal
     access: proxy

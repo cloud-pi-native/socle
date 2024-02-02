@@ -4,11 +4,7 @@ metadata:
   name: {{ grafana_name }}
   namespace: {{ dsc.grafana.namespace }}
   labels:
-{% if dsc.global.environment == 'production' %}
-    app: {{ dsc.grafana.namespace }}-prod
-{% else %}
-    app: {{ dsc.grafana.namespace }}-horsprod
-{% endif %}
+    app: {{ grafana_name }}
     app.kubernetes.io/managed-by: dso-console
     dashboards: default
 spec:
@@ -29,7 +25,7 @@ spec:
       tls_skip_verify_insecure: "true"
       token_url: https://{{ keycloak_domain }}/realms/dso/protocol/openid-connect/token
     server:
-      root_url: https://{{ grafana_domain }}/
+      root_url: https://{{ grafana_domain }}/{{ grafana_name }}
       serve_from_sub_path: "true"
   deployment:
     spec:

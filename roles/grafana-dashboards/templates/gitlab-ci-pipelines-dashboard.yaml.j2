@@ -1,7 +1,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: gitlab-ci-pipeline
+  name: {{ dsc_name }}-gitlab-ci-pipeline
   namespace: {{ dsc.grafana.namespace }}
 spec:
   datasources:
@@ -10,11 +10,7 @@ spec:
   resyncPeriod: 30s
   instanceSelector:
     matchLabels:
-{% if dsc.global.environment == 'production' %}
-      app: {{ dsc.grafana.namespace }}-prod
-{% else %}
-      app: {{ dsc.grafana.namespace }}-horsprod
-{% endif %}
+      app: {{ grafana_label }}
   plugins:
     - name: grafana-polystat-panel
       version: 2.1.5

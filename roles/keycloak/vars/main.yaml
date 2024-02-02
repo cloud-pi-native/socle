@@ -76,3 +76,15 @@ keycloak_clients:
     defaultClientScopes:
       - generic
     publicClient: false
+
+  - clientId: grafana-projects
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ grafana_domain }}/*
+      - https://{{ grafana_domain }}/
+    webOrigins:
+      - https://{{ grafana_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false

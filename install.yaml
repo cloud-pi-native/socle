@@ -98,6 +98,11 @@
         - grafana-datasource
         - never
 
+    - name: grafana-dashboards
+      tags:
+        - grafana-dashboards
+        - never
+
   post_tasks:
     - name: Post-Install Disclaimer
       ansible.builtin.debug:

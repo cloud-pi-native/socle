@@ -1,0 +1,77 @@
+---
+- name: Initialize grafana_label fact
+  ansible.builtin.set_fact:
+    grafana_label: "{{ dsc_name }}-prod"
+
+- name: Set grafana_label
+  when: dsc.global.environment != 'production'
+  ansible.builtin.set_fact:
+    grafana_label: "{{ dsc_name }}-horsprod"
+
+- name: Get Grafana instance
+  kubernetes.core.k8s_info:
+    api_version: grafana.integreatly.org/v1beta1
+    namespace: "{{ dsc.grafana.namespace }}"
+    kind: Grafana
+    label_selectors:
+      - app={{ grafana_label }}
+  register: gf_instance
+
+- name: Manage missing Grafana instance.
+  when: gf_instance.resources | length == 0
+  ansible.builtin.fail:
+    msg: "Missing Grafana instance. Please execute 'ansible-playbook install.yaml -t grafana' before trying to install the default datasource."
+
+# Keycloak dashboard source :
+# https://grafana.com/grafana/dashboards/19659-keycloak-metrics-dashboard
+- name: Create Keycloak dashboard
+  kubernetes.core.k8s:
+    template: keycloak-dashboard.yaml.j2
+
+# Nexus dashboard source :
+# https://grafana.com/grafana/dashboards/16459-infra-nexus
+- name: Create Nexus dashboard
+  kubernetes.core.k8s:
+    template: nexus-dashboard.yaml.j2
+
+# SonarQube dashboard source :
+# https://grafana.com/grafana/dashboards/14152-sonarqube
+- name: Create SonarQube dashboard
+  kubernetes.core.k8s:
+    template: sonarqube-dashboard.yaml.j2
+
+# GitLab Runner dashboard source :
+# https://grafana.com/grafana/dashboards/14016-gitlab-runner-metrics
+- name: Create GitLab Runner dashboard
+  kubernetes.core.k8s:
+    template: gitlab-runner-dashboard.yaml.j2
+
+# GitLab CI Pipelines dashboard source :
+# https://grafana.com/grafana/dashboards/10620-gitlab-ci-pipelines
+- name: Create GitLab CI Pipelines dashboard
+  kubernetes.core.k8s:
+    template: gitlab-ci-pipelines-dashboard.yaml.j2
+
+# GitLab Gitaly dashboard source :
+# https://grafana.com/grafana/dashboards/9123-gitaly
+- name: Create GitLab Gitaly dashboard
+  kubernetes.core.k8s:
+    template: gitlab-gitaly-dashboard.yaml.j2
+
+# Hashicorp Vault dashboard source :
+# https://grafana.com/grafana/dashboards/12904-hashicorp-vault
+- name: Create Vault dashboard
+  kubernetes.core.k8s:
+    template: vault-dashboard.yaml.j2
+
+# Argo CD dashboard source :
+# https://grafana.com/grafana/dashboards/14584-argocd
+- name: Create Argo CD dashboard
+  kubernetes.core.k8s:
+    template: argo-cd-dashboard.yaml.j2
+
+# Harbor dashboard source :
+# https://grafana.com/grafana/dashboards/14075-harbor
+- name: Create Harbor dashboard
+  kubernetes.core.k8s:
+    template: harbor-dashboard.yaml.j2

@@ -307,6 +307,9 @@ spec:
                         The storage size for Grafana instance PVC.
                         Must comply with Kubernetes size definitions (i.e 5Gi).
                       type: string
+                    imageVersion:
+                      description: Grafana release version (e.g., "9.5.5").
+                      type: string
                   type: object
                 grafanaDatasource:
                   description: Configuration for Grafana default Datasource.

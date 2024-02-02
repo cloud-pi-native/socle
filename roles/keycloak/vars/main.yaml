@@ -76,3 +76,15 @@ keycloak_clients:
     defaultClientScopes:
       - generic
     publicClient: false
+
+  - clientId: vault-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ vault_domain }}/ui/vault/auth/oidc/oidc/callback
+      - https://{{ vault_domain }}/oidc/callback
+    webOrigins:
+      - https://{{ vault_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false

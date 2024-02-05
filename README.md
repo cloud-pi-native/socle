@@ -490,7 +490,7 @@ watch "kubectl get ns | grep '\-mynamespace'"
   - **GitLab Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Grafana Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Kubed** déployé dans le namespace `openshift-infra`.
-- Les quatre composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces quatre outils, vous pourrez le faire via l'utilisation des tags correspondants :
+- Les cinq composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces quatre outils, vous pourrez le faire via l'utilisation des tags correspondants :
   - Pour Cert-manager : `-t cert-manager`
   - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`)
   - Pour GitLab Operator : `-t gitlab-operator`

@@ -163,8 +163,8 @@
     realm: dso
     display_name: Dso Realm
     password_policy: >
-      length(8) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
-      passwordHistory(1) and notUsername() and forceExpiredPasswordChange(365)
+      length(15) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
+      passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)
     enabled: true
 
 - name: Create base admins groups

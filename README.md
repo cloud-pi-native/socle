@@ -15,6 +15,7 @@
   - [Cert-manager](#cert-manager)
   - [CloudNativePG](#cloudnativepg)
   - [GitLab Operator](#gitlab-operator)
+  - [Grafana Operator et instance Grafana](#grafana-operator-et-instance-grafana)
 - [Désinstallation](#désinstallation)
   - [Chaîne complète](#chaîne-complète)
   - [Désinstaller un ou plusieurs outils](#désinstaller-un-ou-plusieurs-outils)
@@ -44,26 +45,30 @@ L'installation de la forge DSO (DevSecOps) s'effectue de manière automatisée a
 
 Les éléments déployés seront les suivants :
 
-| Outil                       | Site officiel                                                                  |
-| --------------------------- | ------------------------------------------------------------------------------ |
-| Argo CD                     | <https://argo-cd.readthedocs.io>                                               |
-| Cert-manager                | <https://cert-manager.io>                                                      |
-| Console Cloud π Native      | <https://github.com/cloud-pi-native/console>                                   |
-| CloudNativePG               | <https://cloudnative-pg.io>                                                    |
-| GitLab                      | <https://about.gitlab.com>                                                     |
-| gitLab-ci-catalog           | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                         |
-| GitLab Operator             | <https://docs.gitlab.com/operator>                                             |
-| GitLab Runner               | <https://docs.gitlab.com/runner>                                               |
-| Harbor                      | <https://goharbor.io>                                                          |
-| Keycloak                    | <https://www.keycloak.org>                                                     |
-| Kubed                       | <https://appscode.com/products/kubed>                                          |
-| Sonatype Nexus Repository   | <https://www.sonatype.com/products/sonatype-nexus-repository>                  |
-| SonarQube Community Edition | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
-| HashiCorp Vault             | <https://www.vaultproject.io>                                                  |
+| Outil                        | Site officiel                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| Argo CD                      | <https://argo-cd.readthedocs.io>                                               |
+| Cert-manager                 | <https://cert-manager.io>                                                      |
+| Console Cloud π Native       | <https://github.com/cloud-pi-native/console>                                   |
+| CloudNativePG                | <https://cloudnative-pg.io>                                                    |
+| GitLab                       | <https://about.gitlab.com>                                                     |
+| gitLab-ci-catalog            | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                         |
+| GitLab Operator              | <https://docs.gitlab.com/operator>                                             |
+| GitLab Runner                | <https://docs.gitlab.com/runner>                                               |
+| Grafana (optionnel)          | <https://grafana.com>                                                          |
+| Grafana Operator (optionnel) | <https://grafana.github.io/grafana-operator/>                                  |
+| Harbor                       | <https://goharbor.io>                                                          |
+| HashiCorp Vault              | <https://www.vaultproject.io>                                                  |
+| Keycloak                     | <https://www.keycloak.org>                                                     |
+| Kubed                        | <https://appscode.com/products/kubed>                                          |
+| SonarQube Community Edition  | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
+| Sonatype Nexus Repository    | <https://www.sonatype.com/products/sonatype-nexus-repository>                  |
 
-Certains outils peuvent prendre un peu de temps pour s'installer, par exemple Keycloak, SonarQube ou GitLab.
+Certains outils peuvent prendre un peu de temps pour s'installer. Ce sera le cas de Keycloak, SonarQube et en particulier GitLab.
 
 Vous pouvez trouver la version des outils installés dans le fichier [versions.md](versions.md).
+
+Comme précisé dans le tableau ci-dessus, l'opérateur Grafana et l'instance Grafana sont optionnels. Ils ne s'installeront que sur demande explicite, via l'utilisation des tags appropriés. Ceci afin de vous permettre d'opter ou non pour cette solution d'affichage des métriques.
 
 ## Prérequis
 
@@ -374,7 +379,7 @@ L'outil cert-manager est installé à l'aide de son [chart helm officiel](https:
 
 Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement qu'il n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
 
-- L'API `cert-manager.io/v1`.
+- L'APIVERSION `cert-manager.io/v1`.
 - La `MutatingWebhookConfiguration` nommée `cert-manager-webhook`.
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que cert-manager n'est pas installé. Le rôle associé procédera donc à son installation.
@@ -400,12 +405,35 @@ Toute instance de GitLab sera installée en s'appuyant sur l'[opérateur GitLab]
 
 Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement que cet opérateur n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
 
-- L'API `apps.gitlab.com/v1beta1`.
+- L'APIVERSION `apps.gitlab.com/v1beta1`.
 - La `ValidatingWebhookConfiguration` nommée `gitlab-validating-webhook-configuration`.
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur GitLab n'est pas installé. Le rôle associé procédera donc à son installation.
 
 **Attention !** Assurez-vous que si une précédente instance de GitLab Operator a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur GitLab avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de GitLab échouera car l'opérateur associé n'aura pas été installé par le role.
+
+### Grafana Operator et instance Grafana
+
+Toute instance de Grafana et les éléments par défaut associés (datasource et dashboards) seront installés en s'appuyant sur l'[opérateur Grafana](https://grafana.github.io/grafana-operator/), via le role `grafana-operator`.
+
+Rappel : l'installation de l'opérateur Grafana, de l'instance Grafana et des éléments par défaut associés (datasource, dashboards) sont optionnels. Ils ne s'installeront que sur demande, via l'utilisation des tags appropriés.
+
+Suite à une première installation du socle avec les métriques activées, l'instance Grafana et les ressources Grafana par défaut, pourront s'installer via la commande suivante :
+
+```bash
+ansible-playbook install.yaml -t grafana-operator,grafana,grafana-datasource,grafana-dashboards
+```
+
+Remarque : Il est tout à fait possible de ne pas utiliser la datasource ou les dashboards que nous proposons par défaut, et d'utiliser à la place vos propres datasources et dashboards. Dans ce cas, vous devrez les déclarer par vos soins, en utilisant vos propres fichiers YAML de définitions s'appuyant sur la [documentation de l'opérateur](https://grafana.github.io/grafana-operator/docs/).
+
+Le playbook d'installation, via le role grafana-operator, s'assurera préalablement que l'opérateur Grafana n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
+
+- L'APIVERSION `grafana.integreatly.org/v1beta1`.
+- Le `ClusterRole` nommé `grafana-operator-permissions`.
+
+Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur Grafana n'est pas installé. Le rôle associé procédera donc à son installation.
+
+**Attention !** Assurez-vous que si une précédente instance de Grafana Operator a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur Grafana avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Grafana échouera car l'opérateur associé n'aura pas été installé par le role.
 
 ## Désinstallation
 
@@ -453,11 +481,14 @@ watch "kubectl get ns | grep '\-mynamespace'"
   - **Cert-manager** déployé dans le namespace `cert-manager`.
   - **CloudNativePG** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **GitLab Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
+  - **Grafana Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Kubed** déployé dans le namespace `openshift-infra`.
-- Les trois composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces trois outils, vous pourrez le faire via l'utilisation des tags correspondants :
-  - Pour Kubed : `-t kubed` (ou bien `-t confSyncer`).
-  - Pour Cert-manager : `-t cert-manager`.
-  - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`).
+- Les quatre composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces quatre outils, vous pourrez le faire via l'utilisation des tags correspondants :
+  - Pour Cert-manager : `-t cert-manager`
+  - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`)
+  - Pour GitLab Operator : `-t gitlab-operator`
+  - Pour Grafana Operator : `-t grafana-operator`
+  - Pour Kubed : `-t kubed` (ou bien `-t confSyncer`)
 
 ### Désinstaller un ou plusieurs outils
 
@@ -477,7 +508,7 @@ Pour faire la même chose sur les mêmes outils, mais s'appuyant sur une autre c
 ansible-playbook uninstall.yaml -t keycloak,argocd -e dsc_cr=ma-dsc
 ```
 
-**Remarque importante** : Si vous désinstallez la ressource **console** via le tag approprié, et que vous souhaitez ensuite la réinstaller, vous devrez impérativement **relancer une installation complète** du socle DSO (sans tags) plutôt que de réinstaller la console seule. En effet, la configmap `dso-config` qui lui est associée est alimentée par les autres outils à mesure de l'installation.
+**Remarque importante** : Si vous désinstallez la ressource **console** via le tag approprié, et que vous souhaitez ensuite la réinstaller, vous devrez impérativement **relancer une installation complète** du socle DSO (sans tags) plutôt que de réinstaller la console seule. En effet, la configmap `dso-config` qui lui est associée est alimentée par les autres outils à mesure de leur installation.
 
 ## Gel des versions
 

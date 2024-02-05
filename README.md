@@ -30,6 +30,7 @@
     - [GitLab](#gitlab)
     - [GitLab Runner](#gitlab-runner)
     - [Harbor](#harbor)
+    - [Instance Grafana](#instance-grafana)
     - [Keycloak](#keycloak)
     - [Kubed (config-syncer)](#kubed-config-syncer)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
@@ -123,7 +124,7 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
 
 ## Configuration
 
-Une fois le dépôt socle cloné, lancez une première fois la commande suivante depuis votre environnement de déploiement :
+Lorsque vous avez cloné le présent dépôt socle, lancez une première fois la commande suivante depuis votre environnement de déploiement :
 
 ```bash
 ansible-playbook install.yaml
@@ -135,7 +136,7 @@ Elle vous signalera que vous n'avez encore jamais installé le socle sur votre c
 kubectl edit dsc conf-dso
 ```
 
-Vous pourrez procéder ainsi si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition vous préférerez peut être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
+Vous pourrez procéder comme indiqué si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition vous préférerez peut être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
@@ -178,6 +179,12 @@ spec:
       - my-root-dir
       - projects-sub-dir
     rootDomain: .example.com
+    metrics:
+      enabled: true
+  grafana: {}
+  grafanaDatasource:
+    defaultPrometheusDatasourceUrl: https://my-service.my-monitoring-namespace.svc.cluster.local:9091
+  grafanaOperator: {}
   harbor:
     adminPassword: WhoWantsToPassForever
     pvcRegistrySize: 50Gi
@@ -418,13 +425,13 @@ Toute instance de Grafana et les éléments par défaut associés (datasource et
 
 Rappel : l'installation de l'opérateur Grafana, de l'instance Grafana et des éléments par défaut associés (datasource, dashboards) sont optionnels. Ils ne s'installeront que sur demande, via l'utilisation des tags appropriés.
 
-Suite à une première installation du socle avec les métriques activées, l'instance Grafana et les ressources Grafana par défaut, pourront s'installer via la commande suivante :
+Suite à une première installation du socle avec les métriques activées (section `spec.global.metrics.enabled` de la `dsc`), l'instance Grafana et les ressources Grafana par défaut pourront s'installer via la commande suivante :
 
 ```bash
 ansible-playbook install.yaml -t grafana-operator,grafana,grafana-datasource,grafana-dashboards
 ```
 
-Remarque : Il est tout à fait possible de ne pas utiliser la datasource ou les dashboards que nous proposons par défaut, et d'utiliser à la place vos propres datasources et dashboards. Dans ce cas, vous devrez les déclarer par vos soins, en utilisant vos propres fichiers YAML de définitions s'appuyant sur la [documentation de l'opérateur](https://grafana.github.io/grafana-operator/docs/).
+Remarque : Il est tout à fait possible de ne pas utiliser la datasource ou les dashboards que nous proposons par défaut, et de déployer à la place vos propres datasources et dashboards. Dans ce cas, vous devrez les déclarer par vos soins, en utilisant vos propres fichiers YAML de définitions s'appuyant sur la [documentation de l'opérateur](https://grafana.github.io/grafana-operator/docs/).
 
 Le playbook d'installation, via le role grafana-operator, s'assurera préalablement que l'opérateur Grafana n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
 
@@ -535,11 +542,11 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 
 Techniquement, la modification des versions de charts utilisés est possible mais elle **n'est pas recommandée**.
 
-Ceci parce que la version de la Console Cloud π Native, composant central qui s'interface avec tous les outils de la chaîne, a été testée et développée avec les versions d'outils telles qu'elles sont fixées au moment de sa sortie.
+Ceci parce que la version de la Console Cloud π Native déployée par le socle, composant central qui s'interface avec tous les outils de la chaîne, a été testée et développée avec les versions d'outils telles qu'elles sont fixées au moment de la publication.
 
 Aussi, **nous ne pouvons garantir le bon fonctionnement** de la forge DSO dans un contexte où les versions de charts seraient modifiées.
 
-De plus, et comme indiqué plus haut, les outils cert-manager, Kubed et CloudNativePG seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
+De plus, et comme indiqué plus haut, les outils cert-manager, Kubed, CloudNativePG et Grafana Operator seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
 
 Si malgré tout vous souhaitez tenter une modification de version d'un chart en particulier, Vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
 
@@ -578,11 +585,21 @@ Pour fixer une version de chart dans la ressource `dsc`, il vous suffira d'ajout
 
 ### Gel des versions d'images
 
-Comme indiqué précédemment, le gel des version d'images est géré par le champ `values` que vous pourrez spécifier, pour chaque outil concerné, dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
+Comme indiqué précédemment, le gel des version d'images peut être géré par le champ `values` que vous pourrez spécifier, pour chaque outil concerné, dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
 
 Ce champ correspond rigoureusement à ce qui est utilisable pour une version donnée du chart Helm de l'outil en question.
 
-Lors d'une **première installation du socle**, nous vous recommandons de **ne pas geler immédiatement vos versions d'images dans la `dsc`**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil et utiliseront la version d'image qui correspond à la version du chart définie par défaut.
+Pour certains outils (instance grafana, nexus), l'image est fixée par défaut et nous proposons directement un champ dédié dans la `dsc`.
+
+Si vous souhaitez connaître le champ en question, il vous suffit d'afficher le fichier « releases.yaml »** du role `socle-config`.
+
+Rappel : une fois que nous sommes positionnés dans le répertoire socle, la commande pour afficher ce fichier sera la suivante.
+
+```bash
+cat ./roles/socle-config/files/releases.yaml
+```
+
+Lors d'une **première installation du socle**, nous vous recommandons toutefois de **ne pas geler immédiatement vos versions d'images dans la `dsc`**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil et utiliseront la version d'image qui correspond à la version du chart définie par défaut.
 
 Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions d'images disponibles et à quelles versions de charts elles sont associées.
 
@@ -604,6 +621,7 @@ Les sections suivantes détaillent la façon de procéder au gel de version d'im
   - [GitLab](#gitlab)
   - [GitLab Runner](#gitlab-runner)
   - [Harbor](#harbor)
+  - [Instance Grafana](#instance-grafana)
   - [Keycloak](#keycloak)
   - [Kubed (config-syncer)](#kubed-config-syncer)
   - [Sonatype Nexus Repository](#sonatype-nexus-repository)
@@ -780,6 +798,23 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 ```
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/goharbor/harbor-helm/tree/master>
+
+#### Instance Grafana
+
+L'instance Grafana est déployée par l'opérateur Grafana.
+
+L'image utilisée est déjà gelée. Son numéro de version est spécifié dans le fichier [versions.md](versions.md) situé à la racine du socle.
+
+Il est recommandé de ne pas modifier cette version, sauf si vous savez ce que vous faites.
+
+Si toutefois vous souhaitez la modifier, les tags d'images utilisables sont disponibles ici : <https://github.com/grafana/grafana/tags>
+
+Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageVersion**. Exemple :
+
+```yaml
+  grafana:
+    imageVersion: "9.5.6"
+```
 
 #### Keycloak
 

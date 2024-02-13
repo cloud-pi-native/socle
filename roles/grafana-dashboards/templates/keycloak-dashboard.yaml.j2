@@ -11,6 +11,6 @@ spec:
   instanceSelector:
     matchLabels:
       app: {{ grafana_label }}
-  grafanaCom:
-    id: 14390
-    revision: 2
+  configMapRef:
+    name: {{ dsc_name}}-keycloak-dashboard-definition
+    key: json

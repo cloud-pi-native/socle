@@ -23,7 +23,56 @@
     msg: "Missing Grafana instance. Please execute 'ansible-playbook install.yaml -t grafana' before trying to install the default datasource."
 
 # Keycloak dashboard source :
-# https://grafana.com/grafana/dashboards/19659-keycloak-metrics-dashboard
+# https://grafana.com/grafana/dashboards/14390-keycloak-x-microprofile-metrics/
+- name: Get Keycloak dashboard JSON content
+  ansible.builtin.uri:
+    url: https://grafana.com/api/dashboards/14390/revisions/2/download
+    method: GET
+    return_content: yes
+    status_code: 200
+  register: keycloak_dashboard
+
+- name: Patch Keycloak dashboard JSON content
+  ansible.builtin.set_fact:
+    keycloak_dashboard: "{{ keycloak_dashboard.content
+      | regex_replace ('base_cpu_processCpuLoad_percent', 'base_cpu_processCpuLoad')
+      | regex_replace ('base_jvm_uptime_seconds', 'base_jvm_uptime')
+      | regex_replace ('vendor_cpu_systemCpuLoad_percent', 'system_cpu_usage')
+      | regex_replace ('System CPU load', 'System CPU usage')
+      | regex_replace ('vendor_cpu_processCpuTime_seconds', 'process_cpu_usage')
+      | regex_replace ('Process CPU time', 'Process CPU usage')
+      | regex_replace ('vendor_memory_usedNonHeap_bytes', 'base_memory_usedNonHeap_bytes')
+      | regex_replace ('vendor_memory_maxNonHeap_bytes', 'base_memory_maxNonHeap_bytes')
+      | regex_replace ('vendor_memory_committedNonHeap_bytes', 'base_memory_committedNonHeap_bytes')
+      | regex_replace ('vendor_memoryPool_usage_max_bytes', 'jvm_memory_pool_bytes_max')
+      | regex_replace ('vendor_memoryPool_usage_bytes', 'jvm_memory_pool_bytes_used')
+      | regex_replace ('vendor_agroal_acquire_count_total', 'agroal_acquire_count_total')
+      | regex_replace ('vendor_agroal_active_count', 'agroal_active_count')
+      | regex_replace ('vendor_agroal_max_used_count', 'agroal_max_used_count')
+      | regex_replace ('vendor_agroal_available_count', 'agroal_available_count')
+      | regex_replace ('vendor_agroal_blocking_time_max_seconds(.*)}\"', 'agroal_blocking_time_max_milliseconds{env=\\\"$env\\\",job=\\\"$job\\\",instance=~\\\"$instance\\\"}/1000\"')
+      | regex_replace ('Maximum time an application waited to acquire a connection\\.', 'Maximum time in seconds an application waited to acquire a connection\\.')
+      | regex_replace ('vendor_agroal_flush_count_total', 'agroal_flush_count_total')
+      | regex_replace ('vendor_agroal_leak_detection_count_total', 'agroal_leak_detection_count_total')
+      | regex_replace ('vendor_agroal_creation_count_total', 'agroal_creation_count_total')
+      | regex_replace ('vendor_agroal_destroy_count_total', 'agroal_destroy_count_total')
+      | regex_replace ('vendor_agroal_reap_count_total', 'agroal_reap_count_total')
+      | regex_replace ('vendor_agroal_invalid_count_total', 'agroal_invalid_count_total')
+      }}"
+
+- name: Create Keycloak dashboard ConfigMap
+  when: keycloak_dashboard is not failed
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: conf-dso-keycloak-dashboard-definition
+        namespace: "{{ dsc.grafana.namespace }}"
+      data:
+        json: "{{ keycloak_dashboard | to_nice_json | string }}"
+
 - name: Create Keycloak dashboard
   kubernetes.core.k8s:
     template: keycloak-dashboard.yaml.j2
@@ -64,7 +113,7 @@
   kubernetes.core.k8s:
     template: vault-dashboard.yaml.j2
 
-# Argo CD dashboard source :
+# Argo CD dashboard source (revision 1):
 # https://grafana.com/grafana/dashboards/14584-argocd
 - name: Create Argo CD dashboard
   kubernetes.core.k8s:
@@ -75,3 +124,5 @@
 - name: Create Harbor dashboard
   kubernetes.core.k8s:
     template: harbor-dashboard.yaml.j2
+
+

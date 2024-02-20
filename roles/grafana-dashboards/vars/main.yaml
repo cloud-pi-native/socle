@@ -1,0 +1,39 @@
+---
+grafana_dashboards:
+  - name: Keycloak
+    dashboard_template: keycloak-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/14390-keycloak-x-microprofile-metrics/
+    json: https://grafana.com/api/dashboards/14390/revisions/2/download
+  - name: Nexus
+    dashboard_template: nexus-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/16459-infra-nexus/
+    json: https://grafana.com/api/dashboards/16459/revisions/1/download
+  - name: SonarQube
+    dashboard_template: sonarqube-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/14152-sonarqube/
+    json: https://grafana.com/api/dashboards/14152/revisions/1/download
+  - name: GitLab CI Pipelines
+    dashboard_template: gitlab-ci-pipelines-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/10620-gitlab-ci-pipelines/
+    json: https://grafana.com/api/dashboards/10620/revisions/4/download
+  - name: GitLab Gitaly
+    dashboard_template: gitlab-gitaly-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/9123-gitaly/
+    json: https://grafana.com/api/dashboards/9123/revisions/1/download
+  - name: GitLab Runner
+    dashboard_template: gitlab-runner-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/14016-gitlab-runner-metrics/
+    json: https://grafana.com/api/dashboards/14016/revisions/2/download
+  - name: Hashicorp Vault
+    dashboard_template: vault-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/12904-hashicorp-vault/
+    json: https://grafana.com/api/dashboards/12904/revisions/2/download
+  - name: Argo CD
+    dashboard_template: argo-cd-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/14584-argocd/
+    json: https://grafana.com/api/dashboards/14584/revisions/1/download
+  - name: Harbor
+    dashboard_template: harbor-dashboard.yaml.j2
+    webpage: https://github.com/goharbor/harbor/blob/main/contrib/grafana-dashboard/metrics-example.json
+    json: https://raw.githubusercontent.com/goharbor/harbor/main/contrib/grafana-dashboard/metrics-example.json
+

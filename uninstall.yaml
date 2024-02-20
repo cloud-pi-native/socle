@@ -4,7 +4,7 @@
   vars:
     grafana_dashboards:
       - argo-cd
-      - gitlab-ci-pipeline
+      - gitlab-ci-pipelines
       - gitlab-gitaly
       - gitlab-runner
       - harbor

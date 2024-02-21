@@ -19,6 +19,10 @@ spec:
       schema:
         openAPIV3Schema:
           properties:
+            status:
+              description: Status defines the observed state of Memcached
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
             spec:
               properties:
                 additionalsCA:
@@ -1109,3 +1113,5 @@ spec:
           type: object
       served: true
       storage: true
+      subresources:
+        status: {}

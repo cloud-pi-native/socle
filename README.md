@@ -8,6 +8,7 @@
   - [Utilisation de vos propres values](#utilisation-de-vos-propres-values)
 - [Installation](#installation)
   - [Lancement](#lancement)
+  - [Lancement via l'opérateur](#lancement-via-lopérateur)
   - [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster)
 - [Récupération des secrets](#récupération-des-secrets)
 - [Debug](#debug)
@@ -217,6 +218,30 @@ watch "kubectl get ns | grep 'dso-'"
 ```
 
 Par défaut, ils sont en effet tous préfixés « dso- ».
+
+### Lancement via l'opérateur
+
+Le déploiement de la forge peut aussi se faire via un opérateur. Cela évite d'installer une stack ansible localement notamment mais cela permet aussi de faire des modifications de la forge en éditant l'objet DsoSocleConfig directement sans avoir à relancer Ansible.
+
+Cette opérateur a été créé à l'aide de l'[operateur sdk ansible](https://sdk.operatorframework.io/docs/building-operators/ansible/).
+
+Il est possible de déployer un cluster k8s local à l'aide de kind et mkcert qui vous permettra de tester le déploiement en local. Pour se faire il faut lancer le script présent dans samples :
+
+```
+./samples/start-kind.sh
+```
+
+Pour l'utiliser pour déployer votre forge, il faut déployer le crd, créer la configuration de votre forge et finalement déployer l'opérateur :
+
+```
+kubectl apply -f roles/socle-config/files/crd-conf-dso.yaml
+kubectl apply -f samples/conf-dso.yaml
+# Déploiement de l'opérateur avec l'image latest
+make deploy
+# Il est possible de customiser l'opérateur facilement
+make docker-build docker-push IMG=localhost:5001/controller:demo
+make deploy IMG=localhost:5001/controller:demo
+```
 
 ### Déploiement de plusieurs forges DSO dans un même cluster
 

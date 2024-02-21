@@ -277,6 +277,41 @@ spec:
                     chartVersion:
                       description: GitLab Runner chart version (e.g., "0.57.0").
                       type: string
+                    resources:
+                      description: Resource for the gitlabRunner
+                      type: object
+                      properties:
+                        requests:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                        limits:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                        overwrite:
+                          type: object
+                          properties:
+                            requests:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
+                            limits:
+                              type: object
+                              properties:
+                                cpu:
+                                  type: string
+                                memory:
+                                  type: string
                   type: object
                 global:
                   description: Global configuration not specific to one service

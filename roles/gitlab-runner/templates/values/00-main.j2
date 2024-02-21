@@ -69,12 +69,12 @@ runners:
   {% endif %}
   {% if dsc.gitlabRunner.resources.overwrite != 'none' %}
     {% if dsc.gitlabRunner.resources.overwrite.requests != 'none' %}
-        cpu_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.requests.cpu }}"
+        cpu_request_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.requests.cpu }}"
         memory_request_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.requests.memory }}"
     {% endif %}
     {% if dsc.gitlabRunner.resources.overwrite.limits != 'none' %}
         memory_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.cpu }}"
-        cpu_request_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.memory }}"        
+        cpu_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.memory }}"        
     {% endif %}
   {% endif %}
 {% endif %}

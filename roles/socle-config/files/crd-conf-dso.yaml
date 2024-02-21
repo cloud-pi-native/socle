@@ -250,39 +250,52 @@ spec:
                       description: GitLab Runner chart version (e.g., "0.57.0").
                       type: string
                     resources:
-                      description: Resource for the gitlabRunner
+                      description: Resources for GitLab Runner.
                       type: object
                       properties:
                         requests:
+                          description: Resources requests for GitLab Runner.
                           type: object
                           properties:
                             cpu:
+                              description: CPU request for GitLab Runner.
                               type: string
                             memory:
+                              description: Memory request for GitLab Runner.
                               type: string
                         limits:
+                          description: Resources limits for GitLab Runner.
                           type: object
                           properties:
                             cpu:
+                              description: CPU limit for GitLab Runner.
                               type: string
                             memory:
+                              description: Memory limit for GitLab Runner.
                               type: string
                         overwrite:
+                          description: Resources overwrite for GitLab Runner.
                           type: object
                           properties:
                             requests:
+                              description: Resources requests max overwrite for GitLab Runner.
                               type: object
                               properties:
                                 cpu:
+                                  description: CPU request max overwrite for GitLab Runner.
                                   type: string
                                 memory:
+                                  description: Memory request max overwrite for GitLab Runner.
                                   type: string
                             limits:
+                              description: Resources limits max overwrite for GitLab Runner.
                               type: object
                               properties:
                                 cpu:
+                                  description: CPU limit max overwrite for GitLab Runner.
                                   type: string
                                 memory:
+                                  description: Memory limit max overwrite for GitLab Runner.
                                   type: string
                   type: object
                 global:

@@ -472,11 +472,11 @@ spec:
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
-                kubed:
-                  description: Configuration for Kubed (config-syncer).
+                kyverno:
+                  description: Configuration for Kyverno.
                   properties:
                     chartVersion:
-                      description: Kubed helm chart version (e.g., "v0.13.2").
+                      description: Kyverno helm chart version (e.g., "3.1.4").
                       type: string
                   type: object
                 nexus:
@@ -587,7 +587,7 @@ spec:
                 - harbor
                 - ingress
                 - keycloak
-                - kubed
+                - kyverno
                 - nexus
                 - proxy
                 - sonarqube

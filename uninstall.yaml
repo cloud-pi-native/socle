@@ -168,6 +168,57 @@
       tags:
         - keycloak
 
+    - name: "Suppression de la ClusterPolicy replace-kubed"
+      kubernetes.core.k8s:
+        state: absent
+        kind: ClusterPolicy
+        name: replace-kubed
+      tags:
+        - never
+        - kyverno
+
+    - name: "Suppression de l'instance Kyverno"
+      kubernetes.core.helm:
+        name: kyverno
+        chart_ref: kyverno/kyverno
+        release_namespace: dso-kyverno
+        state: absent
+        wait: true
+      tags:
+        - never
+        - kyverno
+
+    - name: "Suppression du namespace Kyverno"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: dso-kyverno
+      tags:
+        - never
+        - kyverno
+
+    - name: "Suppression des ValidatingWebhookConfigurations Kyverno"
+      kubernetes.core.k8s:
+        api_version: admissionregistration.k8s.io/v1
+        state: absent
+        kind: ValidatingWebhookConfiguration
+        label_selectors:
+          - "webhook.kyverno.io/managed-by=kyverno"
+      tags:
+        - never
+        - kyverno
+
+    - name: "Suppression des MutatingWebhookConfigurations Kyverno"
+      kubernetes.core.k8s:
+        api_version: admissionregistration.k8s.io/v1
+        state: absent
+        kind: MutatingWebhookConfiguration
+        label_selectors:
+          - "webhook.kyverno.io/managed-by=kyverno"
+      tags:
+        - never
+        - kyverno
+
     - name: "Suppression du namespace Nexus"
       kubernetes.core.k8s:
         state: absent

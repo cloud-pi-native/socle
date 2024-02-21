@@ -36,8 +36,7 @@ spec:
     environment: production
     projectsRootDir:
       - forge
-    rootDomain:
-      .example.com
+    rootDomain: .example.com
     metrics:
       enabled: false
     alerting:

@@ -57,6 +57,27 @@ runners:
         image = "ubuntu:22.04"
         # multiple "always" to retry pull on fail (see. https://docs.gitlab.com/runner/executors/kubernetes.html#set-a-pull-policy)
         pull_policy = ["always", "always"]
+{% if dsc.gitlabRunner.resources != 'none' %}
+        # request and limit of build pod and override allowed in ci
+  {% if dsc.gitlabRunner.resources.requests != 'none' %}
+        cpu_request = "{{ dsc.gitlabRunner.resources.requests.cpu }}"
+        memory_request = "{{ dsc.gitlabRunner.resources.requests.memory }}"
+  {% endif %}
+  {% if dsc.gitlabRunner.resources.limits != 'none' %}
+        cpu_limit = "{{ dsc.gitlabRunner.resources.limits.cpu }}"
+        memory_limit = "{{ dsc.gitlabRunner.resources.limits.memory }}"
+  {% endif %}
+  {% if dsc.gitlabRunner.resources.overwrite != 'none' %}
+    {% if dsc.gitlabRunner.resources.overwrite.requests != 'none' %}
+        cpu_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.requests.cpu }}"
+        memory_request_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.requests.memory }}"
+    {% endif %}
+    {% if dsc.gitlabRunner.resources.overwrite.limits != 'none' %}
+        memory_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.cpu }}"
+        cpu_request_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.memory }}"        
+    {% endif %}
+  {% endif %}
+{% endif %}
 
   ## Specify the name for the runner.
   name: gitlab-runner

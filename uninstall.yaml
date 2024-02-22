@@ -208,6 +208,17 @@
         - never
         - kyverno
 
+    - name: "Suppression des CustomResourceDefinitions Kyverno"
+      kubernetes.core.k8s:
+        api_version: apiextensions.k8s.io/v1
+        state: absent
+        kind: CustomResourceDefinition
+        label_selectors:
+          - "app.kubernetes.io/instance=kyverno"
+      tags:
+        - never
+        - kyverno
+
     - name: "Suppression du namespace Nexus"
       kubernetes.core.k8s:
         state: absent

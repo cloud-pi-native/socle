@@ -37,7 +37,7 @@ spec:
           - kyverno
           - openshift-*
           - infra-*
-          - dso-kyverno
+          - {{ dsc.kyverno.namespace }}
     generate:
 {% raw %}
       namespace: "{{request.object.metadata.name}}"

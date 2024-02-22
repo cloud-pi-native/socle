@@ -475,6 +475,9 @@ spec:
                 kyverno:
                   description: Configuration for Kyverno.
                   properties:
+                    namespace:
+                      description: The namespace for Kyverno.
+                      type: string
                     chartVersion:
                       description: Kyverno helm chart version (e.g., "3.1.4").
                       type: string

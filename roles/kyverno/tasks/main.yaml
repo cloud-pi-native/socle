@@ -19,16 +19,27 @@
         name: kyverno
         chart_ref: kyverno/kyverno
         chart_version: "{{ dsc.kyverno.chartVersion }}"
-        release_namespace: dso-kyverno
+        release_namespace: "{{ dsc.kyverno.namespace }}"
         create_namespace: true
 
-- name: Get dsc namespaces
+- name: Wait Kyverno service endpoint to be available
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.kyverno.namespace }}"
+    name: kyverno-svc
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 45
+  delay: 20
+
+- name: Get dsc namespaces but not Kyverno's
   ansible.builtin.set_fact:
     dsc_namespaces: "{{ dsc
       | dict2items
       | map(attribute='value')
       | selectattr('namespace', 'defined')
       | map(attribute='namespace')
+      | reject('equalto', dsc.kyverno.namespace)
       }}"
 
 - name: Create replace-kubed ClusterPolicy

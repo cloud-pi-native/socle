@@ -21,11 +21,6 @@
         - cert-manager
         - cm
 
-#    - name: confSyncer
-#      tags:
-#        - confSyncer
-#        - kubed
-
     - name: kyverno
       tags:
         - kyverno

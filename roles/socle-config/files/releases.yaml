@@ -36,11 +36,8 @@ spec:
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 16.1.5
-#  kubed:
-#    # https://artifacthub.io/packages/helm/appscode/kubed
-#    chartVersion: 0.13.2
   kyverno:
-    # https://github.com/kyverno/kyverno/tree/main/charts/kyverno
+    # https://artifacthub.io/packages/helm/kyverno/kyverno
     chartVersion: 3.1.4
   nexus:
     # https://hub.docker.com/r/sonatype/nexus3/

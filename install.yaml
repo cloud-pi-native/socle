@@ -21,10 +21,9 @@
         - cert-manager
         - cm
 
-    - name: confSyncer
+    - name: kyverno
       tags:
-        - confSyncer
-        - kubed
+        - kyverno
 
     - name: cloudnativepg
       tags:

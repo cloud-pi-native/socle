@@ -1,0 +1,47 @@
+---
+- name: Get existing Kyverno pods
+  kubernetes.core.k8s_info:
+    kind: Pod
+    label_selectors:
+      - "app.kubernetes.io/part-of=kyverno"
+  register: kyverno_pods
+
+- name: Install Kyverno
+  when: kyverno_pods.resources | length == 0
+  block:
+    - name: Add helm repo
+      kubernetes.core.helm_repository:
+        name: kyverno
+        repo_url: https://kyverno.github.io/kyverno/
+
+    - name: Deploy helm
+      kubernetes.core.helm:
+        name: kyverno
+        chart_ref: kyverno/kyverno
+        chart_version: "{{ dsc.kyverno.chartVersion }}"
+        release_namespace: "{{ dsc.kyverno.namespace }}"
+        create_namespace: true
+
+- name: Wait Kyverno service endpoint to be available
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.kyverno.namespace }}"
+    name: kyverno-svc
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 45
+  delay: 20
+
+- name: Get dsc namespaces but not Kyverno's
+  ansible.builtin.set_fact:
+    dsc_namespaces: "{{ dsc
+      | dict2items
+      | map(attribute='value')
+      | selectattr('namespace', 'defined')
+      | map(attribute='namespace')
+      | reject('equalto', dsc.kyverno.namespace)
+      }}"
+
+- name: Create replace-kubed ClusterPolicy
+  kubernetes.core.k8s:
+    template: replace-kubed.yml.j2

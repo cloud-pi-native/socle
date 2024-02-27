@@ -16,6 +16,8 @@
   - [CloudNativePG](#cloudnativepg)
   - [GitLab Operator](#gitlab-operator)
   - [Grafana Operator et instance Grafana](#grafana-operator-et-instance-grafana)
+  - [Kyverno](#kyverno)
+  - [Kubed (config-syncer)](#kubed-config-syncer)
 - [Désinstallation](#désinstallation)
   - [Chaîne complète](#chaîne-complète)
   - [Désinstaller un ou plusieurs outils](#désinstaller-un-ou-plusieurs-outils)
@@ -32,7 +34,7 @@
     - [Harbor](#harbor)
     - [Instance Grafana](#instance-grafana)
     - [Keycloak](#keycloak)
-    - [Kubed (config-syncer)](#kubed-config-syncer)
+    - [Kyverno](#kyverno-1)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
@@ -61,7 +63,7 @@ Les éléments déployés seront les suivants :
 | Harbor                       | <https://goharbor.io>                                                          |
 | HashiCorp Vault              | <https://www.vaultproject.io>                                                  |
 | Keycloak                     | <https://www.keycloak.org>                                                     |
-| Kubed                        | <https://appscode.com/products/kubed>                                          |
+| Kyverno                      | <https://kyverno.io>                                                           |
 | SonarQube Community Edition  | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
 | Sonatype Nexus Repository    | <https://www.sonatype.com/products/sonatype-nexus-repository>                  |
 
@@ -197,7 +199,7 @@ spec:
         name: ingress-tls
         method: in-namespace
   keycloak: {}
-  kubed: {}
+  kyverno: {}
   nexus:
     storageSize: 5Gi
   proxy:
@@ -442,6 +444,24 @@ Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que 
 
 **Attention !** Assurez-vous que si une précédente instance de Grafana Operator a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur Grafana avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Grafana échouera car l'opérateur associé n'aura pas été installé par le role.
 
+### Kyverno
+
+Kyverno est installé via le role `kyverno`. Il est utilisé pour déployer une ClusterPolicy qui automatise la réplication des secrets et configmaps portant le label `ns.kyverno.io/all-sync: ""` dans tous les namespaces de la chaîne DSO.
+
+Pour l'instant, seuls les secrets et configmaps présents dans le namespace `default` et portant ce label sont ainsi répliqués.
+
+Le playbook d'installation, via le role `kyverno`, s'assurera préalablement que cet outil n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence d'éventuels pods Kyverno, en se basant sur le label `app.kubernetes.io/part-of: kyverno`.
+
+Si aucun pod Kyverno n'est détecté, le rôle associé procédera donc à l'installation.
+
+**Attention !** Assurez-vous que si une précédente instance de Kyverno a été désinstallée du cluster elle l'a été proprement, c'est à dire en supprimant également les resources cluster scoped associées. Si ce n'est pas le cas, l'installation de Kyverno échouera. Pour faciliter cette désinstallation préalable au besoin, vous pouvez utiliser la commande de désinstallation associée (voir [section suivante](#désinstallation)).
+
+### Kubed (config-syncer)
+
+Le role Kyverno remplit désormais les mêmes fonctionnalités que celles qui étaient précédemment proposées par le role Kubed, lequel a été supprimé.
+
+C'est pourquoi, dans un cluster dédié à une utilisation à jour du socle DSO, nous vous recommandons de **désinstaller Kubed** (voir [section suivante](#désinstallation)).
+
 ## Désinstallation
 
 ### Chaîne complète
@@ -489,13 +509,14 @@ watch "kubectl get ns | grep '\-mynamespace'"
   - **CloudNativePG** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **GitLab Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Grafana Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
-  - **Kubed** déployé dans le namespace `openshift-infra`.
+  - **Kyverno** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
 - Les cinq composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces outils, vous pourrez le faire via l'utilisation des tags correspondants :
   - Pour Cert-manager : `-t cert-manager`
   - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`)
   - Pour GitLab Operator : `-t gitlab-operator`
   - Pour Grafana Operator : `-t grafana-operator`
-  - Pour Kubed : `-t kubed` (ou bien `-t confSyncer`)
+  - Pour Kyverno : `-t kyverno`
+- La fonctionnalité actuellement remplie par le role Kyverno était auparavant gérée par un role kubed. C'est la raison pour laquelle la désinstallation de kubed est toujours disponible. Si kubed est encore présent dans votre cluster hébergeant le socle DSO, nous vous recommandons sa désinstallation via l'utilisation du tag `-t kubed` (ou `-t confSyncer`).
 
 ### Désinstaller un ou plusieurs outils
 
@@ -546,7 +567,7 @@ Ceci parce que la version de la Console Cloud π Native déployée par le socle,
 
 Aussi, **nous ne pouvons garantir le bon fonctionnement** de la forge DSO dans un contexte où les versions de charts seraient modifiées.
 
-De plus, et comme indiqué plus haut, les outils cert-manager, Kubed, CloudNativePG et Grafana Operator seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
+De plus, et comme indiqué plus haut, les outils cert-manager, CloudNativePG, GitLab Operator, Grafana Operator et Kyverno seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
 
 Si malgré tout vous souhaitez tenter une modification de version d'un chart en particulier, Vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
 
@@ -623,7 +644,7 @@ Les sections suivantes détaillent la façon de procéder au gel de version d'im
   - [Harbor](#harbor)
   - [Instance Grafana](#instance-grafana)
   - [Keycloak](#keycloak)
-  - [Kubed (config-syncer)](#kubed-config-syncer)
+  - [Kyverno](#kyverno-1)
   - [Sonatype Nexus Repository](#sonatype-nexus-repository)
   - [SonarQube Community Edition](#sonarqube-community-edition)
   - [Vault](#vault)
@@ -841,9 +862,9 @@ Pour mémoire, les values utilisables sont disponibles ici : <https://github.com
 
 Les release notes de Keycloak se trouvent ici : <https://github.com/keycloak/keycloak/releases>
 
-#### Kubed (config-syncer)
+#### Kyverno
 
-La version d'image utilisée par Kubed est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
+La version d'image utilisée par Kyverno est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
 
 Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez ce que vous faites.
 

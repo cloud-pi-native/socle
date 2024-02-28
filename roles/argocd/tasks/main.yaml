@@ -29,6 +29,12 @@
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
           name: argo-redis
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocd.namespace }}"
+          name: argo-redis-master
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocd.namespace }}"
+          name: argo-redis-replica
 
 - name: Add helm repo
   kubernetes.core.helm_repository:
@@ -49,6 +55,7 @@
 
 - name: Deploy helm
   kubernetes.core.helm:
+    force: true
     name: argo
     chart_ref: bitnami/argo-cd
     chart_version: "{{ dsc.argocd.chartVersion }}"

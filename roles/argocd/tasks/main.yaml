@@ -55,7 +55,6 @@
 
 - name: Deploy helm
   kubernetes.core.helm:
-    force: true
     name: argo
     chart_ref: bitnami/argo-cd
     chart_version: "{{ dsc.argocd.chartVersion }}"

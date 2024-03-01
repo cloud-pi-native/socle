@@ -24,6 +24,7 @@ spec:
     name: admin-RO
     policies:
     - p, proj:console-pi-native:admin, applications, get, console-pi-native/*, allow
+    - p, proj:console-pi-native:admin-RO, applications, get, console-pi-native/*, allow
   - description: admin-RW
     groups:
     - /admin
@@ -33,5 +34,6 @@ spec:
     name: admin-RW
     policies:
     - p, proj:console-pi-native:admin, applications, *, console-pi-native/*, *
+    - p, proj:console-pi-native:admin-RW, applications, *, console-pi-native/*, *
   sourceRepos:
   - https://github.com/cloud-pi-native/console.git

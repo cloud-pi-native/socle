@@ -1,6 +1,8 @@
 securityContext: &securityContext
   containerSecurityContext:
     runAsUser: null
+    runAsGroup: null
+    seLinuxOptions: null
   podSecurityContext:
     fsGroup: null
 
@@ -9,15 +11,39 @@ config:
   secret:
     argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
 {% endif %}
+  rbac:
+    policy.csv: |
+      p, role:admin, *, *, */*, allow
+      p, role:nada, *, *, */*, deny
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+      g, /ArgoCDAdmins, role:admin
+      g, ArgoCDAdmins, role:admin
+    scopes: "[groups]"
+    policy.default: role:nada
+    admin.enabled: "false"
 redis:
-  <<: *securityContext
   architecture: replication
+  master:
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+  replica:
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
 {% if dsc.global.metrics.enabled %}
   metrics:
     enabled: true
     serviceMonitor:
       enabled: true
       namespace: {{ dsc.argocd.namespace }}
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
 {% endif %}
 controller:
   <<: *securityContext
@@ -82,24 +108,8 @@ repoServer:
       enabled: true
       namespace: {{ dsc.argocd.namespace }}
 {% endif %}
-extraDeploy:
-  - apiVersion: v1
-    data:
-      policy.csv: |
-        p, role:admin, *, *, */*, allow
-        p, role:nada, *, *, */*, deny
-        g, system:cluster-admins, role:admin
-        g, cluster-admins, role:admin
-        g, /ArgoCDAdmins, role:admin
-        g, ArgoCDAdmins, role:admin
-      scopes: "[groups]"
-      policy.default: role:nada
-      admin.enabled: "false"
-    kind: ConfigMap
-    metadata:
-      name: argocd-rbac-cm
-      namespace: {{ dsc.argocd.namespace }}
 applicationSet:
+  enabled: false
   replicaCount: 3
   webhook:
     ingress:
@@ -112,6 +122,7 @@ applicationSet:
       namespace: {{ dsc.argocd.namespace }}
 {% endif %}
 notifications:
+  enabled: false
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}

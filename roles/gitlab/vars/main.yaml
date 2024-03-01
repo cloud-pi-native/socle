@@ -1,29 +1,13 @@
 ---
 gitlab_service_monitors:
-  - name: gitaly
-    port: 9236
-    path: /metrics
-  - name: gitlab-exporter
-    port: 9168
-    path: /metrics
   - name: postgresql
     port: 9187
     path: /metrics
     metrics_endpoint_name: metrics
+
+gitlab_additional_service_monitors:
   - name: redis
     port: 9121
     path: /metrics
     metrics_endpoint_name: metrics
-  - name: webservice
-    port: 8083
-    path: /metrics
 
-gitlab_additional_service_monitors:
-  - name: kas
-    port: 8151
-    path: /metrics
-
-gitlab_additional_pod_monitors:
-  - name: sidekiq
-    port: 3807
-    path: /metrics

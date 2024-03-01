@@ -28,13 +28,15 @@ spec:
   harbor:
     namespace: dso-harbor
     subDomain: harbor
-  nexus:
-    namespace: dso-nexus
-    subDomain: nexus
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
     postgresPvcSize: 1Gi
+  kyverno:
+    namespace: dso-kyverno
+  nexus:
+    namespace: dso-nexus
+    subDomain: nexus
   sonarqube:
     namespace: dso-sonarqube
     subDomain: sonar

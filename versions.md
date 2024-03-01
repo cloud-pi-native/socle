@@ -1,12 +1,12 @@
 | Outil | Version | Chart version | Source |
 | ----- | ------- | ------------- | ------ |
 | argocd | 2.10.1 | 5.9.1 | [argocd](https://artifacthub.io/packages/helm/bitnami/argo-cd) |
-| certmanager | 1.13.1 | 1.13.1 | [certmanager](https://github.com/cert-manager/cert-manager/releases) |
-| cloudnativepg | 1.20.2 | 0.18.2 | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg) |
+| certmanager | 1.14.3 | 1.14.3 | [certmanager](https://github.com/cert-manager/cert-manager/releases) |
+| cloudnativepg | 1.22.1 | 0.20.1 | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg) |
 | console | 6.5.1 | 6.5.1 | [console](https://github.com/cloud-pi-native/console/releases) |
-| gitlab | 16.6.6 | 7.6.6 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
-| gitlabOperator | 0.28.1 | 0.28.1 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
-| gitlabRunner | 16.6.0 | 0.59.1 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
+| gitlab | 16.9.1 | 7.9.1 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
+| gitlabOperator | 0.29.1 | 0.29.1 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
+| gitlabRunner | 16.9.0 | 0.62.0 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
 | grafana | 9.5.5 | N/A |[grafana](https://github.com/grafana/grafana/tags) |
 | grafanaOperator | 5.4.2 | 5.4.2 | [grafanaOperator](https://github.com/grafana/grafana-operator/tags) |
 | harbor | 2.9.1 | 1.13.1 | [harbor](https://artifacthub.io/packages/helm/harbor/harbor) |

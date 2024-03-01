@@ -8,22 +8,22 @@ spec:
     chartVersion: 5.9.1
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
-    chartVersion: v1.13.1
+    chartVersion: v1.14.3
   cloudnativepg:
     # https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
-    chartVersion: 0.18.2
+    chartVersion: 0.20.1
   console:
     # https://github.com/cloud-pi-native/console/releases
     release: "6.5.1"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "7.6.6"
+    chartVersion: "7.9.1"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "0.28.1"
+    chartVersion: "0.29.1"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.59.1"
+    chartVersion: "0.62.0"
   grafana:
     # https://github.com/grafana/grafana/tags
     imageVersion: "9.5.5"

@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.0.0](https://github.com/cloud-pi-native/socle/compare/v1.3.0...v2.0.0) (2024-03-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* :sparkles: Kyverno as a Kubed replacement
+
+### Features
+
+* :art: Add Kyverno namespace to dsc + improve uninstall ([410e344](https://github.com/cloud-pi-native/socle/commit/410e344e09f2e8a9d7d295b87a086ec1fc6948e8))
+* :art: Add uninstall for Grafana ingress ([eb33f15](https://github.com/cloud-pi-native/socle/commit/eb33f15ee8b709d7d4800ac66a23e3ba7f668deb))
+* :art: Improve Kyverno uninstall ([b05d2b9](https://github.com/cloud-pi-native/socle/commit/b05d2b94b2744042a38c3752e3655e45b56cda22))
+* :sparkles: Add keycloak binding, dashboards + refactor ([391eeb8](https://github.com/cloud-pi-native/socle/commit/391eeb845eb06b4cc52f6c99d4b2a4de165c3f78))
+* :sparkles: Add some dashboards ([c29eeef](https://github.com/cloud-pi-native/socle/commit/c29eeefc75b72a13fcb62757da1077f0cf3c7087))
+* :sparkles: Adding Harbor dashboard ([8e94d80](https://github.com/cloud-pi-native/socle/commit/8e94d80816b6453f5daa56cb03975dff511ec903))
+* :sparkles: Adding new dashboards ([c78b738](https://github.com/cloud-pi-native/socle/commit/c78b738f7ecc857b1c0442588c1f4497f4534a9c))
+* :sparkles: Change dashboards creation process ([6719e82](https://github.com/cloud-pi-native/socle/commit/6719e82fa57e7c7b79af77e79642f11c3dc53ee1))
+* :sparkles: Kyverno as a Kubed replacement ([124e24e](https://github.com/cloud-pi-native/socle/commit/124e24e374e9074b4633a5a94432c586f0e33186))
+
+
+### Bug Fixes
+
+* :art: Fix some parameters for updated Argo CD ([ac40895](https://github.com/cloud-pi-native/socle/commit/ac40895c89bec6137ffc4031e7345720957447c7))
+* :art: Remove useless force ([2d7fd26](https://github.com/cloud-pi-native/socle/commit/2d7fd26f216837bc0cc39ea6c09e39ec857bc5f0))
+* :bug: Dashboards settings ([cd4aa01](https://github.com/cloud-pi-native/socle/commit/cd4aa019a241d4179bccf3047e515e7eaca4930f))
+* :bug: Fix (typo) ([9de47fa](https://github.com/cloud-pi-native/socle/commit/9de47fa5ae4ae853d7dc7e812d49d20106498857))
+* :bug: Fix get-credentials (grafana part) ([2ff5a4b](https://github.com/cloud-pi-native/socle/commit/2ff5a4b8c99339d0f1891175a5b1141475b13802))
+* :bug: Fix get-credentials for grafana part ([e154dae](https://github.com/cloud-pi-native/socle/commit/e154dae5673b4a70ca70cdc3ba5bfc03afe31cdc))
+* :bug: Refactor and fix GitLab metrics ([e09a138](https://github.com/cloud-pi-native/socle/commit/e09a138987cf091a6868dff9f86621b7300226a8))
+* :bug: Refactor and fix GitLab metrics ([fbab543](https://github.com/cloud-pi-native/socle/commit/fbab54352d5a65ba361de5369995c628a8ef607e))
+
 ## [1.3.0](https://github.com/cloud-pi-native/socle/compare/v1.2.0...v1.3.0) (2024-01-31)
 
 

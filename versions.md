@@ -1,6 +1,6 @@
 | Outil | Version | Chart version | Source |
 | ----- | ------- | ------------- | ------ |
-| argocd | 2.10.1 | 5.9.1 | [argocd](https://artifacthub.io/packages/helm/bitnami/argo-cd) |
+| argocd | 2.10.2 | 5.9.2 | [argocd](https://artifacthub.io/packages/helm/bitnami/argo-cd) |
 | certmanager | 1.14.3 | 1.14.3 | [certmanager](https://github.com/cert-manager/cert-manager/releases) |
 | cloudnativepg | 1.22.1 | 0.20.1 | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg) |
 | console | 6.5.1 | 6.5.1 | [console](https://github.com/cloud-pi-native/console/releases) |

@@ -5,7 +5,7 @@ metadata:
 spec:
   argocd:
     # https://artifacthub.io/packages/helm/bitnami/argo-cd
-    chartVersion: 5.9.1
+    chartVersion: 5.9.2
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
     chartVersion: v1.14.3

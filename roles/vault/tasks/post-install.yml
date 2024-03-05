@@ -8,29 +8,30 @@
   retries: 15
   delay: 5
 
-- name: Find vault keys
+# Find Vault keys
+- name: Find vault-0 keys
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
+    name: "{{ dsc_name }}-vault-0-keys"
+  register: vaut_keys
 
-# Check vault status
+# Check Vault status - node 1
 - name: Check vault status - node 1
   ansible.builtin.include_tasks: check.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-0"
 
-- name: Check if vault is coherent
+- name: Check if vault-0 is coherent
   ansible.builtin.assert:
     that:
-      - ((vault_status in ['sealed', 'OK']) and (vault_keys.resources | length > 0)) or ((vault_status == 'not init') and (vault_keys.resources | length == 0))
+      - ((vault_status in ['sealed', 'OK']) and (vaut_keys.resources | length > 0)) or ((vault_status == 'not init') and (vaut_keys.resources | length == 0))
     fail_msg:
-      - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-keys dans {{ dsc.vault.namespace }}
+      - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-0-keys dans {{ dsc.vault.namespace }}
       - Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation
-      - Soit le vault est initialisé mais vous n'avez pas de secret vault-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !
+      - Soit le vault est initialisé mais vous n'avez pas de secret vault-0-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !
 
-# Init vault node 1
+# Init Vault - node 1
 - name: Init vault node - node 1
   when: vault_status == 'not init'
   kubernetes.core.k8s_exec:
@@ -43,6 +44,7 @@
   retries: 3
   delay: 20
 
+# Store Vault keys and token - node 1
 - name: Set unseal_keys fact
   when: init.changed
   no_log: true
@@ -63,12 +65,13 @@
       | selectattr('key', 'eq', 'root_token')
       | map(attribute='value') | first }}"
 
-- name: Store vault keys
+- name: Store vault-0 keys and token
+  when: vaut_keys.resources | length == 0
   kubernetes.core.k8s:
     definition:
       kind: Secret
       metadata:
-        name: "{{ dsc_name }}-vault-keys"
+        name: "{{ dsc_name }}-vault-0-keys"
         namespace: "{{ dsc.vault.namespace }}"
       data:
         key1: "{{ unseal_keys[0] | b64encode }}"
@@ -76,67 +79,48 @@
         key3: "{{ unseal_keys[2] | b64encode }}"
         root_token: "{{ root_token | b64encode }}"
         init_config: "{{ init.stdout | from_json | b64encode }}"
-  when: vault_keys.resources | length == 0
 
-- name: Find vault keys
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.vault.namespace }}"
-    kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
-
-- name: Set fact for vault secrets
-  ansible.builtin.set_fact:
-    vault_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
-
-# Unseal vault node 1
+# Unseal Vault - node 1
 - name: Set seal count - node 1
   ansible.builtin.set_fact:
     vault_pod: "{{ dsc_name }}-vault-0"
     unseal_key_index: "0"
 
+- name: Get vault-0 keys
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vault.namespace }}"
+    kind: Secret
+    name: "{{ dsc_name }}-vault-0-keys"
+  register: vault_keys
+
 - name: Unseal vault primary - node 1
+  when: vault_status == 'not init' or vault_status == 'sealed'
   ansible.builtin.include_tasks: unseal.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-0"
-  when: vault_status == 'not init' or vault_status == 'sealed'
 
-# Init vault node 2
-- name: Check vault status - node 2
+# Join node 2 to Vault cluster
+- name: Check vault-1 status - node 2
   ansible.builtin.include_tasks: check.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-1"
 
-- name: Init vault node - node 2
+- name: Join vault-1 node to cluster - node 2
+  when: vault_status == 'not init'
   kubernetes.core.k8s_exec:
     container: vault
     pod: "{{ dsc_name }}-vault-1"
     namespace: "{{ dsc.vault.namespace }}"
-    # command: vault operator raft join http://"{{ dsc_name }}-vault-0".vault-internal:8200
-    command: vault operator raft join -address="http://{{ dsc_name }}-vault-0.{{ dsc_name }}-vault-internal:8200"
+    command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
+  register: node2_join_state
   retries: 3
   delay: 20
-  when: vault_status == 'not init'
 
-# Init node 3
-- name: Check vault status - node 3
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-2"
-
-- name: Init vault node - node 3
-  kubernetes.core.k8s_exec:
-    container: vault
-    pod: "{{ dsc_name }}-vault-2"
-    namespace: "{{ dsc.vault.namespace }}"
-    # command: vault operator raft join http://"{{ dsc_name }}-vault-0".vault-internal:8200
-    command: vault operator raft join -address="http://{{ dsc_name }}-vault-0.{{ dsc_name }}-vault-internal:8200"
-  retries: 3
-  delay: 20
-  when: vault_status == 'not init'
+#- debug:
+#    msg: "{{ node2_join_state }}"
 
 # Unseal node 2
-- name: Check vault status - node 2
+- name: Check vault-1 status - node 2
   ansible.builtin.include_tasks: check.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-1"
@@ -146,14 +130,41 @@
     vault_pod: "{{ dsc_name }}-vault-1"
     unseal_key_index: "0"
 
+- name: Get vault-0 keys
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vault.namespace }}"
+    kind: Secret
+    name: "{{ dsc_name }}-vault-0-keys"
+  register: vault_keys
+
 - name: Unseal vault node - node 2
+  when: vault_status == 'not init' or vault_status == 'sealed'
   ansible.builtin.include_tasks: unseal.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-1"
-  when: vault_status == 'not init' or vault_status == 'sealed'
+
+# Join node 3 to Vault cluster
+- name: Check vault-2 status - node 3
+  ansible.builtin.include_tasks: check.yml
+  vars:
+    vault_pod: "{{ dsc_name }}-vault-2"
+
+- name: Join vault-2 to cluster - node 3
+  when: vault_status == 'not init'
+  kubernetes.core.k8s_exec:
+    container: vault
+    pod: "{{ dsc_name }}-vault-2"
+    namespace: "{{ dsc.vault.namespace }}"
+    command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
+  register: node3_join_state
+  retries: 3
+  delay: 20
+
+#- debug:
+#    msg: "{{ node3_join_state }}"
 
 # Unseal node 3
-- name: Check vault status - node 2
+- name: Check vault-2 status - node 3
   ansible.builtin.include_tasks: check.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-2"
@@ -163,11 +174,30 @@
     vault_pod: "{{ dsc_name }}-vault-2"
     unseal_key_index: "0"
 
+- name: Get vault-0 keys
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vault.namespace }}"
+    kind: Secret
+    name: "{{ dsc_name }}-vault-0-keys"
+  register: vault_keys
+
 - name: Unseal vault node - node 3
+  when: vault_status == 'not init' or vault_status == 'sealed'
   ansible.builtin.include_tasks: unseal.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-2"
-  when: vault_status == 'not init' or vault_status == 'sealed'
+
+# Retrieve Vault token
+- name: Get Vault keys
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vault.namespace }}"
+    kind: Secret
+    name: "{{ dsc_name }}-vault-0-keys"
+  register: vault_keys
+
+- name: Get Vault token
+  ansible.builtin.set_fact:
+    vault_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
 
 # Create kv engine
 - name: Get kv engines
@@ -181,6 +211,7 @@
   register: get_engines
 
 - name: Create default 'forge-dso/' kv engine
+  when: get_engines.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: "https://{{ vault_domain }}/v1/sys/mounts/forge-dso"
@@ -193,7 +224,6 @@
       options:
         version: 2
     body_format: json
-  when: get_engines.status == 400
 
 # Oidc
 - name: Get vault client secret
@@ -214,6 +244,7 @@
   register: get_auth_method
 
 - name: Enable oidc auth method
+  when: get_auth_method.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: "https://{{ vault_domain }}/v1/sys/auth/oidc"
@@ -224,7 +255,14 @@
     body:
       "type": "oidc"
     body_format: json
-  when: get_auth_method.status == 400
+
+- name: Get Vault client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: keycloak-client-secret-vault-client
+  register: vault_secret
+  failed_when: vault_secret.resources | length == 0
 
 - name: Configue oidc auth method
   ansible.builtin.uri:
@@ -235,8 +273,8 @@
     headers:
       "X-Vault-Token": "{{ vault_token }}"
     body:
-      "oidc_discovery_url": "https://{{ keycloak_domain }}/realms/{{ keycloak_realm }}"
-      "oidc_client_id": "{{ vault_client_id }}"
+      "oidc_discovery_url": "https://{{ keycloak_domain }}/realms/dso"
+      "oidc_client_id": "{{ vault_secret.resources[0].data.CLIENT_ID | b64decode }}"
       "oidc_client_secret": "{{ vault_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
       "default_role": "default"
       "type": "oidc"
@@ -258,7 +296,7 @@
         - "openid"
         - "generic"
       "bound_audiences":
-        - "{{ vault_client_id }}"
+        - "{{ vault_secret.resources[0].data.CLIENT_ID | b64decode }}"
       "claim_mappings":
         "prefered_username": "username"
         "email": "email"

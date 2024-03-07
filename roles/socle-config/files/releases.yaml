@@ -17,10 +17,10 @@ spec:
     release: "6.5.1"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "7.9.1"
+    chartVersion: "7.9.2"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "0.29.1"
+    chartVersion: "0.29.2"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
     chartVersion: "0.62.0"

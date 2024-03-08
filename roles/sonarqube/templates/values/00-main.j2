@@ -6,6 +6,13 @@ image:
   pullPolicy: IfNotPresent
   repository: docker.io/sonarqube
 
+securityContext:
+  fsGroup: null
+
+containerSecurityContext:
+  runAsUser: null
+  runAsGroup: null
+
 sonarWebContext: /
 
 ingress:
@@ -26,9 +33,16 @@ ingress:
   labels:
     app: "sonar"
 
-initFs:
+initContainers:
   securityContext:
-    privileged: true
+    runAsUser: null
+    runAsGroup: null
+
+initSysctl:
+  enabled: false
+
+initFs:
+  enabled: false
 
 prometheusExporter:
   enabled: {{ dsc.global.metrics.enabled }}

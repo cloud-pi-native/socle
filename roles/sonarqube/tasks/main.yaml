@@ -107,6 +107,7 @@
 
 - name: Deploy helm
   kubernetes.core.helm:
+    force: true
     name: sonarqube
     chart_ref: sonarqube/sonarqube
     chart_version: "{{ dsc.sonarqube.chartVersion }}"

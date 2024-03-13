@@ -134,6 +134,7 @@
 
 - name: Get SonarQube version
   ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ sonar_domain }}/api/server/version
     method: GET
     return_content: true
@@ -152,10 +153,10 @@
 
 - name: Remove permissions for sonar-users
   ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
     user: "{{ token_pass }}"
     force_basic_auth: true
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: post
     status_code: 204
   with_items:

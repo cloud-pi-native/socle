@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/cloud-pi-native/socle/compare/v2.0.0...v2.1.0) (2024-03-13)
+
+
+### Features
+
+* :sparkles: Enable postgres user access ([71a2f70](https://github.com/cloud-pi-native/socle/commit/71a2f703ef221d45c976f015950021560d825aba))
+
+
+### Bug Fixes
+
+* :bug: Fix get version task (validate_certs) ([be646c8](https://github.com/cloud-pi-native/socle/commit/be646c806fe6c7dab11d64f8edcf533d6dcdbad4))
+
 ## [2.0.0](https://github.com/cloud-pi-native/socle/compare/v1.3.0...v2.0.0) (2024-03-01)
 
 

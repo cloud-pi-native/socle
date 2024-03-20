@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/cloud-pi-native/socle/compare/v2.1.0...v2.1.1) (2024-03-20)
+
+
+### Performance Improvements
+
+* :green_heart: disable KAS as we don't need Gitlab to deploy on kubernetes ([213be12](https://github.com/cloud-pi-native/socle/commit/213be124c59276d1759ec41e62729ac3711d75fa))
+
 ## [2.1.0](https://github.com/cloud-pi-native/socle/compare/v2.0.0...v2.1.0) (2024-03-13)
 
 

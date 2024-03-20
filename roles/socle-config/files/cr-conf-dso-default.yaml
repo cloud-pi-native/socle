@@ -39,6 +39,7 @@ spec:
   keycloak: {}
   nexus:
     storageSize: 25Gi
+    proxyCacheSize: 25Gi
   proxy:
     enabled: false
   sonarqube: {}

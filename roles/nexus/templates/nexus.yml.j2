@@ -26,6 +26,8 @@ spec:
           volumeMounts:
             - mountPath: /nexus-data
               name: nexus-data-volume
+            - mountPath: /nexus-data-docker
+              name: nexus-proxycache-volume
           env:
             - name: INSTALL4J_ADD_VM_PARAMS
               value: "-Djava.util.prefs.userRoot=/nexus-data/app"
@@ -41,6 +43,9 @@ spec:
         - name: nexus-data-volume
           persistentVolumeClaim:
             claimName: nexus-data-claim
+        - name: nexus-proxycache-volume
+          persistentVolumeClaim:
+            claimName: nexus-data-proxy-cache
 ---
 apiVersion: v1
 kind: Service

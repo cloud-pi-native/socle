@@ -10,3 +10,15 @@ spec:
   resources:
     requests:
       storage: {{ dsc.nexus.storageSize }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: {{ dsc.nexus.namespace }}
+  name: nexus-data-proxy-cache
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ dsc.nexus.proxyCacheSize }}

@@ -508,6 +508,12 @@ spec:
                         Must comply with Kubernetes size definitions (i.e 100Gi).
                       type: string
                       default: 25Gi
+                    proxyCacheSize:
+                      description: |
+                        The storage size for Nexus proxy cache.
+                        Must comply with Kubernetes size definitions (i.e 100Gi).
+                      type: string
+                      default: 25Gi
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string

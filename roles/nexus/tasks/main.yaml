@@ -203,6 +203,23 @@
     body_format: json
     status_code: [204]
 
+- name: Create dso Blob Store
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/blobstores/file
+    method: POST
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body:
+      softQuota:
+        type: spaceRemainingQuota
+        limit: 1073741824
+      path: /nexus-data-docker/dso
+      name: dso
+    body_format: json
+    status_code: [204]
+
 - name: Activate Nexus metrics scraping
   when: dsc.global.metrics.enabled
   block:

@@ -14,7 +14,16 @@ config:
   rbac:
     policy.csv: |
       p, role:admin, *, *, */*, allow
-      p, role:nada, *, *, */*, deny
+      p, role:nada, applicationsets, *, */*, deny
+      p, role:nada, applications, *, */*, deny
+      p, role:nada, logs, *, */*, deny
+      p, role:nada, exec, *, */*, deny
+      p, role:nada, certificates, *, *, deny
+      p, role:nada, accounts, *, *, deny
+      p, role:nada, gpgkeys, *, *, deny
+      p, role:nada, projects, *, *, deny
+      p, role:nada, clusters, *, *, deny
+      p, role:nada, repositories, get, *, allow
       g, system:cluster-admins, role:admin
       g, cluster-admins, role:admin
       g, /ArgoCDAdmins, role:admin

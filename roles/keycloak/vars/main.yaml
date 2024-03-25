@@ -35,6 +35,7 @@ keycloak_clients:
   - clientId: argo-client
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
+    directAccessGrantsEnabled: true
     redirectUris:
       - https://{{ argocd_domain }}/auth/callback
       - "*"

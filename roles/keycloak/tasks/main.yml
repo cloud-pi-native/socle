@@ -308,6 +308,7 @@
     auth_password: "{{ keycloak_admin_password }}"
     realm: "{{ item }}"
     brute_force_protected: true
+    failure_factor: 10 
   with_items:
     - master
     - dso

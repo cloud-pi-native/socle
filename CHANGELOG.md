@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.2.0](https://github.com/cloud-pi-native/socle/compare/v2.1.1...v2.2.0) (2024-03-25)
+
+
+### Features
+
+* :sparkles: Enable directAccessGrants for argo-client ([be0843f](https://github.com/cloud-pi-native/socle/commit/be0843f3871a937e45c42c5b5645eead7f86abd0))
+* :sparkles: Enable postgres super user (as we might need it) ([08a64ad](https://github.com/cloud-pi-native/socle/commit/08a64ad836d39448c1516a70215dfaa3a434a9e6))
+* :sparkles: Enabling brute force detection ([c3d8f50](https://github.com/cloud-pi-native/socle/commit/c3d8f50bc67204ac578a57e9f838e0d2019cfe99))
+* :sparkles: Set failureFactor for brute force protection ([dbe7b20](https://github.com/cloud-pi-native/socle/commit/dbe7b2034878ca8e1efdfd7ef1ba767d908b8709))
+
+
+### Bug Fixes
+
+* :bug: Change rbac policies (wrong syntax + disallow clusters for nada role) ([0ce8193](https://github.com/cloud-pi-native/socle/commit/0ce81930f09dd766c80640af6013e95135287dd5))
+* :bug: Fix Argo CD rbac policy ([d9f03f1](https://github.com/cloud-pi-native/socle/commit/d9f03f1d2c84bcddb086a4cb0275ea7f1a386ed1))
+* :bug: Fix clusters rbac policy ([ce5ca77](https://github.com/cloud-pi-native/socle/commit/ce5ca7777a418f667c902ccc7746450fa7ac5979))
+
 ## [2.1.1](https://github.com/cloud-pi-native/socle/compare/v2.1.0...v2.1.1) (2024-03-20)
 
 

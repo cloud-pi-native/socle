@@ -297,3 +297,18 @@
   ansible.builtin.include_tasks:
     file: client.yaml
   with_items: "{{ keycloak_clients }}"
+
+- name: Enable brute force detection
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: "{{ item }}"
+    brute_force_protected: true
+    failure_factor: 10 
+  with_items:
+    - master
+    - dso

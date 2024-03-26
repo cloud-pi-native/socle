@@ -203,7 +203,25 @@
     body_format: json
     status_code: [204]
 
+- name: Get Blob Stores
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/blobstores
+    method: GET
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    status_code: [200]
+  register: blobstores
+
+- name: Set dso_blobstore fact 
+  ansible.builtin.set_fact:
+    dso_blobstore: "{{ blobstores.json 
+      | selectattr('name', 'contains', 'dso') 
+      | map(attribute='name') | first | default('') }}"
+
 - name: Create dso Blob Store
+  when: dso_blobstore != "dso"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true

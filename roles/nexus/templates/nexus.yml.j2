@@ -62,3 +62,19 @@ spec:
       protocol: TCP
   selector:
     app: nexus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ dsc.nexus.namespace }}
+  name: nexus-docker-proxy
+  labels:
+    app: nexus
+spec:
+  type: ClusterIP
+  ports:
+    - name: dockerproxy
+      port: 5000
+      protocol: TCP
+  selector:
+    app: nexus

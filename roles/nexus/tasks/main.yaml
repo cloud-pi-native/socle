@@ -238,6 +238,83 @@
     body_format: json
     status_code: [204]
 
+- name: Get dso-dockerhub-proxy
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/repositories/docker/proxy/dso-dockerhub-proxy
+    method: GET
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    status_code: [200]
+  register: dso_dockerhub_proxy
+  ignore_errors: true
+
+- name: Create Docker Proxy Repository
+  when: dso_dockerhub_proxy.status == 404
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/repositories/docker/proxy
+    method: POST
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body:
+      cleanup: null
+      docker:
+        forceBasicAuth: false
+        httpPort: 5000
+        httpsPort: null
+        subdomain: null
+        v1Enabled: true
+      dockerProxy:
+        cacheForeignLayers: false
+        foreignLayerUrlWhitelist: []
+        indexType: "HUB"
+        indexUrl: null
+      format: docker
+      httpClient:
+        authentication: null
+        autoBlock: true
+        blocked: false
+        connection:
+          enableCircularRedirects: false
+          enableCookies: false
+          retries: null
+          timeout: null
+          useTrustStore: false
+          userAgentSuffix: null
+      name: dso-dockerhub-proxy
+      negativeCache:
+        enabled: true
+        timeToLive: 1440
+      online: true
+      proxy:
+        contentMaxAge: 1440
+        metadataMaxAge: 1440
+        remoteUrl: "https://registry-1.docker.io"
+      routingRuleName: null
+      storage:
+        blobStoreName: dso
+        strictContentTypeValidation: true
+        writePolicy: ALLOW
+      type: proxy
+      url: "https://testcm-nexus.apps.c7.numerique-interieur.com/repository/dso-dockerhub-proxy"
+    body_format: json
+    status_code: [201]
+
+- name: Set active Realms
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/security/realms/active
+    method: PUT
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body: [NexusAuthenticatingRealm, DockerToken]
+    body_format: json
+    status_code: [204]
+
 - name: Activate Nexus metrics scraping
   when: dsc.global.metrics.enabled
   block:

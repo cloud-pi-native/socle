@@ -119,7 +119,8 @@ repoServer:
 {% endif %}
 applicationSet:
   enabled: false
-  replicaCount: 3
+  replicaCount: 2
+  <<: *securityContext
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}

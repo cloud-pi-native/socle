@@ -287,6 +287,17 @@ spec:
                       required:
                         - enabled
                       type: object
+                    backup:
+                      description: Configuration for backup feature.
+                      properties:
+                        type:
+                          default: none
+                          description: Specifies the backup type used for databases.
+                          enum:
+                            - none
+                            - velero
+                          type: strings
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain

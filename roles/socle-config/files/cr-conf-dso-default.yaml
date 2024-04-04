@@ -26,6 +26,8 @@ spec:
       .example.com
     metrics:
       enabled: false
+    backup:
+      type: velero
   grafana: {}
   grafanaDatasource: {}
   grafanaOperator: {}

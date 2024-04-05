@@ -79,6 +79,6 @@
       until: nexus_pod.resources | length == 0
       retries: 5
 
-- name: Create both PVC
+- name: Create both PVCs
   kubernetes.core.k8s:
     template: pvc.yml.j2

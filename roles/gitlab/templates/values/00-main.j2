@@ -96,3 +96,10 @@ global:
 
 prometheus:
   install: false
+
+{% if dsc.global.backup.type == 'velero' %}
+postgresql:
+  primary:
+    podAnnotations:
+      pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD pg_dump -Fc  -U postgres -d gitlabhq_production  > /bitnami/postgresql/data/app.dump"]'
+{% endif %}

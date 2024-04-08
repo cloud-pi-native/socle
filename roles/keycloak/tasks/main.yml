@@ -68,22 +68,17 @@
 - name: Download prometheus-operator CRDs                                                                                               
   ansible.builtin.uri:
     url: https://github.com/prometheus-operator/prometheus-operator/releases/download/{{ dsc.prometheusoperator.chartVersion }}/stripped-down-crds.yaml
-    dest: /tmp/stripped-down-crds.yaml
-    status_code: [ 200, 304 ]
- 
-- name: Add missing quotes in yaml file
-  ansible.builtin.replace:
-    path: /tmp/stripped-down-crds.yaml
-    regexp: '^(\s*)[-]?{{ item.search }}'
-    replace: '\1{{ item.replace }}'
-  with_items:
-    - { search: '\- =~', replace: "- '=~'" }
-    - { search: '\- =', replace: "- '='" }
- 
+    return_content: true
+  register: prometheusoperator_crds
+
 - name: Apply CRDs
   kubernetes.core.k8s:
     state: present
-    src: /tmp/stripped-down-crds.yaml
+    definition: |
+      {{ prometheusoperator_crds.content |
+         regex_replace('- =~', "- '=~'") |
+         regex_replace('- =', "- '='") |
+         from_yaml_all }}
 
 - name: Add bitnami helm repo
   kubernetes.core.helm_repository:

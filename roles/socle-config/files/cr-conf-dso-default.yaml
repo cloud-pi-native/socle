@@ -39,6 +39,9 @@ spec:
   keycloak: {}
   nexus:
     storageSize: 25Gi
+  prometheus:
+    crd:
+      type: external
   proxy:
     enabled: false
   sonarqube: {}

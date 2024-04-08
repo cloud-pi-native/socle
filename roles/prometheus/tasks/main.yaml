@@ -1,0 +1,16 @@
+# Installation des CRDs indépendamment du chart helm.
+# Recommandé en production.
+- name: Download prometheus-operator CRDs
+  ansible.builtin.uri:
+    url: https://github.com/prometheus-operator/prometheus-operator/releases/download/{{ dsc.prometheus.crd.version }}/stripped-down-crds.yaml
+    return_content: true
+  register: prometheusoperator_crds
+
+- name: Apply CRDs
+  kubernetes.core.k8s:
+    state: present
+    definition: |
+      {{ prometheusoperator_crds.content |
+         regex_replace('- =~', "- '=~'") |
+         regex_replace('- =', "- '='") |
+         from_yaml_all }}

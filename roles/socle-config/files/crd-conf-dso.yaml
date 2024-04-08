@@ -296,7 +296,7 @@ spec:
                           enum:
                             - none
                             - velero
-                          type: strings
+                          type: string
                       type: object
                   required:
                     - projectsRootDir

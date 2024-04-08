@@ -503,6 +503,17 @@ spec:
                   required:
                     - storageSize
                   type: object
+                prometheus:
+                  description: Minimal configuration for prometheus CRDs
+                  properties:
+                    crd:
+                      type: string
+                      enum:
+                        - external
+                        - managed
+                      version:
+                        type: string
+                  type: object
                 proxy:
                   description: Proxy configuration for tools.
                   properties:

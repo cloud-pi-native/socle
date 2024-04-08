@@ -30,6 +30,12 @@
         - cloudnativepg
         - cnpg
 
+    - name: prometheus
+      tags:
+        - prometheus
+        - prom
+      when: dsc.prometheus.crd.type == 'managed'
+
     - name: keycloak
       tags:
         - keycloak

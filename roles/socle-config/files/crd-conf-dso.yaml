@@ -507,12 +507,16 @@ spec:
                   description: Minimal configuration for prometheus CRDs
                   properties:
                     crd:
-                      type: string
-                      enum:
-                        - external
-                        - managed
-                      version:
-                        type: string
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - external
+                            - managed
+                          default: external
+                        version:
+                          type: string
+                      type: object
                   type: object
                 proxy:
                   description: Proxy configuration for tools.

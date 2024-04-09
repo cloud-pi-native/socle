@@ -274,7 +274,7 @@
       when: nexus_tasks_check == 'missing'
       ansible.builtin.include_tasks:
         file: manage-nexus-tasks.yaml
-
+  always:
     - name: Disallow scripts
       ansible.builtin.include_tasks:
         file: disallow-scripts.yaml

@@ -238,266 +238,34 @@
     body_format: json
     status_code: [204]
 
-# Create Cleanup policy and tasks
+- name: Check cleanup policy placeholder file
+  ansible.builtin.include_tasks:
+    file: check-cleanup-policy.yaml
 
-- name: Get nexus endpoint
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.nexus.namespace }}"
-    name: nexus
-  register: nexus_ep
-  until: nexus_ep.resources[0].subsets[0].addresses[0] is defined
-  retries: 15
-  delay: 5
+- name: Check Nexus tasks
+  ansible.builtin.include_tasks:
+    file: check-nexus-tasks.yaml
 
-- name: Set nexus_pod
-  ansible.builtin.set_fact:
-    nexus_pod: "{{ nexus_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
+- name: Manage cleanup policy and Nexus tasks
+  when: (cp_placeholder_file.rc != 0) or (nexus_tasks_check == 'missing')
+  block:
+    - name: Allow scripts
+      ansible.builtin.include_tasks:
+        file: allow-scripts.yaml
 
-- name: Get Nexus properties file backup
-  kubernetes.core.k8s_exec:
-    pod: "{{ nexus_pod }}"
-    namespace: "{{ dsc.nexus.namespace }}"
-    command: ls /nexus-data/etc/nexus.properties.bkp
-  register: nx_prop_bkp
-  ignore_errors: true
+    - name: Create cleanup policy
+      when: cp_placeholder_file.rc != 0
+      ansible.builtin.include_tasks:
+        file: manage-cleanup-policy.yaml
 
-- name: Backup Nexus properties file
-  when: nx_prop_bkp.rc != 0
-  kubernetes.core.k8s_exec:
-    pod: "{{ nexus_pod }}"
-    namespace: "{{ dsc.nexus.namespace }}"
-    command: cp -p /nexus-data/etc/nexus.properties /nexus-data/etc/nexus.properties.bkp
+    - name: Create Nexus tasks
+      when: nexus_tasks_check == 'missing'
+      ansible.builtin.include_tasks:
+        file: manage-nexus-tasks.yaml
 
-- name: Check scripts creation permission
-  kubernetes.core.k8s_exec:
-    pod: "{{ nexus_pod }}"
-    namespace: "{{ dsc.nexus.namespace }}"
-    command: grep 'nexus.scripts.allowCreation=true' /nexus-data/etc/nexus.properties
-  register: nx_scripts_permission
-  ignore_errors: true
-
-- name: Allow scripts creation
-  when: nx_scripts_permission.rc != 0
-  kubernetes.core.k8s_exec:
-    pod: "{{ nexus_pod }}"
-    namespace: "{{ dsc.nexus.namespace }}"
-    command: bash -c "echo -e 'nexus.scripts.allowCreation=true\n' >> /nexus-data/etc/nexus.properties"
-  register: scripts_allowed
-
-- name: Restart Nexus pod
-  when: scripts_allowed is not skipped
-  kubernetes.core.k8s:
-    kind: Pod
-    namespace: "{{ dsc.nexus.namespace }}"
-    name: "{{ nexus_pod }}"
-    state: absent
-
-- name: Wait Nexus URL
-  ansible.builtin.uri:
-    url: https://{{ nexus_domain }}
-    method: GET
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    status_code: [200, 202]
-    return_content: false
-  register: nexus_response
-  until: nexus_response is not failed
-  retries: 25
-  delay: 5
-
-- name: Get cleanup policy script
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.json
-    method: GET
-    user: admin
-    password: "{{ nexus_admin_password }}"
-  register: cleanup_policy_script
-  ignore_errors: true
-
-- name: Add cleanup policy script
-  when: cleanup_policy_script.status != 200
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script
-    method: POST
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body:
-      name: dso-docker-cleanup.json
-      content: |
-        import org.sonatype.nexus.cleanup.storage.CleanupPolicyStorage
-
-        def createPolicy (policyName) {
-            try {
-                def policyStorage = container.lookup(CleanupPolicyStorage.class.getName())
-                def cleanupPolicy = policyStorage.newCleanupPolicy()
-                cleanupPolicy.setName(policyName)
-                cleanupPolicy.setNotes('')
-                cleanupPolicy.setMode('deletion')
-                cleanupPolicy.setFormat('docker')
-                cleanupPolicy.setCriteria(['lastDownloaded':'2592000'])
-                policyStorage.add(cleanupPolicy)
-            } catch (e) {
-                log.info("Cleanup policy already exists, skipping...")
-            }
-        }
-
-        createPolicy('DSOdockerCleanupPolicy')
-      type: "groovy"
-    body_format: json
-    status_code: [204]
-
-- name: Run cleanup policy script
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.json/run
-    method: POST
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body: {}
-    body_format: json
-    status_code: [200]
-
-- name: Get DSO tasks script
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-tasks.json
-    method: GET
-    user: admin
-    password: "{{ nexus_admin_password }}"
-  register: dso_tasks_script
-  ignore_errors: true
-
-- name: Add DSO tasks script
-  when: dso_tasks_script.status != 200
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script
-    method: POST
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body:
-      name: dso-tasks.json
-      content: |
-        import org.sonatype.nexus.blobstore.api.BlobStoreManager
-        import org.sonatype.nexus.scheduling.TaskConfiguration
-        import org.sonatype.nexus.scheduling.TaskScheduler
-        import org.sonatype.nexus.scheduling.schedule.Cron
-
-        def createCompactBlobstoreTask(TaskScheduler taskScheduler) {
-            TaskConfiguration taskConfiguration = taskScheduler.createTaskConfigurationInstance("blobstore.compact")
-            taskConfiguration.name = "Compact Blob Stores"
-
-            taskConfiguration.setString("blobstoreName", "dso")
-            // TODO: taskConfiguration.setAlertEmail("TODO")
-            taskScheduler.scheduleTask(
-                taskConfiguration,
-                new Cron(new Date().next(), "0 5 0 * * ?")
-            )
-            log.info("Task ${taskConfiguration.name} created")
-        }
-
-        def createCleanDockerUploadsTask(TaskScheduler taskScheduler) {
-            TaskConfiguration taskConfiguration = taskScheduler.createTaskConfigurationInstance("repository.docker.upload-purge")
-            taskConfiguration.name = "Clean Docker uploads"
-
-            taskConfiguration.setString("age", "24")
-            // TODO: taskConfiguration.setAlertEmail("TODO")
-            taskScheduler.scheduleTask(
-                taskConfiguration,
-                new Cron(new Date().next(), "0 10 0 * * ?")
-            )
-            log.info("Task ${taskConfiguration.name} created")
-        }
-
-        def createCleanDockerUnusedStuffTask(TaskScheduler taskScheduler) {
-            TaskConfiguration taskConfiguration = taskScheduler.createTaskConfigurationInstance("repository.docker.gc")
-            taskConfiguration.name = "Clean Docker unused stuff"
-
-            taskConfiguration.setString("repositoryName", "dso-dockerhub-proxy")
-            taskConfiguration.setString("deployOffset", "24")
-            // TODO: taskConfiguration.setAlertEmail("TODO")
-            taskScheduler.scheduleTask(
-                taskConfiguration,
-                new Cron(new Date().next(), "0 15 0 * * ?")
-            )
-            log.info("Task ${taskConfiguration.name} created")
-        }
-
-        TaskScheduler taskScheduler = container.lookup(TaskScheduler.class)
-
-        createCompactBlobstoreTask(taskScheduler)
-        createCleanDockerUploadsTask(taskScheduler)
-        createCleanDockerUnusedStuffTask(taskScheduler)
-      type: "groovy"
-    body_format: json
-    status_code: [204]
-
-- name: Run DSO tasks script
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-tasks.json/run
-    method: POST
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body: {}
-    body_format: json
-    status_code: [200]
-
-- name: Get nexus endpoint
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.nexus.namespace }}"
-    name: nexus
-  register: nexus_ep
-  until: nexus_ep.resources[0].subsets[0].addresses[0] is defined
-  retries: 15
-  delay: 5
-
-- name: Set nexus_pod
-  ansible.builtin.set_fact:
-    nexus_pod: "{{ nexus_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
-
-- name: Get Nexus properties backup file
-  kubernetes.core.k8s_exec:
-    pod: "{{ nexus_pod }}"
-    namespace: "{{ dsc.nexus.namespace }}"
-    command: ls /nexus-data/etc/nexus.properties.bkp
-  register: nx_prop_bkp_file
-
-- name: Restore original Nexus properties file
-  when: nx_prop_bkp_file.rc == 0
-  kubernetes.core.k8s_exec:
-    pod: "{{ nexus_pod }}"
-    namespace: "{{ dsc.nexus.namespace }}"
-    command: mv /nexus-data/etc/nexus.properties.bkp /nexus-data/etc/nexus.properties
-
-- name: Restart Nexus pod
-  when: scripts_allowed is not skipped
-  kubernetes.core.k8s:
-    kind: Pod
-    namespace: "{{ dsc.nexus.namespace }}"
-    name: "{{ nexus_pod }}"
-    state: absent
-
-- name: Wait Nexus URL
-  ansible.builtin.uri:
-    url: https://{{ nexus_domain }}
-    method: GET
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    status_code: [200, 202]
-    return_content: false
-  register: nexus_response
-  until: nexus_response is not failed
-  retries: 25
-  delay: 5
+    - name: Disallow scripts
+      ansible.builtin.include_tasks:
+        file: disallow-scripts.yaml
 
 # Create Docker Hub Proxy
 

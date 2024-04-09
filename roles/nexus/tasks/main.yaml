@@ -344,7 +344,7 @@
         strictContentTypeValidation: true
         writePolicy: ALLOW
       type: proxy
-      url: "https://testcm-nexus.apps.c7.numerique-interieur.com/repository/dso-dockerhub-proxy"
+      url: "https://{{ nexus_domain }}/repository/dso-dockerhub-proxy"
     body_format: json
     status_code: [201]
 

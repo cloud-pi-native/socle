@@ -28,6 +28,18 @@
     - nexus.yml.j2
     - ingress.yml.j2
 
+- name: Wait Nexus URL
+  ansible.builtin.uri:
+    url: https://{{ nexus_domain }}
+    method: GET
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    status_code: [200, 202]
+    return_content: false
+  register: nexus_response
+  until: nexus_response is not failed
+  retries: 25
+  delay: 5
+
 - name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"

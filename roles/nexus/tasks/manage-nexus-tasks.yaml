@@ -2,7 +2,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_unused_stuff_task.json
+    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_unused_stuff_task.groovy
     method: GET
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -19,7 +19,7 @@
     user: admin
     password: "{{ nexus_admin_password }}"
     body:
-      name: Clean_Docker_unused_stuff_task.json
+      name: Clean_Docker_unused_stuff_task.groovy
       content: |
         import org.sonatype.nexus.blobstore.api.BlobStoreManager
         import org.sonatype.nexus.scheduling.TaskConfiguration
@@ -52,7 +52,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_unused_stuff_task.json/run
+    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_unused_stuff_task.groovy/run
     method: POST
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -64,7 +64,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_uploads_task.json
+    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_uploads_task.groovy
     method: GET
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -81,7 +81,7 @@
     user: admin
     password: "{{ nexus_admin_password }}"
     body:
-      name: Clean_Docker_uploads_task.json
+      name: Clean_Docker_uploads_task.groovy
       content: |
         import org.sonatype.nexus.blobstore.api.BlobStoreManager
         import org.sonatype.nexus.scheduling.TaskConfiguration
@@ -113,7 +113,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_uploads_task.json/run
+    url: https://{{ nexus_domain }}/service/rest/v1/script/Clean_Docker_uploads_task.groovy/run
     method: POST
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -125,7 +125,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/Compact_DSO_Blob_Store_task.json
+    url: https://{{ nexus_domain }}/service/rest/v1/script/Compact_DSO_Blob_Store_task.groovy
     method: GET
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -142,7 +142,7 @@
     user: admin
     password: "{{ nexus_admin_password }}"
     body:
-      name: Compact_DSO_Blob_Store_task.json
+      name: Compact_DSO_Blob_Store_task.groovy
       content: |
         import org.sonatype.nexus.blobstore.api.BlobStoreManager
         import org.sonatype.nexus.scheduling.TaskConfiguration
@@ -174,7 +174,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/Compact_DSO_Blob_Store_task.json/run
+    url: https://{{ nexus_domain }}/service/rest/v1/script/Compact_DSO_Blob_Store_task.groovy/run
     method: POST
     user: admin
     password: "{{ nexus_admin_password }}"

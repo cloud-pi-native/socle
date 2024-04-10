@@ -16,7 +16,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.json
+    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.groovy
     method: GET
     user: admin
     password: "{{ nexus_admin_password }}"
@@ -33,7 +33,7 @@
     user: admin
     password: "{{ nexus_admin_password }}"
     body:
-      name: dso-docker-cleanup.json
+      name: dso-docker-cleanup.groovy
       content: |
         import org.sonatype.nexus.cleanup.storage.CleanupPolicyStorage
 
@@ -61,7 +61,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.json/run
+    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.groovy/run
     method: POST
     user: admin
     password: "{{ nexus_admin_password }}"

@@ -45,7 +45,7 @@
                 cleanupPolicy.setNotes('')
                 cleanupPolicy.setMode('deletion')
                 cleanupPolicy.setFormat('docker')
-                cleanupPolicy.setCriteria(['lastDownloaded':'2592000'])
+                cleanupPolicy.setCriteria(['lastDownloaded':'1209600'])
                 policyStorage.add(cleanupPolicy)
             } catch (e) {
                 log.info("Cleanup policy already exists, skipping...")

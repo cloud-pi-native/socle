@@ -14,7 +14,7 @@ spec:
     chartVersion: 0.20.1
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "6.5.1"
+    release: "8.0.2"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "7.9.2"
@@ -32,7 +32,7 @@ spec:
     chartVersion: "v5.4.2"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
-    chartVersion: 1.13.1
+    chartVersion: 1.14.1
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 19.3.4

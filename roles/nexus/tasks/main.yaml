@@ -215,7 +215,6 @@
     body_format: json
     status_code: [204]
 
-<<<<<<< HEAD
 - name: Get Blob Stores
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -235,9 +234,6 @@
 
 - name: Create dso Blob Store
   when: dso_blobstore != "dso"
-=======
-- name: Create dso Blob Store
->>>>>>> 315a671 (feat: :sparkles: Introducing Nexus dedicated blob store)
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true
@@ -254,7 +250,6 @@
     body_format: json
     status_code: [204]
 
-<<<<<<< HEAD
 - name: Check cleanup policy placeholder file
   ansible.builtin.include_tasks:
     file: check-cleanup-policy.yaml
@@ -365,8 +360,6 @@
     body_format: json
     status_code: [204]
 
-=======
->>>>>>> 315a671 (feat: :sparkles: Introducing Nexus dedicated blob store)
 - name: Activate Nexus metrics scraping
   when: dsc.global.metrics.enabled
   block:

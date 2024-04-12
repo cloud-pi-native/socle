@@ -79,10 +79,6 @@
       until: nexus_pod.resources | length == 0
       retries: 5
 
-<<<<<<< HEAD
 - name: Create both PVCs
-=======
-- name: Create both PVC
->>>>>>> 315a671 (feat: :sparkles: Introducing Nexus dedicated blob store)
   kubernetes.core.k8s:
     template: pvc.yml.j2

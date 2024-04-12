@@ -15,5 +15,5 @@
 
 - name: Combine with user supplied values
   ansible.builtin.set_fact:
-    "{{ combine_dest_var }}": "{{ combine_user_values | default({}) | combine(acc, recursive=True, list_merge='prepend') }}"
+    "{{ combine_dest_var }}": "{{ acc | combine((combine_user_values | default({})), recursive=True, list_merge='prepend') }}"
   tags: ["skip_ansible_lint"]

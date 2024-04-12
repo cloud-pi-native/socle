@@ -26,6 +26,8 @@ spec:
       .example.com
     metrics:
       enabled: false
+    backup:
+      type: velero
   grafana: {}
   grafanaDatasource: {}
   grafanaOperator: {}
@@ -39,6 +41,9 @@ spec:
   keycloak: {}
   nexus:
     storageSize: 25Gi
+  prometheus:
+    crd:
+      type: external
   proxy:
     enabled: false
   sonarqube: {}

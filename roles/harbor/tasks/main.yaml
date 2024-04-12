@@ -132,3 +132,31 @@
     body: "{{ harbor_config | combine({'oidc_client_secret': harbor_secret.resources[0].data.CLIENT_SECRET | b64decode}) }}"
   when: check_config.failed is defined and check_config.failed
   changed_when: true
+
+- name: Get trivy schedule scan config
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ harbor_domain }}/api/v2.0/system/scanAll/schedule
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200, 503]
+  until: get_trivy_schedule_config.status != 503
+  register: get_trivy_schedule_config
+
+- name: Enable daily trivy scans
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: POST
+    url: https://{{ harbor_domain }}/api/v2.0/system/scanAll/schedule
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [201]
+    body:
+      "schedule":
+        "type": "Daily"
+        "cron": "0 0 0 * * *"
+  when: get_trivy_schedule_config.json is undefined

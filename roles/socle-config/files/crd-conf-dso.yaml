@@ -287,6 +287,17 @@ spec:
                       required:
                         - enabled
                       type: object
+                    backup:
+                      description: Configuration for backup feature.
+                      properties:
+                        type:
+                          default: none
+                          description: Specifies the backup type used for databases.
+                          enum:
+                            - none
+                            - velero
+                          type: string
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
@@ -502,6 +513,21 @@ spec:
                       type: string
                   required:
                     - storageSize
+                  type: object
+                prometheus:
+                  description: Minimal configuration for prometheus CRDs
+                  properties:
+                    crd:
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - external
+                            - managed
+                          default: external
+                        version:
+                          type: string
+                      type: object
                   type: object
                 proxy:
                   description: Proxy configuration for tools.

@@ -11,6 +11,10 @@ postgres:
     db: dso-console-db
     user: dso
     pass: {{ dsc.console.dbPassword }}
+{% if dsc.global.backup.type == 'velero' %}
+    annotations:
+      pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "pg_dump -Fc  -U dso -d dso-console-db  > /var/lib/postgresql/data/app.dump"]'
+{% endif %}
 keycloak:
   clientIdBackend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
   clientSecretBackend: {{ console_backend_secret.resources[0].data.CLIENT_SECRET | b64decode }}

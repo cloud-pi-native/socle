@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.3.0](https://github.com/cloud-pi-native/socle/compare/v2.2.0...v2.3.0) (2024-04-12)
+
+
+### Features
+
+* :sparkles: add velero pre hook db backups ([04773cf](https://github.com/cloud-pi-native/socle/commit/04773cff6a512582f20197bb1479cde2b1a06beb))
+* :sparkles: enable daily trivy scan on harbor ([cd77551](https://github.com/cloud-pi-native/socle/commit/cd7755194dc8dadc8e2db42e95a9a159606b1f3a))
+* :sparkles: introduce prometheus crd management ([fc225de](https://github.com/cloud-pi-native/socle/commit/fc225deefcbe9e0df361c06abe8dea07f0414d03))
+
+
+### Bug Fixes
+
+* :bug: fix the ability to customize argo values + security context for AppSet ([4a4e175](https://github.com/cloud-pi-native/socle/commit/4a4e1755c79089d100a6a3381633d0a8afa7a439))
+* :bug: in development mode allow 127.0.0.1 ([9476919](https://github.com/cloud-pi-native/socle/commit/94769194ff0b3bc1cf76f12c95d765b3272c39e7))
+* add missing ServiceMonitor CRD ([828ae4a](https://github.com/cloud-pi-native/socle/commit/828ae4a1718501e16b7e715144e73eafd6aa91a8))
+* regexp without tmp file ([861046e](https://github.com/cloud-pi-native/socle/commit/861046ec9f8bab63fd7fa6abfe2246c4ed96b410))
+* remove prometheus CRD task ([f589940](https://github.com/cloud-pi-native/socle/commit/f5899403657a6acad8b17eee15d77f2485790a24))
+
 ## [2.2.0](https://github.com/cloud-pi-native/socle/compare/v2.1.1...v2.2.0) (2024-03-25)
 
 

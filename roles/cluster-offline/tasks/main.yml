@@ -1,0 +1,30 @@
+---
+- name: Validate dsc.sonarqube.pluginDownloadUrl is not empty
+  assert:
+    that:
+      - dsc.sonarqube.pluginDownloadUrl != ""
+    fail_msg: "'dsc.sonarqube.pluginDownloadUrl' must not be empty"
+
+- name: Validate dsc.sonarqube.PrometheusJavaagentVersion is not empty
+  assert:
+    that:
+      - dsc.sonarqube.PrometheusJavaagentVersion != ""
+    fail_msg: "'dsc.sonarqube.PrometheusJavaagentVersion' must not be empty"
+
+- name: Validate dsc.gitlabCatalog.catalogRepoUrl is different than default
+  assert:
+    that:
+      - dsc.gitlabCatalog.catalogRepoUrl != "https://github.com/cloud-pi-native/gitlab-ci-catalog.git"
+    fail_msg: "'dsc.gitlabCatalog.catalogRepoUrl' is same as 'https://github.com/cloud-pi-native/gitlab-ci-catalog.git'"
+
+- name: Validate dsc.console.consoleRepoUrl is different than default
+  assert:
+    that:
+      - dsc.console.consoleRepoUrl != "https://github.com/cloud-pi-native/console.git"
+    fail_msg: "'dsc.console.consoleRepoUrl' is same as 'https://github.com/cloud-pi-native/console.git'"
+
+- name: Validate dsc.argocd.privateGitlabDomain is not empty
+  assert:
+    that:
+      - dsc.argocd.privateGitlabDomain != ""
+    fail_msg: "'dsc.argocd.privateGitlabDomain' is empty" 

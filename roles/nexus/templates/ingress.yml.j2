@@ -1,3 +1,4 @@
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -35,3 +36,41 @@ spec:
                 name: nexus
                 port:
                   name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docker-proxy
+  namespace: {{ dsc.nexus.namespace }}
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+    app: nexus
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+spec:
+{% if not dsc.ingress.tls.type == 'none' %}
+  tls:
+  - hosts:
+    - {{ dsc.nexus.subDomain }}-docker-proxy{{ root_domain }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: nexus-docker-proxy-tls-secret
+{% endif %}
+{% endif %}
+  ingressClassName: {{ dsc.ingress.className | default('') }}
+  rules:
+    - host: {{ dsc.nexus.subDomain }}-docker-proxy{{ root_domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nexus-docker-proxy
+                port:
+                  name: dockerproxy

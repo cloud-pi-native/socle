@@ -54,7 +54,6 @@ global:
     enabled: false
   certificates:
     customCAs:
-      - configMap: openshift-service-ca.crt
 {% for item in dsc.additionalsCA %}
 {% if item.kind == 'ConfigMap' %}
       - configMap: {{ item.name }}

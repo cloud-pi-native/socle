@@ -32,6 +32,7 @@ config:
     admin.enabled: "false"
 redis:
   architecture: replication
+{% if dsc.global.platform == "openshift" %}
   master:
     podSecurityContext:
       enabled: false
@@ -42,16 +43,19 @@ redis:
       enabled: false
     containerSecurityContext:
       enabled: false
+{% endif %}
 {% if dsc.global.metrics.enabled %}
   <<: *serviceMonitor
+{% if dsc.global.platform == "openshift" %}
     podSecurityContext:
       enabled: false
     containerSecurityContext:
       enabled: false
 {% endif %}
+{% endif %}
 controller:
   replicaCount: 3
-{% if dsc.global.metrics.enabled %}
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
   <<: *serviceMonitor
 {% endif %}
 dex:
@@ -88,13 +92,13 @@ server:
         - TaskRun
         - PipelineRun
   extraEnvVars: []
-{% if dsc.global.metrics.enabled %}
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
   <<: *serviceMonitor
 {% endif %}
 repoServer:
   extraEnvVars: []
   replicaCount: 3
-{% if dsc.global.metrics.enabled %}
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
   <<: *serviceMonitor
 {% endif %}
 applicationSet:
@@ -103,7 +107,7 @@ applicationSet:
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
-{% if dsc.global.metrics.enabled %}
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
   <<: *serviceMonitor
 {% endif %}
 notifications:

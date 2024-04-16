@@ -9,11 +9,11 @@
   delay: 5
 
 # Find Vault keys
-- name: Find vault-0 keys
+- name: Find vault keys
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: "{{ dsc_name }}-vault-0-keys"
+    name: "{{ dsc_name }}-vault-keys"
   register: vaut_keys
 
 # Check Vault status - node 1
@@ -22,14 +22,14 @@
   vars:
     vault_pod: "{{ dsc_name }}-vault-0"
 
-- name: Check if vault-0 is coherent
+- name: Check if vaul is coherent
   ansible.builtin.assert:
     that:
       - ((vault_status in ['sealed', 'OK']) and (vaut_keys.resources | length > 0)) or ((vault_status == 'not init') and (vaut_keys.resources | length == 0))
     fail_msg:
-      - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret vault-0-keys dans {{ dsc.vault.namespace }}
+      - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}
       - Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation
-      - Soit le vault est initialisé mais vous n'avez pas de secret vault-0-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !
+      - Soit le vault est initialisé mais vous n'avez pas de secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !
 
 # Init Vault - node 1
 - name: Init vault node - node 1
@@ -65,13 +65,13 @@
       | selectattr('key', 'eq', 'root_token')
       | map(attribute='value') | first }}"
 
-- name: Store vault-0 keys and token
+- name: Store vault keys and token
   when: vaut_keys.resources | length == 0
   kubernetes.core.k8s:
     definition:
       kind: Secret
       metadata:
-        name: "{{ dsc_name }}-vault-0-keys"
+        name: "{{ dsc_name }}-vault-keys"
         namespace: "{{ dsc.vault.namespace }}"
       data:
         key1: "{{ unseal_keys[0] | b64encode }}"
@@ -86,11 +86,11 @@
     vault_pod: "{{ dsc_name }}-vault-0"
     unseal_key_index: "0"
 
-- name: Get vault-0 keys
+- name: Get vault keys
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: "{{ dsc_name }}-vault-0-keys"
+    name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
 
 - name: Unseal vault primary - node 1
@@ -130,11 +130,11 @@
     vault_pod: "{{ dsc_name }}-vault-1"
     unseal_key_index: "0"
 
-- name: Get vault-0 keys
+- name: Get vault keys
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: "{{ dsc_name }}-vault-0-keys"
+    name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
 
 - name: Unseal vault node - node 2
@@ -174,11 +174,11 @@
     vault_pod: "{{ dsc_name }}-vault-2"
     unseal_key_index: "0"
 
-- name: Get vault-0 keys
+- name: Get vault keys
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: "{{ dsc_name }}-vault-0-keys"
+    name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
 
 - name: Unseal vault node - node 3
@@ -192,7 +192,7 @@
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
-    name: "{{ dsc_name }}-vault-0-keys"
+    name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
 
 - name: Get Vault token

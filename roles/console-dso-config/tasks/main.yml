@@ -6,29 +6,29 @@
     kind: Namespace
     state: present
 
-- name: Create dso configmap
+- name: Create dso config secret
   kubernetes.core.k8s:
     definition:
-      kind: ConfigMap
+      kind: Secret
       metadata:
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
       data:
-        ARGOCD_URL: https://{{ argocd_domain }}/
-        GITLAB_URL: https://{{ gitlab_domain }}/
-        HARBOR_URL: https://{{ harbor_domain }}/
-        KEYCLOAK_URL: https://{{ keycloak_domain }}/
-        NEXUS_URL: https://{{ nexus_domain }}/
-        SONARQUBE_URL: https://{{ sonar_domain }}/
-        VAULT_URL: https://{{ vault_domain }}/
-        HARBOR_ADMIN: admin
+        ARGOCD_URL: "{{ 'https://' + argocd_domain | b64encode }}"
+        GITLAB_URL: "{{ 'https://' + gitlab_domain | b64encode }}"
+        HARBOR_URL: "{{ 'https://' + harbor_domain | b64encode }}"
+        KEYCLOAK_URL: "{{ 'https://' + keycloak_domain | b64encode }}"
+        NEXUS_URL: "{{ 'https://' + nexus_domain | b64encode }}"
+        SONARQUBE_URL: "{{ 'https://' + sonar_domain | b64encode }}"
+        VAULT_URL: "{{ 'https://' + vault_domain | b64encode }}"
+        HARBOR_ADMIN: "{{ 'admin' | b64encode }}"
         # HARBOR_ADMIN_PASSWORD: roles/harbor/tasks/main.yaml
-        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN: "{{ 'admin' | b64encode }}"
         # KEYCLOAK_ADMIN_PASSWORD: roles/keycloak/tasks/main.yaml
         # GITLAB_TOKEN: roles/gitlab/tasks/main.yaml
-        NEXUS_ADMIN: admin
+        NEXUS_ADMIN: "{{ 'admin' | b64encode }}"
         # NEXUS_ADMIN_PASSWORD: roles/nexus/tasks/main.yaml
         # SONAR_API_TOKEN: roles/sonarqube/tasks/main.yaml
         # VAULT_TOKEN: roles/vault/tasks/main.yaml
-        ARGO_NAMESPACE: "{{ dsc.argocd.namespace }}"
-        PROJECTS_ROOT_DIR: "{{ dsc.global.projectsRootDir | join('/') }}"
+        ARGO_NAMESPACE: "{{ dsc.argocd.namespace | b64encode }}"
+        PROJECTS_ROOT_DIR: "{{ dsc.global.projectsRootDir | join('/') | b64encode }}"

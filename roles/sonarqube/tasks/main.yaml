@@ -128,7 +128,7 @@
 - name: Get DSO Console inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
@@ -148,7 +148,7 @@
 - name: Set fact sonar token
   when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is defined
   ansible.builtin.set_fact:
-    token_pass: "{{ ansible_inventory.resources[0].data.SONAR_API_TOKEN }}"
+    token_pass: "{{ ansible_inventory.resources[0].data.SONAR_API_TOKEN | b64decode }}"
   no_log: true
 
 - name: Remove permissions for sonar-users

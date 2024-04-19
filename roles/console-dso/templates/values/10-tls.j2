@@ -1,6 +1,7 @@
+{% if dsc.ingress.tls.type != 'none' and dsc.ingress.tls.type == 'tlsSecret' %}
 ingress:
   tls:
-    enabled: {{ dsc.ingress.tls.type != 'none' }}
-{% if dsc.ingress.tls.type == 'tlsSecret' %}
-    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+    - secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+      hosts:
+        - {{ console_domain }}
 {% endif %}

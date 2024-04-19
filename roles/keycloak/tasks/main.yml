@@ -114,14 +114,14 @@
 
 - name: Update console inventory
   kubernetes.core.k8s:
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
     namespace: "{{ dsc.console.namespace }}"
     state: patched
     definition:
       data:
-        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password }}"
-        KEYCLOAK_ADMIN: "{{ keycloak_admin }}"
+        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password | b64encode }}"
+        KEYCLOAK_ADMIN: "{{ keycloak_admin | b64encode }}"
 
 - name: Get Keycloak API token
   ansible.builtin.uri:

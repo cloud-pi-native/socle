@@ -93,6 +93,7 @@ exporter:
   replicas: 1
   image:
     repository: docker.io/goharbor/harbor-exporter
+  serviceAccountName: harbor-sa
 {% if dsc.global.metrics.enabled %}
 metrics:
   enabled: true

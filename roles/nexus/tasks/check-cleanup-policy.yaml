@@ -1,0 +1,21 @@
+- name: Get nexus endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.nexus.namespace }}"
+    name: nexus
+  register: nexus_ep
+  until: nexus_ep.resources[0].subsets[0].addresses[0] is defined
+  retries: 15
+  delay: 5
+
+- name: Set nexus_pod
+  ansible.builtin.set_fact:
+    nexus_pod: "{{ nexus_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
+
+- name: Check placeholder file
+  kubernetes.core.k8s_exec:
+    pod: "{{ nexus_pod }}"
+    namespace: "{{ dsc.nexus.namespace }}"
+    command: ls /nexus-data/DSOdockerCleanupPolicy.placeholder
+  register: cp_placeholder_file
+  ignore_errors: true

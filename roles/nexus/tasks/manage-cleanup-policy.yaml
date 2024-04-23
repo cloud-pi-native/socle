@@ -1,0 +1,76 @@
+- name: Get nexus endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.nexus.namespace }}"
+    name: nexus
+  register: nexus_ep
+  until: nexus_ep.resources[0].subsets[0].addresses[0] is defined
+  retries: 15
+  delay: 5
+
+- name: Set nexus_pod
+  ansible.builtin.set_fact:
+    nexus_pod: "{{ nexus_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
+
+- name: Get cleanup policy script
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.groovy
+    method: GET
+    user: admin
+    password: "{{ nexus_admin_password }}"
+  register: cleanup_policy_script
+  ignore_errors: true
+
+- name: Add cleanup policy script
+  when: cleanup_policy_script.status != 200
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/script
+    method: POST
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body:
+      name: dso-docker-cleanup.groovy
+      content: |
+        import org.sonatype.nexus.cleanup.storage.CleanupPolicyStorage
+
+        def createPolicy (policyName) {
+            try {
+                def policyStorage = container.lookup(CleanupPolicyStorage.class.getName())
+                def cleanupPolicy = policyStorage.newCleanupPolicy()
+                cleanupPolicy.setName(policyName)
+                cleanupPolicy.setNotes('')
+                cleanupPolicy.setMode('deletion')
+                cleanupPolicy.setFormat('docker')
+                cleanupPolicy.setCriteria(['lastDownloaded':'1209600'])
+                policyStorage.add(cleanupPolicy)
+            } catch (e) {
+                log.info("Cleanup policy already exists, skipping...")
+            }
+        }
+
+        createPolicy('DSOdockerCleanupPolicy')
+      type: "groovy"
+    body_format: json
+    status_code: [204]
+
+- name: Run cleanup policy script
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/script/dso-docker-cleanup.groovy/run
+    method: POST
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body: {}
+    body_format: json
+    status_code: [200]
+
+- name: Create placeholder file
+  kubernetes.core.k8s_exec:
+    pod: "{{ nexus_pod }}"
+    namespace: "{{ dsc.nexus.namespace }}"
+    command: touch /nexus-data/DSOdockerCleanupPolicy.placeholder

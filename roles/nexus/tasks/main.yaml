@@ -28,6 +28,18 @@
     - nexus.yml.j2
     - ingress.yml.j2
 
+- name: Wait Nexus URL
+  ansible.builtin.uri:
+    url: https://{{ nexus_domain }}
+    method: GET
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    status_code: [200, 202]
+    return_content: false
+  register: nexus_response
+  until: nexus_response is not failed
+  retries: 25
+  delay: 5
+
 - name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
@@ -200,6 +212,151 @@
       readOnly: true
       roles:
         - new-anon
+    body_format: json
+    status_code: [204]
+
+- name: Get Blob Stores
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/blobstores
+    method: GET
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    status_code: [200]
+  register: blobstores
+
+- name: Set dso_blobstore fact
+  ansible.builtin.set_fact:
+    dso_blobstore: "{{ blobstores.json
+      | selectattr('name', 'contains', 'dso')
+      | map(attribute='name') | first | default('') }}"
+
+- name: Create dso Blob Store
+  when: dso_blobstore != "dso"
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/blobstores/file
+    method: POST
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body:
+      softQuota:
+        type: spaceRemainingQuota
+        limit: 1073741824
+      path: /nexus-data-docker/dso
+      name: dso
+    body_format: json
+    status_code: [204]
+
+- name: Check cleanup policy placeholder file
+  ansible.builtin.include_tasks:
+    file: check-cleanup-policy.yaml
+
+- name: Check Nexus tasks
+  ansible.builtin.include_tasks:
+    file: check-nexus-tasks.yaml
+
+- name: Manage cleanup policy and Nexus tasks
+  when: (cp_placeholder_file.rc != 0) or (nexus_tasks_check == 'missing')
+  block:
+    - name: Allow scripts
+      ansible.builtin.include_tasks:
+        file: allow-scripts.yaml
+
+    - name: Create cleanup policy
+      when: cp_placeholder_file.rc != 0
+      ansible.builtin.include_tasks:
+        file: manage-cleanup-policy.yaml
+
+    - name: Create Nexus tasks
+      when: nexus_tasks_check == 'missing'
+      ansible.builtin.include_tasks:
+        file: manage-nexus-tasks.yaml
+  always:
+    - name: Disallow scripts
+      ansible.builtin.include_tasks:
+        file: disallow-scripts.yaml
+
+# Create Docker Hub Proxy
+
+- name: Get dso-dockerhub-proxy
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/repositories/docker/proxy/dso-dockerhub-proxy
+    method: GET
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    status_code: [200]
+  register: dso_dockerhub_proxy
+  ignore_errors: true
+
+- name: Create Docker Proxy Repository
+  when: dso_dockerhub_proxy.status == 404
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/repositories/docker/proxy
+    method: POST
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body:
+      cleanup:
+        policyNames:
+          - DSOdockerCleanupPolicy
+      docker:
+        forceBasicAuth: false
+        httpPort: 5000
+        httpsPort: null
+        subdomain: null
+        v1Enabled: true
+      dockerProxy:
+        cacheForeignLayers: false
+        foreignLayerUrlWhitelist: []
+        indexType: "HUB"
+        indexUrl: null
+      format: docker
+      httpClient:
+        authentication: null
+        autoBlock: true
+        blocked: false
+        connection:
+          enableCircularRedirects: false
+          enableCookies: false
+          retries: null
+          timeout: null
+          useTrustStore: false
+          userAgentSuffix: null
+      name: dso-dockerhub-proxy
+      negativeCache:
+        enabled: true
+        timeToLive: 1440
+      online: true
+      proxy:
+        contentMaxAge: 1440
+        metadataMaxAge: 1440
+        remoteUrl: "https://registry-1.docker.io"
+      routingRuleName: null
+      storage:
+        blobStoreName: dso
+        strictContentTypeValidation: true
+        writePolicy: ALLOW
+      type: proxy
+      url: "https://{{ nexus_domain }}/repository/dso-dockerhub-proxy"
+    body_format: json
+    status_code: [201]
+
+- name: Set DockerToken as an active realm
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    force_basic_auth: true
+    url: https://{{ nexus_domain }}/service/rest/v1/security/realms/active
+    method: PUT
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body: [NexusAuthenticatingRealm, DockerToken]
     body_format: json
     status_code: [204]
 

@@ -1,0 +1,44 @@
+- name: Get nexus endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.nexus.namespace }}"
+    name: nexus
+  register: nexus_ep
+  until: nexus_ep.resources[0].subsets[0].addresses[0] is defined
+  retries: 15
+  delay: 5
+
+- name: Set nexus_pod
+  ansible.builtin.set_fact:
+    nexus_pod: "{{ nexus_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
+
+- name: Remove any scripts creation line from properties file
+  kubernetes.core.k8s_exec:
+    pod: "{{ nexus_pod }}"
+    namespace: "{{ dsc.nexus.namespace }}"
+    command: sed -i "/nexus\.scripts\.allowCreation=true/d" /nexus-data/etc/nexus.properties
+
+- name: Remove multiple newlines from properties file
+  kubernetes.core.k8s_exec:
+    pod: "{{ nexus_pod }}"
+    namespace: "{{ dsc.nexus.namespace }}"
+    command: sed -i ':a;N;$!ba;s/\n\+/\n/g' /nexus-data/etc/nexus.properties
+
+- name: Restart Nexus pod
+  kubernetes.core.k8s:
+    kind: Pod
+    namespace: "{{ dsc.nexus.namespace }}"
+    name: "{{ nexus_pod }}"
+    state: absent
+
+- name: Wait Nexus URL
+  ansible.builtin.uri:
+    url: https://{{ nexus_domain }}
+    method: GET
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    status_code: [200, 202]
+    return_content: false
+  register: nexus_response
+  until: nexus_response is not failed
+  retries: 25
+  delay: 5

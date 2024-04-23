@@ -48,7 +48,6 @@ redis:
 {% endif %}
 controller:
   replicaCount: 3
-  resourcesPreset: "large"
 {% if dsc.global.metrics.enabled %}
   metrics:
     enabled: true

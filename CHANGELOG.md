@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.4.0](https://github.com/cloud-pi-native/socle/compare/v2.3.0...v2.4.0) (2024-04-23)
+
+
+### Features
+
+* :sparkles: Introducing Nexus dedicated blob store ([06c5659](https://github.com/cloud-pi-native/socle/commit/06c5659ffc971545116fad3c227e4f3e2c69d128))
+* :zap: ([2a4913f](https://github.com/cloud-pi-native/socle/commit/2a4913f2fb72975ed463f83d20f30b6ffe9836e4))
+
+
+### Bug Fixes
+
+* :bug: Fix missing serviceAccountName for exporter ([7c53427](https://github.com/cloud-pi-native/socle/commit/7c5342777a4df9cbad36283d44d9823cff1edf1d))
+* :bug: Upgrade Argo CD to fix servicemonitor deployment ([75476ee](https://github.com/cloud-pi-native/socle/commit/75476ee8acde2039f99d80e126df85482639a32c))
+
 ## [2.3.0](https://github.com/cloud-pi-native/socle/compare/v2.2.0...v2.3.0) (2024-04-12)
 
 

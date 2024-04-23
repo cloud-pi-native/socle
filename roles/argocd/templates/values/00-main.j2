@@ -1,11 +1,3 @@
-securityContext: &securityContext
-  containerSecurityContext:
-    runAsUser: null
-    runAsGroup: null
-    seLinuxOptions: null
-  podSecurityContext:
-    fsGroup: null
-
 config:
 {% if dsc.argocd.admin.enabled %}
   secret:
@@ -55,7 +47,6 @@ redis:
       enabled: false
 {% endif %}
 controller:
-  <<: *securityContext
   replicaCount: 3
 {% if dsc.global.metrics.enabled %}
   metrics:
@@ -67,7 +58,6 @@ controller:
 dex:
   enabled: false
 server:
-  <<: *securityContext
   replicaCount: 3
   ingress:
     ingressClassName: {{ dsc.ingress.className | default('') }}
@@ -107,7 +97,6 @@ server:
       namespace: {{ dsc.argocd.namespace }}
 {% endif %}
 repoServer:
-  <<: *securityContext
   extraEnvVars: []
   replicaCount: 3
 {% if dsc.global.metrics.enabled %}
@@ -120,7 +109,6 @@ repoServer:
 applicationSet:
   enabled: false
   replicaCount: 2
-  <<: *securityContext
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}

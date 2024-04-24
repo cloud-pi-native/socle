@@ -1,3 +1,18 @@
+securityContext: &securityContext
+  containerSecurityContext:
+    runAsUser: null
+    runAsGroup: null
+    seLinuxOptions: null
+  podSecurityContext:
+    fsGroup: null
+
+serviceMonitor: &serviceMonitor
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+
 config:
 {% if dsc.argocd.admin.enabled %}
   secret:
@@ -36,28 +51,22 @@ redis:
     containerSecurityContext:
       enabled: false
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
     podSecurityContext:
       enabled: false
     containerSecurityContext:
       enabled: false
 {% endif %}
 controller:
+  <<: *securityContext
   replicaCount: 3
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 dex:
   enabled: false
 server:
+  <<: *securityContext
   replicaCount: 3
   ingress:
     ingressClassName: {{ dsc.ingress.className | default('') }}
@@ -90,34 +99,24 @@ server:
         - PipelineRun
   extraEnvVars: []
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 repoServer:
+  <<: *securityContext
   extraEnvVars: []
   replicaCount: 3
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 applicationSet:
   enabled: false
   replicaCount: 2
+  <<: *securityContext
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 notifications:
   enabled: false
@@ -125,9 +124,5 @@ notifications:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}

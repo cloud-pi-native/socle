@@ -194,6 +194,10 @@ spec:
                     chartVersion:
                       description: GitLab chart version (e.g., "6.11.10").
                       type: string
+                    pvcGitalySize:
+                      description: "Size for Gitaly, default: 50Gi"
+                      default: 50Gi
+                      type: string
                     values:
                       description: |
                         You can merge customs values for gitlab, it will be merged with roles/gitlab/templates/gitlab-instance.yaml.j2

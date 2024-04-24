@@ -33,6 +33,8 @@ gitlab:
       serviceMonitor:
         enabled: true
 {% endif %}
+    persistence:
+      size: {{ dsc.gitlab.pvcGitalySize }}
   gitlab-exporter:
 {% if dsc.global.metrics.enabled %}
     metrics:

@@ -35,14 +35,14 @@ spec:
       "fiscalYearStartMonth": 0,
       "gnetId": 16459,
       "graphTooltip": 0,
-      "id": 39,
+      "id": 17,
       "links": [],
       "liveNow": false,
       "panels": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -93,7 +93,8 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_vm_uptime",
+              "editorMode": "code",
+              "expr": "jvm_vm_uptime{job=\"nexus\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -108,7 +109,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -161,7 +162,8 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_heap_usage",
+              "editorMode": "code",
+              "expr": "jvm_memory_heap_usage{job=\"nexus\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -176,7 +178,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -229,7 +231,8 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_fd_usage",
+              "editorMode": "builder",
+              "expr": "jvm_fd_usage{job=\"nexus\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -244,7 +247,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -307,7 +310,8 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "readonly_enabled",
+              "editorMode": "builder",
+              "expr": "readonly_enabled{job=\"nexus\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -352,7 +356,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -400,9 +404,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "copy - p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -410,9 +416,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "copy - p99",
+              "range": true,
               "refId": "B"
             },
             {
@@ -420,9 +428,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "deleteHard - p50",
+              "range": true,
               "refId": "C"
             },
             {
@@ -430,9 +440,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "deleteHard - p99",
+              "range": true,
               "refId": "D"
             },
             {
@@ -440,9 +452,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "get - p50",
+              "range": true,
               "refId": "E"
             },
             {
@@ -450,9 +464,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "get - p99",
+              "range": true,
               "refId": "F"
             },
             {
@@ -460,9 +476,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "delete - p50",
+              "range": true,
               "refId": "G"
             },
             {
@@ -470,9 +488,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "delete - p99",
+              "range": true,
               "refId": "H"
             },
             {
@@ -480,9 +500,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "create - p50",
+              "range": true,
               "refId": "I"
             },
             {
@@ -490,9 +512,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "create - p99",
+              "range": true,
               "refId": "J"
             }
           ],
@@ -535,7 +559,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -583,9 +607,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "getBrowseableFormats - p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -593,9 +619,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "getBrowseableFormats - p99",
+              "range": true,
               "refId": "B"
             },
             {
@@ -603,9 +631,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "readReferences - p50",
+              "range": true,
               "refId": "C"
             },
             {
@@ -613,9 +643,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "readReferences - p99",
+              "range": true,
               "refId": "D"
             },
             {
@@ -623,9 +655,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "read - p50",
+              "range": true,
               "refId": "E"
             },
             {
@@ -633,9 +667,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "read - p99",
+              "range": true,
               "refId": "F"
             }
           ],
@@ -678,7 +714,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -726,9 +762,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "getPermissions - p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -736,9 +774,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "getPermissions - p99",
+              "range": true,
               "refId": "B"
             },
             {
@@ -746,9 +786,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "getUser - p50",
+              "range": true,
               "refId": "C"
             },
             {
@@ -756,9 +798,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "getUser - p99",
+              "range": true,
               "refId": "D"
             }
           ],
@@ -801,7 +845,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -849,9 +893,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "readSources - p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -859,9 +905,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "readSources - p99",
+              "range": true,
               "refId": "B"
             },
             {
@@ -869,9 +917,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "read - p50",
+              "range": true,
               "refId": "C"
             },
             {
@@ -879,9 +929,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "read - p99",
+              "range": true,
               "refId": "D"
             }
           ],
@@ -924,7 +976,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -972,9 +1024,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "verifyLogin - p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -982,9 +1036,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "verifyLogin - p99",
+              "range": true,
               "refId": "B"
             },
             {
@@ -992,9 +1048,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_update_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_update_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "update - p50",
+              "range": true,
               "refId": "C"
             },
             {
@@ -1067,7 +1125,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -1115,9 +1173,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "read - p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -1125,9 +1185,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "read - p99",
+              "range": true,
               "refId": "B"
             }
           ],
@@ -1170,7 +1232,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -1218,9 +1280,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -1228,9 +1292,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "p99",
+              "range": true,
               "refId": "B"
             }
           ],
@@ -1273,7 +1339,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -1321,9 +1387,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_BlobStoreComponent_readGroups_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_BlobStoreComponent_readGroups_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "BlobStoreComponent",
+              "range": true,
               "refId": "A"
             },
             {
@@ -1331,9 +1399,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_blobstore_s3_internal_ui_S3Component_signertypes_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_blobstore_s3_internal_ui_S3Component_signertypes_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "S3Component",
+              "range": true,
               "refId": "B"
             },
             {
@@ -1341,9 +1411,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_TaskComponent_update_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_TaskComponent_update_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "TaskComponent",
+              "range": true,
               "refId": "C"
             },
             {
@@ -1351,9 +1423,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_rapture_internal_state_StateComponent_getState_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_rapture_internal_state_StateComponent_getState_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "StateComponent",
+              "range": true,
               "refId": "D"
             },
             {
@@ -1361,9 +1435,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_cancel_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_cancel_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "AssistantComponent-Cancel",
+              "range": true,
               "refId": "E"
             },
             {
@@ -1371,9 +1447,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_abort_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_abort_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "AssistantComponent-Abort",
+              "range": true,
               "refId": "F"
             },
             {
@@ -1381,9 +1459,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_update_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_update_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "FreezeComponent-Update",
+              "range": true,
               "refId": "G"
             },
             {
@@ -1391,9 +1471,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_read_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_read_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "FreezeComponent-Read",
+              "range": true,
               "refId": "M"
             },
             {
@@ -1401,9 +1483,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_SelectorComponent_readReferences_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_SelectorComponent_readReferences_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "SelectorComponent",
+              "range": true,
               "refId": "H"
             },
             {
@@ -1411,9 +1495,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_rebuildIndex_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_rebuildIndex_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "RepositoryComponent",
+              "range": true,
               "refId": "I"
             },
             {
@@ -1421,9 +1507,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "LdapServerComponent",
+              "range": true,
               "refId": "J"
             },
             {
@@ -1431,9 +1519,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_BrowseComponent_read_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_BrowseComponent_read_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "BrowseComponent",
+              "range": true,
               "refId": "K"
             },
             {
@@ -1441,9 +1531,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(com_sonatype_nexus_clm_internal_ui_ClmComponent_readApplications_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(com_sonatype_nexus_clm_internal_ui_ClmComponent_readApplications_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "ClmComponent-Read",
+              "range": true,
               "refId": "L"
             },
             {
@@ -1451,9 +1543,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_internal_capability_CapabilityComponent_remove_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_internal_capability_CapabilityComponent_remove_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "CapabilityComponent-Remove",
+              "range": true,
               "refId": "N"
             },
             {
@@ -1461,9 +1555,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(com_sonatype_nexus_ssl_plugin_internal_ui_CertificateComponent_details_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(com_sonatype_nexus_ssl_plugin_internal_ui_CertificateComponent_details_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "CertificateComponent-Details",
+              "range": true,
               "refId": "O"
             },
             {
@@ -1471,9 +1567,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_SearchComponent_read_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_SearchComponent_read_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "SearchComponent-Read",
+              "range": true,
               "refId": "P"
             },
             {
@@ -1481,9 +1579,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_rapture_internal_security_SecurityComponent_authenticate_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_rapture_internal_security_SecurityComponent_authenticate_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "SecurityComponent-Authenticate",
+              "range": true,
               "refId": "Q"
             },
             {
@@ -1491,9 +1591,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_changeOrder_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_changeOrder_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "LdapServerComponent-ChangeOrder",
+              "range": true,
               "refId": "R"
             },
             {
@@ -1501,9 +1603,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_remove_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_remove_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "RepositoryComponent-Remove",
+              "range": true,
               "refId": "S"
             },
             {
@@ -1511,9 +1615,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_readReferences_exceptions_total[5m])",
+              "editorMode": "code",
+              "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_readReferences_exceptions_total{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "LdapServerComponent-Read",
+              "range": true,
               "refId": "T"
             }
           ],
@@ -1582,7 +1688,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -1630,9 +1736,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_1xx_responses_total[1m])",
+              "editorMode": "code",
+              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_1xx_responses_total{job=\"nexus\"}[1m])",
               "interval": "",
               "legendFormat": "1xx",
+              "range": true,
               "refId": "A"
             },
             {
@@ -1640,9 +1748,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_2xx_responses_total[1m])",
+              "editorMode": "code",
+              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_2xx_responses_total{job=\"nexus\"}[1m])",
               "interval": "",
               "legendFormat": "2xx",
+              "range": true,
               "refId": "B"
             },
             {
@@ -1650,9 +1760,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_5xx_responses_total[1m])",
+              "editorMode": "code",
+              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_5xx_responses_total{job=\"nexus\"}[1m])",
               "interval": "",
               "legendFormat": "5xx",
+              "range": true,
               "refId": "C"
             },
             {
@@ -1660,9 +1772,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_4xx_responses_total[1m])",
+              "editorMode": "code",
+              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_4xx_responses_total{job=\"nexus\"}[1m])",
               "interval": "",
               "legendFormat": "4xx",
+              "range": true,
               "refId": "D"
             },
             {
@@ -1670,9 +1784,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_3xx_responses_total[1m])",
+              "editorMode": "code",
+              "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_3xx_responses_total{job=\"nexus\"}[1m])",
               "interval": "",
               "legendFormat": "3xx",
+              "range": true,
               "refId": "E"
             }
           ],
@@ -1715,7 +1831,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -1763,9 +1879,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.5\"}",
+              "editorMode": "code",
+              "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.5\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "p50",
+              "range": true,
               "refId": "A"
             },
             {
@@ -1773,9 +1891,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.99\"}",
+              "editorMode": "code",
+              "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.99\", job=\"nexus\"}",
               "interval": "",
               "legendFormat": "p99",
+              "range": true,
               "refId": "B"
             }
           ],
@@ -1818,7 +1938,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -1866,9 +1986,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp2134194857_jobs",
+              "editorMode": "code",
+              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp2134194857_jobs{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "wait-jobs",
+              "range": true,
               "refId": "A"
             },
             {
@@ -1876,9 +1998,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp2134194857_size",
+              "editorMode": "code",
+              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp2134194857_size{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "current-size",
+              "range": true,
               "refId": "C"
             }
           ],
@@ -1947,7 +2071,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -1989,10 +2113,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_count[1m])",
+              "editorMode": "code",
+              "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_count{job=\"nexus\"}[1m])",
               "hide": false,
               "interval": "",
               "legendFormat": "major GC(marksweep)",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2000,9 +2126,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(jvm_garbage_collectors_PS_Scavenge_count[1m])",
+              "editorMode": "code",
+              "expr": "rate(jvm_garbage_collectors_PS_Scavenge_count{job=\"nexus\"}[1m])",
               "interval": "",
               "legendFormat": "minor GC(scavenge)",
+              "range": true,
               "refId": "A"
             }
           ],
@@ -2045,7 +2173,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2087,10 +2215,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_time[5m])/rate(jvm_garbage_collectors_MarkSweepCompact_count[5m])",
+              "editorMode": "code",
+              "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_time{job=\"nexus\"}[5m]) / rate(jvm_garbage_collectors_MarkSweepCompact_count{job=\"nexus\"}[5m])",
               "hide": false,
               "interval": "",
               "legendFormat": "major GC(marksweep)",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2098,9 +2228,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "rate(jvm_garbage_collectors_PS_Scavenge_time[5m])/rate(jvm_garbage_collectors_PS_Scavenge_count[5m])",
+              "editorMode": "code",
+              "expr": "rate(jvm_garbage_collectors_PS_Scavenge_time{job=\"nexus\"}[5m])/rate(jvm_garbage_collectors_PS_Scavenge_count{job=\"nexus\"}[5m])",
               "interval": "",
               "legendFormat": "minor GC(scavenge)",
+              "range": true,
               "refId": "A"
             }
           ],
@@ -2169,7 +2301,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -2219,9 +2351,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_heap_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_heap_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "A"
             },
             {
@@ -2229,9 +2363,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_heap_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_heap_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2239,9 +2375,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_heap_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_heap_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "C"
             },
             {
@@ -2249,7 +2387,8 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_heap_init",
+              "editorMode": "code",
+              "expr": "jvm_memory_heap_init{job=\"nexus\"}",
               "hide": true,
               "instant": false,
               "interval": "",
@@ -2296,7 +2435,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -2346,9 +2485,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_non_heap_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_non_heap_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "A"
             },
             {
@@ -2356,9 +2497,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_non_heap_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_non_heap_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2366,9 +2509,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_non_heap_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_non_heap_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "C"
             },
             {
@@ -2376,7 +2521,8 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_heap_init",
+              "editorMode": "code",
+              "expr": "jvm_memory_heap_init{job=\"nexus\"}",
               "hide": true,
               "instant": false,
               "interval": "",
@@ -2423,7 +2569,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -2473,9 +2619,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_total_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_total_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "A"
             },
             {
@@ -2483,9 +2631,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_total_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_total_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2493,9 +2643,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_total_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_total_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "C"
             },
             {
@@ -2503,10 +2655,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_total_init",
+              "editorMode": "code",
+              "expr": "jvm_memory_total_init{job=\"nexus\"}",
               "hide": true,
               "interval": "",
               "legendFormat": "init",
+              "range": true,
               "refId": "D"
             }
           ],
@@ -2575,7 +2729,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2617,10 +2771,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Eden_Space_init",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Eden_Space_init{job=\"nexus\"}",
               "hide": true,
               "interval": "",
               "legendFormat": "init",
+              "range": true,
               "refId": "A"
             },
             {
@@ -2628,9 +2784,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Eden_Space_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Eden_Space_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2638,9 +2796,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Eden_Space_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Eden_Space_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "C"
             },
             {
@@ -2648,9 +2808,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Eden_Space_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Eden_Space_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "D"
             },
             {
@@ -2658,10 +2820,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Eden_Space_used_after_gc",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Eden_Space_used_after_gc{job=\"nexus\"}",
               "hide": true,
               "interval": "",
               "legendFormat": "used_after_gc",
+              "range": true,
               "refId": "E"
             }
           ],
@@ -2704,7 +2868,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2746,10 +2910,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Tenured_Gen_Space_init",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Tenured_Gen_Space_init{job=\"nexus\"}",
               "hide": true,
               "interval": "",
               "legendFormat": "init",
+              "range": true,
               "refId": "A"
             },
             {
@@ -2757,9 +2923,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Tenured_Gen_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Tenured_Gen_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2767,9 +2935,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Tenured_Gen_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Tenured_Gen_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "C"
             },
             {
@@ -2777,9 +2947,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Tenured_Gen_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Tenured_Gen_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "D"
             },
             {
@@ -2833,7 +3005,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2875,10 +3047,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Survivor_Space_init",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Survivor_Space_init{job=\"nexus\"}",
               "hide": true,
               "interval": "",
               "legendFormat": "init",
+              "range": true,
               "refId": "A"
             },
             {
@@ -2886,9 +3060,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Survivor_Space_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Survivor_Space_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -2896,9 +3072,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Survivor_Space_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Survivor_Space_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "C"
             },
             {
@@ -2906,9 +3084,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Survivor_Space_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Survivor_Space_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "D"
             },
             {
@@ -2916,10 +3096,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Survivor_Space_used_after_gc",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Survivor_Space_used_after_gc{job=\"nexus\"}",
               "hide": true,
               "interval": "",
               "legendFormat": "used_after_gc",
+              "range": true,
               "refId": "E"
             }
           ],
@@ -2988,7 +3170,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3030,10 +3212,12 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Metaspace_init",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Metaspace_init{job=\"nexus\"}",
               "hide": true,
               "interval": "",
               "legendFormat": "init",
+              "range": true,
               "refId": "A"
             },
             {
@@ -3041,9 +3225,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Metaspace_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Metaspace_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -3051,9 +3237,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Metaspace_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Metaspace_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "C"
             },
             {
@@ -3061,9 +3249,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Metaspace_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Metaspace_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "D"
             }
           ],
@@ -3106,7 +3296,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3148,9 +3338,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Compressed_Class_Space_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Compressed_Class_Space_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -3158,9 +3350,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Compressed_Class_Space_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Compressed_Class_Space_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "C"
             },
             {
@@ -3168,9 +3362,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Compressed_Class_Space_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Compressed_Class_Space_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "D"
             }
           ],
@@ -3213,7 +3409,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3255,9 +3451,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Code_Cache_used",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Code_Cache_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "B"
             },
             {
@@ -3265,9 +3463,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Code_Cache_max",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Code_Cache_max{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "max",
+              "range": true,
               "refId": "C"
             },
             {
@@ -3275,9 +3475,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_memory_pools_Code_Cache_committed",
+              "editorMode": "code",
+              "expr": "jvm_memory_pools_Code_Cache_committed{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "committed",
+              "range": true,
               "refId": "D"
             }
           ],
@@ -3346,7 +3548,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -3394,9 +3596,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_buffers_direct_count",
+              "editorMode": "code",
+              "expr": "jvm_buffers_direct_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "count",
+              "range": true,
               "refId": "A"
             }
           ],
@@ -3439,7 +3643,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -3488,9 +3692,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_buffers_direct_used",
+              "editorMode": "code",
+              "expr": "jvm_buffers_direct_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "A"
             },
             {
@@ -3498,9 +3704,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_buffers_direct_capacity",
+              "editorMode": "code",
+              "expr": "jvm_buffers_direct_capacity{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "capacity",
+              "range": true,
               "refId": "B"
             }
           ],
@@ -3543,7 +3751,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -3591,9 +3799,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_buffers_mapped_count",
+              "editorMode": "code",
+              "expr": "jvm_buffers_mapped_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "count",
+              "range": true,
               "refId": "A"
             }
           ],
@@ -3636,7 +3846,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -3685,9 +3895,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_buffers_mapped_used",
+              "editorMode": "code",
+              "expr": "jvm_buffers_mapped_used{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "used",
+              "range": true,
               "refId": "A"
             },
             {
@@ -3695,9 +3907,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_buffers_mapped_capacity",
+              "editorMode": "code",
+              "expr": "jvm_buffers_mapped_capacity{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "capacity",
+              "range": true,
               "refId": "B"
             }
           ],
@@ -3740,7 +3954,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -3788,9 +4002,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_daemon_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_daemon_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "daemon",
+              "range": true,
               "refId": "D"
             },
             {
@@ -3798,9 +4014,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_terminated_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_terminated_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "terminated",
+              "range": true,
               "refId": "G"
             },
             {
@@ -3808,9 +4026,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "total",
+              "range": true,
               "refId": "H"
             }
           ],
@@ -3853,7 +4073,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
           },
           "fieldConfig": {
             "defaults": {
@@ -3901,9 +4121,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_new_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_new_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "new",
+              "range": true,
               "refId": "A"
             },
             {
@@ -3911,9 +4133,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_runnable_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_runnable_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "runnable",
+              "range": true,
               "refId": "B"
             },
             {
@@ -3921,9 +4145,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_blocked_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_blocked_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "blocked",
+              "range": true,
               "refId": "C"
             },
             {
@@ -3931,9 +4157,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_deadlock_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_deadlock_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "deadlock",
+              "range": true,
               "refId": "E"
             },
             {
@@ -3941,9 +4169,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_timed_waiting_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_timed_waiting_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "timed_waiting",
+              "range": true,
               "refId": "F"
             },
             {
@@ -3951,9 +4181,11 @@ spec:
                 "type": "prometheus",
                 "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
               },
-              "expr": "jvm_thread_states_waiting_count",
+              "editorMode": "code",
+              "expr": "jvm_thread_states_waiting_count{job=\"nexus\"}",
               "interval": "",
               "legendFormat": "waiting",
+              "range": true,
               "refId": "I"
             }
           ],
@@ -3990,7 +4222,7 @@ spec:
           }
         }
       ],
-      "refresh": "",
+      "refresh": false,
       "schemaVersion": 38,
       "style": "dark",
       "tags": [
@@ -4000,8 +4232,8 @@ spec:
         "list": []
       },
       "time": {
-        "from": "now-24h",
-        "to": "now"
+        "from": "2024-04-24T03:50:24.210Z",
+        "to": "2024-04-26T03:50:24.214Z"
       },
       "timepicker": {
         "refresh_intervals": [
@@ -4018,7 +4250,7 @@ spec:
         ]
       },
       "timezone": "",
-      "title": "Infra / Nexus",
+      "title": "Nexus",
       "uid": "kdJehb8Zk",
       "version": 1,
       "weekStart": ""

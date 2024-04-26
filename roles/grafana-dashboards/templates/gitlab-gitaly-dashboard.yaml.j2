@@ -46,7 +46,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -87,9 +87,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "rate(process_cpu_seconds_total{job=\"gitaly\"}[$__interval])",
+              "expr": "rate(process_cpu_seconds_total{job=\"gitlab-gitaly\"}[$__interval])",
               "format": "time_series",
               "interval": "1m",
               "intervalFactor": 1,
@@ -131,7 +131,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -194,9 +194,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "topk(1, count by (version) (gitlab_build_info{job=\"gitaly\"}))",
+              "expr": "topk(1, count by (version) (gitlab_build_info{job=\"gitlab-gitaly\"}))",
               "format": "table",
               "instant": true,
               "intervalFactor": 1,
@@ -214,7 +214,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -255,9 +255,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "go_goroutines{job=\"gitaly\"}",
+              "expr": "go_goroutines{job=\"gitlab-gitaly\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Go routines {{instance}}",
@@ -266,9 +266,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "process_open_fds{job=\"gitaly\"}",
+              "expr": "process_open_fds{job=\"gitlab-gitaly\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Open FDs",
@@ -309,7 +309,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -376,9 +376,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "avg(avg_over_time(up{job=\"gitaly\"}[$__interval]))",
+              "expr": "avg(avg_over_time(up{job=\"gitlab-gitaly\"}[$__interval]))",
               "format": "time_series",
               "interval": "1m",
               "intervalFactor": 1,
@@ -396,7 +396,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -437,9 +437,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "process_resident_memory_bytes{job=\"gitaly\"}",
+              "expr": "process_resident_memory_bytes{job=\"gitlab-gitaly\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "RSS - {{instance}}",
@@ -448,9 +448,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "go_memstats_next_gc_bytes{job=\"gitaly\"}",
+              "expr": "go_memstats_next_gc_bytes{job=\"gitlab-gitaly\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Next GC - {{instance}}",
@@ -495,7 +495,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -536,9 +536,9 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "sum without (grpc_method,grpc_service,grpc_type) (\n  rate(grpc_server_started_total{job=\"gitaly\"}[$__interval])\n)",
+              "expr": "sum without (grpc_method,grpc_service,grpc_type) (\n  rate(grpc_server_started_total{job=\"gitlab-gitaly\"}[$__interval])\n)",
               "format": "time_series",
               "interval": "1m",
               "intervalFactor": 1,
@@ -616,7 +616,7 @@ spec:
       },
       "timezone": "",
       "title": "GitLab - Gitaly",
-      "uid": "x6Z50y-iz",
+      "uid": "dso-gitlab-gitaly",
       "version": 1,
       "weekStart": ""
     }

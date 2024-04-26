@@ -45,7 +45,7 @@ spec:
           {
               "collapsed": false,
               "datasource": {
-                  "uid": "${DS_PROMETHEUS}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "gridPos": {
                   "h": 1,
@@ -61,7 +61,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -115,7 +115,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_up",
@@ -132,7 +132,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "description": "",
               "fieldConfig": {
@@ -182,7 +182,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_project_quota_usage_byte",
@@ -198,7 +198,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -275,7 +275,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_project_member_total",
@@ -290,7 +290,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -366,7 +366,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_project_repo_total",
@@ -381,7 +381,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -457,7 +457,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_artifact_pulled",
@@ -472,7 +472,7 @@ spec:
           {
               "collapsed": false,
               "datasource": {
-                  "uid": "${DS_PROMETHEUS}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "gridPos": {
                   "h": 1,
@@ -488,7 +488,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -564,7 +564,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": false,
                       "expr": "rate(harbor_core_http_request_total[5m])",
@@ -581,7 +581,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -657,7 +657,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_core_http_request_duration_seconds{quantile=\"0.9\"}",
@@ -674,7 +674,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -750,7 +750,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_core_http_inflight_requests",
@@ -765,7 +765,7 @@ spec:
           {
               "collapsed": false,
               "datasource": {
-                  "uid": "${DS_PROMETHEUS}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "gridPos": {
                   "h": 1,
@@ -781,7 +781,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -857,7 +857,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "process_open_fds{service=~\"harbor-.*\"}",
@@ -872,7 +872,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -948,7 +948,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "rate(process_cpu_seconds_total{service=~\"harbor-.*\"}[5m])",
@@ -963,7 +963,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -1039,7 +1039,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_threads{service=~\"harbor-.*\"}",
@@ -1054,7 +1054,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -1130,7 +1130,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_goroutines{service=~\"harbor-.*\"}",
@@ -1145,7 +1145,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -1221,7 +1221,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_memstats_heap_objects{service=~\"harbor-.*\"}",
@@ -1236,7 +1236,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "description": "",
               "fieldConfig": {
@@ -1313,7 +1313,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_memstats_alloc_bytes{service=~\"harbor-.*\"}",
@@ -1328,7 +1328,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -1404,7 +1404,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_memstats_next_gc_bytes{service=~\"harbor-.*\"}",
@@ -1419,7 +1419,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -1495,7 +1495,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_gc_duration_seconds{quantile=\"0.25\",service=~\"harbor-.*\"}",
@@ -1510,7 +1510,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -1586,7 +1586,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_gc_duration_seconds{quantile=\"0.5\",service=~\"harbor-.*\"}",
@@ -1601,7 +1601,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "description": "",
               "fieldConfig": {
@@ -1678,7 +1678,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "go_gc_duration_seconds{quantile=\"0.75\",service=~\"harbor-.*\"}",
@@ -1693,7 +1693,7 @@ spec:
           {
               "collapsed": false,
               "datasource": {
-                  "uid": "${DS_PROMETHEUS}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "gridPos": {
                   "h": 1,
@@ -1709,7 +1709,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "description": "time period from last process of task queue",
               "fieldConfig": {
@@ -1786,7 +1786,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_task_queue_latency",
@@ -1801,7 +1801,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "description": "",
               "fieldConfig": {
@@ -1878,7 +1878,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_task_concurrency",
@@ -1893,7 +1893,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -1969,7 +1969,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_task_queue_size",
@@ -1984,7 +1984,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "description": "",
               "fieldConfig": {
@@ -2061,7 +2061,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "rate(harbor_jobservice_task_total[1m])",
@@ -2076,7 +2076,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -2152,7 +2152,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "harbor_jobservice_task_total",
@@ -2167,7 +2167,7 @@ spec:
           {
               "collapsed": false,
               "datasource": {
-                  "uid": "${DS_PROMETHEUS}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "gridPos": {
                   "h": 1,
@@ -2183,7 +2183,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -2259,7 +2259,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "registry_http_in_flight_requests",
@@ -2274,7 +2274,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -2350,7 +2350,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "rate(registry_http_requests_total[5m])",
@@ -2365,7 +2365,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -2441,7 +2441,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "histogram_quantile(0.9, rate(registry_http_request_duration_seconds_bucket[10m]))",
@@ -2456,7 +2456,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -2532,7 +2532,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "histogram_quantile(0.9, rate(registry_http_request_size_bytes_bucket[10m]))",
@@ -2547,7 +2547,7 @@ spec:
           {
               "datasource": {
                   "type": "prometheus",
-                  "uid": "${datasource}"
+                  "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                   "defaults": {
@@ -2623,7 +2623,7 @@ spec:
                   {
                       "datasource": {
                           "type": "prometheus",
-                          "uid": "prometheus"
+                          "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                       },
                       "exemplar": true,
                       "expr": "histogram_quantile(0.9, rate(registry_http_response_size_bytes_bucket[10m]))",

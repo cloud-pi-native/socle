@@ -42,7 +42,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "6DmHLoFMz"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -57,18 +57,18 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "6DmHLoFMz"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
           ],
-          "title": "About $app",
+          "title": "About Runner",
           "type": "row"
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 5,
@@ -83,7 +83,7 @@ spec:
               "showLineNumbers": false,
               "showMiniMap": false
             },
-            "content": "<div>\n  <img style=\"height: 90%;width: 100%;display: block;margin: auto auto;\" src=\"https://gitlab.com/uploads/-/system/project/avatar/250833/runner_logo.png\"/>\n</div>",
+            "content": "<div>\n  <img style=\"height: 90%;width: 100%;display: block;margin: auto auto;\" src=\"https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png\"/>\n</div>",
             "mode": "html"
           },
           "pluginVersion": "9.5.5",
@@ -91,7 +91,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -102,7 +102,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "",
           "fieldConfig": {
@@ -163,7 +163,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "gitlab_runner_version_info{app=~\"^$app$\"}",
               "format": "table",
@@ -181,7 +181,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -241,7 +241,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -275,7 +275,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "",
           "fieldConfig": {
@@ -336,7 +336,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -357,7 +357,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "",
           "fieldConfig": {
@@ -417,7 +417,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -438,7 +438,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "",
           "fieldConfig": {
@@ -499,7 +499,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -521,7 +521,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "6DmHLoFMz"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -535,7 +535,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "6DmHLoFMz"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -546,7 +546,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -635,7 +635,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -656,7 +656,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -745,7 +745,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -766,7 +766,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -855,7 +855,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -876,7 +876,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -965,7 +965,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "sum(delta(gitlab_runner_errors_total{app=~\"^$app$\"} [1m])) by (app,level)",
@@ -984,7 +984,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1072,7 +1072,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -1093,7 +1093,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "6DmHLoFMz"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1107,7 +1107,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "6DmHLoFMz"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1118,7 +1118,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1203,7 +1203,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "gitlab_runner_request_concurrency{app=~\"^$app$\"}",
               "format": "time_series",
@@ -1220,7 +1220,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1305,7 +1305,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "delta(gitlab_runner_request_concurrency_exceeded_total{app=~\"^$app$\"} [2m])",
               "format": "time_series",
@@ -1323,7 +1323,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "6DmHLoFMz"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1337,7 +1337,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "6DmHLoFMz"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1348,7 +1348,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "(user and system)",
           "fieldConfig": {
@@ -1433,7 +1433,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(process_cpu_seconds_total{app=~\"^$app$\"} [1m]) * 100",
@@ -1452,7 +1452,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1536,7 +1536,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "process_open_fds{app=~\"^$app$\"}",
               "format": "time_series",
@@ -1553,7 +1553,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1637,7 +1637,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "process_virtual_memory_bytes{app=~\"^$app$\"}",
               "format": "time_series",
@@ -1654,7 +1654,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "Prometheus"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1738,7 +1738,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "Prometheus"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "process_resident_memory_bytes{app=~\"^$app$\"}",
               "format": "time_series",
@@ -1768,7 +1768,7 @@ spec:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "Prometheus"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "label_values(gitlab_runner_api_request_statuses_total, app)",
             "hide": 0,
@@ -1821,8 +1821,8 @@ spec:
         ]
       },
       "timezone": "browser",
-      "title": "Gitlab Runner Metrics",
-      "uid": "jTW2jWQmz",
+      "title": "Gitlab Runner",
+      "uid": "dso-gitlab-runner",
       "version": 1,
       "weekStart": ""
     }

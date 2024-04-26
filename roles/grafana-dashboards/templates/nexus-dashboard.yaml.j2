@@ -42,7 +42,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -91,7 +91,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_vm_uptime{job=\"nexus\"}",
@@ -109,7 +109,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -160,7 +160,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_heap_usage{job=\"nexus\"}",
@@ -178,7 +178,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -229,7 +229,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "builder",
               "expr": "jvm_fd_usage{job=\"nexus\"}",
@@ -247,7 +247,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -308,7 +308,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "builder",
               "expr": "readonly_enabled{job=\"nexus\"}",
@@ -327,7 +327,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -341,7 +341,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -356,7 +356,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -402,7 +402,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -414,7 +414,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -426,7 +426,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -438,7 +438,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -450,7 +450,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -462,7 +462,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -474,7 +474,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -486,7 +486,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -498,7 +498,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -510,7 +510,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -559,7 +559,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -605,7 +605,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -617,7 +617,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -629,7 +629,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -641,7 +641,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -653,7 +653,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -665,7 +665,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -714,7 +714,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -760,7 +760,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -772,7 +772,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -784,7 +784,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -796,7 +796,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -845,7 +845,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -891,7 +891,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -903,7 +903,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -915,7 +915,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -927,7 +927,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -976,7 +976,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1022,7 +1022,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -1034,7 +1034,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -1046,7 +1046,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_update_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -1058,7 +1058,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_update_timer{quantile=\"0.99\"}",
               "interval": "",
@@ -1068,7 +1068,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_read_timer{quantile=\"0.5\"}",
               "interval": "",
@@ -1078,7 +1078,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_read_timer{quantile=\"0.99\"}",
               "interval": "",
@@ -1125,7 +1125,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1171,7 +1171,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -1183,7 +1183,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -1232,7 +1232,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1278,7 +1278,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
@@ -1290,7 +1290,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
@@ -1339,7 +1339,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1385,7 +1385,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_BlobStoreComponent_readGroups_exceptions_total{job=\"nexus\"}[5m])",
@@ -1397,7 +1397,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_blobstore_s3_internal_ui_S3Component_signertypes_exceptions_total{job=\"nexus\"}[5m])",
@@ -1409,7 +1409,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_TaskComponent_update_exceptions_total{job=\"nexus\"}[5m])",
@@ -1421,7 +1421,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_rapture_internal_state_StateComponent_getState_exceptions_total{job=\"nexus\"}[5m])",
@@ -1433,7 +1433,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_cancel_exceptions_total{job=\"nexus\"}[5m])",
@@ -1445,7 +1445,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_abort_exceptions_total{job=\"nexus\"}[5m])",
@@ -1457,7 +1457,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_update_exceptions_total{job=\"nexus\"}[5m])",
@@ -1469,7 +1469,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_read_exceptions_total{job=\"nexus\"}[5m])",
@@ -1481,7 +1481,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_SelectorComponent_readReferences_exceptions_total{job=\"nexus\"}[5m])",
@@ -1493,7 +1493,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_rebuildIndex_exceptions_total{job=\"nexus\"}[5m])",
@@ -1505,7 +1505,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_exceptions_total{job=\"nexus\"}[5m])",
@@ -1517,7 +1517,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_BrowseComponent_read_exceptions_total{job=\"nexus\"}[5m])",
@@ -1529,7 +1529,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(com_sonatype_nexus_clm_internal_ui_ClmComponent_readApplications_exceptions_total{job=\"nexus\"}[5m])",
@@ -1541,7 +1541,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_internal_capability_CapabilityComponent_remove_exceptions_total{job=\"nexus\"}[5m])",
@@ -1553,7 +1553,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(com_sonatype_nexus_ssl_plugin_internal_ui_CertificateComponent_details_exceptions_total{job=\"nexus\"}[5m])",
@@ -1565,7 +1565,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_SearchComponent_read_exceptions_total{job=\"nexus\"}[5m])",
@@ -1577,7 +1577,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_rapture_internal_security_SecurityComponent_authenticate_exceptions_total{job=\"nexus\"}[5m])",
@@ -1589,7 +1589,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_changeOrder_exceptions_total{job=\"nexus\"}[5m])",
@@ -1601,7 +1601,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_remove_exceptions_total{job=\"nexus\"}[5m])",
@@ -1613,7 +1613,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_readReferences_exceptions_total{job=\"nexus\"}[5m])",
@@ -1659,7 +1659,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1673,7 +1673,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1688,7 +1688,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1734,7 +1734,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_1xx_responses_total{job=\"nexus\"}[1m])",
@@ -1746,7 +1746,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_2xx_responses_total{job=\"nexus\"}[1m])",
@@ -1758,7 +1758,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_5xx_responses_total{job=\"nexus\"}[1m])",
@@ -1770,7 +1770,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_4xx_responses_total{job=\"nexus\"}[1m])",
@@ -1782,7 +1782,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_3xx_responses_total{job=\"nexus\"}[1m])",
@@ -1831,7 +1831,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1877,7 +1877,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.5\", job=\"nexus\"}",
@@ -1889,7 +1889,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.99\", job=\"nexus\"}",
@@ -1938,7 +1938,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1984,10 +1984,10 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
-              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp2134194857_jobs{job=\"nexus\"}",
+              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp612364006_jobs",
               "interval": "",
               "legendFormat": "wait-jobs",
               "range": true,
@@ -1996,10 +1996,10 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
-              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp2134194857_size{job=\"nexus\"}",
+              "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp612364006_size",
               "interval": "",
               "legendFormat": "current-size",
               "range": true,
@@ -2042,7 +2042,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -2056,7 +2056,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -2071,7 +2071,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2111,7 +2111,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_count{job=\"nexus\"}[1m])",
@@ -2124,7 +2124,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(jvm_garbage_collectors_PS_Scavenge_count{job=\"nexus\"}[1m])",
@@ -2173,7 +2173,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2213,7 +2213,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_time{job=\"nexus\"}[5m]) / rate(jvm_garbage_collectors_MarkSweepCompact_count{job=\"nexus\"}[5m])",
@@ -2226,7 +2226,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "rate(jvm_garbage_collectors_PS_Scavenge_time{job=\"nexus\"}[5m])/rate(jvm_garbage_collectors_PS_Scavenge_count{job=\"nexus\"}[5m])",
@@ -2272,7 +2272,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -2286,7 +2286,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -2301,7 +2301,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2349,7 +2349,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_heap_max{job=\"nexus\"}",
@@ -2361,7 +2361,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_heap_used{job=\"nexus\"}",
@@ -2373,7 +2373,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_heap_committed{job=\"nexus\"}",
@@ -2385,7 +2385,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_heap_init{job=\"nexus\"}",
@@ -2435,7 +2435,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2483,7 +2483,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_non_heap_max{job=\"nexus\"}",
@@ -2495,7 +2495,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_non_heap_used{job=\"nexus\"}",
@@ -2507,7 +2507,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_non_heap_committed{job=\"nexus\"}",
@@ -2519,7 +2519,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_heap_init{job=\"nexus\"}",
@@ -2569,7 +2569,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2617,7 +2617,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_total_max{job=\"nexus\"}",
@@ -2629,7 +2629,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_total_used{job=\"nexus\"}",
@@ -2641,7 +2641,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_total_committed{job=\"nexus\"}",
@@ -2653,7 +2653,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_total_init{job=\"nexus\"}",
@@ -2700,7 +2700,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -2714,7 +2714,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -2729,7 +2729,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2769,7 +2769,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Eden_Space_init{job=\"nexus\"}",
@@ -2782,7 +2782,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Eden_Space_used{job=\"nexus\"}",
@@ -2794,7 +2794,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Eden_Space_max{job=\"nexus\"}",
@@ -2806,7 +2806,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Eden_Space_committed{job=\"nexus\"}",
@@ -2818,7 +2818,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Eden_Space_used_after_gc{job=\"nexus\"}",
@@ -2868,7 +2868,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -2908,7 +2908,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Tenured_Gen_Space_init{job=\"nexus\"}",
@@ -2921,7 +2921,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Tenured_Gen_used{job=\"nexus\"}",
@@ -2933,7 +2933,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Tenured_Gen_max{job=\"nexus\"}",
@@ -2945,7 +2945,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Tenured_Gen_committed{job=\"nexus\"}",
@@ -2957,7 +2957,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "jvm_memory_pools_Tenured_Gen_used_after_gc",
               "hide": true,
@@ -3005,7 +3005,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3045,7 +3045,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Survivor_Space_init{job=\"nexus\"}",
@@ -3058,7 +3058,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Survivor_Space_used{job=\"nexus\"}",
@@ -3070,7 +3070,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Survivor_Space_max{job=\"nexus\"}",
@@ -3082,7 +3082,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Survivor_Space_committed{job=\"nexus\"}",
@@ -3094,7 +3094,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Survivor_Space_used_after_gc{job=\"nexus\"}",
@@ -3141,7 +3141,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -3155,7 +3155,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -3170,7 +3170,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3210,7 +3210,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Metaspace_init{job=\"nexus\"}",
@@ -3223,7 +3223,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Metaspace_used{job=\"nexus\"}",
@@ -3235,7 +3235,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Metaspace_max{job=\"nexus\"}",
@@ -3247,7 +3247,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Metaspace_committed{job=\"nexus\"}",
@@ -3296,7 +3296,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3336,7 +3336,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Compressed_Class_Space_used{job=\"nexus\"}",
@@ -3348,7 +3348,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Compressed_Class_Space_max{job=\"nexus\"}",
@@ -3360,7 +3360,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Compressed_Class_Space_committed{job=\"nexus\"}",
@@ -3409,7 +3409,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fill": 1,
           "fillGradient": 0,
@@ -3449,7 +3449,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Code_Cache_used{job=\"nexus\"}",
@@ -3461,7 +3461,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Code_Cache_max{job=\"nexus\"}",
@@ -3473,7 +3473,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_pools_Code_Cache_committed{job=\"nexus\"}",
@@ -3519,7 +3519,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -3533,7 +3533,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -3548,7 +3548,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3594,7 +3594,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_buffers_direct_count{job=\"nexus\"}",
@@ -3643,7 +3643,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3690,7 +3690,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_buffers_direct_used{job=\"nexus\"}",
@@ -3702,7 +3702,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_buffers_direct_capacity{job=\"nexus\"}",
@@ -3751,7 +3751,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3797,7 +3797,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_buffers_mapped_count{job=\"nexus\"}",
@@ -3846,7 +3846,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -3893,7 +3893,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_buffers_mapped_used{job=\"nexus\"}",
@@ -3905,7 +3905,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_buffers_mapped_capacity{job=\"nexus\"}",
@@ -3954,7 +3954,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -4000,7 +4000,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_daemon_count{job=\"nexus\"}",
@@ -4012,7 +4012,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_terminated_count{job=\"nexus\"}",
@@ -4024,7 +4024,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_count{job=\"nexus\"}",
@@ -4073,7 +4073,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -4119,7 +4119,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_new_count{job=\"nexus\"}",
@@ -4131,7 +4131,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_runnable_count{job=\"nexus\"}",
@@ -4143,7 +4143,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_blocked_count{job=\"nexus\"}",
@@ -4155,7 +4155,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_deadlock_count{job=\"nexus\"}",
@@ -4167,7 +4167,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_timed_waiting_count{job=\"nexus\"}",
@@ -4179,7 +4179,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_thread_states_waiting_count{job=\"nexus\"}",

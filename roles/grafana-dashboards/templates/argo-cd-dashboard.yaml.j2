@@ -35,14 +35,14 @@ spec:
       "fiscalYearStartMonth": 0,
       "gnetId": 14584,
       "graphTooltip": 0,
-      "id": 9,
+      "id": 31,
       "links": [],
       "liveNow": false,
       "panels": [
         {
           "collapsed": false,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -55,7 +55,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -65,7 +65,7 @@ spec:
         },
         {
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 4,
@@ -88,7 +88,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -98,7 +98,7 @@ spec:
         },
         {
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -151,7 +151,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "time() - max(process_start_time_seconds{job=\"argo-argo-cd-server-metrics\",namespace=~\"$namespace\"})",
               "format": "time_series",
@@ -164,7 +164,7 @@ spec:
         },
         {
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -217,7 +217,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "count(count by (server) (argocd_cluster_info{namespace=~\"$namespace\"}))",
               "format": "time_series",
@@ -231,7 +231,7 @@ spec:
         },
         {
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -285,7 +285,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "sum(argocd_app_info{namespace=~\"$namespace\",dest_server=~\"$cluster\",health_status=~\"$health_status\",sync_status=~\"$sync_status\"})",
               "format": "time_series",
@@ -299,7 +299,7 @@ spec:
         },
         {
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -352,7 +352,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "count(count by (repo) (argocd_app_info{namespace=~\"$namespace\"}))",
               "format": "time_series",
@@ -366,7 +366,8 @@ spec:
         },
         {
           "datasource": {
-            "uid": "$datasource"
+            "type": "prometheus",
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -384,6 +385,7 @@ spec:
               ],
               "max": 100,
               "min": 0,
+              "noValue": "0",
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
@@ -427,8 +429,9 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
+              "editorMode": "code",
               "expr": "sum(argocd_app_info{namespace=~\"$namespace\",dest_server=~\"$cluster\",operation!=\"\"})",
               "format": "time_series",
               "instant": true,
@@ -446,7 +449,7 @@ spec:
           "dashLength": 10,
           "dashes": false,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -499,7 +502,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "sum(argocd_app_info{namespace=~\"$namespace\",dest_server=~\"$cluster\",health_status=~\"$health_status\",sync_status=~\"$sync_status\"}) by (namespace)",
               "format": "time_series",
@@ -543,7 +546,7 @@ spec:
         {
           "collapsed": true,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -566,7 +569,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -620,7 +623,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(argocd_app_info{namespace=~\"$namespace\",dest_server=~\"$cluster\",health_status=~\"$health_status\",sync_status=~\"$sync_status\",health_status!=\"\"}) by (health_status)",
                   "format": "time_series",
@@ -675,7 +678,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -729,7 +732,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(argocd_app_info{namespace=~\"$namespace\",dest_server=~\"$cluster\",health_status=~\"$health_status\",sync_status=~\"$sync_status\",health_status!=\"\"}) by (sync_status)",
                   "format": "time_series",
@@ -773,7 +776,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -784,7 +787,7 @@ spec:
         {
           "collapsed": true,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -800,7 +803,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -854,7 +857,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(round(increase(argocd_app_sync_total{namespace=~\"$namespace\",dest_server=~\"$cluster\"}[$interval]))) by ($grouping)",
                   "format": "time_series",
@@ -904,7 +907,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -957,7 +960,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(round(increase(argocd_app_sync_total{namespace=~\"$namespace\",phase=~\"Error|Failed\",dest_server=~\"$cluster\"}[$interval]))) by ($grouping, phase)",
                   "format": "time_series",
@@ -1004,7 +1007,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1015,7 +1018,7 @@ spec:
         {
           "collapsed": true,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1031,7 +1034,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1082,7 +1085,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_app_reconcile_count{namespace=~\"$namespace\",dest_server=~\"$cluster\"}[$interval])) by ($grouping)",
                   "format": "time_series",
@@ -1132,7 +1135,7 @@ spec:
               },
               "dataFormat": "tsbuckets",
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1207,7 +1210,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_app_reconcile_bucket{namespace=~\"$namespace\"}[$interval])) by (le)",
                   "format": "heatmap",
@@ -1240,7 +1243,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1293,7 +1296,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_app_k8s_request_total{namespace=~\"$namespace\",server=~\"$cluster\"}[$interval])) by (verb, resource_kind)",
                   "format": "time_series",
@@ -1339,7 +1342,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1388,7 +1391,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(workqueue_depth{namespace=~\"$namespace\",name=~\"app_.*\"}) by (name)",
                   "format": "time_series",
@@ -1435,7 +1438,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1483,7 +1486,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(argocd_kubectl_exec_pending{namespace=~\"$namespace\"}) by (command)",
                   "format": "time_series",
@@ -1532,7 +1535,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1543,7 +1546,7 @@ spec:
         {
           "collapsed": true,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1559,7 +1562,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1610,7 +1613,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "go_memstats_heap_alloc_bytes{job=\"argo-argo-cd-app-controller-metrics\",namespace=~\"$namespace\"}",
                   "format": "time_series",
@@ -1655,7 +1658,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1708,7 +1711,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "irate(process_cpu_seconds_total{job=\"argo-argo-cd-app-controller-metrics\",namespace=~\"$namespace\"}[1m])",
                   "format": "time_series",
@@ -1754,7 +1757,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1807,7 +1810,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "go_goroutines{job=\"argo-argo-cd-app-controller-metrics\",namespace=~\"$namespace\"}",
                   "format": "time_series",
@@ -1850,7 +1853,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1861,7 +1864,7 @@ spec:
         {
           "collapsed": true,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1877,7 +1880,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -1927,7 +1930,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(argocd_cluster_api_resource_objects{namespace=~\"$namespace\",server=~\"$cluster\"}) by (server)",
                   "format": "time_series",
@@ -1972,7 +1975,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2023,7 +2026,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "  sum(argocd_cluster_api_resources{namespace=~\"$namespace\",server=~\"$cluster\"}) by (server)",
                   "format": "time_series",
@@ -2068,7 +2071,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2118,7 +2121,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_cluster_events_total{namespace=~\"$namespace\",server=~\"$cluster\"}[$interval])) by (server)",
                   "format": "time_series",
@@ -2161,7 +2164,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -2172,7 +2175,7 @@ spec:
         {
           "collapsed": true,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -2188,7 +2191,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2234,7 +2237,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_git_request_total{request_type=\"ls-remote\", namespace=~\"$namespace\"}[10m])) by (namespace)",
                   "format": "time_series",
@@ -2279,7 +2282,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2325,7 +2328,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_git_request_total{request_type=\"fetch\", namespace=~\"$namespace\"}[10m])) by (namespace)",
                   "format": "time_series",
@@ -2376,7 +2379,7 @@ spec:
               },
               "dataFormat": "tsbuckets",
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2448,7 +2451,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_git_request_duration_seconds_bucket{request_type=\"fetch\", namespace=~\"$namespace\"}[$interval])) by (le)",
                   "format": "heatmap",
@@ -2484,7 +2487,7 @@ spec:
               },
               "dataFormat": "tsbuckets",
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2556,7 +2559,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(argocd_git_request_duration_seconds_bucket{request_type=\"ls-remote\", namespace=~\"$namespace\"}[$interval])) by (le)",
                   "format": "heatmap",
@@ -2587,7 +2590,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2634,7 +2637,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "go_memstats_heap_alloc_bytes{job=\"argo-argo-cd-repo-server-metrics\",namespace=~\"$namespace\"}",
                   "format": "time_series",
@@ -2679,7 +2682,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -2726,7 +2729,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "go_goroutines{job=\"argo-argo-cd-repo-server-metrics\",namespace=~\"$namespace\"}",
                   "format": "time_series",
@@ -2769,7 +2772,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -2780,7 +2783,7 @@ spec:
         {
           "collapsed": true,
           "datasource": {
-            "uid": "$datasource"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -2796,7 +2799,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -2837,7 +2840,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "go_memstats_heap_alloc_bytes{job=\"argo-argo-cd-server-metrics\",namespace=~\"$namespace\"}",
                   "format": "time_series",
@@ -2883,7 +2886,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -2924,7 +2927,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "go_goroutines{job=\"argo-argo-cd-server-metrics\",namespace=~\"$namespace\"}",
                   "format": "time_series",
@@ -2969,7 +2972,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3010,7 +3013,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "go_gc_duration_seconds{job=\"argo-argo-cd-server-metrics\", quantile=\"1\", namespace=~\"$namespace\"}",
                   "format": "time_series",
@@ -3077,7 +3080,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3124,7 +3127,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"application.ApplicationService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3169,7 +3172,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3214,7 +3217,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"cluster.ClusterService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3259,7 +3262,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3304,7 +3307,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"project.ProjectService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3349,7 +3352,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3393,7 +3396,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"repository.RepositoryService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3446,7 +3449,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3490,7 +3493,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"session.SessionService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3535,7 +3538,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3579,7 +3582,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"version.VersionService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3624,7 +3627,7 @@ spec:
               "dashLength": 10,
               "dashes": false,
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fill": 1,
               "fillGradient": 0,
@@ -3668,7 +3671,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"account.AccountService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3709,7 +3712,7 @@ spec:
             },
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -3751,8 +3754,7 @@ spec:
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
-                        "value": null
+                        "color": "green"
                       },
                       {
                         "color": "red",
@@ -3792,7 +3794,7 @@ spec:
               "targets": [
                 {
                   "datasource": {
-                    "uid": "$datasource"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "expr": "sum(increase(grpc_server_handled_total{job=\"argo-argo-cd-server-metrics\",grpc_service=\"settings.SettingsService\",namespace=~\"$namespace\"}[$interval])) by (grpc_code, grpc_method)",
                   "format": "time_series",
@@ -3808,7 +3810,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$datasource"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -3820,7 +3822,7 @@ spec:
           "collapsed": true,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -3833,7 +3835,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "fieldConfig": {
                 "defaults": {
@@ -3876,8 +3878,7 @@ spec:
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
-                        "value": null
+                        "color": "green"
                       },
                       {
                         "color": "red",
@@ -3913,7 +3914,7 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
                   "editorMode": "code",
                   "expr": "rate(redis_total_error_replies{job=\"argo-redis-metrics\", namespace=~\"$namespace\"}[$interval])",
@@ -3929,7 +3930,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -3938,7 +3939,7 @@ spec:
           "type": "row"
         }
       ],
-      "refresh": false,
+      "refresh": "",
       "schemaVersion": 38,
       "style": "dark",
       "tags": [],
@@ -3970,7 +3971,7 @@ spec:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "$datasource"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "label_values(kube_pod_info, namespace)",
             "hide": 0,
@@ -4095,7 +4096,7 @@ spec:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "$datasource"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "label_values(argocd_cluster_info, server)",
             "hide": 0,
@@ -4237,9 +4238,9 @@ spec:
         ]
       },
       "timezone": "",
-      "title": "ArgoCD",
-      "uid": "qPkgGHg7k",
-      "version": 5,
+      "title": "Argo CD",
+      "uid": "dso-argocd",
+      "version": 1,
       "weekStart": ""
     }
 {% endraw %}

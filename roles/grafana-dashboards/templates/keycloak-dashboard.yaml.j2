@@ -50,7 +50,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -65,7 +65,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -173,7 +173,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_cpu_availableProcessors{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -294,7 +294,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_cpu_processCpuLoad{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -415,7 +415,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_cpu_systemLoadAverage{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -524,7 +524,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_memory_usedHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -653,7 +653,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_memory_committedHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -813,7 +813,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_memory_maxHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -972,7 +972,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_classloader_loadedClasses_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -1131,7 +1131,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_classloader_unloadedClasses_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -1290,7 +1290,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_gc_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -1443,7 +1443,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_jvm_uptime{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -1595,7 +1595,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_classloader_loadedClasses_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -1733,7 +1733,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_thread_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -1854,7 +1854,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_thread_daemon_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -1975,7 +1975,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_thread_max_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -2002,7 +2002,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -2017,7 +2017,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -2125,7 +2125,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "system_cpu_usage{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -2246,7 +2246,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "process_cpu_usage{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -2385,7 +2385,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_memory_usedNonHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -2545,7 +2545,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_memory_maxNonHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -2705,7 +2705,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "base_memory_committedNonHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -2863,7 +2863,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_acquire_count_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -3005,7 +3005,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_active_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -3144,7 +3144,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "jvm_memory_pool_bytes_max{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -3304,7 +3304,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "jvm_memory_pool_bytes_used{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -3446,7 +3446,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_blocking_time_max_milliseconds{env=\"$env\",job=\"$job\",instance=~\"$instance\"}/1000",
               "format": "time_series",
@@ -3584,7 +3584,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_flush_count_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -3726,7 +3726,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_max_used_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -3847,7 +3847,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_available_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -3985,7 +3985,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_destroy_count_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -4144,7 +4144,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_reap_count_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -4303,7 +4303,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_leak_detection_count_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -4462,7 +4462,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_creation_count_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -4604,7 +4604,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_blocking_time_average_milliseconds{env=\"$env\",job=\"$job\",instance=~\"$instance\"}/1000",
               "format": "time_series",
@@ -4725,7 +4725,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_blocking_time_total_milliseconds{env=\"$env\",job=\"$job\",instance=~\"$instance\"}/1000",
               "format": "time_series",
@@ -4846,7 +4846,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_creation_time_max_milliseconds{env=\"$env\",job=\"$job\",instance=~\"$instance\"}/1000",
               "format": "time_series",
@@ -4984,7 +4984,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_invalid_count_total{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
               "format": "time_series",
@@ -5126,7 +5126,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_creation_time_average_milliseconds{env=\"$env\",job=\"$job\",instance=~\"$instance\"}/1000",
               "format": "time_series",
@@ -5247,7 +5247,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "agroal_creation_time_total_milliseconds{env=\"$env\",job=\"$job\",instance=~\"$instance\"}/1000",
               "format": "time_series",
@@ -5368,7 +5368,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "uid": "$PROMETHEUS_DS"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "agroal_awaiting_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
@@ -5428,7 +5428,7 @@ spec:
               "value": ""
             },
             "datasource": {
-              "uid": "$PROMETHEUS_DS"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "",
             "hide": 0,
@@ -5457,7 +5457,7 @@ spec:
               "value": "keycloak-metrics"
             },
             "datasource": {
-              "uid": "$PROMETHEUS_DS"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "",
             "hide": 0,
@@ -5486,7 +5486,7 @@ spec:
               "value": "10.254.10.110:8080"
             },
             "datasource": {
-              "uid": "$PROMETHEUS_DS"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "",
             "hide": 0,
@@ -5541,7 +5541,7 @@ spec:
       },
       "timezone": "browser",
       "title": "KeyCloak",
-      "uid": "60848ec3-e5f4-4191-ab8a-4ec71fb58f71",
+      "uid": "dso-keycloak",
       "version": 3,
       "weekStart": ""
     }

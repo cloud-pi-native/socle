@@ -43,7 +43,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -57,7 +57,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -68,7 +68,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -148,7 +148,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_threads_current{job=\"dso-sonarqube/sonarqube\", namespace=\"dso-sonarqube\", pod=\"sonarqube-sonarqube-0\"}",
@@ -164,7 +164,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -243,7 +243,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "process_virtual_memory_bytes{job=\"dso-sonarqube/sonarqube\", namespace=\"dso-sonarqube\", pod=\"sonarqube-sonarqube-0\"}",
@@ -259,7 +259,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -338,7 +338,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "process_resident_memory_bytes{job=\"dso-sonarqube/sonarqube\", namespace=\"dso-sonarqube\", pod=\"sonarqube-sonarqube-0\"}",
@@ -354,7 +354,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "Total user and system CPU time spent in seconds.",
           "fieldConfig": {
@@ -435,7 +435,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "builder",
               "expr": "process_cpu_seconds_total{job=\"dso-sonarqube/sonarqube\"}",
@@ -451,7 +451,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -494,7 +494,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_bytes_committed{area=\"heap\", job=\"dso-sonarqube/sonarqube\"} - jvm_memory_bytes_used{area=\"heap\", job=\"dso-sonarqube/sonarqube\"}",
@@ -508,7 +508,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_bytes_committed{area=\"heap\", job=\"dso-sonarqube/sonarqube\"}",
@@ -521,7 +521,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_bytes_used{area=\"heap\", job=\"dso-sonarqube/sonarqube\"}",
@@ -539,7 +539,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -582,7 +582,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_bytes_committed{area=\"nonheap\", job=\"dso-sonarqube/sonarqube\"} - jvm_memory_bytes_used{area=\"nonheap\", job=\"dso-sonarqube/sonarqube\"}",
@@ -596,7 +596,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_bytes_committed{area=\"nonheap\", job=\"dso-sonarqube/sonarqube\"}",
@@ -609,7 +609,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "code",
               "expr": "jvm_memory_bytes_used{area=\"nonheap\", job=\"dso-sonarqube/sonarqube\"}",
@@ -628,7 +628,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -642,7 +642,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -653,7 +653,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "Maximum time to process a request.",
           "fieldConfig": {
@@ -732,7 +732,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "e89282b9-2985-4a03-949d-c992b02a6a7b"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "editorMode": "builder",
               "expr": "Tomcat_GlobalRequestProcessor_maxTime{job=\"dso-sonarqube/sonarqube\"}",

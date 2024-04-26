@@ -35,7 +35,7 @@ spec:
       "fiscalYearStartMonth": 0,
       "gnetId": 12904,
       "graphTooltip": 1,
-      "id": 63,
+      "id": 26,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -123,6 +123,7 @@ spec:
           "fieldConfig": {
             "defaults": {
               "custom": {
+                "align": "auto",
                 "cellOptions": {
                   "type": "auto"
                 },
@@ -287,58 +288,37 @@ spec:
           "type": "stat"
         },
         {
-          "aliasColors": {},
-          "breakPoint": "50%",
-          "combine": {
-            "label": "Others",
-            "threshold": 0
-          },
           "datasource": {
             "type": "prometheus",
             "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                }
-              },
-              "mappings": []
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
             },
             "overrides": []
           },
-          "fontSize": "80%",
-          "format": "short",
           "gridPos": {
-            "h": 8,
+            "h": 4,
             "w": 5,
             "x": 19,
             "y": 0
           },
-          "id": 49,
-          "legend": {
-            "header": "count",
-            "percentage": false,
-            "show": true,
-            "values": true
-          },
-          "legendType": "Right side",
-          "links": [],
-          "maxDataPoints": 1,
-          "nullPointMode": "connected",
+          "id": 105,
           "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "pieType": "pie",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
             "reduceOptions": {
               "calcs": [
                 "lastNotNull"
@@ -346,30 +326,25 @@ spec:
               "fields": "",
               "values": false
             },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
+            "textMode": "auto"
           },
-          "pieType": "pie",
-          "pluginVersion": "7.0.3",
-          "strokeWidth": "3",
+          "pluginVersion": "9.5.5",
           "targets": [
             {
               "datasource": {
                 "type": "prometheus",
                 "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "avg without(instance) (vault_identity_entity_alias_count)",
-              "format": "time_series",
+              "editorMode": "code",
+              "expr": "avg(vault_secret_kv_count)",
               "interval": "",
-              "legendFormat": "{{ auth_method }}",
+              "legendFormat": "",
+              "range": true,
               "refId": "A"
             }
           ],
-          "title": "Identity Entities Aliases by Method",
-          "type": "piechart",
-          "valueName": "current"
+          "title": "Number of Secrets",
+          "type": "stat"
         },
         {
           "datasource": {
@@ -555,7 +530,7 @@ spec:
                 "h": 9,
                 "w": 12,
                 "x": 0,
-                "y": 9
+                "y": 17
               },
               "hiddenSeries": false,
               "id": 24,
@@ -705,7 +680,7 @@ spec:
                 "h": 9,
                 "w": 12,
                 "x": 12,
-                "y": 9
+                "y": 17
               },
               "hiddenSeries": false,
               "id": 35,
@@ -2101,132 +2076,6 @@ spec:
           }
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": {
-            "type": "prometheus",
-            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "links": []
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 10,
-            "w": 10,
-            "x": 14,
-            "y": 45
-          },
-          "hiddenSeries": false,
-          "id": 61,
-          "legend": {
-            "alignAsTable": true,
-            "avg": true,
-            "current": true,
-            "max": true,
-            "min": true,
-            "show": true,
-            "total": false,
-            "values": true
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null as zero",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "9.5.5",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
-              },
-              "expr": "avg(irate(vault_consul_get_count[1m]))",
-              "interval": "",
-              "intervalFactor": 1,
-              "legendFormat": "GET",
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
-              },
-              "expr": "avg(irate(vault_consul_put_count[1m]))",
-              "interval": "",
-              "legendFormat": "PUT",
-              "refId": "B"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
-              },
-              "expr": "avg(irate(vault_consul_delete_count[1m]))",
-              "interval": "",
-              "legendFormat": "DELETE",
-              "refId": "C"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
-              },
-              "expr": "irate(vault_consul_list_count{instance=\"$node:$port\"}[1m])",
-              "interval": "",
-              "legendFormat": "LIST",
-              "refId": "D"
-            }
-          ],
-          "thresholds": [],
-          "timeRegions": [],
-          "title": "Consul Requests",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "$$hashKey": "object:949",
-              "format": "short",
-              "label": "Requests per second",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "$$hashKey": "object:950",
-              "format": "short",
-              "logBase": 1,
-              "show": false
-            }
-          ],
-          "yaxis": {
-            "align": false
-          }
-        },
-        {
           "datasource": {
             "type": "prometheus",
             "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
@@ -2640,8 +2489,8 @@ spec:
       },
       "timezone": "",
       "title": "Vault",
-      "uid": "vaults",
-      "version": 1,
+      "uid": "dso-vault",
+      "version": 4,
       "weekStart": ""
     }
 {% endraw %}

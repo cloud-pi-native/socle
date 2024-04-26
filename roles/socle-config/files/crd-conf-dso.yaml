@@ -195,7 +195,7 @@ spec:
                       description: GitLab chart version (e.g., "6.11.10").
                       type: string
                     pvcGitalySize:
-                      description: "Size for Gitaly, default: 50Gi"
+                      description: Size for Gitaly persistent volume.
                       default: 50Gi
                       type: string
                     values:

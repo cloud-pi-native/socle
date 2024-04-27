@@ -597,6 +597,10 @@ spec:
                     chartVersion:
                       description: Hashicorp Vault helm chart version (e.g., "0.25.0").
                       type: string
+                    pvcSize:
+                      description: Size for Vault persistent volume.
+                      default: 23Gi
+                      type: string
                     values:
                       description: |
                         You can merge customs values for vault, it will be merged with roles/vault/tasks/main.yaml

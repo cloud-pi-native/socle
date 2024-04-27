@@ -1,0 +1,5 @@
+{% if use_private_registry %}
+global:
+  image:
+    registry: "{{ dsc.global.registry }}"
+{% endif %}

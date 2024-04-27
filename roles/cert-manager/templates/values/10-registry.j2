@@ -1,0 +1,20 @@
+{% if use_private_registry %}
+image:
+  repository: "{{ dsc.global.registry }}/cert-manager-controller"
+
+webhook:
+  image:
+    repository: "{{ dsc.global.registry }}/cert-manager-webhook"
+
+cainjector:
+  image:
+    repository: "{{ dsc.global.registry }}/cert-manager-cainjector"
+
+acmesolver:
+  image:
+    repository: "{{ dsc.global.registry }}/cert-manager-acmesolver"
+
+startupapicheck:
+  image:
+    repository: "{{ dsc.global.registry }}/cert-manager-startupapicheck"
+{% endif %}

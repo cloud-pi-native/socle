@@ -1,0 +1,77 @@
+{% if use_private_registry %}
+gitlab:
+  gitaly:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitaly"
+  gitlab-exporter:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-exporter"
+  gitlab-shell:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-shell"
+  kas:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-kas"
+  toolbox:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-toolbox-ee"
+
+global:
+  kubectl:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/kubectl"
+  gitlabBase:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-base"
+  certificates:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/certificates"
+  enterpriseImages:
+    migrations:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-toolbox-ee"
+    sidekiq:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-sidekiq-ee"
+    toolbox:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-toolbox-ee"
+    webservice:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-webservice-ee"
+    workhorse:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-workhorse-ee"
+    geo-logcursor:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-geo-logcursor"
+  communityImages:
+    migrations:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-toolbox-ce"
+    sidekiq:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-sidekiq-ce"
+    toolbox:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-toolbox-ce"
+    webservice:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-webservice-ce"
+    workhorse:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/gitlab-workhorse-ce"
+
+shared-secrets:
+  selfsign:
+    image:
+      repository: "{{ dsc.global.registry }}/gitlab-org/build/cng/cfssl-self-sign"
+
+minio:
+  image: "{{ dsc.global.registry }}/minio"
+  minioMc:
+    image: "{{ dsc.global.registry }}/mc"
+
+postgresql:
+  image:
+    registry: "{{ dsc.global.registry }}"
+  metrics:
+    image:
+      registry: "{{ dsc.global.registry }}"
+
+redis:
+  image:
+    registry: "{{ dsc.global.registry }}"
+  metrics:
+    image:
+      registry: "{{ dsc.global.registry }}"
+{% endif %}

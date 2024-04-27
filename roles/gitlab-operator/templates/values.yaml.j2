@@ -1,7 +1,11 @@
 watchCluster: true
 
 image:
+{% if use_private_registry %}                                                         
+  registry: "{{ dsc.global.registry }}"
+{% else %}
   registry: registry.gitlab.com
+{% endif %}
   repository: gitlab-org/cloud-native
   name: gitlab-operator
   tag: {{ dsc.gitlabOperator.chartVersion }}

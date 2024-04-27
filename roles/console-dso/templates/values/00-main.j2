@@ -7,14 +7,13 @@ ingress:
 
 
 postgres:
-  container:
-    db: dso-console-db
-    user: dso
-    pass: {{ dsc.console.dbPassword }}
-{% if dsc.global.backup.type == 'velero' %}
-    annotations:
-      pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "pg_dump -Fc  -U dso -d dso-console-db  > /var/lib/postgresql/data/app.dump"]'
-{% endif %}
+  enabled: false
+  external:
+    host: "pg-cluster-console-rw"
+    port: "5432"
+    username: "dso"
+    password: ""{{ dsc.console.dbPassword }}""
+    database: "dso-console-db"
 keycloak:
   clientIdBackend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
   clientSecretBackend: {{ console_backend_secret.resources[0].data.CLIENT_SECRET | b64decode }}

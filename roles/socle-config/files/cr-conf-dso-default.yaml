@@ -39,6 +39,7 @@ spec:
       type: none
   kubed: {}
   keycloak: {}
+  kyverno: {}
   nexus:
     storageSize: 25Gi
     proxyCacheSize: 25Gi

@@ -76,14 +76,14 @@ trivy:
   image:
     repository: docker.io/goharbor/trivy-adapter-photon
 database:
-  internal:
+  external:
     serviceAccountName: harbor-sa
-    image:
-      repository: docker.io/goharbor/harbor-db
-{% if dsc.global.backup.type == 'velero' %}
-  podAnnotations:
-    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "pg_dump -Fc  -U postgres -d registry  > /var/lib/postgresql/data/app.dump"]'
-{% endif %}
+    external:
+      host: "pg-cluster-harbor-rw"
+      port: "5432"
+      username: "harbor"
+      password: "{{ dsc.harbor.dbPassword }}"
+      coreDatabase: "registry"
 redis:
   internal:
     serviceAccountName: harbor-sa

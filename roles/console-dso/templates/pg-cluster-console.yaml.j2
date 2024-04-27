@@ -1,11 +1,11 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: pg-cluster-keycloak
-  namespace: {{ dsc.keycloak.namespace }}
+  name: pg-cluster-console
+  namespace: {{ dsc.console.namespace }}
 {% if dsc.global.backup.velero.enabled %}
   annotations:
-    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  keycloak > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  dso-console-db > /var/lib/postgresql/data/app.dump-${index}"]'
     pre.hook.backup.velero.io/container: postgres
     pre.hook.backup.velero.io/on-error: Fail
     pre.hook.backup.velero.io/timeout: 90s
@@ -15,24 +15,18 @@ spec:
 
   # Parameters and pg_hba configuration will be append
   # to the default ones to make the cluster work
-{% if use_private_registry %}
-  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
-{% endif %}
   postgresql:
-{% if use_private_registry %}
-    image: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
-{% endif %}
     parameters:
       max_worker_processes: "60"
     pg_hba:
       # To access through TCP/IP you will need to get username
-      # and password from the secret pg-cluster-keycloak-app
-      - host keycloak keycloak all md5
+      # and password from the secret pg-cluster-console-app
+      - host console console all md5
 
   bootstrap:
     initdb:
-      database: keycloak
-      owner: keycloak
+      database: dso-console-db
+      owner: dso
 
   enableSuperuserAccess: true
 
@@ -45,12 +39,12 @@ spec:
 
   # Require 1Gi of space per instance using default storage class
   storage:
-    size: {{ dsc.keycloak.postgresPvcSize }}
+    size: {{ dsc.console.postgresPvcSize }}
 
 {% if dsc.global.backup.cnpg.enabled %}
   backup:
     barmanObjectStore:
-      destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}keycloak"
+      destinationPath: "{{ dsc.global.backup.cnpg.destinationPath }}console"
       endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
       endpointCA:
         name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
@@ -68,10 +62,10 @@ spec:
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: pg-cluster-keycloak
+  name: pg-cluster-console
 spec:
   schedule: "{{ dsc.global.backup.cnpg.cron }}"
   backupOwnerReference: self
   cluster:
-    name: pg-cluster-keycloak
+    name: pg-cluster-console
 {% endif %}

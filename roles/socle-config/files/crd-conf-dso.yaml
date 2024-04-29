@@ -361,8 +361,24 @@ spec:
                       description: Harbor helm chart version (e.g., "1.12.2").
                       type: string
                     pvcRegistrySize:
-                      description: "Size for registry, default: 50Gi"
+                      description: Size for registry persistent volume.
                       default: 50Gi
+                      type: string
+                    pvcJobLogSize:
+                      description: Size for jobLog persistent volume.
+                      default: 5Gi
+                      type: string
+                    pvcDatabaseSize:
+                      description: Size for database persistent volume.
+                      default: 10Gi
+                      type: string
+                    pvcRedisSize:
+                      description: Size for redis persistent volume.
+                      default: 5Gi
+                      type: string
+                    pvcTrivySize:
+                      description: Size for trivy persistent volume.
+                      default: 10Gi
                       type: string
                     values:
                       description: |

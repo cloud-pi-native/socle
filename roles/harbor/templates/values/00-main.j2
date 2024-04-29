@@ -33,13 +33,13 @@ persistence:
       size: "{{ dsc.harbor.pvcRegistrySize }}"
     jobservice:
       jobLog:
-        size: 5Gi
+        size: "{{ dsc.harbor.pvcJobLogSize }}"
     database:
-      size: 10Gi
+      size: "{{ dsc.harbor.pvcDatabaseSize }}"
     redis:
-      size: 5Gi
+      size: "{{ dsc.harbor.pvcRedisSize }}"
     trivy:
-      size: 10Gi
+      size: "{{ dsc.harbor.pvcTrivySize }}"
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
 nginx:
   replicas: 2

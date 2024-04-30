@@ -317,9 +317,7 @@ spec:
                       description: The subdomain for Grafana instance.
                       type: string
                     grafanaPvcSize:
-                      description: |
-                        The storage size for Grafana instance PVC.
-                        Must comply with Kubernetes size definitions (i.e 5Gi).
+                      description: Size for grafana persistent volume.
                       type: string
                     imageVersion:
                       description: Grafana release version (e.g., "9.5.5").
@@ -383,7 +381,6 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                   required:
                     - adminPassword
-                    - pvcRegistrySize
                   type: object
                 ingress:
                   description: General configuration for ingress.
@@ -517,20 +514,14 @@ spec:
                       description: The subdomain for Nexus.
                       type: string
                     storageSize:
-                      description: |
-                        The storage size for Nexus.
-                        Must comply with Kubernetes size definitions (i.e 100Gi).
+                      description: Size for nexus persistent volume.
                       type: string
                     proxyCacheSize:
-                      description: |
-                        The storage size for Nexus proxy cache.
-                        Must comply with Kubernetes size definitions (i.e 100Gi).
+                      description: Size for nexus proxy cache persistent volume.
                       type: string
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
-                  required:
-                    - storageSize
                   type: object
                 prometheus:
                   description: Minimal configuration for prometheus CRDs

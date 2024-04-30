@@ -196,7 +196,6 @@ spec:
                       type: string
                     pvcGitalySize:
                       description: Size for Gitaly persistent volume.
-                      default: 50Gi
                       type: string
                     values:
                       description: |
@@ -362,23 +361,18 @@ spec:
                       type: string
                     pvcRegistrySize:
                       description: Size for registry persistent volume.
-                      default: 50Gi
                       type: string
                     pvcJobLogSize:
                       description: Size for jobLog persistent volume.
-                      default: 5Gi
                       type: string
                     pvcDatabaseSize:
                       description: Size for database persistent volume.
-                      default: 10Gi
                       type: string
                     pvcRedisSize:
                       description: Size for redis persistent volume.
-                      default: 5Gi
                       type: string
                     pvcTrivySize:
                       description: Size for trivy persistent volume.
-                      default: 10Gi
                       type: string
                     values:
                       description: |
@@ -527,13 +521,11 @@ spec:
                         The storage size for Nexus.
                         Must comply with Kubernetes size definitions (i.e 100Gi).
                       type: string
-                      default: 25Gi
                     proxyCacheSize:
                       description: |
                         The storage size for Nexus proxy cache.
                         Must comply with Kubernetes size definitions (i.e 100Gi).
                       type: string
-                      default: 25Gi
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
@@ -619,7 +611,6 @@ spec:
                       type: string
                     pvcSize:
                       description: Size for Vault persistent volume.
-                      default: 23Gi
                       type: string
                     values:
                       description: |

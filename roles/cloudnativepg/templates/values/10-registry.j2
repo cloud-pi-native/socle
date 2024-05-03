@@ -1,0 +1,4 @@
+{% if use_private_registry %}
+image:
+  repository: "{{ dsc.global.registry }}/cloudnative-pg/cloudnative-pg"
+{% endif %}

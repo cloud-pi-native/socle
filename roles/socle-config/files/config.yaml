@@ -19,6 +19,7 @@ spec:
     namespace: dso-gitlab
     subDomain: gitlab
     insecureCI: false
+    pvcGitalySize: 50Gi
   grafana:
     namespace: dso-grafana
     subDomain: grafana
@@ -28,6 +29,11 @@ spec:
   harbor:
     namespace: dso-harbor
     subDomain: harbor
+    pvcRegistrySize: 50Gi
+    pvcJobLogSize: 5Gi
+    pvcDatabaseSize: 10Gi
+    pvcRedisSize: 5Gi
+    pvcTrivySize: 10Gi
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
@@ -37,6 +43,8 @@ spec:
   nexus:
     namespace: dso-nexus
     subDomain: nexus
+    storageSize: 25Gi
+    proxyCacheSize: 25Gi
   sonarqube:
     namespace: dso-sonarqube
     subDomain: sonar
@@ -44,3 +52,4 @@ spec:
   vault:
     namespace: dso-vault
     subDomain: vault
+    pvcSize: 23Gi

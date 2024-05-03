@@ -6,6 +6,17 @@
       - "app.kubernetes.io/part-of=kyverno"
   register: kyverno_pods
 
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+ 
+- name: Compute Kyverno Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_dest_var: "kyverno_values"
+
 - name: Install Kyverno
   when: kyverno_pods.resources | length == 0
   block:
@@ -21,6 +32,7 @@
         chart_version: "{{ dsc.kyverno.chartVersion }}"
         release_namespace: "{{ dsc.kyverno.namespace }}"
         create_namespace: true
+        values: "{{ kyverno_values }}"
 
 - name: Wait Kyverno service endpoint to be available
   kubernetes.core.k8s_info:

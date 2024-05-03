@@ -1,0 +1,13 @@
+{% if use_private_registry %}
+server:
+  container:
+    image: "{{ dsc.global.registry }}/cloud-pi-native/console/server:{{ dsc.console.release }}"
+
+client:
+  container:
+    image: "{{ dsc.global.registry }}/cloud-pi-native/console/client:{{ dsc.console.release }}"
+
+postgres:
+  container:
+    image: "{{ dsc.global.registry }}/postgres:15.3"
+{% endif %}

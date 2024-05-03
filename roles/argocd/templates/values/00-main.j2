@@ -1,3 +1,10 @@
+serviceMonitor: &serviceMonitor
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+
 config:
 {% if dsc.argocd.admin.enabled %}
   secret:
@@ -36,11 +43,7 @@ redis:
     containerSecurityContext:
       enabled: false
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
     podSecurityContext:
       enabled: false
     containerSecurityContext:
@@ -49,11 +52,7 @@ redis:
 controller:
   replicaCount: 3
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 dex:
   enabled: false
@@ -90,21 +89,13 @@ server:
         - PipelineRun
   extraEnvVars: []
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 repoServer:
   extraEnvVars: []
   replicaCount: 3
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 applicationSet:
   enabled: false
@@ -113,11 +104,7 @@ applicationSet:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}
 notifications:
   enabled: false
@@ -125,9 +112,5 @@ notifications:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
 {% if dsc.global.metrics.enabled %}
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: {{ dsc.argocd.namespace }}
+  <<: *serviceMonitor
 {% endif %}

@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.0](https://github.com/cloud-pi-native/socle/compare/v2.4.0...v2.5.0) (2024-05-03)
+
+
+### Features
+
+* :sparkles: add dsc.general.registry ([bd0046c](https://github.com/cloud-pi-native/socle/commit/bd0046c02ba50c7288be5dac7dea60d5c066b091))
+
 ## [2.4.0](https://github.com/cloud-pi-native/socle/compare/v2.3.0...v2.4.0) (2024-04-23)
 
 

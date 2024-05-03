@@ -301,6 +301,9 @@ spec:
                             - velero
                           type: string
                       type: object
+                    registry:
+                      description: Specifies the internal registry to use.
+                      type: string
                   required:
                     - projectsRootDir
                     - rootDomain

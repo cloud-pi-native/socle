@@ -30,39 +30,39 @@ persistence:
   resourcePolicy: keep
   persistentVolumeClaim:
     registry:
-      size: "{{ dsc.harbor.pvcRegistrySize }}"
+      size: "{{ dsc.harbor.registry.pvcSize }}"
     jobservice:
       jobLog:
-        size: "{{ dsc.harbor.pvcJobLogSize }}"
+        size: "{{ dsc.harbor.jobService.pvcJobLogSize }}"
     database:
-      size: "{{ dsc.harbor.pvcDatabaseSize }}"
+      size: "{{ dsc.harbor.database.pvcSize }}"
     redis:
-      size: "{{ dsc.harbor.pvcRedisSize }}"
+      size: "{{ dsc.harbor.redis.pvcSize }}"
     trivy:
-      size: "{{ dsc.harbor.pvcTrivySize }}"
+      size: "{{ dsc.harbor.trivy.pvcSize }}"
 harborAdminPassword: "{{ dsc.harbor.adminPassword }}"
 nginx:
-  replicas: 2
+  replicas: "{{ dsc.harbor.nginx.replicas }}"
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/nginx-photon
 portal:
-  replicas: 2
+  replicas: "{{ dsc.harbor.portal.replicas }}"
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/harbor-portal
 core:
-  replicas: 3
+  replicas: "{{ dsc.harbor.core.replicas }}"
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/harbor-core
 jobservice:
-  replicas: 2
+  replicas: "{{ dsc.harbor.jobService.replicas }}"
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/harbor-jobservice
 registry:
-  replicas: 3
+  replicas: "{{ dsc.harbor.registry.replicas }}"
   serviceAccountName: harbor-sa
   registry:
     image:
@@ -71,7 +71,7 @@ registry:
     image:
       repository: docker.io/goharbor/harbor-registryctl
 trivy:
-  replicas: 2
+  replicas: "{{ dsc.harbor.trivy.replicas }}"
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/trivy-adapter-photon
@@ -90,7 +90,7 @@ redis:
     image:
       repository: docker.io/goharbor/redis-photon
 exporter:
-  replicas: 1
+  replicas: "{{ dsc.harbor.redis.replicas }}"
   image:
     repository: docker.io/goharbor/harbor-exporter
   serviceAccountName: harbor-sa

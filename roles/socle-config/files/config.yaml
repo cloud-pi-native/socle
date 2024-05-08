@@ -29,11 +29,26 @@ spec:
   harbor:
     namespace: dso-harbor
     subDomain: harbor
-    pvcRegistrySize: 50Gi
-    pvcJobLogSize: 5Gi
-    pvcDatabaseSize: 10Gi
-    pvcRedisSize: 5Gi
-    pvcTrivySize: 10Gi
+    nginx:
+      replicas: 2
+    portal:
+      replicas: 2
+    core:
+      replicas: 3
+    registry:
+      pvcSize: 50Gi
+      replicas: 3
+    jobService:
+      pvcJobLogSize: 5Gi
+      replicas: 2
+    database:
+      pvcSize: 10Gi
+    redis: 
+      pvcSize: 5Gi
+      replicas: 1
+    trivy:
+      pvcSize: 10Gi
+      replicas: 2
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
@@ -45,6 +60,7 @@ spec:
     subDomain: nexus
     storageSize: 25Gi
     proxyCacheSize: 25Gi
+    replicas: 1
   sonarqube:
     namespace: dso-sonarqube
     subDomain: sonar

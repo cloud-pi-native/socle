@@ -5,7 +5,7 @@ metadata:
   namespace: {{ dsc.nexus.namespace }}
   name: nexus  # Sets Deployment name
 spec:
-  replicas: 1
+  replicas: "{{ dsc.nexus.replicas }}"
   strategy:
     type: Recreate
   selector:

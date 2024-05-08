@@ -369,21 +369,77 @@ spec:
                     chartVersion:
                       description: Harbor helm chart version (e.g., "1.12.2").
                       type: string
-                    pvcRegistrySize:
-                      description: Size for registry persistent volume.
-                      type: string
-                    pvcJobLogSize:
-                      description: Size for jobLog persistent volume.
-                      type: string
-                    pvcDatabaseSize:
-                      description: Size for database persistent volume.
-                      type: string
-                    pvcRedisSize:
-                      description: Size for redis persistent volume.
-                      type: string
-                    pvcTrivySize:
-                      description: Size for trivy persistent volume.
-                      type: string
+                    nginx:
+                      description: Harbor nginx specifications.
+                      type: object
+                      properties: 
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
+                    portal:
+                      description: Harbor portal specifications.
+                      type: object
+                      properties: 
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
+                    core:
+                      description: Harbor core specifications.
+                      type: object
+                      properties: 
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
+                    registry:
+                      description: Harbor registry specifications.
+                      type: object
+                      properties: 
+                        pvcSize:
+                          description: Size for registry persistent volume.
+                          type: string
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
+                    jobService:
+                      description: Harbor jobService specifications.
+                      type: object
+                      properties: 
+                        pvcJobLogSize:
+                          description: Size for jobLog persistent volume.
+                          type: string
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
+                    database:
+                      description: Harbor database specifications.
+                      type: object
+                      properties: 
+                        pvcSize:
+                          description: Size for database persistent volume.
+                          type: string
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
+                    redis:
+                      description: Harbor redis specifications.
+                      type: object
+                      properties: 
+                        pvcSize:
+                          description: Size for redis persistent volume.
+                          type: string
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
+                    trivy:
+                      description: Harbor trivy specifications.
+                      type: object
+                      properties: 
+                        pvcSize:
+                          description: Size for trivy persistent volume.
+                          type: string
+                        replicas:
+                          description: Number of replicas.
+                          type: integer
                     values:
                       description: |
                         You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml
@@ -534,6 +590,9 @@ spec:
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
+                    replicas:
+                      description: Number of replicas.
+                      type: integer
                   type: object
                 prometheus:
                   description: Minimal configuration for prometheus CRDs

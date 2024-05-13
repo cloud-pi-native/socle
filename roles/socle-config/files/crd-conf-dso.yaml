@@ -318,10 +318,10 @@ spec:
                               type: string
                             endpointCA:
                               properties:
-                                name: 
+                                name:
                                   description: Defines the secret name containing s3 CA for cnpg backups.
                                   type: string
-                                key: 
+                                key:
                                   description: Defines the secret key containing s3 CA for cnpg backups.
                                   type: string
                               type: object
@@ -332,19 +332,19 @@ spec:
                               properties:
                                 accessKeyId:
                                   properties:
-                                    name: 
+                                    name:
                                       description: Defines the s3 accessKeyId kuebernetes secret name used for cnpg backups.
                                       type: string
-                                    key: 
+                                    key:
                                       description: Defines the s3 accessKeyId kubernetes secret key used for cnpg backups.
                                       type: string
                                   type: object
                                 secretAccessKey:
                                   properties:
-                                    name: 
+                                    name:
                                       description: Defines the s3 secretAccessKey kuebernetes secret name used for cnpg backups.
                                       type: string
-                                    key: 
+                                    key:
                                       description: Defines the s3 secretAccessKey kubernetes secret key used for cnpg backups.
                                       type: string
                                   type: object

@@ -15,13 +15,19 @@ spec:
 
   # Parameters and pg_hba configuration will be append
   # to the default ones to make the cluster work
+{% if use_private_registry %}
+  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% endif %}
   postgresql:
+{% if use_private_registry %}
+    image: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% endif %}
     parameters:
       max_worker_processes: "60"
     pg_hba:
       # To access through TCP/IP you will need to get username
       # and password from the secret pg-cluster-console-app
-      - host console console all md5
+      - host dso-console-db dso all md5
 
   bootstrap:
     initdb:

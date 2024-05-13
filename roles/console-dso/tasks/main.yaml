@@ -3,6 +3,10 @@
   kubernetes.core.k8s:
     template: project.j2
 
+- name: Deploy Console cnpg cluster
+  kubernetes.core.k8s:
+    template: pg-cluster-console.yaml.j2
+
 - name: Get console frontend client secret
   kubernetes.core.k8s_info:
     kind: Secret

@@ -6,6 +6,10 @@
       metadata:
         name: "{{ dsc.harbor.namespace }}"
 
+- name: Deploy Harbor cnpg cluster
+  kubernetes.core.k8s:
+    template: pg-cluster-harbor.yaml.j2
+
 - name: Create service account
   kubernetes.core.k8s:
     definition:

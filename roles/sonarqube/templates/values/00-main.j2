@@ -1,17 +1,7 @@
 
-OpenShift:
-  enabled: true
-
 image:
   pullPolicy: IfNotPresent
   repository: docker.io/sonarqube
-
-securityContext:
-  fsGroup: null
-
-containerSecurityContext:
-  runAsUser: null
-  runAsGroup: null
 
 sonarWebContext: /
 
@@ -23,7 +13,6 @@ ingress:
       pathType: Prefix
       path: "/"
   annotations:
-    route.openshift.io/termination: "edge"
 {% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: "{{ val }}"
 {% endfor %}
@@ -33,11 +22,7 @@ ingress:
   labels:
     app: "sonar"
 
-initContainers:
-  securityContext:
-    runAsUser: null
-    runAsGroup: null
-
+# Should be kept as false even if dsc.global.platform == "kubernetesVanilla" and it may be best to work with your cluster administrator to either provide specific nodes with the proper kernel settings, or ensure they are set cluster wide : sysctl -a "name=vm.max_map_count value=262144"
 initSysctl:
   enabled: false
 
@@ -106,7 +91,6 @@ account:
 #  adminPassword: admin
 #  currentAdminPassword: admin
   adminPasswordSecretName: "sonarqube"
-  securityContext: {}
   resources:
     limits:
       cpu: 100m

@@ -1,0 +1,29 @@
+{% if dsc.global.platform == "openshift" %}
+OpenShift:
+  enabled: true
+
+securityContext:
+  fsGroup: null
+
+containerSecurityContext:
+  runAsUser: null
+  runAsGroup: null
+
+ingress:
+  annotations:
+    route.openshift.io/termination: "edge"
+
+initContainers:
+  securityContext:
+    runAsUser: null
+    runAsGroup: null
+
+account:
+  securityContext: {}
+{% endif %}
+
+{% if dsc.global.platform == "kubernetesVanilla" %}
+account:
+  securityContext:
+    runAsUser: 101
+{% endif %}

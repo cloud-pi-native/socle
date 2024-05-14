@@ -31,6 +31,13 @@
   retries: 30
   delay: 5
 
+- name: Get pg-cluster-harbor-app secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.harbor.namespace }}"
+    kind: Secret
+    name: pg-cluster-harbor-app
+  register: pg_harbor_db_secret
+
 - name: Create service account
   kubernetes.core.k8s:
     definition:

@@ -162,9 +162,6 @@ spec:
                 console:
                   description: Configuration for the console.
                   properties:
-                    dbPassword:
-                      description: The password for the console's database.
-                      type: string
                     namespace:
                       description: The namespace for console.
                       type: string
@@ -183,8 +180,6 @@ spec:
                       description: Size for postgres' pvc
                       type: string
                       default: 10Gi
-                  required:
-                    - dbPassword
                   type: object
                 gitlab:
                   description: Configuration for GitLab.
@@ -307,6 +302,7 @@ spec:
                               description: Enable Velero backups.
                               default: false
                               type: boolean
+                          type: object
                         cnpg:
                           properties:
                             enabled:
@@ -409,9 +405,6 @@ spec:
                     adminPassword:
                       description: Administrator password for Harbor.
                       type: string
-                    dbPassword:
-                      description: Database password for Harbor.
-                      type: string
                     namespace:
                       description: The namespace for Harbor.
                       type: string
@@ -449,7 +442,6 @@ spec:
                       default: 10Gi
                   required:
                     - adminPassword
-                    - dbPassword
                     - pvcRegistrySize
                   type: object
                 ingress:

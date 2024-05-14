@@ -169,7 +169,6 @@ spec:
   certmanager: {}
   cloudnativepg: {}
   console:
-    dbPassword: AnotherPassBitesTheDust
     values: {}
   gitlab:
     values: {}

@@ -79,6 +79,13 @@
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
 
+- name: Get pg-cluster-console-app secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: pg-cluster-console-app
+  register: pg_db_secret
+
 - name: Compute Console Helm values
   ansible.builtin.include_role:
     name: combine

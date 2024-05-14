@@ -11,8 +11,8 @@ postgres:
   external:
     host: "pg-cluster-console-rw"
     port: "5432"
-    username: "dso"
-    password: ""{{ dsc.console.dbPassword }}""
+    username: "{{ pg_db_secret.resources[0].data.username | b64decode }}"
+    password: "{{ pg_db_secret.resources[0].data.password | b64decode }}"
     database: "dso-console-db"
 keycloak:
   clientIdBackend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}

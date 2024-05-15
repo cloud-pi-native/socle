@@ -98,7 +98,7 @@ global:
 prometheus:
   install: false
 
-{% if dsc.global.backup.type == 'velero' %}
+{% if dsc.global.backup.velero.enabled %}
 postgresql:
   primary:
     podAnnotations:

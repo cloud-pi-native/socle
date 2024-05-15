@@ -6,6 +6,38 @@
       metadata:
         name: "{{ dsc.harbor.namespace }}"
 
+- name: Create PostgreSQL cluster and harbor database
+  kubernetes.core.k8s:
+    template: pg-cluster-harbor.yaml.j2
+
+- name: Wait pg-cluster-harbor-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: pg-cluster-harbor-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-harbor-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: pg-cluster-harbor-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Get pg-cluster-harbor-app secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.harbor.namespace }}"
+    kind: Secret
+    name: pg-cluster-harbor-app
+  register: pg_harbor_db_secret
+
 - name: Create service account
   kubernetes.core.k8s:
     definition:

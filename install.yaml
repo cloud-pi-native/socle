@@ -68,6 +68,11 @@
         - runner
         - gitlab-runner
 
+    - name: gitlab-ci-pipelines-exporter
+      tags:
+        - ci-pipelines-exporter
+        - gitlab-ci-pipelines-exporter
+
     - name: vault
       tags:
         - vault

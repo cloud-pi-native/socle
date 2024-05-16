@@ -239,6 +239,13 @@ spec:
                       type: string
                       default: 10Gi
                   type: object
+                gitlabCiPipelinesExporter:
+                  description: Configuration for GitLab CI Pipelines Exporter.
+                  properties:
+                    chartVersion:
+                      description: GitLab CI Pipelines Exporter chart version (e.g., "0.3.4").
+                      type: string
+                  type: object
                 gitlabOperator:
                   description: Configuration for GitLab Operator.
                   properties:
@@ -692,6 +699,7 @@ spec:
                 - console
                 - exposedCA
                 - gitlab
+                - gitlabCiPipelinesExporter
                 - gitlabOperator
                 - gitlabRunner
                 - global

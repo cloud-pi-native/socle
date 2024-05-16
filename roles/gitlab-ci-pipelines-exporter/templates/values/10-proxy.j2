@@ -1,0 +1,6 @@
+{% if dsc.proxy.enabled %}
+config:
+  export HTTP_PROXY={{ dsc.proxy.http_proxy }}
+  export HTTPS_PROXY={{ dsc.proxy.https_proxy }}
+  export NO_PROXY={{ dsc.proxy.no_proxy }}
+{% endif %}

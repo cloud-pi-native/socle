@@ -155,10 +155,6 @@ spec:
                   {
                     "color": "green",
                     "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
                   }
                 ]
               },
@@ -182,9 +178,9 @@ spec:
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [
-                "mean"
+                "lastNotNull"
               ],
-              "fields": "/^version$/",
+              "fields": "/^git_version$/",
               "values": false
             },
             "textMode": "auto"
@@ -196,7 +192,8 @@ spec:
                 "type": "prometheus",
                 "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "topk(1, count by (version) (gitlab_build_info{job=\"gitlab-gitaly\"}))",
+              "editorMode": "code",
+              "expr": "gitlab_build_info",
               "format": "table",
               "instant": true,
               "intervalFactor": 1,
@@ -204,7 +201,7 @@ spec:
               "refId": "A"
             }
           ],
-          "title": "Gitaly Version",
+          "title": "Git Version",
           "type": "stat"
         },
         {

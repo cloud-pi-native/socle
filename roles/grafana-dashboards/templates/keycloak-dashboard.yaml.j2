@@ -8,6 +8,7 @@ spec:
     - inputName: "PROMETHEUS_DS"
       datasourceName: "Prometheus"
   resyncPeriod: 30s
+  allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
       app: {{ grafana_label }}

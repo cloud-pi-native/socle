@@ -369,8 +369,8 @@
           kind: Secret
           apiVersion: v1
           data:
-            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN }}"
-            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
+            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN | b64decode }}"
+            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
           metadata:
             labels:
               app: nexus

@@ -116,9 +116,6 @@
   retries: 3
   delay: 20
 
-#- debug:
-#    msg: "{{ node2_join_state }}"
-
 # Unseal node 2
 - name: Check vault-1 status - node 2
   ansible.builtin.include_tasks: check.yml
@@ -159,9 +156,6 @@
   register: node3_join_state
   retries: 3
   delay: 20
-
-#- debug:
-#    msg: "{{ node3_join_state }}"
 
 # Unseal node 3
 - name: Check vault-2 status - node 3

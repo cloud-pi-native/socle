@@ -13,13 +13,13 @@
 - name: Get dso-config inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
 - name: Get gitlab token
   ansible.builtin.set_fact:
-    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
+    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
 
 - name: Initiate a runner in GitLab instance
   ansible.builtin.uri:

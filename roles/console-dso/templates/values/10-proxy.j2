@@ -1,8 +1,10 @@
 {% if dsc.proxy.enabled %}
-server:
-  container:
-    env:
-      HTTP_PROXY: {{ dsc.proxy.http_proxy }}
-      HTTPS_PROXY: {{ dsc.proxy.https_proxy }}
-      NO_PROXY: {{ dsc.proxy.no_proxy }}
+global:
+  env:
+    HTTP_PROXY: {{ dsc.proxy.http_proxy }}
+    HTTPS_PROXY: {{ dsc.proxy.https_proxy }}
+    NO_PROXY: {{ dsc.proxy.no_proxy }}
+    http_proxy: {{ dsc.proxy.http_proxy }}
+    https_proxy: {{ dsc.proxy.https_proxy }}
+    no_proxy: {{ dsc.proxy.no_proxy }}
 {% endif %}

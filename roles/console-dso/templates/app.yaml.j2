@@ -11,9 +11,9 @@ spec:
     server: https://kubernetes.default.svc
   project: console-pi-native
   source: 
-    path: helm
-    repoURL: https://github.com/cloud-pi-native/console.git
-    targetRevision: v{{ dsc.console.release }}
+    chart: cpn-console
+    repoURL: https://cloud-pi-native.github.io/helm-charts
+    targetRevision: {{ dsc.console.release }}
     releaseName: console-pi
     helm:
       parameters: []

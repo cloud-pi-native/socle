@@ -90,13 +90,13 @@
 
 - name: Update inventory
   kubernetes.core.k8s:
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
     namespace: "{{ dsc.console.namespace }}"
     state: patched
     definition:
       data:
-        HARBOR_ADMIN_PASSWORD: "{{ dsc.harbor.adminPassword }}"
+        HARBOR_ADMIN_PASSWORD: "{{ dsc.harbor.adminPassword | b64encode }}"
 
 - name: Wait harbor-core endpoint
   kubernetes.core.k8s_info:

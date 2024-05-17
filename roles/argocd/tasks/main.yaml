@@ -65,7 +65,7 @@
 - name: Find gitlab token in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
@@ -73,7 +73,7 @@
   kubernetes.core.k8s:
     definition:
       data:
-        password: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64encode }}"
+        password: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
         url: "{{ ('https://' + ([gitlab_domain, dsc.global.projectsRootDir] | flatten | join ('/') )) | b64encode }}"
         username: "{{ 'root' | b64encode }}"
       kind: Secret

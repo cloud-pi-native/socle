@@ -43,13 +43,13 @@
 - name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
 - name: Cache admin password
   ansible.builtin.set_fact:
-    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
+    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
   register: set_nx_pass
   when: ansible_inventory.resources | length > 0 and ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined
 
@@ -115,24 +115,24 @@
 
     - name: Update inventory
       kubernetes.core.k8s:
-        kind: ConfigMap
+        kind: Secret
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
         state: patched
         definition:
           data:
-            NEXUS_ADMIN_PASSWORD: "{{ new_pass }}"
+            NEXUS_ADMIN_PASSWORD: "{{ new_pass | b64encode }}"
 
 - name: Get inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
 - name: Retrieve admin password from inventory
   ansible.builtin.set_fact:
-    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
+    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
   register: get_nx_pass
 
 - name: Enable Anonymous access
@@ -369,8 +369,8 @@
           kind: Secret
           apiVersion: v1
           data:
-            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN | b64encode }}"
-            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64encode }}"
+            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN | b64decode }}"
+            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
           metadata:
             labels:
               app: nexus

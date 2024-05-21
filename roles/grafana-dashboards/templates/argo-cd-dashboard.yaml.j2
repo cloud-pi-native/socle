@@ -1616,7 +1616,7 @@ spec:
                   "datasource": {
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "go_memstats_heap_alloc_bytes{job=\"argo-argo-cd-app-controller-metrics\",namespace=~\"$namespace\"}",
+                  "expr": "go_memstats_heap_alloc_bytes{job=\"argo-argo-cd-server-metrics\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
                   "legendFormat": "{{namespace}}",

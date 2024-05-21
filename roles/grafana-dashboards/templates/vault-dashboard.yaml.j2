@@ -569,7 +569,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_create_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_create_forge_dso__count[5m]))",
                   "format": "time_series",
                   "hide": false,
                   "interval": "5m",
@@ -581,7 +581,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_delete_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_delete_forge_dso__count[5m]))",
                   "hide": false,
                   "interval": "5m",
                   "legendFormat": "Delete",
@@ -592,7 +592,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_read_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_read_forge_dso__count[5m]))",
                   "format": "time_series",
                   "hide": false,
                   "instant": false,
@@ -606,7 +606,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_list_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_list_forge_dso__count[5m]))",
                   "format": "time_series",
                   "hide": false,
                   "interval": "5m",
@@ -618,7 +618,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_rollback_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_rollback_forge_dso__count[5m]))",
                   "hide": true,
                   "interval": "5m",
                   "legendFormat": "Rollback",
@@ -719,7 +719,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_create_${mountpoint}__sum[1m]) / rate(vault_route_create_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_create_forge_dso__sum[1m]) / rate(vault_route_create_forge_dso__count[1m]) * 1000)",
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
@@ -731,7 +731,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_delete_${mountpoint}__sum[1m]) / rate(vault_route_delete_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_delete_forge_dso__sum[1m]) / rate(vault_route_delete_forge_dso__count[1m]) * 1000)",
                   "interval": "",
                   "legendFormat": "Delete",
                   "refId": "B"
@@ -741,7 +741,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_read_${mountpoint}__sum[1m]) / rate(vault_route_read_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_read_forge_dso__sum[1m]) / rate(vault_route_read_forge_dso__count[1m]) * 1000)",
                   "hide": false,
                   "interval": "",
                   "legendFormat": "Read",
@@ -752,7 +752,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_list_${mountpoint}__sum[1m]) / rate(vault_route_list_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_list_forge_dso__sum[1m]) / rate(vault_route_list_forge_dso__count[1m]) * 1000)",
                   "hide": false,
                   "interval": "",
                   "legendFormat": "List",
@@ -763,7 +763,7 @@ spec:
                     "type": "prometheus",
                     "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_rollback_${mountpoint}__sum[1m]) / rate(vault_route_rollback_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_rollback_forge_dso__sum[1m]) / rate(vault_route_rollback_forge_dso__count[1m]) * 1000)",
                   "hide": true,
                   "interval": "",
                   "legendFormat": "Rollback",

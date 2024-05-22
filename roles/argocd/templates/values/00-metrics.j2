@@ -1,0 +1,54 @@
+redis:
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+{% if dsc.global.platform == "openshift" %}
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
+{% endif %}
+{% endif %}
+controller:
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+{% endif %}
+server:
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+{% endif %}
+repoServer:
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+{% endif %}
+applicationSet:
+{% if dsc.global.metrics.enabled and dsc.global.platform == "openshift" %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+{% endif %}
+notifications:
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocd.namespace }}"
+{% endif %}

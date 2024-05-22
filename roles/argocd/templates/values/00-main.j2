@@ -25,18 +25,6 @@ config:
     admin.enabled: "false"
 redis:
   architecture: replication
-{% if dsc.global.platform == "openshift" %}
-  master:
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
-  replica:
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
-{% endif %}
 controller:
   replicaCount: 3
 dex:

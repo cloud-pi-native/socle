@@ -14,13 +14,13 @@
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
       data:
-        ARGOCD_URL: "{{ 'https://' + argocd_domain | b64encode }}"
-        GITLAB_URL: "{{ 'https://' + gitlab_domain | b64encode }}"
-        HARBOR_URL: "{{ 'https://' + harbor_domain | b64encode }}"
-        KEYCLOAK_URL: "{{ 'https://' + keycloak_domain | b64encode }}"
-        NEXUS_URL: "{{ 'https://' + nexus_domain | b64encode }}"
-        SONARQUBE_URL: "{{ 'https://' + sonar_domain | b64encode }}"
-        VAULT_URL: "{{ 'https://' + vault_domain | b64encode }}"
+        ARGOCD_URL: "{{ ('https://' + argocd_domain + '/') | b64encode }}"
+        GITLAB_URL: "{{ ('https://' + gitlab_domain + '/') | b64encode }}"
+        HARBOR_URL: "{{ ('https://' + harbor_domain + '/') | b64encode }}"
+        KEYCLOAK_URL: "{{ ('https://' + keycloak_domain + '/') | b64encode }}"
+        NEXUS_URL: "{{ ('https://' + nexus_domain + '/') | b64encode }}"
+        SONARQUBE_URL: "{{ ('https://' + sonar_domain + '/') | b64encode }}"
+        VAULT_URL: "{{ ('https://' + vault_domain + '/') | b64encode }}"
         HARBOR_ADMIN: "{{ 'admin' | b64encode }}"
         # HARBOR_ADMIN_PASSWORD: roles/harbor/tasks/main.yaml
         KEYCLOAK_ADMIN: "{{ 'admin' | b64encode }}"

@@ -14,8 +14,8 @@ spec:
     chart: cpn-console
     repoURL: https://cloud-pi-native.github.io/helm-charts
     targetRevision: {{ dsc.console.release }}
-    releaseName: console-pi
     helm:
+      releaseName: dso
       parameters: []
       values: |-
 {{ console_values | to_yaml | indent(8, true) }}

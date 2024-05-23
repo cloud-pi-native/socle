@@ -9,7 +9,8 @@ postgresql:
   enabled: false
 
 global:
-  dbUrl: {{ 'postgresql://' + (pg_db_secret.resources[0].data.username | b64decode) + ':' + (pg_db_secret.resources[0].data.password | b64decode) + '@pg-cluster-console-rw:5432/dso-console-db?schema=public' }}
+  postgresql:
+    dbUrl: {{ 'postgresql://' + (pg_db_secret.resources[0].data.username | b64decode) + ':' + (pg_db_secret.resources[0].data.password | b64decode) + '@pg-cluster-console-rw:5432/dso-console-db?schema=public' }}
   keycloak:
     clientIds:
       backend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
@@ -20,3 +21,8 @@ global:
     sessionSecret: {{ session_secret }}
     domain: "{{ keycloak_domain }}"
     realm: dso
+
+server:
+  envFrom:
+    - secretRef: 
+        name: dso-config

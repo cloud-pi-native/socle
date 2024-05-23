@@ -229,7 +229,7 @@
 
     - name: "Suppression de l'ancien mot de passe Nexus"
       kubernetes.core.k8s:
-        kind: ConfigMap
+        kind: Secret
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
         state: patched

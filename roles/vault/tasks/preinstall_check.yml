@@ -21,13 +21,13 @@
   block:
     - name: Update inventory
       kubernetes.core.k8s:
-        kind: ConfigMap
+        kind: Secret
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
         state: patched
         definition:
           data:
-            VAULT_TOKEN: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
+            VAULT_TOKEN: "{{ vault_keys.resources[0].data.root_token }}"
 
     - name: Set fact root_token
       ansible.builtin.set_fact:

@@ -137,20 +137,7 @@
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
 
-- name: Get keycloak realms from API
-  ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}/admin/realms
-    method: GET
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    status_code: [200, 202]
-    return_content: true
-    body_format: json
-    headers:
-      Authorization: bearer {{ kc_access_token }}
-  register: kc_realms
-
 - name: Create dso realm
-  when: kc_realms.json | selectattr('realm', 'equalto', 'dso') | length == 0
   community.general.keycloak_realm:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
@@ -172,7 +159,7 @@
     supportedLocales:
       - en
       - fr
-    defaultLocal: fr
+    defaultLocale: fr
     password_policy: >
       length(15) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
       passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)

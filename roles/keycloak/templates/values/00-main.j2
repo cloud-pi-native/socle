@@ -208,11 +208,11 @@ extraVolumes:
 extraVolumeMounts:
   - mountPath: /opt/bitnami/keycloak/providers
     name: extensions
-extraEnv:
+extraEnvVars:
   - name: DSFR_THEME_HOME_URL
     value: https://{{ console_domain }}
   - name: DSFR_THEME_SERVICE_TITLE
-    value: DSO
+    value: Cloud π Native
   - name: DSFR_THEME_BRAND_TOP
     value: "Ministère<br/>de l'intérieur<br/>et des outre-mer"
   - name: DSFR_THEME_CONTACT_EMAIL

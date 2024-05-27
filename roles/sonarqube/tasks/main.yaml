@@ -145,17 +145,19 @@
   ansible.builtin.include_tasks:
     file: reset-admin-password.yaml
 
-- name: Set fact sonar token
-  when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is defined
-  ansible.builtin.set_fact:
-    token_pass: "{{ ansible_inventory.resources[0].data.SONAR_API_TOKEN | b64decode }}"
-  no_log: true
+- name: Get Sonarqube admin password secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    name: "sonarqube"
+  register: sonarqube_pwd
 
 - name: Remove permissions for sonar-users
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
-    user: "{{ token_pass }}"
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
     force_basic_auth: true
     method: post
     status_code: 204

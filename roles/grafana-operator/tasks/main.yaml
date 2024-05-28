@@ -7,10 +7,12 @@
   ansible.builtin.set_fact:
     grafana_op_api: "{{ cluster_infos.apis | dict2items | selectattr('key', 'contains', 'integreatly') }}"
 
-- name: Check if grafana-operator-permissions ClusterRole exists
+- name: Get Grafana Operator ClusterRole
   kubernetes.core.k8s_info:
+    api_version: rbac.authorization.k8s.io/v1
     kind: ClusterRole
-    name: grafana-operator-permissions
+    label_selectors:
+      - "app.kubernetes.io/name=grafana-operator"
   register: grafana_op_cr
 
 - name: Install Grafana Operator

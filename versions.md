@@ -5,6 +5,7 @@
 | cloudnativepg | 1.22.1 | 0.20.1 | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg) |
 | console | 8.0.2 | 8.0.2 | [console](https://github.com/cloud-pi-native/console/releases) |
 | gitlab | 16.9.2 | 7.9.2 | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab) |
+| gitlabCiPipelinesExporter | 0.5.8 | 0.3.4 | https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter |
 | gitlabOperator | 0.29.2 | 0.29.2 | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags) |
 | gitlabRunner | 16.9.0 | 0.62.0 | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags) |
 | grafana | 9.5.5 | N/A |[grafana](https://github.com/grafana/grafana/tags) |

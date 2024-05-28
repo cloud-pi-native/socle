@@ -15,6 +15,7 @@ spec:
   console:
     values: {}
   gitlab: {}
+  gitlabCiPipelinesExporter: {}
   gitlabOperator: {}
   gitlabRunner: {}
   global:

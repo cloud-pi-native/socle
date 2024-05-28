@@ -426,6 +426,28 @@
         - never
         - grafana-operator
 
+    - name: "Suppression du ClusterRole de Grafana Operator"
+      kubernetes.core.k8s:
+        api_version: rbac.authorization.k8s.io/v1
+        state: absent
+        kind: ClusterRole
+        label_selectors:
+          - "app.kubernetes.io/name=grafana-operator"
+      tags:
+        - never
+        - grafana-operator
+
+    - name: "Suppression du ClusterRoleBinding de Grafana Operator"
+      kubernetes.core.k8s:
+        api_version: rbac.authorization.k8s.io/v1
+        state: absent
+        kind: ClusterRoleBinding
+        label_selectors:
+          - "app.kubernetes.io/name=grafana-operator"
+      tags:
+        - never
+        - grafana-operator
+
     - name: "Suppression du namespace Grafana Operator"
       kubernetes.core.k8s:
         state: absent

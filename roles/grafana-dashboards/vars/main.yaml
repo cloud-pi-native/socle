@@ -36,4 +36,7 @@ grafana_dashboards:
     dashboard_template: harbor-dashboard.yaml.j2
     webpage: https://github.com/goharbor/harbor/blob/main/contrib/grafana-dashboard/metrics-example.json
     json: https://raw.githubusercontent.com/goharbor/harbor/main/contrib/grafana-dashboard/metrics-example.json
-
+  - name: CNPG
+    dashboard_template: cnpg-dashboard.yaml.j2
+    webpage: https://grafana.com/grafana/dashboards/20417-cloudnativepg/
+    json: https://grafana.com/api/dashboards/20417/revisions/2/download

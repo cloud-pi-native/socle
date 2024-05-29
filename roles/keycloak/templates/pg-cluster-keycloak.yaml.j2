@@ -47,6 +47,9 @@ spec:
   storage:
     size: {{ dsc.keycloak.postgresPvcSize }}
 
+  monitoring:
+    enablePodMonitor: {{ dsc.global.metrics.enabled }}
+
 {% if dsc.global.backup.cnpg.enabled %}
   backup:
     barmanObjectStore:

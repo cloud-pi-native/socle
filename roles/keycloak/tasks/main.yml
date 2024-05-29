@@ -310,3 +310,7 @@
   with_items:
     - master
     - dso
+
+- name: Create CNPG PodMonitor
+  kubernetes.core.k8s:
+    template: podmonitor.yml.j2

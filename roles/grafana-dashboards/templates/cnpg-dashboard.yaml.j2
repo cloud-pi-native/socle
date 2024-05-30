@@ -9095,7 +9095,7 @@ spec:
               "type": "prometheus",
               "uid": "${DS_PROMETHEUS}"
             },
-            "definition": "label_values(controller_runtime_active_workers,namespace)",
+            "definition": "label_values(namespace)",
             "description": "Namespace where the CNPG operator is located",
             "hide": 0,
             "includeAll": false,
@@ -9105,7 +9105,7 @@ spec:
             "options": [],
             "query": {
               "qryType": 1,
-              "query": "label_values(controller_runtime_active_workers,namespace)",
+              "query": "label_values(namespace)",
               "refId": "PrometheusVariableQueryEditor-VariableQuery"
             },
             "refresh": 2,

@@ -24,5 +24,9 @@ global:
 
 server:
   envFrom:
-    - secretRef: 
+    - secretRef:
         name: dso-config
+
+cnpg:
+  enabled: true
+  nameOverride: pg-cluster-console

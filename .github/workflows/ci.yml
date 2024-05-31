@@ -12,8 +12,8 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: "20.9.0"
-  PNPM_VERSION: "8"
+  NODE_VERSION: "20"
+  PNPM_VERSION: "9"
 
 jobs:
   expose-vars:

@@ -386,11 +386,12 @@ spec:
                       type: object
                     platform:
                       default: openshift
-                      description: Cluster platform only openshift and kubernetesVanilla
+                      description: Cluster platform only openshift, kubernetesVanilla and rke2
                         are supported (for now).
                       enum:
                         - openshift
                         - kubernetesVanilla
+                        - rke2 
                       type: string
                     offline:
                       default: false

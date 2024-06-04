@@ -44,7 +44,7 @@ spec:
     chartVersion: 3.1.4
   nexus:
     # https://hub.docker.com/r/sonatype/nexus3/
-    imageTag: 3.66.0
+    imageTag: 3.68.1
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.4.1+2389

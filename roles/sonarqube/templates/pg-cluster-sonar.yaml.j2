@@ -53,17 +53,17 @@ spec:
 {% if dsc.global.backup.cnpg.enabled %}
   backup:
     barmanObjectStore:
-      destinationPath: "{{ dsc.global.backup.cnpg.destinationPath }}sonar"
+      destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}sonar"
       endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
       endpointCA:
-        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
-        key: "{{ dsc.global.backup.cnpg.endpointCA.key }}"
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
       s3Credentials:
         accessKeyId:
-          name: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.name }}"
+          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
           key: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.key }}"
         secretAccessKey:
-          name: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.name }}"
+          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
           key: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.key }}"
     retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
 
@@ -72,6 +72,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
   name: pg-cluster-sonar
+  namespace: {{ dsc.sonarqube.namespace }}
 spec:
   schedule: "{{ dsc.global.backup.cnpg.cron }}"
   backupOwnerReference: self

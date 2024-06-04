@@ -10,7 +10,7 @@ postgresql:
 
 global:
   postgresql:
-    dbUrl: {{ 'postgresql://' + (pg_db_secret.resources[0].data.username | b64decode) + ':' + (pg_db_secret.resources[0].data.password | b64decode) + '@pg-cluster-console-rw:5432/dso-console-db?schema=public' }}
+    dbUrl: {{ (pg_db_secret.resources[0].data.uri | default('cHNxbDovL3VzZXJuYW1lOnBhc3N3b3JkQGhvc3Q6cG9ydA==') | b64decode) + '?schema=public' }}
   keycloak:
     clientIds:
       backend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}

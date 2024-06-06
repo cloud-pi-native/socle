@@ -24,8 +24,8 @@ spec:
       - forge
     rootDomain:
       .example.com
-    metrics:
-      enabled: false
+    metrics: {}
+    alerting: {}
     backup: {}
   grafana: {}
   grafanaDatasource: {}

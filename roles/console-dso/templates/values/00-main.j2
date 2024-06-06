@@ -10,7 +10,7 @@ postgresql:
 
 global:
   postgresql:
-    dbUrl: {{ (pg_db_secret.resources[0].data.uri | default('cHNxbDovL3VzZXJuYW1lOnBhc3N3b3JkQGhvc3Q6cG9ydA==') | b64decode) + '?schema=public' }}
+    dbUrl: {{ (pg_db_secret | from_yaml | json_query('resources[0].data.uri') | b64decode + '?schema=public') | default('postgresql://username:password@host:port?schema=public') }}
   keycloak:
     clientIds:
       backend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}
@@ -30,3 +30,20 @@ server:
 cnpg:
   enabled: true
   nameOverride: pg-cluster-console
+{% if dsc.global.backup.cnpg.enabled %}
+  backup:
+    enabled: "{{ dsc.global.backup.cnpg.enabled }}"
+    destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}console"
+    endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
+    endpointCA:
+      name: "bundle-cnpg-s3"
+      key: "ca.pem"
+    s3Credentials:
+      name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+      accessKeyId:
+        key: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.key }}"
+      secretAccessKey:
+        key: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.key }}"
+    cron: "{{ dsc.global.backup.cnpg.cron }}"
+    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+{% endif %}

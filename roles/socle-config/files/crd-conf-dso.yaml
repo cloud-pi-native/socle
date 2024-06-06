@@ -313,7 +313,7 @@ spec:
                         cnpg:
                           properties:
                             enabled:
-                              description: Enable cnpg backups.
+                              description: Enable s3 cnpg backups.
                               default: false
                               type: boolean
                             endpointURL:
@@ -321,6 +321,9 @@ spec:
                               type: string
                             endpointCA:
                               properties:
+                                namespace:
+                                  description: Defines in which namespace is located the secret containing CA bundle for cnpg backups (it will be copy into each namespace that use cnpg).
+                                  type: string
                                 name:
                                   description: Defines the secret name containing s3 CA for cnpg backups.
                                   type: string
@@ -329,33 +332,37 @@ spec:
                                   type: string
                               type: object
                             destinationPath:
-                              description: Defines the s3 destination path for cnpg backups (it should be set like `<bucket_name>/<path_name>/` with the trailing slash).
+                              description: Defines the globally shared s3 destination path for cnpg backups (it should be set like `<bucket_name>/<optional_dir>/` with the trailing slash).
                               type: string
+                              default: ""
                             s3Credentials:
                               properties:
+                                name:
+                                  description: Defines the s3 kuebernetes secret name used for cnpg backups.
+                                  type: string
                                 accessKeyId:
                                   properties:
-                                    name:
-                                      description: Defines the s3 accessKeyId kuebernetes secret name used for cnpg backups.
-                                      type: string
                                     key:
                                       description: Defines the s3 accessKeyId kubernetes secret key used for cnpg backups.
+                                      type: string
+                                    value:
+                                      description: Defines the s3 accessKeyId value used for cnpg backups.
                                       type: string
                                   type: object
                                 secretAccessKey:
                                   properties:
-                                    name:
-                                      description: Defines the s3 secretAccessKey kuebernetes secret name used for cnpg backups.
-                                      type: string
                                     key:
                                       description: Defines the s3 secretAccessKey kubernetes secret key used for cnpg backups.
+                                      type: string
+                                    value:
+                                      description: Defines the s3 secretAccessKey value used for cnpg backups.
                                       type: string
                                   type: object
                               type: object
                             cron:
                               description: Defines the cron rule used for cnpg backups. By default it runs every 6 hours.
                               type: string
-                              default: "0 */6 * * * *"
+                              default: "0 0 */6 * * *"
                             retentionPolicy:
                               description: Defines retention policy for cnpg backups recurrences.
                               type: string

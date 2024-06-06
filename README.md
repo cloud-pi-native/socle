@@ -77,7 +77,7 @@ Vous pouvez trouver la version des outils installés dans le fichier [versions.m
 
 Comme précisé dans le tableau ci-dessus, certains éléments sont optionnels :
 * L'opérateur Grafana et l'instance Grafana ne s'installeront que sur demande explicite, via l'utilisation des tags appropriés. Ceci afin de vous permettre d'opter ou non pour cette solution d'affichage des métriques.
-* Les CRDs de l'opérateur Prometheus ne s'installent que s'il est déjà présent dans le cluster (parametre `managed` dans notre configuration).
+* Les CRDs de l'opérateur Prometheus ne s'installent que s'il est déjà présent dans le cluster (paramètre `managed` dans notre configuration).
 
 ## Prérequis
 
@@ -156,9 +156,9 @@ Pour vous aider à démarrer, voici un **exemple** de fichier de configuration v
 * du paramètre `global.rootDomain` (votre domaine principal précédé d'un point),
 * des mots de passe de certains outils,
 * du paramètre `global.platform` (à positionner sur `kubernetesVanilla` si vous n'utilisez pas OpenShift),
-*  de la taille de certains PVCs,
-*   de l'activation ou non des métriques,
-*   du proxy ainsi que des sections CA et ingress.
+* de la taille de certains PVCs,
+* de l'activation ou non des métriques,
+* du proxy ainsi que des sections CA et ingress.
 
 ```yaml
 ---
@@ -249,7 +249,7 @@ Les champs utilisables dans cette ressource de type **dsc** peuvent être décri
 kubectl explain dsc.spec.argocd
 ```
 
-Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à demander la description de tout champ pour lequel vous avez un doute.
+Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à lancer la commande ci-dessus pour obtenir la description de tout champ sur lequel vous avez un doute.
 
 ### Utilisation de vos propres values
 

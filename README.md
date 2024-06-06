@@ -40,6 +40,7 @@
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
+- [Backups](#backups)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1003,6 +1004,28 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 ```
 
 **Remarque importante** : En cas de tentative de mise à jour des versions d'images, dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse éventuellement se mettre à jour avec le tag que vous avez indiqué.
+
+## Backups
+
+Selon les possibilités de votre cluster, nous proposons dans la resource `dsc` de configuration différentes options de backup :
+* Backup des namespaces avec Velero.
+* Backup dans un bucket S3 des BDD PostgreSQL déployées via CNPG.
+
+Ceci est géré au niveau du paramètre `global.backup`.
+
+Vous pouvez obtenir plus de renseignements sur le paramétrage des champs de backup proposés via les commandes suivantes.
+
+Pour les backups de namespaces avec Velero :
+
+```
+kubectl explain dsc.spec.global.backup.velero
+```
+
+Pour les backups S3 des BDD PostgreSQL déployées via CNPG : 
+
+```
+kubectl explain dsc.spec.global.backup.cnpg
+```
 
 ## Contributions
 

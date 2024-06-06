@@ -474,6 +474,16 @@ spec:
                             replicaExtraArgs:
                               description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
                               type: string
+                    alerting:
+                      description: Configuration for Prometheus alerting feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether alerting should be enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
                     backup:
                       description: Configuration for backup feature.
                       properties:
@@ -568,6 +578,7 @@ spec:
                     - rootDomain
                     - environment
                     - metrics
+                    - alerting
                     - platform
                     - offline
                   type: object

@@ -78,4 +78,6 @@ spec:
   backupOwnerReference: self
   cluster:
     name: pg-cluster-sonar
+{% else %}
+  backup: null
 {% endif %}

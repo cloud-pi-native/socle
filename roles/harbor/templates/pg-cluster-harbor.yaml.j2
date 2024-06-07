@@ -78,4 +78,6 @@ spec:
   backupOwnerReference: self
   cluster:
     name: pg-cluster-harbor
+{% else %}
+  backup: null
 {% endif %}

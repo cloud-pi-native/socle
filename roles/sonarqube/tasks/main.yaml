@@ -44,6 +44,15 @@
         secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    name: pg-cluster-sonar
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
 - name: Create PostgreSQL cluster and sonar database
   kubernetes.core.k8s:
     template: pg-cluster-sonar.yaml.j2

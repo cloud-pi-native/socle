@@ -78,4 +78,6 @@ spec:
   backupOwnerReference: self
   cluster:
     name: pg-cluster-keycloak
+{% else %}
+  backup: null
 {% endif %}

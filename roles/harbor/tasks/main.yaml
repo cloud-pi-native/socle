@@ -46,6 +46,15 @@
         secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: pg-cluster-harbor
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
 - name: Create PostgreSQL cluster and harbor database
   kubernetes.core.k8s:
     template: pg-cluster-harbor.yaml.j2

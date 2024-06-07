@@ -46,6 +46,15 @@
         secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: pg-cluster-keycloak
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
 - name: Create PostgreSQL cluster and keycloak database
   kubernetes.core.k8s:
     template: pg-cluster-keycloak.yaml.j2
@@ -127,6 +136,16 @@
     chart_version: "{{ dsc.keycloak.chartVersion }}"
     release_namespace: "{{ dsc.keycloak.namespace }}"
     values: "{{ kc_values }}"
+
+- name: Wait Keycloak URL
+  ansible.builtin.uri:
+    url: https://{{ keycloak_domain }}
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    return_content: false
+  register: kc_response
+
+- debug: msg="{{ kc_response }}"
 
 - name: Wait Keycloak URL
   ansible.builtin.uri:

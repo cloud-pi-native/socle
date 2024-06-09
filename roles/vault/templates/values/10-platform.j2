@@ -3,7 +3,7 @@ global:
   openshift: true
 {% endif %}
 
-{% if dsc.global.platform == "kubernetesVanilla" %}
+{% if dsc.global.platform == "kubernetesVanilla" or dsc.global.platform == "rke2" %}
 injector:
   securityContext:
     pod:

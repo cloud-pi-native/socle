@@ -58,3 +58,13 @@
 - name: Create replace-kubed ClusterPolicy
   kubernetes.core.k8s:
     template: replace-kubed.yml.j2
+
+- name: Create security-context ClusterPolicy for cis profile
+  kubernetes.core.k8s:
+    template: cis.yml.j2
+  when: dsc.global.profile is defined and dsc.global.profile == "cis"
+
+- name: Create ClusterPolicy for exposedCA
+  kubernetes.core.k8s:
+    template: exposedCA.yml.j2
+  when: dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret"

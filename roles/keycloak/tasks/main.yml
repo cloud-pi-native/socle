@@ -142,16 +142,6 @@
     url: https://{{ keycloak_domain }}
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    return_content: false
-  register: kc_response
-
-- debug: msg="{{ kc_response }}"
-
-- name: Wait Keycloak URL
-  ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    method: GET
     status_code: [200, 202]
     return_content: false
   register: kc_response

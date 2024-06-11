@@ -151,6 +151,7 @@
           psql -U postgres -d keycloak -c "delete from credential where user_id = '"{{ kc_admin_id }}"';"
           -c "delete from user_role_mapping where user_id = '"{{ kc_admin_id }}"';"
           -c "delete from user_entity where id = '"{{ kc_admin_id }}"';"
+          -c "delete from user_required_action where user_id = '"{{ kc_admin_id }}"';"
 
     - name: Restart Keycloak pods to reset admin password
       kubernetes.core.k8s:

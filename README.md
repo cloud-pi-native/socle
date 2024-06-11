@@ -18,6 +18,7 @@
   - [Grafana Operator et instance Grafana](#grafana-operator-et-instance-grafana)
   - [Kyverno](#kyverno)
   - [Kubed (config-syncer)](#kubed-config-syncer)
+  - [Prometheus](#prometheus)
 - [Désinstallation](#désinstallation)
   - [Chaîne complète](#chaîne-complète)
   - [Désinstaller un ou plusieurs outils](#désinstaller-un-ou-plusieurs-outils)
@@ -30,6 +31,7 @@
     - [CloudNativePG](#cloudnativepg-1)
     - [Console Cloud π Native](#console-cloud-π-native)
     - [GitLab](#gitlab)
+    - [GitLab CI pipelines exporter](#gitlab-ci-pipelines-exporter)
     - [GitLab Runner](#gitlab-runner)
     - [Harbor](#harbor)
     - [Instance Grafana](#instance-grafana)
@@ -38,6 +40,7 @@
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
+- [Backups](#backups)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -48,34 +51,40 @@ L'installation de la forge DSO (DevSecOps) s'effectue de manière automatisée a
 
 Les éléments déployés seront les suivants :
 
-| Outil                        | Site officiel                                                                  |
-| ---------------------------- | ------------------------------------------------------------------------------ |
-| Argo CD                      | <https://argo-cd.readthedocs.io>                                               |
-| Cert-manager                 | <https://cert-manager.io>                                                      |
-| Console Cloud π Native       | <https://github.com/cloud-pi-native/console>                                   |
-| CloudNativePG                | <https://cloudnative-pg.io>                                                    |
-| GitLab                       | <https://about.gitlab.com>                                                     |
-| gitLab-ci-catalog            | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                         |
-| GitLab Operator              | <https://docs.gitlab.com/operator>                                             |
-| GitLab Runner                | <https://docs.gitlab.com/runner>                                               |
-| Grafana (optionnel)          | <https://grafana.com>                                                          |
-| Grafana Operator (optionnel) | <https://grafana.github.io/grafana-operator/>                                  |
-| Harbor                       | <https://goharbor.io>                                                          |
-| HashiCorp Vault              | <https://www.vaultproject.io>                                                  |
-| Keycloak                     | <https://www.keycloak.org>                                                     |
-| Kyverno                      | <https://kyverno.io>                                                           |
-| SonarQube Community Edition  | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
-| Sonatype Nexus Repository    | <https://www.sonatype.com/products/sonatype-nexus-repository>                  |
+| Outil                                | Site officiel                                                                             |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- |
+| Argo CD                              | <https://argo-cd.readthedocs.io>                                                          |
+| Cert-manager                         | <https://cert-manager.io>                                                                 |
+| CloudNativePG                        | <https://cloudnative-pg.io>                                                               |
+| Console Cloud π Native               | <https://github.com/cloud-pi-native/console>                                              |
+| GitLab                               | <https://about.gitlab.com>                                                                |
+| gitLab-ci-catalog                    | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                                    |
+| gitLab-ci-pipelines-exporter         | <https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter> |
+| GitLab Operator                      | <https://docs.gitlab.com/operator>                                                        |
+| GitLab Runner                        | <https://docs.gitlab.com/runner>                                                          |
+| Grafana (optionnel)                  | <https://grafana.com>                                                                     |
+| Grafana Operator (optionnel)         | <https://grafana.github.io/grafana-operator/>                                             |
+| Harbor                               | <https://goharbor.io>                                                                     |
+| HashiCorp Vault                      | <https://www.vaultproject.io>                                                             |
+| Keycloak                             | <https://www.keycloak.org>                                                                |
+| Kyverno                              | <https://kyverno.io>                                                                      |
+| Prometheus Operator CRDs (optionnel) | <https://github.com/prometheus-operator/prometheus-operator/releases><br>Fichier `stripped-down-crds.yaml`<br>Disponible dans les Assets de chaque version.           |
+| SonarQube Community Edition          | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition>            |
+| Sonatype Nexus Repository            | <https://www.sonatype.com/products/sonatype-nexus-repository>                             |
 
-Certains outils peuvent prendre un peu de temps pour s'installer. Ce sera le cas de Keycloak, SonarQube et en particulier GitLab.
+Certains outils peuvent prendre un peu de temps pour s'installer. Ce sera le cas de Keycloak, Nexus, SonarQube et en particulier GitLab.
 
 Vous pouvez trouver la version des outils installés dans le fichier [versions.md](versions.md).
 
-Comme précisé dans le tableau ci-dessus, l'opérateur Grafana et l'instance Grafana sont optionnels. Ils ne s'installeront que sur demande explicite, via l'utilisation des tags appropriés. Ceci afin de vous permettre d'opter ou non pour cette solution d'affichage des métriques.
+Comme précisé dans le tableau ci-dessus, certains éléments sont optionnels :
+* L'opérateur Grafana et l'instance Grafana ne s'installeront que sur demande explicite, via l'utilisation des tags appropriés. Ceci afin de vous permettre d'opter ou non pour cette solution d'affichage des métriques.
+* Les CRDs de l'opérateur Prometheus ne s'installent que s'il est déjà présent dans le cluster (paramètre `managed` dans notre configuration).
 
 ## Prérequis
 
-Cette installation s'effectue dans un cluster OpenShift opérationnel et correctement démarré.
+Cette installation s'effectue par défaut dans un cluster [OpenShift](https://www.redhat.com/fr/technologies/cloud-computing/openshift) opérationnel et correctement démarré.
+
+La plateforme [Kubernetes](https://kubernetes.io/fr/) ([vanilla](https://fr.wikipedia.org/wiki/Logiciel_vanilla)) est également supportée si besoin, via l'option de configuration `global.platform` (cf. section [Configuration](#configuration) ci-dessous).
 
 Vous devrez disposer d'un **accès administrateur au cluster**.
 
@@ -110,7 +119,7 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
   - ruby
   - tar
 
-- Modules python :
+- Modules python requis par certains modules Ansible :
   - pyyaml
   - kubernetes
   - python-gitlab
@@ -122,7 +131,7 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
 - Commandes installées avec Homebrew :
   - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
   - [helm](https://helm.sh/docs/intro/install/)
-  - [yq](https://github.com/mikefarah/yq/#install), facultative mais utile pour debug.
+  - [yq](https://github.com/mikefarah/yq/#install) (Facultative mais utile pour debug.)
 
 ## Configuration
 
@@ -144,7 +153,13 @@ Vous pourrez procéder comme indiqué si vous le souhaitez, mais pour des raison
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau du champ "global.rootDomain" (votre domaine principal précédé d'un point), des mots de passe de certains outils, du proxy ainsi que des sections CA et ingress :
+Pour vous aider à démarrer, voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau :
+* du paramètre `global.rootDomain` (votre domaine principal précédé d'un point),
+* des mots de passe de certains outils,
+* du paramètre `global.platform` (à positionner sur `kubernetesVanilla` si vous n'utilisez pas OpenShift),
+* de la taille de certains PVCs,
+* de l'activation ou non des métriques,
+* du proxy ainsi que des sections CA et ingress.
 
 ```yaml
 ---
@@ -166,29 +181,37 @@ spec:
     admin:
       enabled: true
       password: WeAreThePasswords
+    values: {}
   certmanager: {}
   cloudnativepg: {}
   console:
+    postgresPvcSize: 10Gi
     values: {}
   gitlab:
+    postgresPvcSize: 10Gi
     values: {}
+  gitlabCiPipelinesExporter: {}
   gitlabOperator: {}
   gitlabRunner: {}
   global:
+    backup: {}
     environment: production
+    metrics:
+      enabled: true
+    platform: openshift
     projectsRootDir:
       - my-root-dir
       - projects-sub-dir
     rootDomain: .example.com
-    metrics:
-      enabled: true
   grafana: {}
   grafanaDatasource:
     defaultPrometheusDatasourceUrl: https://my-service.my-monitoring-namespace.svc.cluster.local:9091
   grafanaOperator: {}
   harbor:
     adminPassword: WhoWantsToPassForever
+    postgresPvcSize: 10Gi
     pvcRegistrySize: 50Gi
+    values: {}
   ingress:
     annotations:
       route.openshift.io/termination: "edge"
@@ -197,12 +220,18 @@ spec:
       tlsSecret:
         name: ingress-tls
         method: in-namespace
-  keycloak: {}
+  keycloak:
+    postgresPvcSize: 10Gi
+    values: {}
   kyverno: {}
   nexus:
-    storageSize: 5Gi
+    proxyCacheSize: 10Gi
+    storageSize: 10Gi
+  prometheus:
+    crd:
+      type: external
   proxy:
-    enabled: true
+    enabled: false
     host: "192.168.xx.xx"
     http_proxy: http://192.168.xx.xx:3128/
     https_proxy: http://192.168.xx.xx:3128/
@@ -210,6 +239,7 @@ spec:
     port: "3128"
   sonarqube:
     postgresPvcSize: 25Gi
+    values: {}
   vault:
     values: {}
 ```
@@ -219,6 +249,8 @@ Les champs utilisables dans cette ressource de type **dsc** peuvent être décri
 ```
 kubectl explain dsc.spec.argocd
 ```
+
+Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à lancer la commande ci-dessus pour obtenir la description de tout champ sur lequel vous avez un doute.
 
 ### Utilisation de vos propres values
 
@@ -260,7 +292,7 @@ Par défaut, ils sont en effet tous préfixés « dso- ».
 
 ### Déploiement de plusieurs forges DSO dans un même cluster
 
-Suite à une première installation réussie et selon vos besoins, il est possible d'installer dans un même cluster une ou plusieurs autres forges DSO, en parallèle de celle installée par défaut.
+Suite à une première installation réussie et selon vos besoins, il est possible, selon sa capacité, d'installer dans un même cluster une ou plusieurs autres forges DSO, en parallèle de celle installée par défaut.
 
 Pour cela, il vous suffit de déclarer une **nouvelle ressource de type dsc dans le cluster**, en la nommant différemment de la ressource `dsc` par défaut qui pour rappel se nomme `conf-dso`, et en y modifiant les éléments souhaités.
 
@@ -281,7 +313,7 @@ Exemple pour Argo CD :
       password: PasswordForEveryone
 ```
 
-Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la première installation du socle, peuvent être listés en se positionnant préalablement dans le répertoire socle, puis en affichant le fichier « config.yaml » du role socle-config :
+Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la première installation du socle, peuvent être listés en se positionnant préalablement dans le répertoire socle, puis en affichant le fichier « config.yaml » du role socle-config, exemple en ligne de commande :
 
 ```bash
 cat ./roles/socle-config/files/config.yaml
@@ -359,7 +391,7 @@ Et bien sûr cibler un ou plusieurs outils en même temps, via les tags. Exemple
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf -t keycloak,argocd
 ```
 
-**Remarque importante** : Il est **vivement encouragé** de **sauvegarder les valeurs** qui vous sont fournies par le playbook « get-credentials.yaml ». Par exemple dans un fichier de base de données chiffré de type KeePass ou Bitwarden. Il est toutefois important de **ne pas les modifier ou les supprimer** sous peine de voir certains composants, par exemple Vault, être réinitialisés.
+**Remarque importante** : Il est **vivement encouragé** de **sauvegarder les valeurs** qui vous sont fournies par le playbook « get-credentials.yaml ». Par exemple dans un fichier de base de données chiffré de type KeePass, Vaultwarden ou Bitwarden. Il est toutefois important de **ne pas les modifier ou les supprimer** sous peine de voir certains composants, par exemple Vault, être réinitialisés.
 
 ## Debug
 
@@ -396,7 +428,11 @@ Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que 
 
 ### CloudNativePG
 
-La BDD PostgreSQL des composants Keycloak et SonarQube est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/), via le role `cloudnativepg`.
+La BDD PostgreSQL des composants suivants est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/) (lui même installé via le role `cloudnativepg`) :
+* console-dso
+* harbor
+* keycloak
+* sonarqube
 
 Le playbook d'installation, en s'appuyant sur le role en question, s'assurera préalablement que cet opérateur n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
 
@@ -432,7 +468,9 @@ Suite à une première installation du socle avec les métriques activées (sect
 ansible-playbook install.yaml -t grafana-operator,grafana,grafana-datasource,grafana-dashboards
 ```
 
-Remarque : Il est tout à fait possible de ne pas utiliser la datasource ou les dashboards que nous proposons par défaut, et de déployer à la place vos propres datasources et dashboards. Dans ce cas, vous devrez les déclarer par vos soins, en utilisant vos propres fichiers YAML de définitions s'appuyant sur la [documentation de l'opérateur](https://grafana.github.io/grafana-operator/docs/).
+Remarques :
+* Il est tout à fait possible de ne pas utiliser la datasource ou les dashboards que nous proposons par défaut, et de déployer à la place vos propres datasources et dashboards. Dans ce cas, vous devrez les déclarer par vos soins, en utilisant vos propres fichiers YAML de définitions s'appuyant sur la [documentation de l'opérateur](https://grafana.github.io/grafana-operator/docs/).
+* Si au contraire vous souhaitez installer l'intégralité de la stack Grafana que nous proposons, vous pouvez utiliser le tag unique `-t grafana-stack`.
 
 Le playbook d'installation, via le role grafana-operator, s'assurera préalablement que l'opérateur Grafana n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
 
@@ -457,9 +495,23 @@ Si aucun pod Kyverno n'est détecté, le rôle associé procédera donc à l'ins
 
 ### Kubed (config-syncer)
 
-Le role Kyverno remplit désormais les mêmes fonctionnalités que celles qui étaient précédemment proposées par le role Kubed, lequel a été supprimé.
+Le rôle kyverno remplit désormais les mêmes fonctionnalités que celles qui étaient précédemment proposées par le role confSyncer.
 
 C'est pourquoi, dans un cluster dédié à une utilisation à jour du socle DSO, nous vous recommandons de **désinstaller Kubed** (voir [section suivante](#désinstallation)).
+
+### Prometheus
+
+Les tâches du rôle prometheus ne se lancent que si le paramètre `prometheus.crd.type` de la `dsc` est posionné sur `managed` comme dans l'exemple suivant :
+
+```
+  prometheus:
+    crd:
+      type: managed
+```
+
+Il faudra positionner cette valeur `managed` dans le cas de figure où l'opérateur Prometheus est installé dans notre cluster.
+
+Le rôle en lui-même sert à installer séparément les CRDs de l'opérateur Prometheus, ce qui est recommandé en production.
 
 ## Désinstallation
 
@@ -669,7 +721,7 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
       image:
         registry: docker.io
         repository: bitnami/argo-cd
-        tag: 2.7.6-debian-11-r2
+        tag: 2.10.7-debian-12-r0
         imagePullPolicy: IfNotPresent
 ```
 
@@ -721,6 +773,12 @@ https://docs.gitlab.com/charts/installation/version_mappings.html
 
 Il est donc recommandé de ne pas modifier les versions de charts déjà fixées au moment de la sortie du socle, sauf si vous savez ce que vous faites. Dans le cas où vous souhaiteriez les modifier, gardez à l'esprit les correspondances signalées précédemment, entre version du chart de l'opérateur et versions de chart GitLab qu'il peut installer.
 
+#### GitLab CI pipelines exporter
+
+La version d'image utilisée par GitLab CI pipelines exporter est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
+
+Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez ce que vous faites.
+
 #### GitLab Runner
 
 La version d'image utilisée par GitLab Runner est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
@@ -756,7 +814,7 @@ Les différents tags utilisables sont disponibles ici :
 
 **Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
 
-Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.13.1 du chart :
+Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.14.1 du chart :
 
 ```yaml
   harbor:
@@ -766,55 +824,55 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
       nginx:
         image:
           repository: docker.io/goharbor/nginx-photon
-          tag: v2.9.1
+          tag: v2.10.1
       portal:
         image:
           repository: docker.io/goharbor/harbor-portal
-          tag: v2.9.1
+          tag: v2.10.1
       core:
         image:
           repository: docker.io/goharbor/harbor-core
-          tag: v2.9.1
+          tag: v2.10.1
       jobservice:
         image:
           repository: docker.io/goharbor/harbor-jobservice
-          tag: v2.9.1
+          tag: v2.10.1
       registry:
         registry:
           image:
             repository: docker.io/goharbor/registry-photon
-            tag: v2.9.1
+            tag: v2.10.1
         controller:
           image:
             repository: docker.io/goharbor/harbor-registryctl
-            tag: v2.9.1
+            tag: v2.10.1
       trivy:
         image:
           repository: docker.io/goharbor/trivy-adapter-photon
-          tag: v2.9.1
+          tag: v2.10.1
       notary:
         server:
           image:
             repository: docker.io/goharbor/notary-server-photon
-            tag: v2.9.1
+            tag: v2.10.1
         signer:
           image:
             repository: docker.io/goharbor/notary-signer-photon
-            tag: v2.9.1
+            tag: v2.10.1
       database:
         internal:
           image:
             repository: docker.io/goharbor/harbor-db
-            tag: v2.9.1
+            tag: v2.10.1
       redis:
         internal:
           image:
             repository: docker.io/goharbor/redis-photon
-            tag: v2.9.1
+            tag: v2.10.1
       exporter:
         image:
           repository: docker.io/goharbor/harbor-exporter
-          tag: v2.9.1
+          tag: v2.10.1
 ```
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/goharbor/harbor-helm/tree/master>
@@ -854,7 +912,7 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
       image:
         registry: docker.io
         repository: bitnami/keycloak
-        tag: 19.0.3-debian-11-r22
+        tag: 23.0.7-debian-12-r4
 ```
 
 Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml>
@@ -882,7 +940,7 @@ Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence
 ```yaml
   nexus:
     storageSize: 25Gi
-    imageTag: 3.56.0
+    imageTag: 3.68.1
 ```
 
 #### SonarQube Community Edition
@@ -907,7 +965,7 @@ Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de conf
         registry: docker.io
         repository: sonarqube
         edition: community
-        tag: 9.9.2-{{ .Values.edition }}
+        tag: 10.4.1-{{ .Values.edition }}
 ```
 
 #### Vault
@@ -946,6 +1004,28 @@ Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de config
 ```
 
 **Remarque importante** : En cas de tentative de mise à jour des versions d'images, dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse éventuellement se mettre à jour avec le tag que vous avez indiqué.
+
+## Backups
+
+Selon les possibilités de votre cluster, nous proposons dans la resource `dsc` de configuration différentes options de backup :
+* Backup des namespaces avec Velero.
+* Backup dans un bucket S3 des BDD PostgreSQL déployées via CNPG.
+
+Ceci est géré au niveau du paramètre `global.backup`.
+
+Vous pouvez obtenir plus de renseignements sur le paramétrage des champs de backup proposés via les commandes suivantes.
+
+Pour les backups de namespaces avec Velero :
+
+```
+kubectl explain dsc.spec.global.backup.velero
+```
+
+Pour les backups S3 des BDD PostgreSQL déployées via CNPG : 
+
+```
+kubectl explain dsc.spec.global.backup.cnpg
+```
 
 ## Contributions
 

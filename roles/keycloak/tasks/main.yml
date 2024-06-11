@@ -112,6 +112,67 @@
         namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque
 
+- name: Check Keycloak helm release
+  kubernetes.core.helm_info:
+    name: keycloak
+    namespace: "{{ dsc.keycloak.namespace }}"
+  register: kc_helm_release
+
+- name: Reset Keycloak admin password
+  when: >
+    kc_helm_release.status is defined and
+    kc_adm_pass_secret.resources | length == 0
+  block:
+    - name: Get Keycloak primary BDD pod
+      kubernetes.core.k8s_info:
+        kind: Pod
+        label_selectors:
+          - "cnpg.io/cluster=pg-cluster-keycloak"
+          - "cnpg.io/instanceRole=primary"
+      register: kc_bdd_pod
+
+    - name: Get Keycloak admin ID from database
+      kubernetes.core.k8s_exec:
+        pod: "{{ kc_bdd_pod.resources[0].metadata.name }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        command: >
+          psql -U postgres -d keycloak --csv -c "\x" -c "select id from user_entity where username = 'admin';"
+      register: kc_admin_id
+
+    - name: Set kc_admin_id fact
+      ansible.builtin.set_fact:
+        kc_admin_id: "{{ kc_admin_id.stdout | regex_search('^id.*', multiline=True) | regex_search('id,(.+)', '\\1') | first }}"
+
+    - name: Delete Keycloak admin in database
+      kubernetes.core.k8s_exec:
+        pod: "{{ kc_bdd_pod.resources[0].metadata.name }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        command: >
+          psql -U postgres -d keycloak -c "delete from credential where user_id = '"{{ kc_admin_id }}"';"
+          -c "delete from user_role_mapping where user_id = '"{{ kc_admin_id }}"';"
+          -c "delete from user_entity where id = '"{{ kc_admin_id }}"';"
+
+    - name: Restart Keycloak pods to reset admin password
+      kubernetes.core.k8s:
+        kind: Pod
+        namespace: "{{ dsc.keycloak.namespace }}"
+        label_selectors:
+          - "app.kubernetes.io/component=keycloak"
+          - "app.kubernetes.io/instance=keycloak"
+        state: absent
+
+    - name: Wait Keycloak URL
+      ansible.builtin.uri:
+        url: https://{{ keycloak_domain }}
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        method: GET
+        status_code: [200, 202]
+        return_content: false
+      register: kc_response
+      until: kc_response is not failed
+      retries: 30
+      delay: 5
+
 - name: Add bitnami helm repo
   kubernetes.core.helm_repository:
     name: bitnami
@@ -142,16 +203,6 @@
     url: https://{{ keycloak_domain }}
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    return_content: false
-  register: kc_response
-
-- debug: msg="{{ kc_response }}"
-
-- name: Wait Keycloak URL
-  ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    method: GET
     status_code: [200, 202]
     return_content: false
   register: kc_response
@@ -166,7 +217,7 @@
     name: keycloak
   register: kc_adm_pass
 
-- name: Set Keycloak admin credentials facts
+- name: Set Keycloak admin name fact
   ansible.builtin.set_fact:
     keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password'] | b64decode }}"
     keycloak_admin: admin

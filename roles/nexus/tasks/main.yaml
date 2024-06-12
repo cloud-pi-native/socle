@@ -106,7 +106,7 @@
         return_content: false
       register: nexus_response
       until: nexus_response is not failed
-      retries: 25
+      retries: 60
       delay: 5
 
     - name: Generate random password

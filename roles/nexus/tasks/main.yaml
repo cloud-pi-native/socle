@@ -141,6 +141,24 @@
           data:
             NEXUS_ADMIN_PASSWORD: "{{ new_pass | b64encode }}"
 
+    - name: Get admin-creds secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.nexus.namespace }}"
+        kind: Secret
+        name: admin-creds
+      register: admin_creds_secret
+
+    - name: Update admin-creds secret
+      when: admin_creds_secret.resources[0] is defined
+      kubernetes.core.k8s:
+        kind: Secret
+        name: admin-creds
+        namespace: "{{ dsc.nexus.namespace }}"
+        state: patched
+        definition:
+          data:
+            password: "{{ new_pass | b64encode }}"
+
 - name: Get inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"

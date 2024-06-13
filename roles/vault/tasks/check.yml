@@ -27,15 +27,15 @@
 - name: Set vault_status to "not init"
   when: not vault_initialized
   ansible.builtin.set_fact:
-    vault_status: not init
+    vault_status: "not init"
 
 - name: Set vault_status to sealed
   when: (vault_initialized) and (vault_sealed)
   ansible.builtin.set_fact:
-    vault_status: sealed
+    vault_status: "sealed"
 
 - name: Set vault_status to OK
   when: (vault_initialized) and (not vault_sealed)
   ansible.builtin.set_fact:
-    vault_status: OK
+    vault_status: "OK"
 

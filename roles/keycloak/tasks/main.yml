@@ -421,3 +421,14 @@
   with_items:
     - master
     - dso
+
+- name: Set OTP policy algorithm in dso realm
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    otp_policy_algorithm: SHA256

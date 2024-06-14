@@ -1,0 +1,4 @@
+{% if use_private_registry %}
+image:
+  repository: "{{ dsc.global.registry }}/mvisonneau/gitlab-ci-pipelines-exporter"
+{% endif %}

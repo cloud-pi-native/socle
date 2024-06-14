@@ -16,6 +16,13 @@ spec:
       labels:
         app: nexus
     spec:
+{% if dsc.global.platform == "kubernetesVanilla" %}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 200 
+        runAsUser: 200
+        fsGroup: 200
+{% endif %}
       containers:
         - name: nexus
 {% if use_private_registry %}

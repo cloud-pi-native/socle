@@ -20,6 +20,12 @@ spec:
     subDomain: gitlab
     insecureCI: false
     pvcGitalySize: 50Gi
+  global:
+    backup:
+      velero:
+        enabled: false
+      cnpg:
+        enabled: false
   grafana:
     namespace: dso-grafana
     subDomain: grafana

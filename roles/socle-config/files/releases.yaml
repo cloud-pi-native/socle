@@ -14,10 +14,13 @@ spec:
     chartVersion: 0.20.1
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "8.0.2"
+    release: "1.*.*"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "7.9.2"
+  gitlabCiPipelinesExporter:
+    # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
+    chartVersion: "0.3.4"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
     chartVersion: "0.29.2"
@@ -41,7 +44,7 @@ spec:
     chartVersion: 3.1.4
   nexus:
     # https://hub.docker.com/r/sonatype/nexus3/
-    imageTag: 3.66.0
+    imageTag: 3.68.1
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.4.1+2389

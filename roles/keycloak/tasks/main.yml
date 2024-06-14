@@ -6,6 +6,55 @@
     kind: Namespace
     state: present
 
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.endpointCA.namespace is defined and
+    dsc.global.backup.cnpg.endpointCA.name is defined and
+    dsc.global.backup.cnpg.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
+        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact: 
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+- name: Set cnpg backup secret
+  kubernetes.core.k8s:
+    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    namespace: "{{ dsc.keycloak.namespace }}"
+    kind: Secret
+    api_version: v1
+    definition:
+      data:
+        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+  when: dsc.global.backup.cnpg.enabled
+
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: pg-cluster-keycloak
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
 - name: Create PostgreSQL cluster and keycloak database
   kubernetes.core.k8s:
     template: pg-cluster-keycloak.yaml.j2
@@ -63,6 +112,68 @@
         namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque
 
+- name: Check Keycloak helm release
+  kubernetes.core.helm_info:
+    name: keycloak
+    namespace: "{{ dsc.keycloak.namespace }}"
+  register: kc_helm_release
+
+- name: Reset Keycloak admin password
+  when: >
+    kc_helm_release.status is defined and
+    kc_adm_pass_secret.resources | length == 0
+  block:
+    - name: Get Keycloak primary BDD pod
+      kubernetes.core.k8s_info:
+        kind: Pod
+        label_selectors:
+          - "cnpg.io/cluster=pg-cluster-keycloak"
+          - "cnpg.io/instanceRole=primary"
+      register: kc_bdd_pod
+
+    - name: Get Keycloak admin ID from database
+      kubernetes.core.k8s_exec:
+        pod: "{{ kc_bdd_pod.resources[0].metadata.name }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        command: >
+          psql -U postgres -d keycloak --csv -c "\x" -c "select id from user_entity where username = 'admin';"
+      register: kc_admin_id
+
+    - name: Set kc_admin_id fact
+      ansible.builtin.set_fact:
+        kc_admin_id: "{{ kc_admin_id.stdout | regex_search('^id.*', multiline=True) | regex_search('id,(.+)', '\\1') | first }}"
+
+    - name: Delete Keycloak admin in database
+      kubernetes.core.k8s_exec:
+        pod: "{{ kc_bdd_pod.resources[0].metadata.name }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        command: >
+          psql -U postgres -d keycloak -c "delete from credential where user_id = '"{{ kc_admin_id }}"';"
+          -c "delete from user_role_mapping where user_id = '"{{ kc_admin_id }}"';"
+          -c "delete from user_entity where id = '"{{ kc_admin_id }}"';"
+          -c "delete from user_required_action where user_id = '"{{ kc_admin_id }}"';"
+
+    - name: Restart Keycloak pods to reset admin password
+      kubernetes.core.k8s:
+        kind: Pod
+        namespace: "{{ dsc.keycloak.namespace }}"
+        label_selectors:
+          - "app.kubernetes.io/component=keycloak"
+          - "app.kubernetes.io/instance=keycloak"
+        state: absent
+
+    - name: Wait Keycloak URL
+      ansible.builtin.uri:
+        url: https://{{ keycloak_domain }}
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        method: GET
+        status_code: [200, 202]
+        return_content: false
+      register: kc_response
+      until: kc_response is not failed
+      retries: 30
+      delay: 5
+
 - name: Add bitnami helm repo
   kubernetes.core.helm_repository:
     name: bitnami
@@ -107,21 +218,21 @@
     name: keycloak
   register: kc_adm_pass
 
-- name: Set Keycloak admin credentials facts
+- name: Set Keycloak admin name fact
   ansible.builtin.set_fact:
     keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password'] | b64decode }}"
     keycloak_admin: admin
 
 - name: Update console inventory
   kubernetes.core.k8s:
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
     namespace: "{{ dsc.console.namespace }}"
     state: patched
     definition:
       data:
-        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password }}"
-        KEYCLOAK_ADMIN: "{{ keycloak_admin }}"
+        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password | b64encode }}"
+        KEYCLOAK_ADMIN: "{{ keycloak_admin | b64encode }}"
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
@@ -137,20 +248,7 @@
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
 
-- name: Get keycloak realms from API
-  ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}/admin/realms
-    method: GET
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    status_code: [200, 202]
-    return_content: true
-    body_format: json
-    headers:
-      Authorization: bearer {{ kc_access_token }}
-  register: kc_realms
-
 - name: Create dso realm
-  when: kc_realms.json | selectattr('realm', 'equalto', 'dso') | length == 0
   community.general.keycloak_realm:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
@@ -162,6 +260,17 @@
     id: dso
     realm: dso
     display_name: Dso Realm
+    loginWithEmailAllowed: true
+    registration_email_as_username: false
+    loginTheme: dsfr
+    accountTheme: dsfr
+    adminTheme: dsfr
+    emailTheme: dsfr
+    internationalizationEnabled: true
+    supportedLocales:
+      - en
+      - fr
+    defaultLocale: fr
     password_policy: >
       length(15) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
       passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)
@@ -312,3 +421,14 @@
   with_items:
     - master
     - dso
+
+- name: Set OTP policy algorithm in dso realm
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    otp_policy_algorithm: SHA256

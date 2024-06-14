@@ -68,6 +68,11 @@
         - runner
         - gitlab-runner
 
+    - name: gitlab-ci-pipelines-exporter
+      tags:
+        - ci-pipelines-exporter
+        - gitlab-ci-pipelines-exporter
+
     - name: vault
       tags:
         - vault
@@ -91,21 +96,25 @@
     - name: grafana-operator
       tags:
         - grafana-operator
+        - grafana-stack
         - never
 
     - name: grafana
       tags:
         - grafana
+        - grafana-stack
         - never
 
     - name: grafana-datasource
       tags:
         - grafana-datasource
+        - grafana-stack
         - never
 
     - name: grafana-dashboards
       tags:
         - grafana-dashboards
+        - grafana-stack
         - never
 
   post_tasks:

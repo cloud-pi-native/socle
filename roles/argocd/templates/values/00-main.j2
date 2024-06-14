@@ -1,10 +1,3 @@
-serviceMonitor: &serviceMonitor
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: "{{ dsc.argocd.namespace }}"
-
 config:
 {% if dsc.argocd.admin.enabled %}
   secret:
@@ -32,28 +25,8 @@ config:
     admin.enabled: "false"
 redis:
   architecture: replication
-  master:
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
-  replica:
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
-{% if dsc.global.metrics.enabled %}
-  <<: *serviceMonitor
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
-{% endif %}
 controller:
   replicaCount: 3
-{% if dsc.global.metrics.enabled %}
-  <<: *serviceMonitor
-{% endif %}
 dex:
   enabled: false
 server:
@@ -88,29 +61,18 @@ server:
         - TaskRun
         - PipelineRun
   extraEnvVars: []
-{% if dsc.global.metrics.enabled %}
-  <<: *serviceMonitor
-{% endif %}
 repoServer:
   extraEnvVars: []
   replicaCount: 3
-{% if dsc.global.metrics.enabled %}
-  <<: *serviceMonitor
-{% endif %}
 applicationSet:
   enabled: false
   replicaCount: 2
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
-{% if dsc.global.metrics.enabled %}
-  <<: *serviceMonitor
-{% endif %}
 notifications:
   enabled: false
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
-{% if dsc.global.metrics.enabled %}
-  <<: *serviceMonitor
-{% endif %}
+

@@ -6,6 +6,87 @@
       metadata:
         name: "{{ dsc.harbor.namespace }}"
 
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.endpointCA.namespace is defined and
+    dsc.global.backup.cnpg.endpointCA.name is defined and
+    dsc.global.backup.cnpg.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
+        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact: 
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.harbor.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+- name: Set cnpg backup secret
+  kubernetes.core.k8s:
+    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    namespace: "{{ dsc.harbor.namespace }}"
+    kind: Secret
+    api_version: v1
+    definition:
+      data:
+        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+  when: dsc.global.backup.cnpg.enabled
+
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: pg-cluster-harbor
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
+- name: Create PostgreSQL cluster and harbor database
+  kubernetes.core.k8s:
+    template: pg-cluster-harbor.yaml.j2
+
+- name: Wait pg-cluster-harbor-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: pg-cluster-harbor-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-harbor-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: pg-cluster-harbor-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Get pg-cluster-harbor-app secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.harbor.namespace }}"
+    kind: Secret
+    name: pg-cluster-harbor-app
+  register: pg_harbor_db_secret
+
 - name: Create service account
   kubernetes.core.k8s:
     definition:
@@ -58,13 +139,23 @@
 
 - name: Update inventory
   kubernetes.core.k8s:
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
     namespace: "{{ dsc.console.namespace }}"
     state: patched
     definition:
       data:
-        HARBOR_ADMIN_PASSWORD: "{{ dsc.harbor.adminPassword }}"
+        HARBOR_ADMIN_PASSWORD: "{{ dsc.harbor.adminPassword | b64encode }}"
+
+- name: Wait harbor-core endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: harbor-core
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
 
 - name: Get harbor config
   ansible.builtin.uri:
@@ -144,6 +235,16 @@
     status_code: [200, 503]
   until: get_trivy_schedule_config.status != 503
   register: get_trivy_schedule_config
+
+- name: Wait harbor-jobservice endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.harbor.namespace }}"
+    name: harbor-jobservice
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
 
 - name: Enable daily trivy scans
   ansible.builtin.uri:

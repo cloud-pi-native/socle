@@ -128,13 +128,13 @@
 - name: Find GitLab token in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
 - name: Get GitLab token
   ansible.builtin.set_fact:
-    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"
+    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
   when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
   register: set_token_inv
 
@@ -175,13 +175,13 @@
 
     - name: Update inventory
       kubernetes.core.k8s:
-        kind: ConfigMap
+        kind: Secret
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
         state: patched
         definition:
           data:
-            GITLAB_TOKEN: "{{ gitlab_token }}"
+            GITLAB_TOKEN: "{{ gitlab_token | b64encode }}"
 
 - name: Get settings
   ansible.builtin.uri:

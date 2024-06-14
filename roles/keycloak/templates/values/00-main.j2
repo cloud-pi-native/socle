@@ -11,35 +11,22 @@ tls:
   enabled: false
 
 production: true
-
 proxy: "edge"
-
 httpRelativePath: "/"
-
 configuration: ""
-
 existingConfigmap: ""
-
 extraStartupArgs: ""
-
 initdbScriptsConfigMap: ""
-
 command: []
-
 args: []
-
 extraEnvVarsCM: ""
-
 extraEnvVarsSecret: ""
-
 replicaCount: 3
 
 containerPorts:
   http: 8080
   https: 8443
   infinispan: 7800
-
-extraContainerPorts: []
 
 podSecurityContext:
   enabled: false
@@ -214,3 +201,31 @@ cache:
 logging:
   output: "default"
   level: "INFO"
+
+extraVolumes:
+  - name: extensions
+    emptyDir: {}
+extraVolumeMounts:
+  - mountPath: /opt/bitnami/keycloak/providers
+    name: extensions
+extraEnvVars:
+  - name: DSFR_THEME_HOME_URL
+    value: https://{{ console_domain }}
+  - name: DSFR_THEME_SERVICE_TITLE
+    value: Cloud π Native
+  - name: DSFR_THEME_BRAND_TOP
+    value: "Ministère<br/>de l'intérieur<br/>et des outre-mer"
+  - name: DSFR_THEME_CONTACT_EMAIL
+    value: cloudpinative-relations@interieur.gouv.fr
+initContainers:
+  - name: realm-ext-provider
+    image: docker.io/curlimages/curl:8.8.0
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+    args:
+      - -c
+      - curl -L -f -S -o /extensions/keycloak-theme-dsfr.jar https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v1.0.3/retrocompat-keycloak-theme.jar
+    volumeMounts:
+      - name: extensions
+        mountPath: /extensions

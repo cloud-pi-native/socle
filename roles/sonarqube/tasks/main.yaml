@@ -4,6 +4,55 @@
     kind: Namespace
     name: "{{ dsc.sonarqube.namespace }}"
 
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.endpointCA.namespace is defined and
+    dsc.global.backup.cnpg.endpointCA.name is defined and
+    dsc.global.backup.cnpg.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
+        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact: 
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+- name: Set cnpg backup secret
+  kubernetes.core.k8s:
+    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    api_version: v1
+    definition:
+      data:
+        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+  when: dsc.global.backup.cnpg.enabled
+
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    name: pg-cluster-sonar
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
 - name: Create PostgreSQL cluster and sonar database
   kubernetes.core.k8s:
     template: pg-cluster-sonar.yaml.j2
@@ -128,7 +177,7 @@
 - name: Get DSO Console inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
@@ -145,17 +194,19 @@
   ansible.builtin.include_tasks:
     file: reset-admin-password.yaml
 
-- name: Set fact sonar token
-  when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is defined
-  ansible.builtin.set_fact:
-    token_pass: "{{ ansible_inventory.resources[0].data.SONAR_API_TOKEN }}"
-  no_log: true
+- name: Get Sonarqube admin password secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    name: "sonarqube"
+  register: sonarqube_pwd
 
 - name: Remove permissions for sonar-users
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
-    user: "{{ token_pass }}"
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
     force_basic_auth: true
     method: post
     status_code: 204

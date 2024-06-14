@@ -1,4 +1,11 @@
 ---
+- name: Create console Namespace
+  kubernetes.core.k8s:
+    definition:
+      kind: Namespace
+      metadata:
+        name: "{{ dsc.console.namespace }}"
+
 - name: Apply project
   kubernetes.core.k8s:
     template: project.j2
@@ -43,9 +50,65 @@
           {{ exposed_ca_pem }}
   when: dsc.exposedCA.type != 'none'
 
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.endpointCA.namespace is defined and
+    dsc.global.backup.cnpg.endpointCA.name is defined and
+    dsc.global.backup.cnpg.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
+        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact: 
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.console.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+- name: Set cnpg backup secret
+  kubernetes.core.k8s:
+    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    api_version: v1
+    definition:
+      data:
+        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+  when: dsc.global.backup.cnpg.enabled
+
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.console.namespace }}"
+    name: pg-cluster-console
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
 - name: Set path fact
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
+
+- name: Get pg-cluster-console-app secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: pg-cluster-console-app
+  register: pg_db_secret
 
 - name: Compute Console Helm values
   ansible.builtin.include_role:
@@ -58,3 +121,24 @@
 - name: Apply app
   kubernetes.core.k8s:
     template: app.yaml.j2
+
+- block: 
+    - name: Get pg-cluster-console-app secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.console.namespace }}"
+        kind: Secret
+        name: pg-cluster-console-app
+      register: pg_db_secret
+
+    - name: Compute Console Helm values
+      ansible.builtin.include_role:
+        name: combine
+      vars:
+        combine_path: "{{ path }}"
+        combine_user_values: "{{ dsc.console['values'] }}"
+        combine_dest_var: "console_values"
+
+    - name: Apply app
+      kubernetes.core.k8s:
+        template: app.yaml.j2
+  when: pg_db_secret | from_yaml | json_query('resources[0].data.uri') is undefined

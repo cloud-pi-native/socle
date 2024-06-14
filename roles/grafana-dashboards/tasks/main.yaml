@@ -17,10 +17,27 @@
       - app={{ grafana_label }}
   register: gf_instance
 
-- name: Manage missing Grafana instance.
+- name: Manage missing Grafana instance
   when: gf_instance.resources | length == 0
   ansible.builtin.fail:
-    msg: "Missing Grafana instance. Please execute 'ansible-playbook install.yaml -t grafana' before trying to install the default datasource."
+    msg: "Missing Grafana instance. Please execute 'ansible-playbook install.yaml -t grafana'."
+
+- name: Get Grafana datasource
+  kubernetes.core.k8s_info:
+    api_version: grafana.integreatly.org/v1beta1
+    namespace: "{{ dsc.grafana.namespace }}"
+    kind: GrafanaDatasource
+    name: datasource-prom-{{ grafana_label }}
+  register: gf_datasource
+
+- name: Manage missing Grafana datasource
+  when: gf_instance.resources | length == 0
+  ansible.builtin.fail:
+    msg: "Missing Grafana datasource. Please execute 'ansible-playbook install.yaml -t grafana-datasource'."
+
+- name: Get datasource UID
+  ansible.builtin.set_fact:
+    gf_datasource_uid: "{{ gf_datasource.resources[0].metadata.uid }}"
 
 - name: Create Grafana dashboards
   kubernetes.core.k8s:

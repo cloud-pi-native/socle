@@ -1,0 +1,83 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-harbor
+  namespace: {{ dsc.harbor.namespace }}
+{% if dsc.global.backup.velero.enabled %}
+  annotations:
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  registry > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/container: postgres
+    pre.hook.backup.velero.io/on-error: Fail
+    pre.hook.backup.velero.io/timeout: 90s
+{% endif %}
+spec:
+  instances: 3
+
+  # Parameters and pg_hba configuration will be append
+  # to the default ones to make the cluster work
+{% if use_private_registry %}
+  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% endif %}
+  postgresql:
+{% if use_private_registry %}
+    image: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% endif %}
+    parameters:
+      max_worker_processes: "60"
+    pg_hba:
+      # To access through TCP/IP you will need to get username
+      # and password from the secret pg-cluster-harbor-app
+      - host registry harbor all md5
+
+  bootstrap:
+    initdb:
+      database: registry
+      owner: harbor
+
+  enableSuperuserAccess: true
+
+  # Example of rolling update strategy:
+  # - unsupervised: automated update of the primary once all
+  #                 replicas have been upgraded (default)
+  # - supervised: requires manual supervision to perform
+  #               the switchover of the primary
+  primaryUpdateStrategy: unsupervised
+
+  # Require 1Gi of space per instance using default storage class
+  storage:
+    size: {{ dsc.harbor.postgresPvcSize }}
+
+  monitoring:
+    enablePodMonitor: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled %}
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}harbor"
+      endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+          key: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+          key: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.key }}"
+    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: pg-cluster-harbor
+  namespace: {{ dsc.harbor.namespace }}
+spec:
+  schedule: "{{ dsc.global.backup.cnpg.cron }}"
+  backupOwnerReference: self
+  cluster:
+    name: pg-cluster-harbor
+{% else %}
+  backup: null
+{% endif %}

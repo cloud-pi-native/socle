@@ -13,9 +13,9 @@ spec:
       enabled: false
   cloudnativepg: {}
   console:
-    dbPassword: myAwesomePassword
     values: {}
   gitlab: {}
+  gitlabCiPipelinesExporter: {}
   gitlabOperator: {}
   gitlabRunner: {}
   global:
@@ -26,8 +26,7 @@ spec:
       .example.com
     metrics:
       enabled: false
-    backup:
-      type: velero
+    backup: {}
   grafana: {}
   grafanaDatasource: {}
   grafanaOperator: {}
@@ -39,6 +38,7 @@ spec:
       type: none
   kubed: {}
   keycloak: {}
+  kyverno: {}
   nexus:
     storageSize: 25Gi
     proxyCacheSize: 25Gi

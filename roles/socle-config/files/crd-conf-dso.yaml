@@ -162,9 +162,6 @@ spec:
                 console:
                   description: Configuration for the console.
                   properties:
-                    dbPassword:
-                      description: The password for the console's database.
-                      type: string
                     namespace:
                       description: The namespace for console.
                       type: string
@@ -179,8 +176,10 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - dbPassword
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
+                      type: string
+                      default: 10Gi
                   type: object
                 gitlab:
                   description: Configuration for GitLab.
@@ -235,6 +234,17 @@ spec:
                         required:
                           - name
                           - value
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
+                      type: string
+                      default: 10Gi
+                  type: object
+                gitlabCiPipelinesExporter:
+                  description: Configuration for GitLab CI Pipelines Exporter.
+                  properties:
+                    chartVersion:
+                      description: GitLab CI Pipelines Exporter chart version (e.g., "0.3.4").
+                      type: string
                   type: object
                 gitlabOperator:
                   description: Configuration for GitLab Operator.
@@ -293,14 +303,80 @@ spec:
                     backup:
                       description: Configuration for backup feature.
                       properties:
-                        type:
-                          default: none
-                          description: Specifies the backup type used for databases.
-                          enum:
-                            - none
-                            - velero
-                          type: string
+                        velero:
+                          properties:
+                            enabled:
+                              description: Enable Velero backups.
+                              default: false
+                              type: boolean
+                          type: object
+                        cnpg:
+                          properties:
+                            enabled:
+                              description: Enable s3 cnpg backups.
+                              default: false
+                              type: boolean
+                            endpointURL:
+                              description: Defines the s3 endpoint for cnpg backups.
+                              type: string
+                            endpointCA:
+                              properties:
+                                namespace:
+                                  description: Defines in which namespace is located the secret containing CA bundle for cnpg backups (it will be copy into each namespace that use cnpg).
+                                  type: string
+                                name:
+                                  description: Defines the secret name containing s3 CA for cnpg backups.
+                                  type: string
+                                key:
+                                  description: Defines the secret key containing s3 CA for cnpg backups.
+                                  type: string
+                              type: object
+                            destinationPath:
+                              description: Defines the globally shared s3 destination path for cnpg backups (it should be set like `<bucket_name>/<optional_dir>/` with the trailing slash).
+                              type: string
+                              default: ""
+                            s3Credentials:
+                              properties:
+                                name:
+                                  description: Defines the s3 kuebernetes secret name used for cnpg backups.
+                                  type: string
+                                accessKeyId:
+                                  properties:
+                                    key:
+                                      description: Defines the s3 accessKeyId kubernetes secret key used for cnpg backups.
+                                      type: string
+                                    value:
+                                      description: Defines the s3 accessKeyId value used for cnpg backups.
+                                      type: string
+                                  type: object
+                                secretAccessKey:
+                                  properties:
+                                    key:
+                                      description: Defines the s3 secretAccessKey kubernetes secret key used for cnpg backups.
+                                      type: string
+                                    value:
+                                      description: Defines the s3 secretAccessKey value used for cnpg backups.
+                                      type: string
+                                  type: object
+                              type: object
+                            cron:
+                              description: Defines the cron rule used for cnpg backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for cnpg backups recurrences.
+                              type: string
+                              default: "30d"
+                          type: object
                       type: object
+                    platform:
+                      default: openshift
+                      description: Cluster platform only openshift and kubernetesVanilla
+                        are supported (for now).
+                      enum:
+                        - openshift
+                        - kubernetesVanilla
+                      type: string
                     registry:
                       description: Specifies the internal registry to use.
                       type: string
@@ -309,6 +385,7 @@ spec:
                     - rootDomain
                     - environment
                     - metrics
+                    - platform
                   type: object
                 grafana:
                   description: Configuration for Grafana instance.
@@ -382,8 +459,13 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
+                      type: string
+                      default: 10Gi
                   required:
                     - adminPassword
+                    - pvcRegistrySize
                   type: object
                 ingress:
                   description: General configuration for ingress.
@@ -488,6 +570,7 @@ spec:
                     postgresPvcSize:
                       description: Size for postgres' pvc
                       type: string
+                      default: 10Gi
                     values:
                       description: |
                         You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values.j2
@@ -583,6 +666,7 @@ spec:
                     postgresPvcSize:
                       description: Size for postgres' pvc
                       type: string
+                      default: 10Gi
                     values:
                       description: |
                         You can merge customs values for sonarqube, it will be merged with roles/sonarqube/tasks/main.yaml
@@ -622,6 +706,7 @@ spec:
                 - console
                 - exposedCA
                 - gitlab
+                - gitlabCiPipelinesExporter
                 - gitlabOperator
                 - gitlabRunner
                 - global

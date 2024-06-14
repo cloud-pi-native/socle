@@ -43,17 +43,17 @@
 - name: Find nexus admin password in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
 - name: Cache admin password
   ansible.builtin.set_fact:
-    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
+    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
   register: set_nx_pass
   when: ansible_inventory.resources | length > 0 and ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined
 
-- name: Find password in container
+- name: Change Nexus password
   when: set_nx_pass.skipped is defined and set_nx_pass.skipped
   block:
     - name: Wait nexus to initialize
@@ -77,19 +77,37 @@
       ansible.builtin.set_fact:
         nx_pod: "{{ nx_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
 
-    - name: Récupération du compte admin
+    - name: Set default_pass fact
+      ansible.builtin.set_fact:
+        default_pass: "\\\\\\$shiro1\\\\\\$SHA-512\\\\\\$1024\\\\\\$NE+wqQq/TmjZMvfI7ENh/g==\\\\\\$V4yPw8T64UQ6GfJfxYq2hLsVrBY8D1v+bktfOxGdt4b/9BthpWPNUy/CBk6V9iA0nHpzYzJFWO8v/tZFtES8CA=="
+
+    - name: Temporarily reset admin password to admin123
       kubernetes.core.k8s_exec:
         pod: "{{ nx_pod }}"
         namespace: "{{ dsc.nexus.namespace }}"
-        command: cat /nexus-data/admin.password
-      register: admin_account
-      until: admin_account.stdout is defined and admin_account.stdout
-      retries: 15
-      delay: 12
+        command: |
+          sh -c "cd /nexus-data ; \
+          java -jar $NEXUS_HOME/lib/support/nexus-orient-console.jar \
+          connect plocal:./db/security admin admin \; update user SET password=\\\""{{ default_pass }}"\\\" UPSERT WHERE id=\\\"admin\\\" \;"
 
-    - name: Set nexus password from cat
-      ansible.builtin.set_fact:
-        nexus_admin_password: "{{ admin_account.stdout }}"
+    - name: Restart Nexus pod
+      kubernetes.core.k8s:
+        kind: Pod
+        namespace: "{{ dsc.nexus.namespace }}"
+        name: "{{ nx_pod }}"
+        state: absent
+
+    - name: Wait Nexus URL
+      ansible.builtin.uri:
+        url: https://{{ nexus_domain }}
+        method: GET
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        status_code: [200, 202]
+        return_content: false
+      register: nexus_response
+      until: nexus_response is not failed
+      retries: 60
+      delay: 5
 
     - name: Generate random password
       ansible.builtin.set_fact:
@@ -102,7 +120,7 @@
         url: https://{{ nexus_domain }}/service/rest/v1/security/users/admin/change-password
         method: PUT
         user: admin
-        password: "{{ nexus_admin_password }}"
+        password: admin123
         body: "{{ new_pass }}"
         body_format: raw
         headers:
@@ -115,24 +133,42 @@
 
     - name: Update inventory
       kubernetes.core.k8s:
-        kind: ConfigMap
+        kind: Secret
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
         state: patched
         definition:
           data:
-            NEXUS_ADMIN_PASSWORD: "{{ new_pass }}"
+            NEXUS_ADMIN_PASSWORD: "{{ new_pass | b64encode }}"
+
+    - name: Get admin-creds secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.nexus.namespace }}"
+        kind: Secret
+        name: admin-creds
+      register: admin_creds_secret
+
+    - name: Update admin-creds secret
+      when: admin_creds_secret.resources[0] is defined
+      kubernetes.core.k8s:
+        kind: Secret
+        name: admin-creds
+        namespace: "{{ dsc.nexus.namespace }}"
+        state: patched
+        definition:
+          data:
+            password: "{{ new_pass | b64encode }}"
 
 - name: Get inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
-    kind: ConfigMap
+    kind: Secret
     name: dso-config
   register: ansible_inventory
 
 - name: Retrieve admin password from inventory
   ansible.builtin.set_fact:
-    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
+    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
   register: get_nx_pass
 
 - name: Enable Anonymous access
@@ -369,8 +405,8 @@
           kind: Secret
           apiVersion: v1
           data:
-            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN | b64encode }}"
-            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64encode }}"
+            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN }}"
+            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
           metadata:
             labels:
               app: nexus

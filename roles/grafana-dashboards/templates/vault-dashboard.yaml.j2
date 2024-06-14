@@ -8,6 +8,7 @@ spec:
     - inputName: "DS_PROMXY"
       datasourceName: "Prometheus"
   resyncPeriod: 30s
+  allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
       app: {{ grafana_label }}
@@ -20,7 +21,7 @@ spec:
             "builtIn": 1,
             "datasource": {
               "type": "prometheus",
-              "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "enable": true,
             "hide": true,
@@ -35,14 +36,14 @@ spec:
       "fiscalYearStartMonth": 0,
       "gnetId": 12904,
       "graphTooltip": 1,
-      "id": 63,
+      "id": 26,
       "links": [],
       "liveNow": false,
       "panels": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -103,7 +104,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "up{job=\"conf-dso-vault-internal\"}",
               "format": "time_series",
@@ -118,11 +119,12 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
               "custom": {
+                "align": "auto",
                 "cellOptions": {
                   "type": "auto"
                 },
@@ -189,7 +191,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg without(instance) (vault_secret_kv_count)",
               "format": "table",
@@ -232,7 +234,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -275,7 +277,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(vault_identity_num_entities)",
               "interval": "",
@@ -287,58 +289,37 @@ spec:
           "type": "stat"
         },
         {
-          "aliasColors": {},
-          "breakPoint": "50%",
-          "combine": {
-            "label": "Others",
-            "threshold": 0
-          },
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                }
-              },
-              "mappings": []
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
             },
             "overrides": []
           },
-          "fontSize": "80%",
-          "format": "short",
           "gridPos": {
-            "h": 8,
+            "h": 4,
             "w": 5,
             "x": 19,
             "y": 0
           },
-          "id": 49,
-          "legend": {
-            "header": "count",
-            "percentage": false,
-            "show": true,
-            "values": true
-          },
-          "legendType": "Right side",
-          "links": [],
-          "maxDataPoints": 1,
-          "nullPointMode": "connected",
+          "id": 105,
           "options": {
-            "legend": {
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "pieType": "pie",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
             "reduceOptions": {
               "calcs": [
                 "lastNotNull"
@@ -346,35 +327,30 @@ spec:
               "fields": "",
               "values": false
             },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
+            "textMode": "auto"
           },
-          "pieType": "pie",
-          "pluginVersion": "7.0.3",
-          "strokeWidth": "3",
+          "pluginVersion": "9.5.5",
           "targets": [
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
-              "expr": "avg without(instance) (vault_identity_entity_alias_count)",
-              "format": "time_series",
+              "editorMode": "code",
+              "expr": "avg(vault_secret_kv_count)",
               "interval": "",
-              "legendFormat": "{{ auth_method }}",
+              "legendFormat": "",
+              "range": true,
               "refId": "A"
             }
           ],
-          "title": "Identity Entities Aliases by Method",
-          "type": "piechart",
-          "valueName": "current"
+          "title": "Number of Secrets",
+          "type": "stat"
         },
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -438,7 +414,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "max(1 + vault_core_unsealed{})",
               "format": "time_series",
@@ -453,7 +429,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -508,7 +484,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(vault_expire_num_leases)",
               "interval": "",
@@ -523,7 +499,7 @@ spec:
           "collapsed": true,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -540,7 +516,7 @@ spec:
               "dashes": false,
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "decimals": 0,
               "fieldConfig": {
@@ -555,7 +531,7 @@ spec:
                 "h": 9,
                 "w": 12,
                 "x": 0,
-                "y": 9
+                "y": 17
               },
               "hiddenSeries": false,
               "id": 24,
@@ -591,9 +567,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_create_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_create_forge_dso__count[5m]))",
                   "format": "time_series",
                   "hide": false,
                   "interval": "5m",
@@ -603,9 +579,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_delete_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_delete_forge_dso__count[5m]))",
                   "hide": false,
                   "interval": "5m",
                   "legendFormat": "Delete",
@@ -614,9 +590,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_read_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_read_forge_dso__count[5m]))",
                   "format": "time_series",
                   "hide": false,
                   "instant": false,
@@ -628,9 +604,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_list_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_list_forge_dso__count[5m]))",
                   "format": "time_series",
                   "hide": false,
                   "interval": "5m",
@@ -640,9 +616,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(increase(vault_route_rollback_${mountpoint}__count[5m]))",
+                  "expr": "avg(increase(vault_route_rollback_forge_dso__count[5m]))",
                   "hide": true,
                   "interval": "5m",
                   "legendFormat": "Rollback",
@@ -690,7 +666,7 @@ spec:
               "dashes": false,
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "decimals": 0,
               "fieldConfig": {
@@ -705,7 +681,7 @@ spec:
                 "h": 9,
                 "w": 12,
                 "x": 12,
-                "y": 9
+                "y": 17
               },
               "hiddenSeries": false,
               "id": 35,
@@ -741,9 +717,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_create_${mountpoint}__sum[1m]) / rate(vault_route_create_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_create_forge_dso__sum[1m]) / rate(vault_route_create_forge_dso__count[1m]) * 1000)",
                   "format": "time_series",
                   "interval": "",
                   "intervalFactor": 1,
@@ -753,9 +729,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_delete_${mountpoint}__sum[1m]) / rate(vault_route_delete_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_delete_forge_dso__sum[1m]) / rate(vault_route_delete_forge_dso__count[1m]) * 1000)",
                   "interval": "",
                   "legendFormat": "Delete",
                   "refId": "B"
@@ -763,9 +739,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_read_${mountpoint}__sum[1m]) / rate(vault_route_read_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_read_forge_dso__sum[1m]) / rate(vault_route_read_forge_dso__count[1m]) * 1000)",
                   "hide": false,
                   "interval": "",
                   "legendFormat": "Read",
@@ -774,9 +750,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_list_${mountpoint}__sum[1m]) / rate(vault_route_list_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_list_forge_dso__sum[1m]) / rate(vault_route_list_forge_dso__count[1m]) * 1000)",
                   "hide": false,
                   "interval": "",
                   "legendFormat": "List",
@@ -785,9 +761,9 @@ spec:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                    "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
                   },
-                  "expr": "avg(rate(vault_route_rollback_${mountpoint}__sum[1m]) / rate(vault_route_rollback_${mountpoint}__count[1m]) * 1000)",
+                  "expr": "avg(rate(vault_route_rollback_forge_dso__sum[1m]) / rate(vault_route_rollback_forge_dso__count[1m]) * 1000)",
                   "hide": true,
                   "interval": "",
                   "legendFormat": "Rollback",
@@ -835,7 +811,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -847,7 +823,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -861,7 +837,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -872,7 +848,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "",
           "fieldConfig": {
@@ -921,7 +897,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(vault_runtime_heap_objects{} / vault_runtime_malloc_count{})",
               "interval": "",
@@ -936,7 +912,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -992,7 +968,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(vault_runtime_num_goroutines{})",
               "interval": "",
@@ -1010,7 +986,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 3,
           "fieldConfig": {
@@ -1061,7 +1037,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(vault_runtime_alloc_bytes{})",
               "interval": "",
@@ -1106,7 +1082,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1120,7 +1096,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1131,7 +1107,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1175,7 +1151,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(vault_token_count)",
               "interval": "",
@@ -1193,7 +1169,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 0,
           "fieldConfig": {
@@ -1242,7 +1218,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg without(instance) (vault_token_count_by_policy)",
               "interval": "",
@@ -1287,7 +1263,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -1347,7 +1323,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(vault_token_create_count - vault_token_store_count)",
               "format": "time_series",
@@ -1367,7 +1343,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 0,
           "fieldConfig": {
@@ -1416,7 +1392,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg without(instance) (vault_token_count_by_ttl)",
               "format": "time_series",
@@ -1466,7 +1442,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 0,
           "fieldConfig": {
@@ -1515,7 +1491,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg without(instance) (vault_token_count_by_auth)",
               "interval": "",
@@ -1564,7 +1540,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 0,
           "fieldConfig": {
@@ -1614,7 +1590,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg by(auth_method, creation_ttl) (vault_token_creation)",
               "format": "time_series",
@@ -1668,7 +1644,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 0,
           "fieldConfig": {
@@ -1716,7 +1692,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg without(instance) (vault_token_create_count)",
               "format": "time_series",
@@ -1729,7 +1705,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg without(instance) (vault_token_store_count)",
               "format": "time_series",
@@ -1783,7 +1759,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 3,
           "fieldConfig": {
@@ -1834,7 +1810,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(irate(vault_token_lookup_count[1m]))",
               "hide": false,
@@ -1882,7 +1858,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -1896,7 +1872,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -1907,7 +1883,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "",
           "fieldConfig": {
@@ -1956,7 +1932,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "max(idelta(vault_audit_log_request_failure[1m]))",
               "format": "time_series",
@@ -1975,7 +1951,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "decimals": 3,
           "fieldConfig": {
@@ -2027,7 +2003,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(irate(vault_audit_log_request_count[1m]))",
               "format": "time_series",
@@ -2040,7 +2016,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(irate(vault_audit_log_response_count[1m]))",
               "format": "time_series",
@@ -2054,7 +2030,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(irate(vault_core_handle_request_count[1m]))",
               "format": "time_series",
@@ -2101,135 +2077,9 @@ spec:
           }
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "links": []
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 10,
-            "w": 10,
-            "x": 14,
-            "y": 45
-          },
-          "hiddenSeries": false,
-          "id": 61,
-          "legend": {
-            "alignAsTable": true,
-            "avg": true,
-            "current": true,
-            "max": true,
-            "min": true,
-            "show": true,
-            "total": false,
-            "values": true
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null as zero",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "9.5.5",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
-              },
-              "expr": "avg(irate(vault_consul_get_count[1m]))",
-              "interval": "",
-              "intervalFactor": 1,
-              "legendFormat": "GET",
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
-              },
-              "expr": "avg(irate(vault_consul_put_count[1m]))",
-              "interval": "",
-              "legendFormat": "PUT",
-              "refId": "B"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
-              },
-              "expr": "avg(irate(vault_consul_delete_count[1m]))",
-              "interval": "",
-              "legendFormat": "DELETE",
-              "refId": "C"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
-              },
-              "expr": "irate(vault_consul_list_count{instance=\"$node:$port\"}[1m])",
-              "interval": "",
-              "legendFormat": "LIST",
-              "refId": "D"
-            }
-          ],
-          "thresholds": [],
-          "timeRegions": [],
-          "title": "Consul Requests",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "$$hashKey": "object:949",
-              "format": "short",
-              "label": "Requests per second",
-              "logBase": 1,
-              "show": true
-            },
-            {
-              "$$hashKey": "object:950",
-              "format": "short",
-              "logBase": 1,
-              "show": false
-            }
-          ],
-          "yaxis": {
-            "align": false
-          }
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "description": "",
           "fieldConfig": {
@@ -2278,7 +2128,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "max(idelta(vault_audit_log_response_failure[1m]))",
               "format": "time_series",
@@ -2294,7 +2144,7 @@ spec:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "gridPos": {
             "h": 1,
@@ -2308,7 +2158,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "refId": "A"
             }
@@ -2325,7 +2175,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2373,7 +2223,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(irate(vault_policy_get_policy_count[1m]))",
               "format": "time_series",
@@ -2425,7 +2275,7 @@ spec:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+            "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
           },
           "fieldConfig": {
             "defaults": {
@@ -2472,7 +2322,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+                "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
               },
               "expr": "avg(irate(vault_policy_get_policy_count[1m]))",
               "format": "time_series",
@@ -2534,7 +2384,7 @@ spec:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "label_values(up{job=\"vault\"}, instance)",
             "hide": 2,
@@ -2562,7 +2412,7 @@ spec:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "label_values(up{job=\"vault\",instance=~\"$node:(.*)\"}, instance)",
             "hide": 2,
@@ -2589,7 +2439,7 @@ spec:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "46d8bc08-1055-4f82-ba21-8f9a47999480"
+              "uid": "{% endraw %}{{ gf_datasource_uid }}{% raw %}"
             },
             "definition": "label_values(vault_secret_kv_count, mount_point)",
             "hide": 0,
@@ -2639,9 +2489,9 @@ spec:
         ]
       },
       "timezone": "",
-      "title": "Hashicorp Vault",
-      "uid": "vaults",
-      "version": 1,
+      "title": "Vault",
+      "uid": "dso-vault",
+      "version": 4,
       "weekStart": ""
     }
 {% endraw %}

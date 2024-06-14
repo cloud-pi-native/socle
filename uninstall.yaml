@@ -229,7 +229,7 @@
 
     - name: "Suppression de l'ancien mot de passe Nexus"
       kubernetes.core.k8s:
-        kind: ConfigMap
+        kind: Secret
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
         state: patched
@@ -422,6 +422,28 @@
         release_namespace: "{{ dsc.grafanaOperator.namespace }}"
         release_state: absent
         wait: true
+      tags:
+        - never
+        - grafana-operator
+
+    - name: "Suppression du ClusterRole de Grafana Operator"
+      kubernetes.core.k8s:
+        api_version: rbac.authorization.k8s.io/v1
+        state: absent
+        kind: ClusterRole
+        label_selectors:
+          - "app.kubernetes.io/name=grafana-operator"
+      tags:
+        - never
+        - grafana-operator
+
+    - name: "Suppression du ClusterRoleBinding de Grafana Operator"
+      kubernetes.core.k8s:
+        api_version: rbac.authorization.k8s.io/v1
+        state: absent
+        kind: ClusterRoleBinding
+        label_selectors:
+          - "app.kubernetes.io/name=grafana-operator"
       tags:
         - never
         - grafana-operator

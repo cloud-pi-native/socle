@@ -23,7 +23,6 @@ spec:
     - /ArgoCDAdmins
     name: admin-RO
     policies:
-    - p, proj:console-pi-native:admin, applications, get, console-pi-native/*, allow
     - p, proj:console-pi-native:admin-RO, applications, get, console-pi-native/*, allow
   - description: admin-RW
     groups:
@@ -33,7 +32,6 @@ spec:
     - /ArgoCDAdmins
     name: admin-RW
     policies:
-    - p, proj:console-pi-native:admin, applications, *, console-pi-native/*, *
-    - p, proj:console-pi-native:admin-RW, applications, *, console-pi-native/*, *
+    - p, proj:console-pi-native:admin-RW, applications, *, console-pi-native/*, allow
   sourceRepos:
-  - https://github.com/cloud-pi-native/console.git
+  - https://cloud-pi-native.github.io/helm-charts

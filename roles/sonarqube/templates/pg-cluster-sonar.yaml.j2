@@ -3,7 +3,7 @@ kind: Cluster
 metadata:
   name: pg-cluster-sonar
   namespace: {{ dsc.sonarqube.namespace }}
-{% if dsc.global.backup.type == 'velero' %}
+{% if dsc.global.backup.velero.enabled %}
   annotations:
     pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  sonardb > /var/lib/postgresql/data/app.dump-${index}"]'
     pre.hook.backup.velero.io/container: postgres
@@ -47,3 +47,37 @@ spec:
   storage:
     size: {{ dsc.sonarqube.postgresPvcSize }}
 
+  monitoring:
+    enablePodMonitor: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled %}
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}sonar"
+      endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+          key: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+          key: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.key }}"
+    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: pg-cluster-sonar
+  namespace: {{ dsc.sonarqube.namespace }}
+spec:
+  schedule: "{{ dsc.global.backup.cnpg.cron }}"
+  backupOwnerReference: self
+  cluster:
+    name: pg-cluster-sonar
+{% else %}
+  backup: null
+{% endif %}

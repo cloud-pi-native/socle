@@ -1,5 +1,75 @@
 # Changelog
 
+## [2.6.0](https://github.com/cloud-pi-native/socle/compare/v2.5.0...v2.6.0) (2024-06-14)
+
+
+### Features
+
+* :sparkles: add dsc.global.platform (Vanilla) ([682512f](https://github.com/cloud-pi-native/socle/commit/682512f3af1f97e58d4b9f376884857b89425b5c))
+* :sparkles: Add gitlab-ci-pipelines-exporter ([9c47614](https://github.com/cloud-pi-native/socle/commit/9c476141cfe62aa4570bc8daa01076be866fbd61))
+* :sparkles: Add keycloak binding, dashboards + refactor ([f447b31](https://github.com/cloud-pi-native/socle/commit/f447b31d39a0b93f157ff57c81511b7890098047))
+* :sparkles: Add Keycloak CNPG PodMonitor ([f582691](https://github.com/cloud-pi-native/socle/commit/f582691871396065ec19f4b51f217dc95f24a3ac))
+* :sparkles: Add PodMonitor for remaining CNPG clusters ([d8ba40f](https://github.com/cloud-pi-native/socle/commit/d8ba40f8fd7a7af98cc617ff07cbebeef86afae1))
+* :sparkles: Declare CNPG Dashboard ([76350c2](https://github.com/cloud-pi-native/socle/commit/76350c23e125e437fd0a45d8f3a69372196b7ce8))
+* :sparkles: enable keycloak dsfr theme ([445b819](https://github.com/cloud-pi-native/socle/commit/445b819ad1be5addc93e1e961a471048f2cba3ef))
+* :sparkles: Reset Keycloak admin when keycloak secret disapeared ([42bd6cc](https://github.com/cloud-pi-native/socle/commit/42bd6cce27d0821c9e47c735193a4d66ee191b46))
+* :sparkles: Set OTP encryption algorithm ([da9c416](https://github.com/cloud-pi-native/socle/commit/da9c416738b906ea556befe3a6b410dc480eb117))
+* :sparkles: use cnpg clusters for all services ([400f429](https://github.com/cloud-pi-native/socle/commit/400f429a82a260bca193a1423942988e39b599bf))
+* :sparkles: use console chart instead of embed helm in console repo ([64620a2](https://github.com/cloud-pi-native/socle/commit/64620a2d5012e4cb31ab334b47a5286c63a2dd07))
+* :technologist: enable oidc connection for admins ([df339a9](https://github.com/cloud-pi-native/socle/commit/df339a9018da3e394cad426c43f73e4994fb5426))
+* :zap: Improve Grafana stack install and uninstall ([406c202](https://github.com/cloud-pi-native/socle/commit/406c202bcd6bbbddf406a3a59c5f1dc0b66f4d89))
+* :zap: We might need allowCrossNamespaceImport ([ece35a0](https://github.com/cloud-pi-native/socle/commit/ece35a022fb43bbd5baa4dbfe188543fd1bc393e))
+
+
+### Bug Fixes
+
+* :ambulance: Add trailing slash to URLs ([6f6beaf](https://github.com/cloud-pi-native/socle/commit/6f6beaf899772e5c4b70c5a9511088415d3416a4))
+* :ambulance: Fix dso-config secret ([c6ce806](https://github.com/cloud-pi-native/socle/commit/c6ce806dd78aafc6cc046745c40f42e313da61d2))
+* :ambulance: Fix GitLab CI Pipelines Exporter role (token retrieval) ([7949c3e](https://github.com/cloud-pi-native/socle/commit/7949c3e4af1fcf9d7d02f975f15476057bc6c193))
+* :ambulance: Removing YAML anchors generating Ansible errors ([5b6d23c](https://github.com/cloud-pi-native/socle/commit/5b6d23c6da339225e4b0c13bb0a0fe041e06f666))
+* :art: Fix Argo CD Dashboard ([fcba600](https://github.com/cloud-pi-native/socle/commit/fcba600684511cf0d0b9041a99a82918d1ca4248))
+* :art: Fix Keycloak and SonarQube dashboards ([588f986](https://github.com/cloud-pi-native/socle/commit/588f98663eb9f242855762e9f058be12cd042385))
+* :art: Fix Nexus dashboard ([6126c2b](https://github.com/cloud-pi-native/socle/commit/6126c2b680671c354c40b8a39d5c031b1c2fc706))
+* :art: Fix Vault dashboard ([ea42530](https://github.com/cloud-pi-native/socle/commit/ea425301e9c27af9d737fb2503c6054048350acf))
+* :art: Manage datasource UID ([47c8451](https://github.com/cloud-pi-native/socle/commit/47c84517b3122ea23914ab7d088b97705ecbf439))
+* :art: use native console cnpg cluster ([2f74868](https://github.com/cloud-pi-native/socle/commit/2f74868410ec24786b34634df6b7e5f87d033b36))
+* :bug: Adapt join command for Vault node 3 ([41aa2c1](https://github.com/cloud-pi-native/socle/commit/41aa2c1aeb787e34df8b2769b88786260b9f4b0f))
+* :bug: Add conditions to prevent some tasks from failing ([ca79f57](https://github.com/cloud-pi-native/socle/commit/ca79f57db7e9bd1094ae91bd0933045a2a31e325))
+* :bug: Add missing postgres delete command ([78bce70](https://github.com/cloud-pi-native/socle/commit/78bce7069c99992043be987c80c99554abbbbe31))
+* :bug: add wait endpoints tasks ([8f371ab](https://github.com/cloud-pi-native/socle/commit/8f371ab0a213d83ed2724f6e4bdf4a066e2deac9))
+* :bug: cnpg backups management ([5bece28](https://github.com/cloud-pi-native/socle/commit/5bece2888e149df35e264ca74c38941c80a680c0))
+* :bug: console deployment related tasks and templates ([742f2ab](https://github.com/cloud-pi-native/socle/commit/742f2ab67a1f94fc60f3be43c6edff4b542b3d07))
+* :bug: Fix Argo CD job name ([4a4f6bf](https://github.com/cloud-pi-native/socle/commit/4a4f6bf37a5f0d4b28cfd11dbef68a0c493c804e))
+* :bug: Fix CNPG Dashboard namespace selector ([3261b76](https://github.com/cloud-pi-native/socle/commit/3261b76f602d7331f4c61ce268cbd58349c1cef1))
+* :bug: Fix conf kind + decoding values ([8504b71](https://github.com/cloud-pi-native/socle/commit/8504b710e664cfed628a7a041f3af2a458de95ca))
+* :bug: Fix GitLab Runner and Gitaly dashboards ([960e98f](https://github.com/cloud-pi-native/socle/commit/960e98f5d8382f964a3b5dab1b24c835ea222e4a))
+* :bug: Fix HA enablement + OIDC + get credentials ([76a8aa1](https://github.com/cloud-pi-native/socle/commit/76a8aa1ac70b5aeb143ced437f28211100e81a23))
+* :bug: Fix Harbor dashboard ([95e317f](https://github.com/cloud-pi-native/socle/commit/95e317ff2f13192222ab259cf45e72f2e67f5895))
+* :bug: Fix missing admin-creds secret update ([5724454](https://github.com/cloud-pi-native/socle/commit/57244541f1053f8025a18690eb2d383cebd8dec1))
+* :bug: Fix Nexus admin password setting tasks ([b5707f3](https://github.com/cloud-pi-native/socle/commit/b5707f376ce900a0ab88b8367edd431d26b42dcb))
+* :bug: Fix some tasks ([9d5bcf8](https://github.com/cloud-pi-native/socle/commit/9d5bcf8d7364b0c72514841bc66810d086213ba8))
+* :bug: Fix Vault metric call ([76ded42](https://github.com/cloud-pi-native/socle/commit/76ded42c2cd5e8a3dfa4d532c12691781a3a76c2))
+* :bug: get-credentials playbook ([7d91efd](https://github.com/cloud-pi-native/socle/commit/7d91efd74504d11c0bda1b2a10f2750ccdd4284f))
+* :bug: gitlab catalog shell script ([e598083](https://github.com/cloud-pi-native/socle/commit/e5980838c6e5b48d332364b76ecc21145c10aafc))
+* :bug: handle cnpg backups deactivation ([5563dd9](https://github.com/cloud-pi-native/socle/commit/5563dd94f8d78a58c1f4d22e96d3e9a94ba9d15d))
+* :bug: missing pg secret on first console deployment ([dd101d8](https://github.com/cloud-pi-native/socle/commit/dd101d8abbe1007593edf766391c70cdaca06169))
+* :bug: Refactor check tasks and fix root_token ([8bcc42a](https://github.com/cloud-pi-native/socle/commit/8bcc42aa25208d9b3d08462585522832a34e571e))
+* :bug: Remove unneeded time range ([a0a2a17](https://github.com/cloud-pi-native/socle/commit/a0a2a17f6b94bd643e6ee5574b334374b8e48bba))
+* :bug: Upgrade Argo CD to fix servicemonitor deployment ([2d2f417](https://github.com/cloud-pi-native/socle/commit/2d2f41780ca5c1c3014b4382c16a397664a754ce))
+* :bug: vault oidc group mapping need full group path ([292d6eb](https://github.com/cloud-pi-native/socle/commit/292d6eb012c51ff81207bfc6bdc56addd1f7212d))
+* :memo: Corrections de typos et reformulations ([477b6ad](https://github.com/cloud-pi-native/socle/commit/477b6ad614700d694943fbb4e7fc535840b4efe8))
+* :zap: Update retries count ([85602eb](https://github.com/cloud-pi-native/socle/commit/85602eb75ece9d581ccdf70420f42c17bc66ae1c))
+
+
+### Performance Improvements
+
+* :zap: enable vault ha ([d90ee55](https://github.com/cloud-pi-native/socle/commit/d90ee559884b8eff9ef91075c4d00c42b4b79e74))
+
+
+### Reverts
+
+* :fire: Reverting commit 2d2f417 ([7ffefc7](https://github.com/cloud-pi-native/socle/commit/7ffefc75ae8000dcea0c963c29c60ae657866992))
+
 ## [2.5.0](https://github.com/cloud-pi-native/socle/compare/v2.4.0...v2.5.0) (2024-05-03)
 
 

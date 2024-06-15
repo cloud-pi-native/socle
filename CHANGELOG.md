@@ -20,6 +20,141 @@
 * :zap: Improve Grafana stack install and uninstall ([406c202](https://github.com/cloud-pi-native/socle/commit/406c202bcd6bbbddf406a3a59c5f1dc0b66f4d89))
 * :zap: We might need allowCrossNamespaceImport ([ece35a0](https://github.com/cloud-pi-native/socle/commit/ece35a022fb43bbd5baa4dbfe188543fd1bc393e))
 
+:warning: This new version includes several migrations described in the following sections :warning:
+
+#### Databases
+
+Harbor and Console databases have been migrated to CNPG clusters, to perform the migration, follow the steps bellow :
+
+1. Scale down deployments
+2. Backup database
+3. Deploy CNPG cluster
+4. Restore database
+5. Scale up deployments
+
+To change Harbor database permission from the old user `registry` to the new one `harbor`, connect to the primary instance of the fresh CNPG cluster and run the following command :
+
+```sh
+for tbl in `psql -U postgres -qAt -c "select tablename from pg_tables where schemaname = 'public';" registry`; do
+  psql -U postgres -c "alter table \"$tbl\" owner to harbor" registry
+done
+
+for tbl in `psql -U postgres -qAt -c "select sequence_name from information_schema.sequences where sequence_schema = 'public';" registry`; do  
+  psql -U postgres -c "alter sequence \"$tbl\" owner to harbor" registry
+done
+
+for tbl in `psql  -U postgres -qAt -c "select table_name from information_schema.views where table_schema = 'public';" registry`; do  
+  psql -U postgres -c "alter view \"$tbl\" owner to harbor" registry
+done
+```
+
+For more informations, see. https://stackoverflow.com/questions/1348126/postgresql-modify-owner-on-all-tables-simultaneously-in-postgresql
+
+#### Vault
+
+The vault server is now running in HA, which involves migrating to the raft storage backend by following the steps below :
+
+1. Retrieve the credentials for our standalone Vault instance, e.g. :
+    ```bash
+    ansible-playbook admin-tools/get-credentials.yaml -t vault
+    ```
+
+2. Connect to Vault and create a test secret if necessary, or check the secrets already present.
+
+3. Launch Vault HA installation via Vault's Ansible role :
+    ```bash
+    ansible-playbook install.yaml -t vault
+    ```
+
+    The installation will create two new pods which will act as standby instances, but **it will fail to add them to the raft cluster**. This is normal, as the active instance does not yet have raft storage.
+
+4. Open a shell in the vault container on the active Vault pod (vault-0), example in the context of a Vault configured via the conf-dso dsc :
+    ```bash
+    kubectl -n dso-vault exec -it -c vault conf-dso-vault-0 -- sh
+    ```
+
+    The `vi` command is available in the pod. Use it to create a migration configuration file in the `/home/vault` directory, which is writable :
+    ```bash
+    vi /home/vault/migrate.hcl
+    ```
+
+    With the following contents:
+    ```bash
+    storage_source "file" {
+      path = "/vault/data
+    }
+
+    storage_destination "raft" {
+      path = "/vault/data"
+    }
+
+    cluster_addr = "http://127.0.0.1:8201"
+    ```
+
+    Then run the following migration command:
+    ```bash
+    vault operator migrate -config /home/vault/migrate.hcl
+    ```
+
+    This will perform the migration and create a `/vault/data/raft` directory.
+
+    Its last line should return the following output :
+    ```bash
+    Success! All of the keys have been migrated.
+    ```
+
+5. Delete the vault-0 pod so that it seals itself and wait for it to restart (state `0/1 Running`).
+
+6. Restart the HA installation, which should now run to completion, and unseal the 3 Vault instances :
+    ```bash
+    ansible-playbook install.yaml -t vault
+    ```
+
+    The three vault pods are then set to READY (1/1) and we are now in **HA** mode.
+
+__Check that the migration is done and healthy :__
+- Connect to Vault and make sure our secrets are present.
+- Open a shell on each pod and run the `vault status` command. It should tell us :
+  - Storage Type" is raft.
+  - HA enabled" is set to true.
+  - The "HA Mode" of our node (active or standby).
+  - The same value between each pod in the last two lines (Index). The value may vary slightly over time between pods, but must not drift too much, otherwise it indicates a synchronization problem.
+
+__Troubleshoot :__
+
+If the Vault cluster finds itself in a state where none of the nodes is a leader, it is possible to re-establish a leader via the following procedure:
+
+1. Remove pods from the Vault cluster
+
+2. Run the following command block:
+	```bash
+	# Namespace Vault
+	VAULT_NS="dso-vault"
+
+	# Vault internal service
+	VAULT_INTERNAL_SVC="conf-dso-vault-internal:8201"
+
+	# Vault cluster pod names
+	NODES=(
+		conf-dso-vault-0
+		conf-dso-vault-1
+		conf-dso-vault-2
+	)
+
+	PEERS="[]"
+	for ((i=1; i <= ${#NODES[@]}; ++i)); do
+		PEERS=$(echo "$PEERS" | jq --arg i "$(kubectl -n $VAULT_NS exec ${NODES[i]} -c vault -- cat /vault/data/node-id)" --arg s "$VAULT_INTERNAL_SVC" '. + [{ "id": $i, "address": $s, "non_voter": false }]')
+	done
+
+	for NODE in ${NODES[*]}; do
+		kubectl -n $VAULT_NAMESPACE exec $NODE -c vault -- sh -c "cat > /vault/data/raft/peers.json << $PEERS"
+	done
+	```
+
+3. Restart the HA installation, which should now run to completion, and unseal the Vault instances:
+	```bash
+	ansible-playbook install.yaml -t vault
+	```
 
 ### Bug Fixes
 

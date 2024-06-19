@@ -161,10 +161,19 @@ metrics:
           - alert: KeycloakInstanceNotAvailable
             annotations:
               message: "Keycloak instance in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} has not been available for the last 5 minutes."
-              summary: "Keycloak instance down"
+              summary: "Keycloak instance down (containers not ready)"
             expr: |
-              absent(kube_pod_status_ready{namespace="{{ include "common.names.namespace" . }}", condition="true"} * on (pod) kube_pod_labels{pod=~"{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"}) != 0
-            for: 5m
+              (absent(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) == 1) or sum(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) == 0
+            for: 1m
+            labels:
+              severity: critical
+          - alert: KeycloakDatabaseNotAvailable
+            annotations:
+              message: "Keycloak CNPG pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have not been available for the last 5 minutes."
+              summary: "Keycloak database down (containers not ready)"
+            expr: |
+              (absent(kube_pod_container_status_ready{pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 1) or sum(kube_pod_container_status_ready{pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 0
+            for: 1m
             labels:
               severity: critical
 {% endraw %}

@@ -401,6 +401,9 @@ spec:
                     registry:
                       description: Specifies the internal registry to use.
                       type: string
+                    imagePullSecretsData:
+                      description: Specifies the credentials to use for pulling image.
+                      type: string
                   required:
                     - projectsRootDir
                     - rootDomain

@@ -23,6 +23,10 @@ spec:
         runAsUser: 200
         fsGroup: 200
 {% endif %}
+{% if use_image_pull_secrets %}
+      imagePullSecrets:
+      - name: dso-config-pull-secret
+{% endif %}
       containers:
         - name: nexus
 {% if use_private_registry %}

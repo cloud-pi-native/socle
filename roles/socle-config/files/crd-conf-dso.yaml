@@ -402,7 +402,7 @@ spec:
                       description: Specifies the internal registry to use.
                       type: string
                     imagePullSecretsData:
-                      description: Specifies the credentials to use for pulling image.
+                      description: Specifies the credentials to use for pulling image, encoded in base64.
                       type: string
                   required:
                     - projectsRootDir

@@ -2,3 +2,9 @@
 image:
   repository: "{{ dsc.global.registry }}/sonarqube"
 {% endif %}
+
+{% if use_image_pull_secrets %}
+image:
+  pullSecrets: 
+  - name: dso-config-pull-secret
+{% endif %}

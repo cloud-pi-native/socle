@@ -6,3 +6,9 @@ redis:
   image:
     registry: "{{ dsc.global.registry }}"
 {% endif %}
+
+{% if use_image_pull_secrets %}
+global:
+  imagePullSecrets: 
+  - dso-config-pull-secret
+{% endif %}

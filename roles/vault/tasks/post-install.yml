@@ -323,7 +323,7 @@
     headers:
       "X-Vault-Token": "{{ vault_token }}"
     body:
-      "name": "/admin"
+      "name": "admin"
       "type": "external"
       "policies":
         - "admin"
@@ -342,7 +342,7 @@
 - name: Get admin group id
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/identity/group/name/%2Fadmin"
+    url: "https://{{ vault_domain }}/v1/identity/group/name/admin"
     method: GET
     status_code: [200, 204]
     headers:

@@ -41,7 +41,7 @@
         name: dso-config-pull-secret
         labels: 
           ns.kyverno.io/all-sync: "" # Share secret for all dso namespaces
-        namespace: "{{ dsc.console.namespace }}"
+        namespace: "default"
       type: kubernetes.io/dockerconfigjson
       data:
         .dockerconfigjson: "{{ dsc.global.imagePullSecretsData }}"

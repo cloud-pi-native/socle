@@ -295,14 +295,14 @@
     file: check-nexus-tasks.yaml
 
 - name: Manage cleanup policy and Nexus tasks
-  when: (cp_placeholder_file.rc != 0) or (nexus_tasks_check == 'missing')
+  when: (cp_placeholder_file.stderr_lines | length > 0) or (nexus_tasks_check == 'missing')
   block:
     - name: Allow scripts
       ansible.builtin.include_tasks:
         file: allow-scripts.yaml
 
     - name: Create cleanup policy
-      when: cp_placeholder_file.rc != 0
+      when: cp_placeholder_file.stderr_lines | length > 0
       ansible.builtin.include_tasks:
         file: manage-cleanup-policy.yaml
 

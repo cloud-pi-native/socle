@@ -112,6 +112,10 @@
   ansible.builtin.set_fact:
     use_private_registry: "{{ dsc.global.registry is defined and dsc.global.registry | length > 0 | bool }}"
 
+- name: use imagePullSecrets
+  ansible.builtin.set_fact:
+    use_image_pull_secrets: "{{ dsc.global.imagePullSecretsData is defined and (dsc.global.imagePullSecretsData | b64decode | from_json | length > 0 | bool ) }}"
+
 - name: Set root_domain fact
   ansible.builtin.set_fact:
     root_domain: "{{ dsc.global.rootDomain }}"

@@ -41,3 +41,9 @@ exporter:
   image:
     repository: "{{ dsc.global.registry }}/goharbor/harbor-exporter"
 {% endif %}
+
+
+{% if use_image_pull_secrets %}
+imagePullSecrets:
+  - name: dso-config-pull-secret
+{% endif %}

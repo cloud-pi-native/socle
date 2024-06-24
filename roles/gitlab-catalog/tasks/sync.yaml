@@ -1,0 +1,79 @@
+---
+- name: Get destination catalog branches
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ gitlab_domain }}/api/v4/projects/{{ catalog_repo.project.id }}/repository/branches
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+  register: destination_branches
+  retries: 5
+  until: destination_branches.status != 404
+- name: Get destination catalog tags
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ gitlab_domain }}/api/v4/projects/{{ catalog_repo.project.id }}/repository/tags
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+  register: destination_tags
+
+- name: Get source catalog branches
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/cloud-pi-native/gitlab-ci-catalog/branches
+  register: source_branches
+
+- name: Get source catalog tags
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/cloud-pi-native/gitlab-ci-catalog/tags
+  register: source_tags
+
+- name: Set refs to update
+  when: not dsc.global.offline
+  ansible.builtin.set_fact:
+    branches: "{{ source_branches.json | diff_branches(destination_branches.json) }}"
+    tags: "{{ source_tags.json | diff_tags(destination_tags.json) }}"
+
+- name: Set refs to update
+  when: dsc.global.offline
+  ansible.builtin.set_fact:
+    branches: "{{ source_branches.json | diff_offline_branches(destination_branches.json) }}"
+    tags: "{{ source_tags.json | diff_offline_tags(destination_tags.json) }}"
+
+- name: Update refs
+  block:
+    - name: Ensure no repo exist locally
+      ansible.builtin.file:
+        path: /tmp/test
+        state: absent
+
+    - name: Synchronize branches
+      when: branches.to_push or branches.to_delete or tags.to_push or tags.to_delete
+      ansible.builtin.shell: |
+        set -e
+        git -c http.sslVerify=false clone "{{ dsc.gitlabCatalog.catalogRepoUrl }}" test && cd test || exit 1
+        git remote add dest https://root:{{ gitlab_token }}@{{ gitlab_domain }}/{{ dsc.global.projectsRootDir | join('/') }}/catalog.git
+        for branch in {{ branches.to_delete }}; do
+          echo "delete branch $branch"
+          git push -c http.sslVerify=false dest --delete $branch -f
+        done
+        for branch in {{ branches.to_push }}; do
+          git switch "$branch"
+          git reset --hard "origin/$branch"
+          git push -c http.sslVerify=false --set-upstream dest "$branch" -f
+        done
+        for tag in {{ tags.to_delete }}; do
+          echo "delete tag $tag"
+          git -c http.sslVerify=false push dest --delete $tag -f
+        done
+        for tag in {{ tags.to_push }}; do
+          git checkout 1
+          git -c http.sslVerify=false push dest $tag -f
+        done
+      changed_when: false
+      args:
+        chdir: /tmp
+
+  always:
+    - name: Cleanup repo locally
+      ansible.builtin.file:
+        path: /tmp/test
+        state: absent

@@ -8,6 +8,11 @@
       tags:
         - always
 
+    - name: cluster-offline
+      tags:
+        - always
+      when: dsc.global.offline
+
     - name: ca
       tags:
         - always
@@ -72,6 +77,7 @@
       tags:
         - ci-pipelines-exporter
         - gitlab-ci-pipelines-exporter
+      when: not dsc.global.offline
 
     - name: vault
       tags:

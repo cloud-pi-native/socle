@@ -229,3 +229,12 @@ initContainers:
     volumeMounts:
       - name: extensions
         mountPath: /extensions
+{% if dsc.proxy.enabled %}
+    env:
+      - name: HTTP_PROXY
+        value: {{ dsc.proxy.http_proxy }}
+      - name: HTTPS_PROXY
+        value: {{ dsc.proxy.https_proxy }}
+      - name: NO_PROXY
+        value: {{ dsc.proxy.no_proxy }}
+{% endif %}

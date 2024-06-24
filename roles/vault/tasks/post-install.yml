@@ -4,7 +4,8 @@
     name: "{{ dsc_name }}-vault-0"
     namespace: "{{ dsc.vault.namespace }}"
   register: vault_pod_check
-  until: vault_pod_check.resources[0].status.phase == 'Running'
+  until: vault_pod_check.resources[0] is defined and
+    vault_pod_check.resources[0].status.phase == 'Running'
   retries: 15
   delay: 5
 
@@ -99,87 +100,93 @@
   vars:
     vault_pod: "{{ dsc_name }}-vault-0"
 
-# Join node 2 to Vault cluster
-- name: Check vault-1 status - node 2
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-1"
+- name: Join and unseal node 2
+  when: vault_values.server.ha.enabled
+  block:
+    # Join node 2 to Vault cluster
+    - name: Check vault-1 status - node 2
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-1"
 
-- name: Join vault-1 node to cluster - node 2
-  when: vault_status == 'not init'
-  kubernetes.core.k8s_exec:
-    container: vault
-    pod: "{{ dsc_name }}-vault-1"
-    namespace: "{{ dsc.vault.namespace }}"
-    command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
-  register: node2_join_state
-  retries: 3
-  delay: 20
+    - name: Join vault-1 node to cluster - node 2
+      when: vault_status == 'not init'
+      kubernetes.core.k8s_exec:
+        container: vault
+        pod: "{{ dsc_name }}-vault-1"
+        namespace: "{{ dsc.vault.namespace }}"
+        command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
+      register: node2_join_state
+      retries: 3
+      delay: 20
 
-# Unseal node 2
-- name: Check vault-1 status - node 2
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-1"
+    # Unseal node 2
+    - name: Check vault-1 status - node 2
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-1"
 
-- name: Set seal count - node 2
-  ansible.builtin.set_fact:
-    vault_pod: "{{ dsc_name }}-vault-1"
-    unseal_key_index: "0"
+    - name: Set seal count - node 2
+      ansible.builtin.set_fact:
+        vault_pod: "{{ dsc_name }}-vault-1"
+        unseal_key_index: "0"
 
-- name: Get vault keys
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.vault.namespace }}"
-    kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
+    - name: Get vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vault.namespace }}"
+        kind: Secret
+        name: "{{ dsc_name }}-vault-keys"
+      register: vault_keys
 
-- name: Unseal vault node - node 2
-  when: vault_status == 'not init' or vault_status == 'sealed'
-  ansible.builtin.include_tasks: unseal.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-1"
+    - name: Unseal vault node - node 2
+      when: vault_status == 'not init' or vault_status == 'sealed'
+      ansible.builtin.include_tasks: unseal.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-1"
 
-# Join node 3 to Vault cluster
-- name: Check vault-2 status - node 3
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-2"
+- name: Join and unseal node 3
+  when: vault_values.server.ha.enabled
+  block:
+    # Join node 3 to Vault cluster
+    - name: Check vault-2 status - node 3
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-2"
 
-- name: Join vault-2 to cluster - node 3
-  when: vault_status == 'not init'
-  kubernetes.core.k8s_exec:
-    container: vault
-    pod: "{{ dsc_name }}-vault-2"
-    namespace: "{{ dsc.vault.namespace }}"
-    command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
-  register: node3_join_state
-  retries: 3
-  delay: 20
+    - name: Join vault-2 to cluster - node 3
+      when: vault_status == 'not init'
+      kubernetes.core.k8s_exec:
+        container: vault
+        pod: "{{ dsc_name }}-vault-2"
+        namespace: "{{ dsc.vault.namespace }}"
+        command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
+      register: node3_join_state
+      retries: 3
+      delay: 20
 
-# Unseal node 3
-- name: Check vault-2 status - node 3
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-2"
+    # Unseal node 3
+    - name: Check vault-2 status - node 3
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-2"
 
-- name: Set seal count - node 3
-  ansible.builtin.set_fact:
-    vault_pod: "{{ dsc_name }}-vault-2"
-    unseal_key_index: "0"
+    - name: Set seal count - node 3
+      ansible.builtin.set_fact:
+        vault_pod: "{{ dsc_name }}-vault-2"
+        unseal_key_index: "0"
 
-- name: Get vault keys
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.vault.namespace }}"
-    kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
+    - name: Get vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vault.namespace }}"
+        kind: Secret
+        name: "{{ dsc_name }}-vault-keys"
+      register: vault_keys
 
-- name: Unseal vault node - node 3
-  when: vault_status == 'not init' or vault_status == 'sealed'
-  ansible.builtin.include_tasks: unseal.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-2"
+    - name: Unseal vault node - node 3
+      when: vault_status == 'not init' or vault_status == 'sealed'
+      ansible.builtin.include_tasks: unseal.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-2"
 
 # Retrieve Vault token
 - name: Get Vault keys

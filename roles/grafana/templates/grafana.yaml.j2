@@ -34,3 +34,7 @@ spec:
           containers:
           - image: grafana/grafana:{{ dsc.grafana.imageVersion }}
             name: grafana
+{% if use_image_pull_secrets %}
+          imagePullSecrets: 
+            - name: dso-config-pull-secret
+{% endif %}

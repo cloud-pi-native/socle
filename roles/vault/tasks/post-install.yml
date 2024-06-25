@@ -397,7 +397,7 @@
               insecureSkipVerify: true
         namespaceSelector:
           matchNames:
-          - "{{ dsc.vault.namespace }}"
+            - "{{ dsc.vault.namespace }}"
         selector:
           matchLabels:
             app.kubernetes.io/instance: "{{ dsc_name }}-vault"

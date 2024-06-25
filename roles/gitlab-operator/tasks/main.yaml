@@ -66,24 +66,6 @@
         chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
         release_namespace: "{{ dsc.gitlabOperator.namespace }}"
         values: "{{ operator_values }}"
-      when: not use_private_registry
-
-    - name: Generate post_renderer script
-      template:
-        src: post_renderer_template.j2
-        dest: /tmp/yq_script.sh
-        mode: 0755
-      when: use_private_registry
-
-    - name: Deploy GitLab Operator helm
-      kubernetes.core.helm:
-        name: gitlab-operator
-        chart_ref: gitlab-operator/gitlab-operator
-        chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
-        release_namespace: "{{ dsc.gitlabOperator.namespace }}"
-        values: "{{ operator_values }}"
-        post_renderer: /tmp/yq_script.sh 
-      when: use_private_registry
 
     - name: Wait gitlab-webhook-service endpoint
       kubernetes.core.k8s_info:

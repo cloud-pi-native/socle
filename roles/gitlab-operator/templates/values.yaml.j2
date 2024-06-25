@@ -1,7 +1,7 @@
 watchCluster: true
 
 image:
-{% if use_private_registry %}                                                         
+{% if use_private_registry %}
   registry: "{{ dsc.global.registry }}"
 {% else %}
   registry: registry.gitlab.com
@@ -36,6 +36,11 @@ tolerations: []
 manager:
   debug:
     enabled: true
+{% if use_private_registry %}
+  kubeRbacProxy:
+    image:
+      registry: "{{ dsc.global.registry }}"
+{% endif %}
   serviceAccount:
     # Specifies whether a service account should be created
     create: true

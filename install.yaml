@@ -25,6 +25,7 @@
       tags:
         - cert-manager
         - cm
+        - always
 
     - name: kyverno
       tags:

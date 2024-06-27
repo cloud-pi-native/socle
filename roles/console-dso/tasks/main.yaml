@@ -123,13 +123,22 @@
     template: app.yaml.j2
 
 - block: 
+    - name: Set first_console_deployment to "true"
+      ansible.builtin.set_fact:
+        first_console_deployment: true
+
     - name: Get pg-cluster-console-app secret
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.console.namespace }}"
         kind: Secret
         name: pg-cluster-console-app
       register: pg_db_secret
+      until: pg_db_secret.resources[0].data.uri is defined
+      retries: 10
+      delay: 5
+  when: pg_db_secret.resources[0].data.uri is undefined 
 
+- block: 
     - name: Compute Console Helm values
       ansible.builtin.include_role:
         name: combine
@@ -141,4 +150,4 @@
     - name: Apply app
       kubernetes.core.k8s:
         template: app.yaml.j2
-  when: pg_db_secret | from_yaml | json_query('resources[0].data.uri') is undefined
+  when: first_console_deployment is defined

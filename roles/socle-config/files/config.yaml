@@ -20,6 +20,8 @@ spec:
     subDomain: gitlab
     insecureCI: false
     pvcGitalySize: 50Gi
+  gitlabCatalog:
+    catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
   global:
     backup:
       velero:

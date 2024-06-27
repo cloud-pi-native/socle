@@ -26,5 +26,5 @@
 
 - name: Synchronize repo
   ansible.builtin.include_tasks:
-    file: sync.yml
+    file: sync.yaml
   when: not dsc.global.offline

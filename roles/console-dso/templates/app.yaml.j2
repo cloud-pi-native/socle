@@ -23,3 +23,8 @@ spec:
     automated: {}
     syncOptions:
     - CreateNamespace=true
+  ignoreDifferences:
+    - group: kyverno.io
+      kind: ClusterPolicy
+      jqPathExpressions:
+        - .spec.rules[] | select(.name|test("enforce-container-security-."))

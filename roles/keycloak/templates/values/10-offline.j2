@@ -1,0 +1,53 @@
+{% if dsc.global.offline %}
+initContainers:
+  - name: realm-ext-provider
+{% if use_private_registry %}                                                                                                           
+    image: "{{ dsc.global.registry }}/curlimages/curl:8.8.0"
+{% else %}
+    image: docker.io/curlimages/curl:8.8.0
+{% endif %}
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+    args:
+      - -c
+      - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}/retrocompat-keycloak-theme.jar
+    volumeMounts:
+      - name: extensions
+        mountPath: /extensions
+{% if dsc.proxy.enabled %}
+    env:
+      - name: HTTP_PROXY
+        value: {{ dsc.proxy.http_proxy }}
+      - name: HTTPS_PROXY
+        value: {{ dsc.proxy.https_proxy }}
+      - name: NO_PROXY
+        value: {{ dsc.proxy.no_proxy }}
+{% endif %}
+{% else %}
+initContainers:
+  - name: realm-ext-provider
+{% if use_private_registry %}                                                                                                           
+    image: "{{ dsc.global.registry }}/curlimages/curl:8.8.0"
+{% else %}
+    image: docker.io/curlimages/curl:8.8.0
+{% endif %}
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+    args:
+      - -c
+      - curl -L -f -S -o /extensions/keycloak-theme-dsfr.jar https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v1.0.3/retrocompat-keycloak-theme.jar
+    volumeMounts:
+      - name: extensions
+        mountPath: /extensions
+{% if dsc.proxy.enabled %}
+    env:
+      - name: HTTP_PROXY
+        value: {{ dsc.proxy.http_proxy }}
+      - name: HTTPS_PROXY
+        value: {{ dsc.proxy.https_proxy }}
+      - name: NO_PROXY
+        value: {{ dsc.proxy.no_proxy }}
+{% endif %}
+{% endif %}

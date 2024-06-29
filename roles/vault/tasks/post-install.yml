@@ -265,7 +265,7 @@
   register: vault_secret
   failed_when: vault_secret.resources | length == 0
 
-- name: Configue oidc auth method
+- name: Configure oidc auth method
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: "https://{{ vault_domain }}/v1/auth/oidc/config"

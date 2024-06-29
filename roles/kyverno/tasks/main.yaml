@@ -57,3 +57,8 @@
 - name: Create replace-kubed ClusterPolicy
   kubernetes.core.k8s:
     template: replace-kubed.yml.j2
+
+- name: Create security-context ClusterPolicy for cis profile
+  kubernetes.core.k8s:
+    template: cis.yml.j2
+  when: dsc.global.profile == "cis"

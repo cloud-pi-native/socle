@@ -1,4 +1,4 @@
-{% if dsc.proxy.enabled %}
+{% if dsc.proxy.enabled and dsc.global.platform != "rke2" %}
 global:
   env:
     HTTP_PROXY: {{ dsc.proxy.http_proxy }}

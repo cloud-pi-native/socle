@@ -217,24 +217,3 @@ extraEnvVars:
     value: "Ministère<br/>de l'intérieur<br/>et des outre-mer"
   - name: DSFR_THEME_CONTACT_EMAIL
     value: cloudpinative-relations@interieur.gouv.fr
-initContainers:
-  - name: realm-ext-provider
-    image: docker.io/curlimages/curl:8.8.0
-    imagePullPolicy: IfNotPresent
-    command:
-      - sh
-    args:
-      - -c
-      - curl -L -f -S -o /extensions/keycloak-theme-dsfr.jar https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v1.0.3/retrocompat-keycloak-theme.jar
-    volumeMounts:
-      - name: extensions
-        mountPath: /extensions
-{% if dsc.proxy.enabled %}
-    env:
-      - name: HTTP_PROXY
-        value: {{ dsc.proxy.http_proxy }}
-      - name: HTTPS_PROXY
-        value: {{ dsc.proxy.https_proxy }}
-      - name: NO_PROXY
-        value: {{ dsc.proxy.no_proxy }}
-{% endif %}

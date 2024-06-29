@@ -401,6 +401,9 @@ spec:
                     registry:
                       description: Specifies the internal registry to use.
                       type: string
+                    profile:
+                      description: Specifies security profile (e.g. cis).
+                      type: string
                   required:
                     - projectsRootDir
                     - rootDomain
@@ -593,6 +596,9 @@ spec:
                       description: Size for postgres' pvc
                       type: string
                       default: 10Gi
+                    pluginDownloadUrl:
+                      description: Plugins download Url.
+                      type: string
                     values:
                       description: |
                         You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values.j2

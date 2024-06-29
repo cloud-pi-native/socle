@@ -1,0 +1,408 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: security-context-dso
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet, Job
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Deployment
+        - StatefulSet
+        - Job
+        namespaces:
+        - "{{ dsc.nexus.namespace }}"
+        - "{{ dsc.sonarqube.namespace }}"
+        - "{{ dsc.gitlabOperator.namespace }}"
+        - "{{ dsc.vault.namespace }}"
+        - "{{ dsc.argocd.namespace }}"
+    exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          namespaces:
+          - "dso-*"
+          names: 
+          - "pg-cluster-*"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                +(runAsNonRoot): true
+                +(runAsUser): 65534
+              containers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 65534
+                  +(seccompProfile):
+                    type: RuntimeDefault
+              initContainers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 65534
+                  +(seccompProfile):
+                    type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: security-context-dso-keycloak
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet, Job
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Deployment
+        - StatefulSet
+        - Job
+        namespaces:
+        - "{{ dsc.keycloak.namespace }}"
+    exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          namespaces:
+          - "{{ dsc.keycloak.namespace }}"
+          names: 
+          - "pg-cluster-*"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                +(runAsNonRoot): true
+                +(runAsUser): 1001
+              containers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 1001
+                  +(seccompProfile):
+                    type: RuntimeDefault
+              initContainers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 1001
+                  +(seccompProfile):
+                    type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: security-context-dso-gitlab
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet, Job
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Deployment
+        - StatefulSet
+        - Job
+        namespaces:
+        - "{{ dsc.gitlab.namespace }}"
+    exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          namespaces:
+          - "{{ dsc.gitlab.namespace }}"
+          names: 
+          - "pg-cluster-*"
+          - "gitlab-shared-secrets-*-selfsign"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                +(runAsNonRoot): true
+              containers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(seccompProfile):
+                    type: RuntimeDefault
+              initContainers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(seccompProfile):
+                    type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: security-context-dso-gitlab-job
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet, Job
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Job
+        namespaces:
+        - "{{ dsc.gitlab.namespace }}"
+        names: 
+        - "gitlab-shared-secrets-*-selfsign"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                +(runAsNonRoot): true
+                +(runAsUser): 65534
+              containers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 65534
+                  +(seccompProfile):
+                    type: RuntimeDefault
+              initContainers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 65534
+                  +(seccompProfile):
+                    type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: security-context-dso-harbor
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet, Job
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Deployment
+        - StatefulSet
+        - Job
+        namespaces:
+        - "{{ dsc.harbor.namespace }}"
+    exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          namespaces:
+          - "dso-*"
+          names: 
+          - "pg-cluster-*"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                +(runAsNonRoot): true
+                +(runAsUser): 10000
+              containers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 10000
+                  +(seccompProfile):
+                    type: RuntimeDefault
+              initContainers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 10000
+                  +(seccompProfile):
+                    type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: non-root-security-context
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet, Job
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Deployment
+        - StatefulSet
+        - Job
+        namespaces:
+        - "dso-*"
+    exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          namespaces:
+          - "dso-*"
+          names: 
+          - "pg-cluster-*"
+    preconditions:
+      any:
+      - key: "{% raw %}{{ request.object.spec.template.spec.securityContext.runAsUser || '' }}{% endraw %}"
+        operator: Equals
+        value: 0
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+              containers:
+              - (name): "*"
+                +(securityContext):
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  runAsNonRoot: true
+                  runAsUser: 1000
+                  seccompProfile:
+                    type: RuntimeDefault
+              initContainers:
+              - (name): "*"
+                +(securityContext):
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  runAsNonRoot: true
+                  runAsUser: 1000
+                  seccompProfile:
+                    type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: set-home-env-var
+  annotations:
+    policies.kyverno.io/title: Set HOME environment variable
+    policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Job
+spec:
+  validationFailureAction: Enforce
+  rules:
+  - name: set-home-env-var
+    match:
+      resources:
+        kinds:
+        - Job
+        names: 
+        - "gitlab-minio-create-buckets-*"
+        namespaces: 
+        - "{{ dsc.gitlab.namespace }}"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              containers:
+              - name: minio-mc
+                env:
+                - name: HOME
+                  value: "/tmp"

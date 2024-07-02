@@ -1,0 +1,507 @@
+---
+- name: Get versions
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+    - name: Display tags list
+      ansible.builtin.debug:
+        msg:
+          - "List of available tags for convenience"
+          - "(Can also be retrieved with the --list-tags option on ansible-playbook run) :"
+          - ""
+          - "cert-manager"
+          - "kyverno"
+          - "cnpg (or cloudNativePG)"
+          - "keycloak"
+          - "nexus"
+          - "sonar (or sonarqube)"
+          - "gitlab"
+          - "gitlabCiPipelinesExporter (or gitlab-ci-pipelines-exporter)"
+          - "gitlabOperator (or gitlab-operator)"
+          - "gitlabRunner (or gitlab-runner)"
+          - "vault"
+          - "argo (or argocd)"
+          - "harbor"
+          - "console (or console-dso)"
+          - "grafana"
+          - "grafanaOperator (or grafana-operator)"
+      tags:
+        - always
+
+    - name: "Get socle config from conf-dso dsc (default)"
+      kubernetes.core.k8s_info:
+        kind: dsc
+        name: conf-dso
+        api_version: cloud-pi-native.fr/v1alpha
+      register: socle_config
+      tags:
+        - always
+
+    - name: Get socle config from dsc_cr extra var when defined
+      when: dsc_cr is defined
+      kubernetes.core.k8s_info:
+        kind: dsc
+        name: "{{ dsc_cr }}"
+        api_version: cloud-pi-native.fr/v1alpha
+      register: socle_config_custom
+      tags:
+        - always
+
+    - name: Check socle_config_custom and exit if empty
+      when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
+      block:
+        - name: Warning message
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Vous avez lancé le playbook avec l'option '-e dsc_cr={{ dsc_cr }}'"
+              - "mais la ressource dsc nommée '{{ dsc_cr }}' est vide ou inexistante côté cluster !"
+              - ""
+              - "Vérifiez que vous ne vous êtes pas trompé de nom et que la ressource existe bien, via la commande suivante :"
+              - ""
+              - " kubectl get dsc {{ dsc_cr }} "
+              - ""
+              - "Si elle n'est pas trouvée (not found), listez simplement les resources dsc actuellement déclarées :"
+              - ""
+              - " kubectl get dsc "
+              - ""
+              - "Puis relancez le playbook avec une resource dsc existante."
+              - ""
+              - "Rappel : le présent playbook lancé seul, sans extra vars, founira les credentials associés à la configuration dsc par défaut (conf-dso)"
+
+        - name: Exit playbook
+          ansible.builtin.meta: end_play
+      tags:
+        - always
+
+    - name: Set socle_config fact when dsc_cr defined and not empty
+      ansible.builtin.set_fact:
+        socle_config: "{{ socle_config_custom }}"
+      when: (socle_config_custom is not skipped) and (socle_config_custom.resources | length > 0)
+      tags:
+        - always
+
+    - name: Set DSC Name fact
+      ansible.builtin.set_fact:
+        dsc_name: "{{ socle_config.resources[0].metadata.name }}"
+      tags:
+        - always
+
+    - name: Set DSC fact
+      ansible.builtin.set_fact:
+        dsc: "{{ socle_config.resources[0] }}"
+      tags:
+        - always
+
+    - ansible.builtin.set_fact:
+        dsc_default_config: "{{ lookup('ansible.builtin.file', '../roles/socle-config/files/config.yaml') | from_yaml }}"
+        dsc_default_releases: "{{ lookup('ansible.builtin.file', '../roles/socle-config/files/releases.yaml') | from_yaml }}"
+      tags:
+        - always
+
+    - ansible.builtin.set_fact:
+        dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
+      tags:
+        - always
+
+    - ansible.builtin.set_fact:
+        dsc: "{{ dsc.spec }}"
+      tags:
+        - always
+
+    - name: Get cert-manager app and chart versions
+      tags:
+        - cert-manager
+      block:
+        - name: Get cert-manager namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: cert-manager
+          register: cm_ns
+
+        - name: Warning message
+          when: cm_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Le namespace cert-manager n'existe pas !"
+              - "Cela signifie que cert-manager est probablement installé dans un namespace indépendant du Socle."
+
+        - name: Retrieve cert-manager infos
+          when: cm_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: cert-manager
+            namespace: cert-manager
+          register: cert_manager_infos
+
+        - name: Display cert-manager version
+          when: cm_ns.resources | length > 0
+          ansible.builtin.debug:
+            msg:
+              - "Version de cert-manager : {{ cert_manager_infos.status.app_version }}"
+              - "Version de chart Helm cert-manager : {{ cert_manager_infos.status.chart }}"
+
+    - name: Get Kyverno app and chart versions
+      tags:
+        - kyverno
+      block:
+        - name: Get Kyverno namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.kyverno.namespace }}"
+          register: kyverno_ns
+
+        - name: Warning message
+          when: kyverno_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Le namespace {{ dsc.kyverno.namespace }} n'existe pas !"
+              - "Cela signifie que Kyverno est probablement installé dans un namespace indépendant du Socle."
+
+        - name: Retrieve Kyverno infos
+          when: kyverno_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: kyverno
+            namespace: "{{ dsc.kyverno.namespace  }}"
+          register: kyverno_infos
+
+        - name: Display Kyverno version
+          when: kyverno_ns.resources | length > 0
+          ansible.builtin.debug:
+            msg:
+              - "Version de Kyverno : {{ kyverno_infos.status.app_version }}"
+              - "Version de chart Helm Kyverno : {{ kyverno_infos.status.chart }}"
+
+    - name: Get CNPG Operator app and chart versions
+      tags:
+        - cnpg
+        - cloudNativePG
+      block:
+        - name: Get CNPG Operator namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.cloudnativepg.namespace }}"
+          register: cnpg_ns
+
+        - name: Warning message
+          when: cnpg_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Le namespace {{ dsc.cloudnativepg.namespace }} n'existe pas !"
+              - "Cela signifie que l'opérateur CNPG est probablement installé dans un namespace indépendant du Socle."
+
+        - name: Retrieve CNPG Operator infos
+          when: cnpg_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: cloudnative-pg
+            namespace: "{{ dsc.cloudnativepg.namespace  }}"
+          register: cnpg_infos
+
+        - name: Display CNPG Operator version
+          when: cnpg_ns.resources | length > 0
+          ansible.builtin.debug:
+            msg:
+              - "Version de l'opérateur CNPG : {{ cnpg_infos.status.app_version }}"
+              - "Version de chart Helm de l'opérateur CNPG : {{ cnpg_infos.status.chart }}"
+
+    - name: Get Keycloak app and chart versions
+      tags:
+        - keycloak
+      block:
+        - name: Retrieve Keycloak infos
+          kubernetes.core.helm_info:
+            name: keycloak
+            namespace: "{{ dsc.keycloak.namespace  }}"
+          register: keycloak_infos
+
+        - name: Display Keycloak version
+          ansible.builtin.debug:
+            msg:
+              - "Version de Keycloak : {{ keycloak_infos.status.app_version }}"
+              - "Version de chart Helm Keycloak : {{ keycloak_infos.status.chart }}"
+
+    - name: Get Nexus app version
+      tags:
+        - nexus
+      block:
+        - name: Retrieve Nexus deployment info
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.nexus.namespace }}"
+            kind: Deployment
+            name: nexus
+          register: nexus_deploy
+
+        - name: Get Nexus image
+          ansible.builtin.set_fact:
+            nexus_image: "{{ nexus_deploy.resources[0].spec.template.spec.containers
+            | selectattr('name', 'contains', 'nexus')
+            | map(attribute='image') | first }}"
+
+        - name: Display Nexus version
+          ansible.builtin.debug:
+            msg: "Version de Nexus : {{ nexus_image | regex_search('\\:(.+)', '\\1') | first }}"
+
+    - name: Get SonarQube app and chart versions
+      tags:
+        - sonar
+        - sonarqube
+      block:
+        - name: Retrieve SonarQube infos
+          kubernetes.core.helm_info:
+            name: sonarqube
+            namespace: "{{ dsc.sonarqube.namespace  }}"
+          register: sonarqube_infos
+
+        - name: Display SonarQube version
+          ansible.builtin.debug:
+            msg:
+              - "Version de SonarQube : {{ sonarqube_infos.status.app_version }}"
+              - "Version de chart Helm SonarQube : {{ sonarqube_infos.status.chart }}"
+
+    - name: Get GitLab app and chart versions
+      tags:
+        - gitlab
+      block:
+        - name: Retrieve GitLab instance info
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.gitlab.namespace }}"
+            kind: GitLab
+            api_version: apps.gitlab.com/v1beta1
+            name: gitlab
+          register: gitlab_instance
+
+        - name: Find GitLab token in inventory
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.console.namespace }}"
+            kind: Secret
+            name: dso-config
+          register: ansible_inventory
+
+        - name: Get GitLab token
+          ansible.builtin.set_fact:
+            gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
+
+        - name: Get metadata
+          ansible.builtin.uri:
+            validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+            url: https://{{ dsc.gitlab.subDomain }}{{ dsc.global.rootDomain }}/api/v4/metadata
+            headers:
+              PRIVATE-TOKEN: "{{ gitlab_token }}"
+          register: gitlab_metadata
+          ignore_errors: true
+
+        - name: Set GitLab version
+          ansible.builtin.set_fact:
+            gitlab_version: "{{ gitlab_metadata.json.version }}"
+
+        - name: Display GitLab version
+          ansible.builtin.debug:
+            msg:
+              - "Version de GitLab : {{ gitlab_version }}"
+              - "Version de chart Helm GitLab : {{ gitlab_instance.resources[0].spec.chart.version }}"
+
+    - name: Get gitlab-ci-pipelines-exporter app and chart versions
+      tags:
+        - gitlabCiPipelinesExporter
+        - gitlab-ci-pipelines-exporter
+      block:
+        - name: Retrieve gitlab-ci-pipelines-exporter infos
+          kubernetes.core.helm_info:
+            name: gitlab-ci-pipelines-exporter
+            namespace: "{{ dsc.gitlab.namespace  }}"
+          register: gcipe_infos
+
+        - name: Warning message
+          when: gcipe_infos.status is not defined
+          ansible.builtin.debug:
+            msg: "Attention ! Gitlab-ci-pipelines-exporter n'est pas installé !"
+ 
+        - name: Display gitlab-ci-pipelines-exporter version
+          when: gcipe_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version de gitlab-ci-pipelines-exporter : {{ gcipe_infos.status.app_version }}"
+              - "Version de chart Helm gitlab-ci-pipelines-exporter : {{ gcipe_infos.status.chart }}"
+
+    - name: Get gitlab-operator app and chart versions
+      tags:
+        - gitlabOperator
+        - gitlab-operator
+      block:
+        - name: Retrieve gitlab-operator infos
+          kubernetes.core.helm_info:
+            name: gitlab-operator
+            namespace: "{{ dsc.gitlabOperator.namespace  }}"
+          register: gop_infos
+
+        - name: Display gitlab-operator version
+          ansible.builtin.debug:
+            msg:
+              - "Version de gitlab-operator : {{ gop_infos.status.app_version }}"
+              - "Version de chart Helm gitlab-operator : {{ gop_infos.status.chart }}"
+
+    - name: Get gitlab-runner app and chart versions
+      tags:
+        - gitlabRunner
+        - gitlab-runner
+      block:
+        - name: Retrieve gitlab-runner infos
+          kubernetes.core.helm_info:
+            name: gitlab-runner
+            namespace: "{{ dsc.gitlab.namespace  }}"
+          register: grunner_infos
+
+        - name: Display gitlab-runner version
+          ansible.builtin.debug:
+            msg:
+              - "Version de gitlab-runner : {{ grunner_infos.status.app_version }}"
+              - "Version de chart Helm gitlab-runner : {{ grunner_infos.status.chart }}"
+
+    - name: Get Vault app and chart versions
+      tags:
+        - vault
+      block:
+        - name: Retrieve Vault infos
+          kubernetes.core.helm_info:
+            name: "{{ dsc_name }}-vault"
+            namespace: "{{ dsc.vault.namespace  }}"
+          register: vault_infos
+
+        - name: Display Vault version
+          ansible.builtin.debug:
+            msg:
+              - "Version de Vault : {{ vault_infos.status.app_version }}"
+              - "Version de chart Helm Vault : {{ vault_infos.status.chart }}"
+
+    - name: Get Argo CD app and chart versions
+      tags:
+        - argo
+        - argocd
+      block:
+        - name: Retrieve Argo CD infos
+          kubernetes.core.helm_info:
+            name: "argo"
+            namespace: "{{ dsc.argocd.namespace  }}"
+          register: argocd_infos
+
+        - name: Display Argo CD version
+          ansible.builtin.debug:
+            msg:
+              - "Version d'Argo CD : {{ argocd_infos.status.app_version }}"
+              - "Version de chart Helm Argo CD : {{ argocd_infos.status.chart }}"
+
+    - name: Get Harbor app and chart versions
+      tags:
+        - harbor
+      block:
+        - name: Retrieve Harbor infos
+          kubernetes.core.helm_info:
+            name: "harbor"
+            namespace: "{{ dsc.harbor.namespace  }}"
+          register: harbor_infos
+
+        - name: Display Harbor version
+          ansible.builtin.debug:
+            msg:
+              - "Version de Harbor : {{ harbor_infos.status.app_version }}"
+              - "Version de chart Helm Harbor : {{ harbor_infos.status.chart }}"
+
+    - name: Get Console Pi Native app version
+      tags:
+        - console
+        - console-dso
+      block:
+        - name: Retrieve Console Pi Native deployment info
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.console.namespace }}"
+            kind: Deployment
+            name: dso-cpn-console-server
+          register: console_deploy
+
+        - name: Get Console Pi Native version
+          ansible.builtin.set_fact:
+            console_version: "{{ console_deploy.resources[0].metadata.labels['app.kubernetes.io/version'] }}"
+
+        - name: Get Console Pi Native chart
+          ansible.builtin.set_fact:
+            console_chart: "{{ console_deploy.resources[0].metadata.labels['helm.sh/chart'] }}"
+
+        - name: Display Console Pi Native version
+          ansible.builtin.debug:
+            msg:
+              - "Version de Console Pi Native : {{ console_version }}"
+              - "Version de chart Helm Console Pi Native : {{ console_chart }}"
+
+    - name: Get Grafana app version
+      tags:
+        - grafana
+      block:
+        - name: Get Grafana namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.grafana.namespace }}"
+          register: grafana_ns
+
+        - name: Warning message
+          when: grafana_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Le namespace {{ dsc.grafana.namespace }} n'existe pas !"
+              - "Cela signifie que l'instance Grafana est absente ou installée dans un namespace indépendant du Socle."
+
+        - name: Initialize grafana_name fact
+          when: grafana_ns.resources | length > 0
+          ansible.builtin.set_fact:
+            grafana_name: "{{ dsc_name }}-prod"
+
+        - name: Set grafana_name
+          when: (grafana_ns.resources | length > 0) and (dsc.global.environment != 'production')
+          ansible.builtin.set_fact:
+            grafana_name: "{{ dsc_name }}-horsprod"
+
+        - name: Retrieve Grafana instance info
+          when: grafana_ns.resources | length > 0
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.grafana.namespace }}"
+            kind: Grafana
+            api_version: grafana.integreatly.org/v1beta1
+            name: "{{ grafana_name }}"
+          register: grafana_instance
+
+        - name: Display Grafana version
+          when: grafana_ns.resources | length > 0
+          ansible.builtin.debug:
+            msg:
+              - "Version de Grafana : {{ grafana_instance.resources[0].spec.deployment.spec.template.spec.containers[0].image
+                | regex_search('\\:(.+)', '\\1') | first }}"
+
+    - name: Get Grafana Operator app and chart versions
+      tags:
+        - grafanaOperator
+        - grafana-operator
+      block:
+        - name: Get Grafana Operator namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.grafanaOperator.namespace }}"
+          register: gop_ns
+
+        - name: Warning message
+          when: gop_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Le namespace {{ dsc.grafanaOperator.namespace }} n'existe pas !"
+              - "Cela signifie que l'opérateur Grafana est absent ou installé dans un namespace indépendant du Socle."
+
+        - name: Retrieve Grafana Operator infos
+          when: gop_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: grafana-operator
+            namespace: "{{ dsc.grafanaOperator.namespace  }}"
+          register: gop_infos
+
+        - name: Display Grafana Operator version
+          when: gop_ns.resources | length > 0
+          ansible.builtin.debug:
+            msg:
+              - "Version de l'opérateur Grafana : {{ gop_infos.status.app_version }}"
+              - "Version de chart Helm de l'opérateur Grafana : {{ gop_infos.status.chart }}"

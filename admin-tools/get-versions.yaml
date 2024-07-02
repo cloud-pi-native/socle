@@ -233,8 +233,8 @@
         - name: Get Nexus image
           ansible.builtin.set_fact:
             nexus_image: "{{ nexus_deploy.resources[0].spec.template.spec.containers
-            | selectattr('name', 'contains', 'nexus')
-            | map(attribute='image') | first }}"
+              | selectattr('name', 'contains', 'nexus')
+              | map(attribute='image') | first }}"
 
         - name: Display Nexus version
           ansible.builtin.debug:

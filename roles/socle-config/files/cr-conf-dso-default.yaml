@@ -17,13 +17,20 @@ spec:
   gitlab: {}
   gitlabCiPipelinesExporter: {}
   gitlabOperator: {}
-  gitlabRunner: {}
+  gitlabRunner:
+    resources:
+      overwrite:
+        requests:
+          memory: "6Gi"
+          cpu: "2"
+        limits:
+          memory: "6Gi"
+          cpu: "2"
   global:
     environment: production
     projectsRootDir:
       - forge
-    rootDomain:
-      .example.com
+    rootDomain: .example.com
     metrics:
       enabled: false
     backup: {}

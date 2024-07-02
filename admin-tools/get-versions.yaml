@@ -123,7 +123,7 @@
           when: cm_ns.resources | length == 0
           ansible.builtin.debug:
             msg:
-              - "Attention ! Le namespace cert-manager n'existe pas !"
+              - "Le namespace cert-manager n'existe pas."
               - "Cela signifie que cert-manager est probablement installé dans un namespace indépendant du Socle."
 
         - name: Retrieve cert-manager infos
@@ -154,7 +154,7 @@
           when: kyverno_ns.resources | length == 0
           ansible.builtin.debug:
             msg:
-              - "Attention ! Le namespace {{ dsc.kyverno.namespace }} n'existe pas !"
+              - "Le namespace {{ dsc.kyverno.namespace }} n'existe pas."
               - "Cela signifie que Kyverno est probablement installé dans un namespace indépendant du Socle."
 
         - name: Retrieve Kyverno infos
@@ -186,7 +186,7 @@
           when: cnpg_ns.resources | length == 0
           ansible.builtin.debug:
             msg:
-              - "Attention ! Le namespace {{ dsc.cloudnativepg.namespace }} n'existe pas !"
+              - "Le namespace {{ dsc.cloudnativepg.namespace }} n'existe pas."
               - "Cela signifie que l'opérateur CNPG est probablement installé dans un namespace indépendant du Socle."
 
         - name: Retrieve CNPG Operator infos
@@ -313,7 +313,7 @@
         - name: Warning message
           when: gcipe_infos.status is not defined
           ansible.builtin.debug:
-            msg: "Attention ! Gitlab-ci-pipelines-exporter n'est pas installé !"
+            msg: "Gitlab-ci-pipelines-exporter n'est pas installé."
  
         - name: Display gitlab-ci-pipelines-exporter version
           when: gcipe_infos.status is defined
@@ -445,7 +445,7 @@
           when: grafana_ns.resources | length == 0
           ansible.builtin.debug:
             msg:
-              - "Attention ! Le namespace {{ dsc.grafana.namespace }} n'existe pas !"
+              - "Le namespace {{ dsc.grafana.namespace }} n'existe pas."
               - "Cela signifie que l'instance Grafana est absente ou installée dans un namespace indépendant du Socle."
 
         - name: Initialize grafana_name fact
@@ -489,7 +489,7 @@
           when: gop_ns.resources | length == 0
           ansible.builtin.debug:
             msg:
-              - "Attention ! Le namespace {{ dsc.grafanaOperator.namespace }} n'existe pas !"
+              - "Le namespace {{ dsc.grafanaOperator.namespace }} n'existe pas."
               - "Cela signifie que l'opérateur Grafana est absent ou installé dans un namespace indépendant du Socle."
 
         - name: Retrieve Grafana Operator infos

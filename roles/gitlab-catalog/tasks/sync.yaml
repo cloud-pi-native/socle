@@ -49,24 +49,25 @@
       when: branches.to_push or branches.to_delete or tags.to_push or tags.to_delete
       ansible.builtin.shell: |
         set -e
-        git -c http.sslVerify=false clone "{{ dsc.gitlabCatalog.catalogRepoUrl }}" test && cd test || exit 1
+        git config --add http.sslVerify false
+        git clone "{{ dsc.gitlabCatalog.catalogRepoUrl }}" test && cd test || exit 1
         git remote add dest https://root:{{ gitlab_token }}@{{ gitlab_domain }}/{{ dsc.global.projectsRootDir | join('/') }}/catalog.git
         for branch in {{ branches.to_delete }}; do
           echo "delete branch $branch"
-          git push -c http.sslVerify=false dest --delete $branch -f
+          git push dest --delete $branch -f
         done
         for branch in {{ branches.to_push }}; do
           git switch "$branch"
           git reset --hard "origin/$branch"
-          git push -c http.sslVerify=false --set-upstream dest "$branch" -f
+          git push --set-upstream dest "$branch" -f
         done
         for tag in {{ tags.to_delete }}; do
           echo "delete tag $tag"
-          git -c http.sslVerify=false push dest --delete $tag -f
+          git push dest --delete $tag -f
         done
         for tag in {{ tags.to_push }}; do
           git checkout 1
-          git -c http.sslVerify=false push dest $tag -f
+          git push dest $tag -f
         done
       changed_when: false
       args:

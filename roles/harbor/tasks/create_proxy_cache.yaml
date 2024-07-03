@@ -1,0 +1,42 @@
+---
+- name: Create registry
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: POST
+    url: https://{{ harbor_domain }}/api/v2.0/registries
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [201]
+    body:
+      credential: "{{ proxy_cache.registry.credential }}"
+      insecure: "{{ proxy_cache.registry.insecure }}"
+      name: "{{ proxy_cache.name }}"
+      type: "{{ proxy_cache.registry.provider }}"
+      url: "{{ proxy_cache.registry.endpointUrl }}"
+
+- name: Retrieve info from registry name
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: _result
+
+- name: Create Project registry cache
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: POST
+    url: https://{{ harbor_domain }}/api/v2.0/projects
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [201]
+    body: "{{ {'project_name': proxy_cache.name, 'metadata': {'public': 'true'},'storage_limit': -1,'registry_id': (_result.json[0].id | int)} }}"
+  

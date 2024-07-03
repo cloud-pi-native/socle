@@ -1,0 +1,49 @@
+---
+- name: Retrieve all projects of type proxy cache
+  # define an arbitrary long range for registry_id
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/projects?q=registry_id=[1~150000]&page=1&page_size=100
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: _result
+
+- name: Delete loop for previously projects
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: DELETE
+    url: "https://{{ harbor_domain }}/api/v2.0/projects/{{ item.project_id }}"
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  loop: "{{ _result.json }}"
+
+- name: Retrieve all registries
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/registries?page=1&page_size=100
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: _result
+
+- name: Delete loop for previously registries
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: DELETE
+    url: "https://{{ harbor_domain }}/api/v2.0/registries/{{ item.id }}"
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  loop: "{{ _result.json }}"

@@ -474,6 +474,48 @@ spec:
                     pvcTrivySize:
                       description: Size for trivy persistent volume.
                       type: string
+                    proxyCache:
+                      description: Array of proxy cache
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            description: Name of project and registry
+                            type: string
+                          registry:
+                            description: registry configuration
+                            type: object
+                            properties:
+                              provider:
+                                description: ID of the provider 
+                                type: string
+                                default: docker-hub
+                              endpointUrl:
+                                description: URL of the registry
+                                type: string
+                                default: ""
+                              insecure:
+                                description: Insecure connection
+                                default: false
+                                type: boolean
+                              credential:
+                                type: object
+                                properties:
+                                  accessKey:
+                                    type: string
+                                    default: ""
+                                  accessSecret:
+                                    type: string
+                                    default: ""
+                                  type:
+                                    type: string
+                                    default: "basic"
+                            required:
+                              - provider
+                        required:
+                          - name
+                          - registry
                     values:
                       description: |
                         You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml

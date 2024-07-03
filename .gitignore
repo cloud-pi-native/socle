@@ -6,3 +6,7 @@ vars.yaml
 
 # node modules
 node_modules
+
+.venv/
+.vscode/
+pyvenv.cfg

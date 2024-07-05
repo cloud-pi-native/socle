@@ -57,7 +57,11 @@
 
 - name: Create PostgreSQL cluster and harbor database
   kubernetes.core.k8s:
-    template: pg-cluster-harbor.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-harbor.yaml.j2
+    - pg-cluster-harbor-backup.yaml.j2
+    - pg-cluster-harbor-nodeport.yaml.j2
 
 - name: Wait pg-cluster-harbor-rw endpoint
   kubernetes.core.k8s_info:

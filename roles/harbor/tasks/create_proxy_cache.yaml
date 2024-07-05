@@ -1,42 +1,104 @@
 ---
-- name: Create registry
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    method: POST
-    url: https://{{ harbor_domain }}/api/v2.0/registries
-    password: "{{ dsc.harbor.adminPassword }}"
-    user: admin
-    force_basic_auth: true
-    body_format: json
-    status_code: [201]
-    body:
-      credential: "{{ proxy_cache.registry.credential }}"
-      insecure: "{{ proxy_cache.registry.insecure }}"
-      name: "{{ proxy_cache.name }}"
-      type: "{{ proxy_cache.registry.provider }}"
-      url: "{{ proxy_cache.registry.endpointUrl }}"
+- debug:
+    msg: "Proxy cache: {{ _proxy_cache.name }}"
 
-- name: Retrieve info from registry name
+- name: Check if registry exists
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
+    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ _proxy_cache.name }}
     password: "{{ dsc.harbor.adminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json
     status_code: [200]
-  register: _result
+  register: _result_registry
 
-- name: Create Project registry cache
+- name: Create or Update registry
+  vars:
+    _x_total_count_test: "{{ (_result_registry.x_total_count | int) == 0 }}"
+    _method: "{{ _x_total_count_test | ternary('POST', 'PUT')  }}"
+    _url_id_param: "{{ _x_total_count_test | ternary('', _result_registry.json[0].id)  }}"
+
+    # Harbor n'attend pas la même structure de paramètre pour une création ou une modification
+    _body_post:
+      credential: 
+        type: "{{ _proxy_cache.registry.credential.type | default('basic') }}"
+        access_key: "{{ _proxy_cache.registry.credential.accessKey | default('') }}"
+        access_secret: "{{ _proxy_cache.registry.credential.accessSecret | default('') }}"
+      insecure: "{{ _proxy_cache.registry.insecure }}"
+      name: "{{ _proxy_cache.name }}"
+      type: "{{ _proxy_cache.registry.provider }}"
+      url: "{{ _proxy_cache.registry.endpointUrl }}"
+    _body_put:
+      credential_type: "{{ _proxy_cache.registry.credential.type | default('basic') }}"
+      access_key: "{{ _proxy_cache.registry.credential.accessKey | default('') }}"
+      access_secret: "{{ _proxy_cache.registry.credential.accessSecret | default('') }}"
+      insecure: "{{ _proxy_cache.registry.insecure }}"
+      name: "{{ _proxy_cache.name }}"
+      type: "{{ _proxy_cache.registry.provider }}"
+      url: "{{ _proxy_cache.registry.endpointUrl }}"
+    
+    _body: "{{ _x_total_count_test | ternary(_body_post, _body_put)  }}"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    method: POST
-    url: https://{{ harbor_domain }}/api/v2.0/projects
+    method: "{{ _method }}"
+    url: https://{{ harbor_domain }}/api/v2.0/registries/{{_url_id_param}}
     password: "{{ dsc.harbor.adminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json
-    status_code: [201]
-    body: "{{ {'project_name': proxy_cache.name, 'metadata': {'public': 'true'},'storage_limit': -1,'registry_id': (_result.json[0].id | int)} }}"
+    status_code: [200, 201]
+    body: "{{ _body }}"
+
+- name: Retrieve info from registry name
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ _proxy_cache.name }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: _result_registry
+
+- name: Check if registry exists
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/projects?q=name={{ _proxy_cache.name }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: _result_project
+
+- name: Debug _result_project
+  debug:
+    var: _result_project
+    verbosity: 1
+
+- name: Debug _result_registry
+  debug:
+    var: _result_registry
+    verbosity: 1
+
+- name: Create or Update Project registry cache
+  vars:
+    _x_total_count_test: "{{ (_result_project.x_total_count | int) == 0 }}"
+    _project_id: "{{ _result_project.json[0].project_id | default('-1') }}"
+    _method: "{{ _x_total_count_test | ternary('POST', 'PUT')  }}"
+    _url_id_param: "{{ _x_total_count_test | ternary('', _project_id)  }}"
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: "{{ _method }}"
+    url: https://{{ harbor_domain }}/api/v2.0/projects/{{ _url_id_param }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200, 201]
+    body: "{{ {'project_name': _proxy_cache.name, 'metadata': {'public': 'true'},'storage_limit': -1,'registry_id': (_result_registry.json[0].id | int)} }}"
   

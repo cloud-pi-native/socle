@@ -33,7 +33,7 @@ cnpg:
 {% if dsc.global.backup.cnpg.enabled %}
   backup:
     enabled: "{{ dsc.global.backup.cnpg.enabled }}"
-    destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}console"
+    destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}"
     endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
     endpointCA:
       name: "bundle-cnpg-s3"

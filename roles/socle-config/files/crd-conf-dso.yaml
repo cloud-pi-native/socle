@@ -187,6 +187,27 @@ spec:
                       description: Console repository url.
                       default: https://cloud-pi-native.github.io/helm-charts 
                       type: string
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          type: string
                   type: object
                 gitlab:
                   description: Configuration for GitLab.
@@ -395,7 +416,7 @@ spec:
                                   type: string
                               type: object
                             destinationPath:
-                              description: Defines the globally shared s3 destination path for cnpg backups (it should be set like `<bucket_name>/<optional_dir>/` with the trailing slash).
+                              description: Defines the globally shared s3 destination path for cnpg backups (it should be set like `<bucket_name>/<optional_dir>`).
                               type: string
                               default: ""
                             s3Credentials:
@@ -578,6 +599,27 @@ spec:
                       description: Size for postgres' pvc
                       type: string
                       default: 10Gi
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          type: string
                   required:
                     - adminPassword
                     - pvcRegistrySize
@@ -694,6 +736,27 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          type: string
                   type: object
                 kyverno:
                   description: Configuration for Kyverno.
@@ -795,6 +858,27 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          type: string
                   type: object
                 vault:
                   description: Configuration for Vault.

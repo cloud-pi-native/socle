@@ -27,6 +27,8 @@ spec:
           memory: "6Gi"
           cpu: "2"
   global:
+    platform: openshift
+    offline: false
     environment: production
     projectsRootDir:
       - forge

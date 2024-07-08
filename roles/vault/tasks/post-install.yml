@@ -243,7 +243,7 @@
     url: https://{{ vault_domain }}/v1/sys/auth/jwt
     status_code: [200, 400]
     headers:
-      X-Vault-Token: "{{ root_token }}"
+      X-Vault-Token: "{{ vault_token }}"
   register: jwt_state
   retries: 5
 

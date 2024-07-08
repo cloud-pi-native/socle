@@ -269,6 +269,6 @@
         file: create_proxy_cache.yaml
       loop: "{{ dsc.harbor.proxyCache }}"
       loop_control:
-        loop_var: _proxy_cache
-        label: "{{ _proxy_cache.name }}"
+        loop_var: proxy_cache
+        label: "{{ proxy_cache.name }}"
   when: dsc.harbor.proxyCache is defined

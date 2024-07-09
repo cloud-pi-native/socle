@@ -22,9 +22,19 @@
     path: catalog
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     visibility: internal
-  register: catalog_repo
 
-- name: Synchronize repo
-  ansible.builtin.include_tasks:
-    file: sync.yaml
-  when: not dsc.global.offline
+- name: Clone Git repository as bare
+  ansible.builtin.git:
+    repo: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
+    dest: /tmp/test
+    bare: yes
+  environment:
+    GIT_SSL_NO_VERIFY: "1"
+
+- name: Sync Git repository with push mirror
+  ansible.builtin.shell: |
+    set -e
+    git config --add http.sslVerify false
+    git push --mirror "https://admin:{{ gitlab_token }}@{{ gitlab_domain }}/{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+  args:
+    chdir: /tmp/test

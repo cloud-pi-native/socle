@@ -4,7 +4,8 @@
     name: "{{ dsc_name }}-vault-0"
     namespace: "{{ dsc.vault.namespace }}"
   register: vault_pod_check
-  until: vault_pod_check.resources[0].status.phase == 'Running'
+  until: vault_pod_check.resources[0] is defined and
+    vault_pod_check.resources[0].status.phase == 'Running'
   retries: 15
   delay: 5
 
@@ -99,87 +100,93 @@
   vars:
     vault_pod: "{{ dsc_name }}-vault-0"
 
-# Join node 2 to Vault cluster
-- name: Check vault-1 status - node 2
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-1"
+- name: Join and unseal node 2
+  when: vault_values.server.ha.enabled
+  block:
+    # Join node 2 to Vault cluster
+    - name: Check vault-1 status - node 2
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-1"
 
-- name: Join vault-1 node to cluster - node 2
-  when: vault_status == 'not init'
-  kubernetes.core.k8s_exec:
-    container: vault
-    pod: "{{ dsc_name }}-vault-1"
-    namespace: "{{ dsc.vault.namespace }}"
-    command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
-  register: node2_join_state
-  retries: 3
-  delay: 20
+    - name: Join vault-1 node to cluster - node 2
+      when: vault_status == 'not init'
+      kubernetes.core.k8s_exec:
+        container: vault
+        pod: "{{ dsc_name }}-vault-1"
+        namespace: "{{ dsc.vault.namespace }}"
+        command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
+      register: node2_join_state
+      retries: 3
+      delay: 20
 
-# Unseal node 2
-- name: Check vault-1 status - node 2
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-1"
+    # Unseal node 2
+    - name: Check vault-1 status - node 2
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-1"
 
-- name: Set seal count - node 2
-  ansible.builtin.set_fact:
-    vault_pod: "{{ dsc_name }}-vault-1"
-    unseal_key_index: "0"
+    - name: Set seal count - node 2
+      ansible.builtin.set_fact:
+        vault_pod: "{{ dsc_name }}-vault-1"
+        unseal_key_index: "0"
 
-- name: Get vault keys
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.vault.namespace }}"
-    kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
+    - name: Get vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vault.namespace }}"
+        kind: Secret
+        name: "{{ dsc_name }}-vault-keys"
+      register: vault_keys
 
-- name: Unseal vault node - node 2
-  when: vault_status == 'not init' or vault_status == 'sealed'
-  ansible.builtin.include_tasks: unseal.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-1"
+    - name: Unseal vault node - node 2
+      when: vault_status == 'not init' or vault_status == 'sealed'
+      ansible.builtin.include_tasks: unseal.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-1"
 
-# Join node 3 to Vault cluster
-- name: Check vault-2 status - node 3
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-2"
+- name: Join and unseal node 3
+  when: vault_values.server.ha.enabled
+  block:
+    # Join node 3 to Vault cluster
+    - name: Check vault-2 status - node 3
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-2"
 
-- name: Join vault-2 to cluster - node 3
-  when: vault_status == 'not init'
-  kubernetes.core.k8s_exec:
-    container: vault
-    pod: "{{ dsc_name }}-vault-2"
-    namespace: "{{ dsc.vault.namespace }}"
-    command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
-  register: node3_join_state
-  retries: 3
-  delay: 20
+    - name: Join vault-2 to cluster - node 3
+      when: vault_status == 'not init'
+      kubernetes.core.k8s_exec:
+        container: vault
+        pod: "{{ dsc_name }}-vault-2"
+        namespace: "{{ dsc.vault.namespace }}"
+        command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
+      register: node3_join_state
+      retries: 3
+      delay: 20
 
-# Unseal node 3
-- name: Check vault-2 status - node 3
-  ansible.builtin.include_tasks: check.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-2"
+    # Unseal node 3
+    - name: Check vault-2 status - node 3
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-2"
 
-- name: Set seal count - node 3
-  ansible.builtin.set_fact:
-    vault_pod: "{{ dsc_name }}-vault-2"
-    unseal_key_index: "0"
+    - name: Set seal count - node 3
+      ansible.builtin.set_fact:
+        vault_pod: "{{ dsc_name }}-vault-2"
+        unseal_key_index: "0"
 
-- name: Get vault keys
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.vault.namespace }}"
-    kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
+    - name: Get vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vault.namespace }}"
+        kind: Secret
+        name: "{{ dsc_name }}-vault-keys"
+      register: vault_keys
 
-- name: Unseal vault node - node 3
-  when: vault_status == 'not init' or vault_status == 'sealed'
-  ansible.builtin.include_tasks: unseal.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-2"
+    - name: Unseal vault node - node 3
+      when: vault_status == 'not init' or vault_status == 'sealed'
+      ansible.builtin.include_tasks: unseal.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-2"
 
 # Retrieve Vault token
 - name: Get Vault keys
@@ -188,6 +195,16 @@
     kind: Secret
     name: "{{ dsc_name }}-vault-keys"
   register: vault_keys
+
+- name: Update inventory
+  kubernetes.core.k8s:
+    kind: Secret
+    name: dso-config
+    namespace: "{{ dsc.console.namespace }}"
+    state: patched
+    definition:
+      data:
+        VAULT_TOKEN: "{{ vault_keys.resources[0].data.root_token }}"
 
 - name: Get Vault token
   ansible.builtin.set_fact:
@@ -217,6 +234,99 @@
       type: kv
       options:
         version: 2
+    body_format: json
+
+# Jwt
+- name: Config - get auth method"
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ vault_domain }}/v1/sys/auth/jwt
+    status_code: [200, 400]
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+  register: jwt_state
+  retries: 5
+
+- name: Config - set auth method
+  when: jwt_state.status == 400
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ vault_domain }}/v1/sys/auth/jwt
+    method: POST
+    status_code: [204]
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    body:
+      type: jwt
+      description: Login for Gitlab-ci
+    body_format: json
+
+- name: Config - add role default-ci
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ vault_domain }}/v1/auth/jwt/role/default-ci
+    method: POST
+    status_code: [204]
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+      Content-Type: application/json
+    body:
+      role_type: jwt
+      policies:
+        - default-ci
+      token_explicit_max_ttl: 60
+      bound_claims_type: glob
+      user_claim: user_email
+      bound_audiences: 
+        - https://{{ vault_domain }}
+      claim_mappings:
+        namespace_path: namespace_path
+        project_path: project_path
+        project_id: project_id
+        ref: ref
+    body_format: json
+
+- name: Config - set jwt config
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ vault_domain }}/v1/auth/jwt/config
+    method: POST
+    status_code: [204]
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    body:
+      oidc_discovery_url: https://{{ gitlab_domain }}
+      oidc_discovery_ca_pem: "{{ exposed_ca_pem }}"
+      bound_issuer: https://{{ gitlab_domain }}
+      default_role: default-ci
+      namespace_in_state: false
+    body_format: json
+
+- name: Config - get accessor jwt config
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ vault_domain }}/v1/sys/auth/jwt
+    status_code: [200]
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+  register: get_accessor
+
+- name: Config - create policy
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ vault_domain }}/v1/sys/policy/default-ci
+    method: POST
+    status_code: [204]
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    body:
+      policy: |
+        path "forge-dso/+/{{ '{{' }}identity.entity.aliases.{{ get_accessor.json.accessor }}.metadata.namespace_path{{ '}}' }}/*" {
+          capabilities = ["list","read"]
+        }
+        path "forge-dso/+/{{ '{{' }}identity.entity.aliases.{{ get_accessor.json.accessor }}.metadata.namespace_path{{ '}}' }}" {
+          capabilities = ["list","read"]
+        }
     body_format: json
 
 # Oidc
@@ -258,7 +368,7 @@
   register: vault_secret
   failed_when: vault_secret.resources | length == 0
 
-- name: Configue oidc auth method
+- name: Configure oidc auth method
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: "https://{{ vault_domain }}/v1/auth/oidc/config"
@@ -323,7 +433,7 @@
     headers:
       "X-Vault-Token": "{{ vault_token }}"
     body:
-      "name": "/admin"
+      "name": "admin"
       "type": "external"
       "policies":
         - "admin"
@@ -342,7 +452,7 @@
 - name: Get admin group id
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/identity/group/name/%2Fadmin"
+    url: "https://{{ vault_domain }}/v1/identity/group/name/admin"
     method: GET
     status_code: [200, 204]
     headers:
@@ -388,3 +498,12 @@
             scrapeTimeout: 10s
             tlsConfig:
               insecureSkipVerify: true
+        namespaceSelector:
+          matchNames:
+            - "{{ dsc.vault.namespace }}"
+        selector:
+          matchLabels:
+            app.kubernetes.io/instance: "{{ dsc_name }}-vault"
+            app.kubernetes.io/name: vault
+            vault-active: null
+            vault-internal: "true"

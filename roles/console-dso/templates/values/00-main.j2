@@ -10,7 +10,7 @@ postgresql:
 
 global:
   postgresql:
-    dbUrl: {{ (pg_db_secret | from_yaml | json_query('resources[0].data.uri') | b64decode + '?schema=public') | default('postgresql://username:password@host:port?schema=public') }}
+    dbUrl: "{% if pg_db_secret.resources == [] %}postgresql://username:password@host:port?schema=public{% else %}{{ (pg_db_secret | from_yaml | json_query('resources[0].data.uri') | b64decode + '?schema=public')}}{% endif %}"
   keycloak:
     clientIds:
       backend: {{ console_backend_secret.resources[0].data.CLIENT_ID | b64decode }}

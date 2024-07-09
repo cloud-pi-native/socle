@@ -1,4 +1,4 @@
-# Installation de la plateforme DSO <!-- omit in toc -->
+# Installation de la plateforme Cloud π Native <!-- omit in toc -->
 
 ## Sommaire <!-- omit in toc -->
 
@@ -47,30 +47,30 @@
 
 ## Introduction
 
-L'installation de la forge DSO (DevSecOps) s'effectue de manière automatisée avec **Ansible**.
+L'installation de la plateforme Cloud π Native (aussi appelée `DSO` pour `DevSecOps`) s'effectue de manière automatisée avec **Ansible**.
 
 Les éléments déployés seront les suivants :
 
-| Outil                                | Site officiel                                                                             |
-| ------------------------------------ | ----------------------------------------------------------------------------------------- |
-| Argo CD                              | <https://argo-cd.readthedocs.io>                                                          |
-| Cert-manager                         | <https://cert-manager.io>                                                                 |
-| CloudNativePG                        | <https://cloudnative-pg.io>                                                               |
-| Console Cloud π Native               | <https://github.com/cloud-pi-native/console>                                              |
-| GitLab                               | <https://about.gitlab.com>                                                                |
-| gitLab-ci-catalog                    | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                                    |
-| gitLab-ci-pipelines-exporter         | <https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter> |
-| GitLab Operator                      | <https://docs.gitlab.com/operator>                                                        |
-| GitLab Runner                        | <https://docs.gitlab.com/runner>                                                          |
-| Grafana (optionnel)                  | <https://grafana.com>                                                                     |
-| Grafana Operator (optionnel)         | <https://grafana.github.io/grafana-operator/>                                             |
-| Harbor                               | <https://goharbor.io>                                                                     |
-| HashiCorp Vault                      | <https://www.vaultproject.io>                                                             |
-| Keycloak                             | <https://www.keycloak.org>                                                                |
-| Kyverno                              | <https://kyverno.io>                                                                      |
-| Prometheus Operator CRDs (optionnel) | <https://github.com/prometheus-operator/prometheus-operator/releases><br>Fichier `stripped-down-crds.yaml`<br>Disponible dans les Assets de chaque version.           |
-| SonarQube Community Edition          | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition>            |
-| Sonatype Nexus Repository            | <https://www.sonatype.com/products/sonatype-nexus-repository>                             |
+| Outil                                | Site officiel                                                                                                                                               |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Argo CD                              | <https://argo-cd.readthedocs.io>                                                                                                                            |
+| Cert-manager                         | <https://cert-manager.io>                                                                                                                                   |
+| CloudNativePG                        | <https://cloudnative-pg.io>                                                                                                                                 |
+| Console Cloud π Native               | <https://github.com/cloud-pi-native/console>                                                                                                                |
+| GitLab                               | <https://about.gitlab.com>                                                                                                                                  |
+| gitLab-ci-catalog                    | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                                                                                                      |
+| gitLab-ci-pipelines-exporter         | <https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter>                                                                   |
+| GitLab Operator                      | <https://docs.gitlab.com/operator>                                                                                                                          |
+| GitLab Runner                        | <https://docs.gitlab.com/runner>                                                                                                                            |
+| Grafana (optionnel)                  | <https://grafana.com>                                                                                                                                       |
+| Grafana Operator (optionnel)         | <https://grafana.github.io/grafana-operator/>                                                                                                               |
+| Harbor                               | <https://goharbor.io>                                                                                                                                       |
+| HashiCorp Vault                      | <https://www.vaultproject.io>                                                                                                                               |
+| Keycloak                             | <https://www.keycloak.org>                                                                                                                                  |
+| Kyverno                              | <https://kyverno.io>                                                                                                                                        |
+| Prometheus Operator CRDs (optionnel) | <https://github.com/prometheus-operator/prometheus-operator/releases><br>Fichier `stripped-down-crds.yaml`<br>Disponible dans les Assets de chaque version. |
+| SonarQube Community Edition          | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition>                                                                              |
+| Sonatype Nexus Repository            | <https://www.sonatype.com/products/sonatype-nexus-repository>                                                                                               |
 
 Certains outils peuvent prendre un peu de temps pour s'installer. Ce sera le cas de Keycloak, Nexus, SonarQube et en particulier GitLab.
 
@@ -1041,7 +1041,7 @@ pnpm install && pnpm run format
 
 ### Conventions
 
-Cf. [Conventions - MIOM Fabrique Numérique](https://projets-ts-fabnum.netlify.app/conventions/nommage.html).
+Cf. [Conventions - MIOM Fabrique Numérique](https://docs.fabrique-numerique.fr/conventions/nommage.html).
 
 Les commits doivent suivre la spécification des [Commits Conventionnels](https://www.conventionalcommits.org/en/v1.0.0/), il est possible d'ajouter l'[extension VSCode](https://github.com/vivaxy/vscode-conventional-commits) pour faciliter la création des commits.
 

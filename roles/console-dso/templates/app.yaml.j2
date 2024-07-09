@@ -12,7 +12,7 @@ spec:
   project: console-pi-native
   source: 
     chart: cpn-console
-    repoURL: https://cloud-pi-native.github.io/helm-charts
+    repoURL: "{{ dsc.console.consoleRepoUrl }}" 
     targetRevision: {{ dsc.console.release }}
     helm:
       releaseName: dso

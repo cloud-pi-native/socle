@@ -1,5 +1,34 @@
 # Changelog
 
+## [2.7.0](https://github.com/cloud-pi-native/socle/compare/v2.6.0...v2.7.0) (2024-07-09)
+
+
+### Features
+
+* :sparkles: add dsc.global.offline ([87e6bd6](https://github.com/cloud-pi-native/socle/commit/87e6bd6c1a79cbbeb9113919f7cb73c16736fb0d))
+* :sparkles: add dsc.global.platform: rke2 ([48403de](https://github.com/cloud-pi-native/socle/commit/48403de21de0e41a52fef90b0383a0870810942e))
+* :sparkles: add proxy cache for Harbor ([77d3207](https://github.com/cloud-pi-native/socle/commit/77d3207691102ac80261fef22f18ea9e2812a8d1))
+* :sparkles: Introducing get-versions playbook ([6c0893e](https://github.com/cloud-pi-native/socle/commit/6c0893e99c60d29bacbbf3283cc3902dbc7fabf6))
+
+
+### Bug Fixes
+
+* :ambulance: add vault jwt auth config ([39d226c](https://github.com/cloud-pi-native/socle/commit/39d226c5a883d9032b04b75fb7cce887da923582))
+* :art: Indentation ([0b02c4d](https://github.com/cloud-pi-native/socle/commit/0b02c4df080e530cf3658f45662f8c0306b503a9))
+* :bug: Add always tag to cert-manager role ([71e1b3f](https://github.com/cloud-pi-native/socle/commit/71e1b3f45f1795c55e526c49ffc35ee87de7b8a0))
+* :bug: Fix placeholder file check ([c71d1e0](https://github.com/cloud-pi-native/socle/commit/c71d1e0b68186f3a4fbf558e46028726d9e04cd2))
+* :bug: Fix ServiceMonitor and standalone config ([2b19515](https://github.com/cloud-pi-native/socle/commit/2b1951504eb72db90cdc946a4180ab3210d5ba01))
+* :bug: Fix variable name ([0b351f2](https://github.com/cloud-pi-native/socle/commit/0b351f26cb69e629c74517da431e21a44fcfae7f))
+* :bug: Fix Vault post-install ([ab06d38](https://github.com/cloud-pi-native/socle/commit/ab06d3889263843d94a5255aa2a569e8269fa3cc))
+* :bug: gitlab ci catalog sync ([3421aa9](https://github.com/cloud-pi-native/socle/commit/3421aa9b4af932c3f5043fd4b12f1cd15f90bdef))
+* :bug: Set default repo URL + sync.yaml filename ([6c3abde](https://github.com/cloud-pi-native/socle/commit/6c3abde54d964295e64d1ce2e2768caa4c2e7f2c))
+* :bug: Vault admin group ([5ff2b52](https://github.com/cloud-pi-native/socle/commit/5ff2b522b1f0a99c38065766c96f3bcd34ed4dda))
+* :pencil2: Fix typos ([b15e9d2](https://github.com/cloud-pi-native/socle/commit/b15e9d2ade4c15a640084a17a2bf902d520a854f))
+* :wrench: block logic for first console deployment ([068376d](https://github.com/cloud-pi-native/socle/commit/068376dbab6e92364416bf5a79f1c57be9a2aafd))
+* :wrench: populate VAULT_TOKEN in dso-config ([e9dad90](https://github.com/cloud-pi-native/socle/commit/e9dad90e5f1271fe6a0b9d9093cc2571d21f9257))
+* :wrench: remove force true ([9a2eda6](https://github.com/cloud-pi-native/socle/commit/9a2eda65de245d769546c8f2c732c2cf2c59bfc5))
+* 🐛 Fix first install for dso-console ([8ffe6a5](https://github.com/cloud-pi-native/socle/commit/8ffe6a5618ff0a15eb1b48bf44be3f87716ac2d7))
+
 ## [2.6.0](https://github.com/cloud-pi-native/socle/compare/v2.5.0...v2.6.0) (2024-06-14)
 
 

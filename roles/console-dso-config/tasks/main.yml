@@ -39,7 +39,7 @@
       kind: Secret
       metadata:
         name: dso-config-pull-secret
-        labels: 
+        labels:
           ns.kyverno.io/all-sync: "" # Share secret for all dso namespaces
         namespace: "default"
       type: kubernetes.io/dockerconfigjson

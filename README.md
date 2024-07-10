@@ -41,6 +41,7 @@
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
 - [Backups](#backups)
+- [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1026,6 +1027,58 @@ Pour les backups S3 des BDD PostgreSQL déployées via CNPG :
 ```
 kubectl explain dsc.spec.global.backup.cnpg
 ```
+
+## Utilisation de credentials Docker Hub pour le pull des images
+
+Si vous disposez d'un compte Docker Hub, il est possible de l'utiliser pour le pull d'images des outils de la plateforme elle-même.
+
+Ceci peut se révéler utile si vous effectuez de nombreux tests d'installation, et que vous vous retrouvez confronté à la problématique des [pull rate limits](https://www.docker.com/increase-rate-limits) de Docker Hub.
+
+Pour cela, générez tout d'abord un secret de type `kubernetes.io/dockerconfigjson` en mode dry run et qui contiendra vos identifiants Docker Hub.
+
+Vous en récupérerez le contenu encodé en base64, en une seule fois, via la commande suivante (à adapter avec vos identifiants) :
+
+```bash
+k create secret docker-registry docker-hub-creds \
+    --docker-server="https://index.docker.io/v1" \
+    --docker-username="email@example.com" \
+    --docker-password="mot_de_passe_ici" \
+    --docker-email="email@example.com" \
+    --dry-run=client \
+    -o yaml \
+    | yq '.data[.dockerconfigjson]'
+```
+
+Notez que du fait de l'utilisation de l'option `dry-run`, le secret n'est pas véritablement créé. La partie qui nous intéresse, encodée en base64, est simplement affichée sur la sortie standard.
+
+Copiez cette sortie, et collez-là dans la section `spec.global.imagePullSecretsData` de votre resource dsc (par défaut conf-dso), exemple :
+
+```yaml
+  global:
+    imagePullSecretsData: valeur_récupérée_ici
+```
+
+Une fois le changement appliqué à la dsc, relancez l'installation de l'outil souhaité ou de la chaîne DSO complète. Le processus d'installation va maintenant s'appuyer sur le secret `dso-config-pull-secret` créé dans le namespace `default`, utilisant vos identifiants Docker Hub, et répliqué dans le namespace de chaque outil.
+
+Si vous constatez que la réplication du secret n'a pas lieu ou qu'elle prend trop de temps, supprimez préalablement la ClusterPolicy Kyverno `replace-kubed` :
+
+```bash
+kubectl delete cpol replace-kubed
+```
+
+Puis relancez l'installation de Kyverno, qui va simplement recréer puis appliquer immédiatement la policy :
+
+```bash
+ansible-playbook install.yaml -t kyverno
+```
+
+Vérifiez la présence du secret `dso-config-pull-secret` dans le(s) namespace(s) souhaité(s) :
+
+```bash
+kubectl get secrets -A | egrep 'NAME|dso-config-pull-secret'
+```
+
+Puis relancez l'installation de l'outil voulu ou de la chaîne complète. 
 
 ## Contributions
 

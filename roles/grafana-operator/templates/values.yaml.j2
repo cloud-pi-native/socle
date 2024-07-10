@@ -27,7 +27,12 @@ image:
   tag: ""
 
 # -- image pull secrets
+{% if use_image_pull_secrets %}
+imagePullSecrets: 
+- name: dso-config-pull-secret
+{% else %}
 imagePullSecrets: []
+{% endif %}
 
 nameOverride: ""
 fullnameOverride: ""

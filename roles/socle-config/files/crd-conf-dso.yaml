@@ -244,7 +244,7 @@ spec:
                     postgresPvcSize:
                       description: Size for postgres' pvc
                       type: string
-                      default: 10Gi                        
+                      default: 10Gi
                   type: object
                 gitlabCiPipelinesExporter:
                   description: Configuration for GitLab CI Pipelines Exporter.

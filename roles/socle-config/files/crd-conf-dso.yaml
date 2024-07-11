@@ -244,7 +244,7 @@ spec:
                     postgresPvcSize:
                       description: Size for postgres' pvc
                       type: string
-                      default: 10Gi
+                      default: 10Gi                        
                   type: object
                 gitlabCiPipelinesExporter:
                   description: Configuration for GitLab CI Pipelines Exporter.
@@ -325,6 +325,21 @@ spec:
                                 memory:
                                   description: Memory limit max overwrite for GitLab Runner.
                                   type: string
+                    image:
+                      description: Image used for runner
+                      type: string
+                      default: "ubuntu:22.04"
+                    pullPolicy:
+                      description: | 
+                        Pull policy for runner's image 
+                        (see https://docs.gitlab.com/runner/security/index.html#usage-of-private-docker-images-with-if-not-present-pull-policy)
+                      type: array
+                      items:
+                        type: string
+                      minItems: 1
+                      default:
+                        - always
+                        - always
                   type: object
                 global:
                   description: Global configuration not specific to one service

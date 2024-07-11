@@ -137,7 +137,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for argocd, it will be merged with roles/argocd/tasks/main.yaml
+                        You can merge customs values for argocd, it will be merged with roles/argocd/templates/values/
                         See https://github.com/bitnami/charts/tree/main/bitnami/argo-cd
                       type: object
                       default: {}
@@ -164,6 +164,13 @@ spec:
                         Set to true for a forced installation.
                       default: false
                       type: boolean
+                    values:
+                      description: |
+                        You can merge customs values for CloudNativePG, it will be merged with roles/cert-manager/templates/values/
+                        See https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/README.md#values
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 cloudnativepg:
                   description: Configuration for CloudNativePG.
@@ -184,6 +191,13 @@ spec:
                         Set to true for a forced installation.
                       default: false
                       type: boolean
+                    values:
+                      description: |
+                        You can merge customs values for CloudNativePG, it will be merged with roles/cloudnativepg/templates/values/
+                        See https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/README.md#values
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 console:
                   description: Configuration for the console.
@@ -249,7 +263,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for gitlab, it will be merged with roles/gitlab/templates/gitlab-instance.yaml.j2
+                        You can merge customs values for gitlab, it will be merged with roles/gitlab/templates/values/
                         See https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
                         And https://docs.gitlab.com/charts/charts/globals.html
                       type: object
@@ -321,6 +335,12 @@ spec:
                     chartVersion:
                       description: GitLab CI Pipelines Exporter chart version (e.g., "0.3.4").
                       type: string
+                    values:
+                      description: |
+                        You can merge customs values for GitLab-ci-pipeline-exporter, they will be merged with roles/gitlab-ci-pipeline-exporter/templates/values/
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 gitlabOperator:
                   description: Configuration for GitLab Operator.
@@ -341,6 +361,14 @@ spec:
                         Set to true for a forced installation.
                       default: false
                       type: boolean
+                    values:
+                      description: |
+                        You can merge customs values for GitLab Operator, it will be merged with roles/gitlab-operator/templates/values/
+                        See https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/
+                        And https://docs.gitlab.com/operator/
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 gitlabCatalog:
                   description: Configuration for GitLab Catalog.
@@ -407,6 +435,14 @@ spec:
                                 memory:
                                   description: Memory limit max overwrite for GitLab Runner.
                                   type: string
+                    values:
+                      description: |
+                        You can merge customs values for GitLab Runner, it will be merged with roles/gitlab-runner/templates/values/
+                        See https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
+                        And https://docs.gitlab.com/runner/
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 global:
                   description: Global configuration not specific to one service
@@ -627,6 +663,13 @@ spec:
                     namespace:
                       description: The namespace for Grafana Operator.
                       type: string
+                    values:
+                      description: |
+                        You can merge customs values for Grafana Operator, it will be merged with roles/grafana-operator/templates/values/
+                        See https://grafana.github.io/grafana-operator/docs/installation/helm/#values
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 harbor:
                   description: Configuration for Harbor.
@@ -705,7 +748,7 @@ spec:
                           - registry
                     values:
                       description: |
-                        You can merge customs values for harbor, it will be merged with roles/harbor/tasks/main.yaml
+                        You can merge customs values for harbor, it will be merged with roles/harbor/templates/values/
                         See https://github.com/goharbor/harbor-helm
                       type: object
                       default: {}
@@ -852,7 +895,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values.j2
+                        You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values/
                         See https://github.com/bitnami/charts/tree/main/bitnami/keycloak
                         And https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
                       type: object
@@ -900,6 +943,13 @@ spec:
                     chartVersion:
                       description: Kyverno helm chart version (e.g., "3.1.4").
                       type: string
+                    values:
+                      description: |
+                        You can merge customs values for Kyverno, they will be merged with roles/kyverno/templates/values/
+                        See https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 nexus:
                   description: Configuration for Nexus.
@@ -989,7 +1039,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for sonarqube, it will be merged with roles/sonarqube/tasks/main.yaml
+                        You can merge customs values for sonarqube, it will be merged with roles/sonarqube/templates/values/
                         See https://github.com/bitnami/charts/tree/main/bitnami/sonarqube
                       type: object
                       default: {}
@@ -1037,7 +1087,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for vault, it will be merged with roles/vault/tasks/main.yaml
+                        You can merge customs values for vault, it will be merged with roles/vault/templates/values/
                         See https://github.com/hashicorp/vault-helm
                       type: object
                       default: {}

@@ -41,6 +41,7 @@
         name: combine
       vars:
         combine_path: "{{ path }}"
+        combine_user_values: "{{ dsc.cloudnativepg['values'] }}"
         combine_dest_var: "cnpg_values"
 
     - name: Deploy CloudNativePG helm

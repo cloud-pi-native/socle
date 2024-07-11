@@ -60,9 +60,17 @@
         repo_url: "{{ dsc.gitlabOperator.helmRepoUrl }}"
         force_update: true
 
-    - name: Set GitLab Operator helm values
+    - name: Set path fact
       ansible.builtin.set_fact:
-        operator_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+        path: "{{ role_path + '/templates/values' }}"
+
+    - name: Compute Cert-manager Helm values
+      ansible.builtin.include_role:
+        name: combine
+      vars:
+        combine_path: "{{ path }}"
+        combine_user_values: "{{ dsc.gitlabOperator['values'] }}"
+        combine_dest_var: "operator_values"
 
     - name: Deploy GitLab Operator helm
       kubernetes.core.helm:

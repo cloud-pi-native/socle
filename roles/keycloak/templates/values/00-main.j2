@@ -161,12 +161,21 @@ metrics:
           - alert: KeycloakInstanceNotAvailable
             annotations:
               message: "Keycloak instance in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} has not been available for the last 5 minutes."
-              summary: "Keycloak instance down (containers not ready)"
+              summary: "Keycloak instance down (no ready container)"
             expr: |
               (absent(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) == 1) or sum(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) == 0
             for: 1m
             labels:
               severity: critical
+          - alert: KeycloakInstanceNotHealthy
+            annotations:
+              message: "Keycloak instance in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} has not been healthy for the last 5 minutes."
+              summary: "Keycloak instance not healthy (some containers are not ready)"
+            expr: |
+              sum(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) < {{ int .Values.replicaCount }}
+            for: 1m
+            labels:
+              severity: warning
           - alert: KeycloakDatabaseNotAvailable
             annotations:
               message: "Keycloak CNPG pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have not been available for the last 5 minutes."

@@ -57,7 +57,7 @@ runners:
         image = "ubuntu:22.04"
         # multiple "always" to retry pull on fail (see. https://docs.gitlab.com/runner/executors/kubernetes.html#set-a-pull-policy)
         pull_policy = ["always", "always"]
-{% if dsc.gitlabRunner.resources != 'none' %}
+{% if dsc.gitlabRunner.resources is defined and dsc.gitlabRunner.resources != 'none' %}
         # request and limit of build pod and override allowed in ci
   {% if dsc.gitlabRunner.resources.requests != 'none' %}
         cpu_request = "{{ dsc.gitlabRunner.resources.requests.cpu }}"

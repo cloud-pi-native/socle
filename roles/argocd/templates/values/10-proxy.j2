@@ -1,6 +1,6 @@
 {% if dsc.proxy.enabled %}
 server:
-  extraEnvVars: &extraEnvVars
+  env: &extraEnvVars
     - name: HTTP_PROXY
       value: "{{ dsc.proxy.http_proxy }}"
     - name: HTTPS_PROXY
@@ -9,5 +9,5 @@ server:
       value: "{{ dsc.proxy.no_proxy }},argo-argo-cd-repo-server"
 
 repoServer:
-  extraEnvVars: *extraEnvVars
+  env: *extraEnvVars
 {% endif %}

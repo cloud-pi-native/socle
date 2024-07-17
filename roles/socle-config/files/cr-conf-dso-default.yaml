@@ -13,8 +13,12 @@ spec:
       enabled: false
   cloudnativepg: {}
   console:
+    cnpg:
+      mode: primary
     values: {}
-  gitlab: {}
+  gitlab:
+    cnpg:
+      mode: primary
   gitlabCiPipelinesExporter: {}
   gitlabOperator: {}
   gitlabRunner:
@@ -40,13 +44,17 @@ spec:
   grafanaDatasource: {}
   grafanaOperator: {}
   harbor:
+    cnpg:
+      mode: primary
     adminPassword: anotherGreatPassword
     pvcRegistrySize: 20Gi
   ingress:
     tls:
       type: none
   kubed: {}
-  keycloak: {}
+  keycloak:
+    cnpg:
+      mode: primary
   kyverno: {}
   nexus:
     storageSize: 25Gi
@@ -56,5 +64,7 @@ spec:
       type: external
   proxy:
     enabled: false
-  sonarqube: {}
+  sonarqube: 
+    cnpg:
+      mode: primary
   vault: {}

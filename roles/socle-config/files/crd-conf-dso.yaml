@@ -194,6 +194,7 @@ spec:
                         mode:
                           description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
                           default: primary
+                          type: string
                           enum:
                             - primary
                             - replica
@@ -266,6 +267,28 @@ spec:
                       description: Size for postgres' pvc
                       type: string
                       default: 10Gi
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          type: string
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          type: string
                   type: object
                 gitlabCiPipelinesExporter:
                   description: Configuration for GitLab CI Pipelines Exporter.
@@ -606,6 +629,7 @@ spec:
                         mode:
                           description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
                           default: primary
+                          type: string
                           enum:
                             - primary
                             - replica
@@ -743,6 +767,7 @@ spec:
                         mode:
                           description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
                           default: primary
+                          type: string
                           enum:
                             - primary
                             - replica
@@ -865,6 +890,7 @@ spec:
                         mode:
                           description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
                           default: primary
+                          type: string
                           enum:
                             - primary
                             - replica

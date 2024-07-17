@@ -279,6 +279,10 @@
       user_claim: user_email
       bound_audiences: 
         - https://{{ vault_domain }}
+      bound_claims:
+        iss: 
+          - "https://{{ gitlab_domain }}"
+          - "{{ gitlab_domain }}"
       claim_mappings:
         namespace_path: namespace_path
         project_path: project_path

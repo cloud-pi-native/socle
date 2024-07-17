@@ -1,8 +1,17 @@
-config:
+crds:
+  install: true
+  keep: true
+{% if dsc.global.platform == "openshift" %}
+openshift:
+  enabled: true
+{% endif %}
+configs:
 {% if dsc.argocd.admin.enabled %}
   secret:
     argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
 {% endif %}
+  params:
+    server.insecure: true
   rbac:
     policy.csv: |
       p, role:admin, *, *, */*, allow
@@ -23,20 +32,7 @@ config:
     scopes: "[groups]"
     policy.default: role:nada
     admin.enabled: "false"
-redis:
-  architecture: replication
-controller:
-  replicaCount: 3
-dex:
-  enabled: false
-server:
-  replicaCount: 3
-  ingress:
-    ingressClassName: {{ dsc.ingress.className | default('') }}
-  ingressGrpc:
-    ingressClassName: {{ dsc.ingress.className | default('') }}
-  insecure: true
-  config:
+  cm:
     clusterResources: "true"
     url: "https://{{ argocd_domain }}"
     oidc.config: |
@@ -60,13 +56,28 @@ server:
         kinds:
         - TaskRun
         - PipelineRun
-  extraEnvVars: []
+redis-ha:
+  enabled: true
+redis:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+controller:
+  replicas: 3
+dex:
+  enabled: false
+server:
+  replicas: 3
+  ingress:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
+  ingressGrpc:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
 repoServer:
-  extraEnvVars: []
-  replicaCount: 3
+  replicas: 3
 applicationSet:
   enabled: false
-  replicaCount: 2
+  replicas: 2
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}

@@ -53,7 +53,8 @@
     - name: Add GitLab Operator helm repo
       kubernetes.core.helm_repository:
         name: gitlab-operator
-        repo_url: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+        repo_url: "{{ dsc.gitlabOperator.helmRepoUrl }}"
+        force_update: true
 
     - name: Set GitLab Operator helm values
       ansible.builtin.set_fact:
@@ -82,7 +83,7 @@
         chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
         release_namespace: "{{ dsc.gitlabOperator.namespace }}"
         values: "{{ operator_values }}"
-        post_renderer: /tmp/yq_script.sh 
+        post_renderer: /tmp/yq_script.sh
       when: use_private_registry
 
     - name: Wait gitlab-webhook-service endpoint

@@ -81,7 +81,8 @@
 - name: Add SonarQube helm repo
   kubernetes.core.helm_repository:
     name: sonarqube
-    repo_url: https://SonarSource.github.io/helm-chart-sonarqube
+    repo_url: "{{ dsc.sonarqube.helmRepoUrl }}"
+    force_update: true
 
 - name: Get admin password secret
   kubernetes.core.k8s_info:

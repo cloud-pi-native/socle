@@ -23,7 +23,8 @@
     - name: Add helm repo
       kubernetes.core.helm_repository:
         name: kyverno
-        repo_url: https://kyverno.github.io/kyverno/
+        repo_url: "{{ dsc.kyverno.helmRepoUrl }}"
+        force_update: true
 
     - name: Deploy helm
       kubernetes.core.helm:

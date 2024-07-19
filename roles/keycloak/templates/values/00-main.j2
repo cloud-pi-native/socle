@@ -197,11 +197,11 @@ metrics:
           - alert: Keycloak DB PVC almost out of disk space
             annotations:
               message: |
-                PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is almost full (< 10% left). VALUE = {{"{{"}} $value {{"}}"}}
+                PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is almost full (< 10% left). VALUE = {{"{{"}} $value {{"}}"}}%
               summary: |
                 Keycloak CNPG PVC almost out of disk space in namespace {{ include "common.names.namespace" . }}
             expr: |
-              kubelet_volume_stats_available_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} * 100 < 10 > 0
+              round(kubelet_volume_stats_available_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} * 100, 0.01) < 10 > 0
             for: 1m
             labels:
               severity: warning

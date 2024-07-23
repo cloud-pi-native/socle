@@ -28,6 +28,10 @@ spec:
         enabled: false
       cnpg:
         enabled: false
+    metrics:
+      enabled: false
+    alerting:
+      enabled: false
   grafana:
     namespace: dso-grafana
     subDomain: grafana

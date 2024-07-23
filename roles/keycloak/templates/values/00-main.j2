@@ -163,16 +163,26 @@ metrics:
               message: "Keycloak instance in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} has not been available for the last 5 minutes."
               summary: "Keycloak instance down (no ready container)"
             expr: |
-              (absent(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) == 1) or sum(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) == 0
+              (absent(kube_pod_container_status_ready{
+              pod=~"{{ include "common.names.fullname" . }}-\\d+",
+              container="{{ include "common.names.fullname" . }}",
+              namespace="{{ include "common.names.namespace" . }}"}) == 1)
+              or sum(kube_pod_container_status_ready{
+              pod=~"{{ include "common.names.fullname" . }}-\\d+",
+              container="{{ include "common.names.fullname" . }}",
+              namespace="{{ include "common.names.namespace" . }}"}) == 0
             for: 5m
             labels:
               severity: critical
           - alert: Keycloak Pods not healthy
             annotations:
-              message: "Some Keycloak pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} has not been healthy for the last 5 minutes."
+              message: "Some Keycloak pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have been unavailable for the last 5 minutes."
               summary: "Keycloak pods not healthy (some containers are not ready)"
             expr: |
-              sum(kube_pod_container_status_ready{pod=~"{{ include "common.names.fullname" . }}-\\d+", container="{{ include "common.names.fullname" . }}", namespace="{{ include "common.names.namespace" . }}"}) < {{ int .Values.replicaCount }} > 0
+              sum(kube_pod_container_status_ready{
+              pod=~"{{ include "common.names.fullname" . }}-\\d+",
+              container="{{ include "common.names.fullname" . }}",
+              namespace="{{ include "common.names.namespace" . }}"}) < {{ int .Values.replicaCount }} > 0
             for: 5m
             labels:
               severity: warning
@@ -181,7 +191,12 @@ metrics:
               message: "All Keycloak CNPG pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have been unavailable for the last 5 minutes."
               summary: "Keycloak database down (containers not ready)"
             expr: |
-              (absent(kube_pod_container_status_ready{pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 1) or sum(kube_pod_container_status_ready{pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 0
+              (absent(kube_pod_container_status_ready{
+              pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 1)
+              or sum(kube_pod_container_status_ready{
+              pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 0
             for: 5m
             labels:
               severity: critical
@@ -190,29 +205,35 @@ metrics:
               message: "Some Keycloak CNPG pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have been unavailable for the last 5 minutes."
               summary: "Keycloak database not healthy (some containers are not ready)"
             expr: |
-              sum(kube_pod_container_status_ready{pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", container="postgres", namespace="{{ include "common.names.namespace" . }}"}) < 3 > 0
+              sum(kube_pod_container_status_ready{
+              pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              container="postgres", namespace="{{ include "common.names.namespace" . }}"}) < 3 > 0
             for: 5m
             labels:
               severity: warning
           - alert: Keycloak DB PVC almost out of disk space
             annotations:
-              message: |
-                PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is almost full (< 10% left). VALUE = {{"{{"}} $value {{"}}"}}%
-              summary: |
-                Keycloak CNPG PVC almost out of disk space in namespace {{ include "common.names.namespace" . }}
+              message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is almost full (< 10% left). VALUE = {{"{{"}} $value {{"}}"}}%
+              summary: Keycloak CNPG PVC almost out of disk space in namespace {{ include "common.names.namespace" . }}
             expr: |
-              round(kubelet_volume_stats_available_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} * 100, 0.01) < 10 > 0
+              round(
+              kubelet_volume_stats_available_bytes{
+              persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"}
+              / kubelet_volume_stats_capacity_bytes{
+              persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"} * 100, 0.01) < 10 > 0
             for: 1m
             labels:
               severity: warning
           - alert: Keycloak DB PVC out of disk space
             annotations:
-              message: |
-                PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is full (0% left).
-              summary: |
-                Keycloak CNPG PVC out of disk space in namespace {{ include "common.names.namespace" . }}
+              message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is full (0% left).
+              summary: Keycloak CNPG PVC out of disk space in namespace {{ include "common.names.namespace" . }}
             expr: |
-              kubelet_volume_stats_available_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+", namespace="{{ include "common.names.namespace" . }}"} * 100 == 0
+              kubelet_volume_stats_available_bytes{
+              persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"} == 0
             for: 1m
             labels:
               severity: critical

@@ -22,7 +22,7 @@ spec:
         pod=~"sonarqube-.*",
         container="sonarqube",
         namespace="{{ dsc.sonarqube.namespace }}"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: SonarQube DB not available
@@ -36,7 +36,7 @@ spec:
         or sum(kube_pod_container_status_ready{
         pod=~"pg-cluster-sonar-\\d+",
         container="postgres", namespace="{{ dsc.sonarqube.namespace }}"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Sonarqube DB Pods not healthy
@@ -47,7 +47,7 @@ spec:
         sum(kube_pod_container_status_ready{
         pod=~"pg-cluster-sonar-\\d+",
         container="postgres", namespace="{{ dsc.sonarqube.namespace }}"}) < 3 > 0
-      for: 1m
+      for: 5m
       labels:
         severity: warning
     - alert: SonarQube DB PVC almost out of disk space

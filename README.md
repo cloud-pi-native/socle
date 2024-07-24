@@ -1040,7 +1040,6 @@ En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devron
 - `helmRepoUrl` pour chaque service à savoir :
   - `argocd`, `certmanager`, `cloudnativepg`, `console`, `gitlabCiPipelinesExporter`, `gitlabOperator`, `gitlabRunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
 
-
 ## Utilisation de credentials Docker Hub pour le pull des images
 
 Si vous disposez d'un compte Docker Hub, il est possible de l'utiliser pour le pull d'images des outils de la plateforme elle-même.

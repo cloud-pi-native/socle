@@ -132,7 +132,6 @@ spec:
                     helmRepoUrl:
                       description: ArgoCD Bitnami helm repository url.
                       type: string
-                      default: https://charts.bitnami.com/bitnami
                     chartVersion:
                       description: ArgoCD Bitnami helm chart version (e.g., "4.7.13").
                       type: string
@@ -155,7 +154,6 @@ spec:
                     helmRepoUrl:
                       description: Cert-manager helm repository url.
                       type: string
-                      default: https://charts.jetstack.io
                     chartVersion:
                       description: Cert-manager helm chart version (e.g., "v1.13.1").
                       type: string
@@ -169,7 +167,6 @@ spec:
                     helmRepoUrl:
                       description: CloudNativePG helm repository url.
                       type: string
-                      default: https://cloudnative-pg.github.io/charts
                     chartVersion:
                       description: CloudNativePG helm chart version (e.g., "0.18.2").
                       type: string
@@ -189,7 +186,6 @@ spec:
                     helmRepoUrl:
                       description: Console helm repository url.
                       type: string
-                      default: https://cloud-pi-native.github.io/helm-charts
                     values:
                       description: Extra helm values for console
                       type: object
@@ -264,7 +260,6 @@ spec:
                     helmRepoUrl:
                       description: GitLab CI Pipelines Exporter helm repository url.
                       type: string
-                      default: https://charts.visonneau.fr
                     chartVersion:
                       description: GitLab CI Pipelines Exporter chart version (e.g., "0.3.4").
                       type: string
@@ -275,7 +270,6 @@ spec:
                     helmRepoUrl:
                       description: GitLab Operator helm repository url.
                       type: string
-                      default: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
                     chartVersion:
                       description: GitLab Operator release version (e.g., "0.24.1").
                       type: string
@@ -297,7 +291,6 @@ spec:
                     helmRepoUrl:
                       description: GitLab Runner helm repository url.
                       type: string
-                      default: https://charts.gitlab.io
                     chartVersion:
                       description: GitLab Runner chart version (e.g., "0.57.0").
                       type: string
@@ -526,7 +519,6 @@ spec:
                     ociChartUrl:
                       description: Grafana Operator OCI chart url.
                       type: string
-                      default: ghcr.io/grafana/helm-charts/grafana-operator
                     chartVersion:
                       description: Grafana Operator release version (e.g., "v5.6.0").
                       type: string
@@ -549,7 +541,6 @@ spec:
                     helmRepoUrl:
                       description: Harbor helm repository url.
                       type: string
-                      default: https://helm.goharbor.io
                     chartVersion:
                       description: Harbor helm chart version (e.g., "1.12.2").
                       type: string
@@ -725,7 +716,6 @@ spec:
                     helmRepoUrl:
                       description: Keycloak Bitnami helm repository url.
                       type: string
-                      default: https://charts.bitnami.com/bitnami
                     chartVersion:
                       description: Keycloak Bitnami chart version (e.g., "16.0.3").
                       type: string
@@ -751,7 +741,6 @@ spec:
                     helmRepoUrl:
                       description: Kyverno helm repository url.
                       type: string
-                      default: https://kyverno.github.io/kyverno
                     chartVersion:
                       description: Kyverno helm chart version (e.g., "3.1.4").
                       type: string
@@ -829,7 +818,6 @@ spec:
                     helmRepoUrl:
                       description: SonarQube helm repository url.
                       type: string
-                      default: https://sonarsource.github.io/helm-chart-sonarqube
                     chartVersion:
                       description: SonarQube helm chart version (e.g., "10.2.1+800").
                       type: string
@@ -863,7 +851,6 @@ spec:
                     helmRepoUrl:
                       description: Hashicorp Vault helm repository url.
                       type: string
-                      default: https://helm.releases.hashicorp.com
                     chartVersion:
                       description: Hashicorp Vault helm chart version (e.g., "0.25.0").
                       type: string

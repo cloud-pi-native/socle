@@ -427,3 +427,8 @@
       ansible.builtin.include_tasks:
         file: add-servicemonitors.yaml
       loop: "{{ gitlab_additional_service_monitors }}"
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

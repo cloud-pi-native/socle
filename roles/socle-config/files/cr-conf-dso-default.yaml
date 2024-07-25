@@ -4,32 +4,16 @@ apiVersion: cloud-pi-native.fr/v1alpha
 metadata:
   name: conf-dso
 spec:
-  certmanager: {}
   additionalsCA: []
+#    - kind: ConfigMap
+#      name: kube-root-ca.crt
   exposedCA:
     type: none
-  argocd:
-    admin:
-      enabled: false
-  cloudnativepg: {}
-  console:
-    cnpg:
-      mode: primary
-    values: {}
-  gitlab:
-    cnpg:
-      mode: primary
-  gitlabCiPipelinesExporter: {}
-  gitlabOperator: {}
-  gitlabRunner:
-    resources:
-      overwrite:
-        requests:
-          memory: "6Gi"
-          cpu: "2"
-        limits:
-          memory: "6Gi"
-          cpu: "2"
+#    type: configmap
+#    configmap:
+#      namespace: default
+#      name: ca-cert
+#      key: ingress.crt
   global:
     platform: openshift
     offline: false
@@ -48,6 +32,29 @@ spec:
       vault:
         enabled: false
         pathPrefix: vault
+  argocd:
+    admin:
+      enabled: false
+#      password: WeAreThePasswords
+  certmanager: {}
+  cloudnativepg: {}
+  console:
+    cnpg:
+      mode: primary
+  gitlab:
+    cnpg:
+      mode: primary
+  gitlabCiPipelinesExporter: {}
+  gitlabOperator: {}
+  gitlabRunner: {}
+#    resources:
+#      overwrite:
+#        requests:
+#          memory: "6Gi"
+#          cpu: "2"
+#        limits:
+#          memory: "6Gi"
+#          cpu: "2"
   grafana: {}
   grafanaDatasource: {}
   grafanaOperator: {}
@@ -55,23 +62,26 @@ spec:
     cnpg:
       mode: primary
     adminPassword: anotherGreatPassword
-    pvcRegistrySize: 20Gi
   ingress:
+    annotations:
+      route.openshift.io/termination: "edge"
     tls:
       type: none
-  kubed: {}
   keycloak:
     cnpg:
       mode: primary
   kyverno: {}
-  nexus:
-    storageSize: 25Gi
-    proxyCacheSize: 25Gi
+  nexus: {}
   prometheus:
     crd:
       type: external
   proxy:
     enabled: false
+#    host: "192.168.xx.xx"
+#    http_proxy: http://192.168.xx.xx:3128/
+#    https_proxy: http://192.168.xx.xx:3128/
+#    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
+#    port: "3128"
   sonarqube:
     cnpg:
       mode: primary

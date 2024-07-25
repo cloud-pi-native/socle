@@ -101,13 +101,13 @@ Toujours sur votre environnement de déploiement, vous devrez :
 
 L'installation de la suite des prérequis **sur l'environnement de déploiement** s'effectue à l'aide du playbook nommé `install-requirements.yaml`. Il est mis à disposition dans le répertoire `admin-tools` du dépôt socle que vous aurez clôné.
 
-Si l'utilisateur avec lequel vous exécutez ce playbook dispose des droits sudo sans mot de passe (option NOPASSWD du fichier sudoers), vous pourrez le lancer directement sans options :
+Si l'utilisateur avec lequel vous exécutez ce playbook dispose des droits sudo sans mot de passe (option `NOPASSWD` du fichier sudoers), vous pourrez le lancer directement sans options :
 
 ```bash
 ansible-playbook admin-tools/install-requirements.yaml
 ```
 
-Sinon vous devrez utiliser l'option `-K` (abréviation de l'option `--ask-become-pass`) qui vous demandera le mot de passe sudo de l'utilisateur :
+Sinon, vous devrez utiliser l'option `-K` (abréviation de l'option `--ask-become-pass`) qui vous demandera le mot de passe sudo de l'utilisateur :
 
 ```bash
 ansible-playbook -K admin-tools/install-requirements.yaml
@@ -152,107 +152,30 @@ Elle vous signalera que vous n'avez encore jamais installé le socle sur votre c
 kubectl edit dsc conf-dso
 ```
 
-Vous pourrez procéder comme indiqué si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition vous préférerez peut être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
+Vous pourrez procéder comme indiqué si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition vous préférerez peut-être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
 
 ```bash
 kubectl apply -f ma-conf-dso.yaml
 ```
 
-Pour vous aider à démarrer, voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau :
+Pour vous aider à démarrer, le fichier [cr-conf-dso-default.yaml](roles/socle-config/files/cr-conf-dso-default.yaml) est un **exemple** de configuration également utilisé lors de la première installation. Il surcharge les valeurs par défaut des fichiers [config.yaml](roles/socle-config/files/config.yaml) et [releases.yaml](roles/socle-config/files/releases.yaml). Ce fichier doit être adapté à partir de la section **spec**, en particulier pour les éléments suivants :
 * du paramètre `global.rootDomain` (votre domaine principal précédé d'un point),
 * des mots de passe de certains outils,
-* du paramètre `global.platform` (à positionner sur `kubernetes` si vous n'utilisez pas OpenShift),
+* du paramètre `global.platform` (définir à `kubernetes` si vous n'utilisez pas OpenShift),
 * de la taille de certains PVCs,
 * de l'activation ou non des métriques,
-* du proxy ainsi que des sections CA et ingress.
+* du proxy si besoin ainsi que des sections CA et ingress.
 
-```yaml
----
-kind: DsoSocleConfig
-apiVersion: cloud-pi-native.fr/v1alpha
-metadata:
-  name: conf-dso
-spec:
-  additionalsCA:
-    - kind: ConfigMap
-      name: kube-root-ca.crt
-  exposedCA:
-    type: configmap
-    configmap:
-      namespace: default
-      name: ca-cert
-      key: ingress.crt
-  argocd:
-    admin:
-      enabled: true
-      password: WeAreThePasswords
-    values: {}
-  certmanager: {}
-  cloudnativepg: {}
-  console:
-    postgresPvcSize: 10Gi
-    values: {}
-  gitlab:
-    postgresPvcSize: 10Gi
-    values: {}
-  gitlabCiPipelinesExporter: {}
-  gitlabOperator: {}
-  gitlabRunner: {}
-  global:
-    backup: {}
-    environment: production
-    metrics:
-      enabled: true
-    platform: openshift
-    projectsRootDir:
-      - my-root-dir
-      - projects-sub-dir
-    rootDomain: .example.com
-  grafana: {}
-  grafanaDatasource:
-    defaultPrometheusDatasourceUrl: https://my-service.my-monitoring-namespace.svc.cluster.local:9091
-  grafanaOperator: {}
-  harbor:
-    adminPassword: WhoWantsToPassForever
-    postgresPvcSize: 10Gi
-    pvcRegistrySize: 50Gi
-    values: {}
-  ingress:
-    annotations:
-      route.openshift.io/termination: edge
-    tls:
-      type: tlsSecret
-      tlsSecret:
-        name: ingress-tls
-        method: in-namespace
-  keycloak:
-    postgresPvcSize: 10Gi
-    values: {}
-  kyverno: {}
-  nexus:
-    proxyCacheSize: 10Gi
-    storageSize: 10Gi
-  prometheus:
-    crd:
-      type: external
-  proxy:
-    enabled: false
-    host: 192.168.xx.xx
-    http_proxy: http://192.168.xx.xx:3128/
-    https_proxy: http://192.168.xx.xx:3128/
-    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
-    port: "3128"
-  sonarqube:
-    postgresPvcSize: 25Gi
-    values: {}
-  vault:
-    values: {}
-```
+Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec ArgoCD :
 
-Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec argocd :
-
-```
+```shell
 kubectl explain dsc.spec.argocd
+```
+
+Les valeurs des helm charts peuvent être surchargés en ajoutant le paramètre `values` au service concerné. Ces `values` dépendent de la [version du helm chart](versions.md) et peuvent être consultés avec la command `helm show values`. Exemple avec l'opérateur GitLab :
+
+```shell
+helm show values gitlab-operator/gitlab-operator --version 1.1.2
 ```
 
 Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à lancer la commande ci-dessus pour obtenir la description de tout champ sur lequel vous avez un doute.
@@ -279,7 +202,7 @@ S'agissant du gel des versions de charts ou d'images pour les outils en question
 
 ### Lancement
 
-Dès que votre [configuration](#configuration) est prête, c'est à dire que la ressource `dsc` par défaut  `conf-dso` a bien été mise à jour avec les éléments nécessaires et souhaités, relancez la commande suivante :
+Dès que votre [configuration](#configuration) est prête, c'est-à-dire que la ressource `dsc` par défaut  `conf-dso` a bien été mise à jour avec les éléments nécessaires et souhaités, relancez la commande suivante :
 
 ```bash
 ansible-playbook install.yaml
@@ -324,7 +247,7 @@ Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la p
 cat ./roles/socle-config/files/config.yaml
 ```
 
-Lorsque votre nouvelle configuration est prête, et déclarée par exemple dans le fichier « ma-conf-perso.yaml », créez-là dans le cluster comme ceci :
+Lorsque votre nouvelle configuration est prête, et déclarée par exemple dans le fichier « ma-conf-perso.yaml », créez-la dans le cluster comme ceci :
 
 ```bash
 kubectl apply -f ma-conf-perso.yaml
@@ -342,7 +265,7 @@ Puis éventuellement l'afficher (exemple avec une `dsc` nommée `ma-dsc`) :
 kubectl get dsc ma-dsc -o yaml
 ```
 
-Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO  dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) Ansible prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
+Dès lors, il vous sera possible de déployer une nouvelle chaîne DSO dans ce cluster, en plus de celle existante. Pour cela, vous utiliserez l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) Ansible prévue à cet effet, nommée `dsc_cr` (pour DSO Socle Config Custom Resource).
 
 Par exemple, si votre nouvelle ressource `dsc` se nomme `ma-dsc`, alors vous lancerez l'installation correspondante comme ceci :
 
@@ -352,13 +275,13 @@ ansible-playbook install.yaml -e dsc_cr=ma-dsc
 
 Pendant l'installation, et si vous avez nommé vos namespaces en utilisant un même suffixe ou préfixe, vous pourrez surveiller l'arrivée de ces namespaces dans le cluster.
 
-Exemple avec des namespaces préfixés « mynamespace- » :
+Exemple avec des namespaces préfixés `mynamespace-` :
 
 ```bash
 watch "kubectl get ns | grep 'mynamespace-'"
 ```
 
-Exemple avec des namespaces dont le suffixe est « -mynamespace » :
+Exemple avec des namespaces dont le suffixe est `-mynamespace` :
 
 ```bash
 watch "kubectl get ns | grep '\-mynamespace'"
@@ -370,7 +293,7 @@ Au moment de leur initialisation, certains outils stockent des secrets qui ne so
 
 **Attention !** Pour garantir l'[idempotence](https://fr.wikipedia.org/wiki/Idempotence), ces secrets sont stockés dans plusieurs ressources du cluster. Supprimer ces ressources **indique à Ansible qu'il doit réinitialiser les composants associés**.
 
-Afin de faciliter la récupération des secrets, un playbook d'administration nommé « get-credentials.yaml » est mis à disposition dans le répertoire « admin-tools ».
+Afin de faciliter la récupération des secrets, un playbook d'administration nommé `get-credentials.yaml` est mis à disposition dans le répertoire `admin-tools/`.
 
 Pour le lancer :
 
@@ -396,13 +319,13 @@ Et bien sûr cibler un ou plusieurs outils en même temps, via les tags. Exemple
 ansible-playbook admin-tools/get-credentials.yaml -e dsc_cr=ma-conf -t keycloak,argocd
 ```
 
-**Remarque importante** : Il est **vivement encouragé** de **sauvegarder les valeurs** qui vous sont fournies par le playbook « get-credentials.yaml ». Par exemple dans un fichier de base de données chiffré de type KeePass, Vaultwarden ou Bitwarden. Il est toutefois important de **ne pas les modifier ou les supprimer** sous peine de voir certains composants, par exemple Vault, être réinitialisés.
+**Remarque importante** : Il est **vivement encouragé** de **sauvegarder les valeurs** qui vous sont fournies par le playbook `get-credentials.yaml`. Par exemple dans un fichier de base de données chiffré de type KeePass, Vaultwarden ou Bitwarden. Il est toutefois important de **ne pas les modifier ou les supprimer** sous peine de voir certains composants, par exemple Vault, être réinitialisés.
 
 ## Debug
 
 ### Réinstallation
 
-Si vous rencontrez des problèmes lors de l'éxécution du playbook, vous voudrez certainement relancer l'installation d'un ou plusieurs composants plutôt que d'avoir à tout réinstaller.
+Si vous rencontrez des problèmes lors de l'exécution du playbook, vous voudrez certainement relancer l'installation d'un ou plusieurs composants plutôt que d'avoir à tout réinstaller.
 
 Pour cela, vous pouvez utiliser les tags qui sont associés aux rôles dans le fichier « install.yaml ».
 
@@ -429,11 +352,11 @@ Le playbook d'installation, en s'appuyant sur le role en question, s'assurera pr
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que cert-manager n'est pas installé. Le rôle associé procédera donc à son installation.
 
-**Attention !** Assurez-vous que si une précédente instance de cert-manager a été désinstallée du cluster elle l'a été proprement. En effet, si l'outil avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, et si un ingress avec tls de type acme est déclaré dans votre ressource `dsc`, les déploiements de ressources ingress et les routes associées échoueront à se créer car cert-manager n'aura pas été installé par le role.
+**Attention !** Assurez-vous que si une précédente instance de cert-manager a été désinstallée du cluster, elle l'a été proprement. En effet, si l'outil avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, et si un ingress avec tls de type acme est déclaré dans votre ressource `dsc`, les déploiements de ressources ingress et les routes associées échoueront à se créer, car cert-manager n'aura pas été installé par le role.
 
 ### CloudNativePG
 
-La BDD PostgreSQL des composants suivants est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/) (lui même installé via le role `cloudnativepg`) :
+La BDD PostgreSQL des composants suivants est installée à l'aide de l'opérateur communautaire [CloudNativePG](https://cloudnative-pg.io/) (lui-même installé via le role `cloudnativepg`) :
 * console-dso
 * harbor
 * keycloak
@@ -446,7 +369,7 @@ Le playbook d'installation, en s'appuyant sur le role en question, s'assurera pr
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur CloudNativePG n'est pas installé. Le rôle associé procédera donc à son installation.
 
-**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Keycloak ou de SonarQube échouera car l'opérateur CloudNativePG n'aura pas été installé par le role.
+**Attention !** Assurez-vous que si une précédente instance de CloudNativePG a été désinstallée du cluster, elle l'a été proprement. En effet, si l'opérateur CloudNativePG avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Keycloak ou de SonarQube échouera, car l'opérateur CloudNativePG n'aura pas été installé par le role.
 
 ### GitLab Operator
 
@@ -459,7 +382,7 @@ Le playbook d'installation, en s'appuyant sur le role en question, s'assurera pr
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur GitLab n'est pas installé. Le rôle associé procédera donc à son installation.
 
-**Attention !** Assurez-vous que si une précédente instance de GitLab Operator a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur GitLab avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de GitLab échouera car l'opérateur associé n'aura pas été installé par le role.
+**Attention !** Assurez-vous que si une précédente instance de GitLab Operator a été désinstallée du cluster, elle l'a été proprement. En effet, si l'opérateur GitLab avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de GitLab échouera, car l'opérateur associé n'aura pas été installé par le role.
 
 ### Grafana Operator et instance Grafana
 
@@ -475,16 +398,16 @@ ansible-playbook install.yaml -t grafana-operator,grafana,grafana-datasource,gra
 
 Remarques :
 * Il est tout à fait possible de ne pas utiliser la datasource ou les dashboards que nous proposons par défaut, et de déployer à la place vos propres datasources et dashboards. Dans ce cas, vous devrez les déclarer par vos soins, en utilisant vos propres fichiers YAML de définitions s'appuyant sur la [documentation de l'opérateur](https://grafana.github.io/grafana-operator/docs/).
-* Si au contraire vous souhaitez installer l'intégralité de la stack Grafana que nous proposons, vous pouvez utiliser le tag unique `-t grafana-stack`.
+* Si au contraire, vous souhaitez installer l'intégralité de la stack Grafana que nous proposons, vous pouvez utiliser le tag unique `-t grafana-stack`.
 
-Le playbook d'installation, via le role grafana-operator, s'assurera préalablement que l'opérateur Grafana n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
+Le playbook d'installation, via le role `grafana-operator`, s'assurera préalablement que l'opérateur Grafana n'est pas déjà installé dans le cluster. Il vérifiera pour cela la présence de deux éléments :
 
 - L'APIVERSION `grafana.integreatly.org/v1beta1`.
 - Le `ClusterRole` nommé `grafana-operator-permissions`.
 
 Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que l'opérateur Grafana n'est pas installé. Le rôle associé procédera donc à son installation.
 
-**Attention !** Assurez-vous que si une précédente instance de Grafana Operator a été désinstallée du cluster elle l'a été proprement. En effet, si l'opérateur Grafana avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Grafana échouera car l'opérateur associé n'aura pas été installé par le role.
+**Attention !** Assurez-vous que si une précédente instance de Grafana Operator a été désinstallée du cluster, elle l'a été proprement. En effet, si l'opérateur Grafana avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, l'installation de Grafana échouera, car l'opérateur associé n'aura pas été installé par le role.
 
 ### Kyverno
 
@@ -496,7 +419,7 @@ Le playbook d'installation, via le role `kyverno`, s'assurera préalablement que
 
 Si aucun pod Kyverno n'est détecté, le rôle associé procédera donc à l'installation.
 
-**Attention !** Assurez-vous que si une précédente instance de Kyverno a été désinstallée du cluster elle l'a été proprement, c'est à dire en supprimant également les resources cluster scoped associées. Si ce n'est pas le cas, l'installation de Kyverno échouera. Pour faciliter cette désinstallation préalable au besoin, vous pouvez utiliser la commande de désinstallation associée (voir [section suivante](#désinstallation)).
+**Attention !** Assurez-vous que si une précédente instance de Kyverno a été désinstallée du cluster, elle l'a été proprement, c'est-à-dire en supprimant également les resources cluster scoped associées. Si ce n'est pas le cas, l'installation de Kyverno échouera. Pour faciliter cette désinstallation préalable au besoin, vous pouvez utiliser la commande de désinstallation associée (voir [section suivante](#désinstallation)).
 
 ### Kubed (config-syncer)
 
@@ -506,9 +429,9 @@ C'est pourquoi, dans un cluster dédié à une utilisation à jour du socle DSO,
 
 ### Prometheus
 
-Les tâches du rôle prometheus ne se lancent que si le paramètre `prometheus.crd.type` de la `dsc` est posionné sur `managed` comme dans l'exemple suivant :
+Les tâches du rôle prometheus ne se lancent que si le paramètre `prometheus.crd.type` de la `dsc` est positionné sur `managed` comme dans l'exemple suivant :
 
-```
+```yaml
   prometheus:
     crd:
       type: managed
@@ -532,7 +455,7 @@ Pour le lancer, en vue de désinstaller la chaîne DSO qui utilise la `dsc` par 
 ansible-playbook uninstall.yaml
 ```
 
-Vous pourrez ensuite surveiller la déinstallation des namespaces par défaut via la commande suivante :
+Vous pourrez ensuite surveiller la désinstallation des namespaces par défaut via la commande suivante :
 
 ```bash
 watch "kubectl get ns | grep 'dso-'"
@@ -546,13 +469,13 @@ ansible-playbook uninstall.yaml -e dsc_cr=ma-dsc
 
 Selon les performances ou la charge de votre cluster, la désinstallation de certains composants (par exemple GitLab) pourra prendre un peu de temps.
 
-Pour surveiller l'état d'une désinstallation en cours il sera possible, si vous avez correctement préfixé ou suffixé vos namespaces dans votre configuration, de vous appuyer sur la commande suivante. Exemple avec le préfixe « mynamespace- » :
+Pour surveiller l'état d'une désinstallation en cours, si vous avez correctement préfixé ou suffixé vos namespaces dans votre configuration, il sera possible de vous appuyer sur la commande suivante. Exemple avec le préfixe `mynamespace-` :
 
 ```bash
 watch "kubectl get ns | grep 'mynamespace-'"
 ```
 
-Même exemple, mais avec le suffixe « -mynamespace » :
+Même exemple, mais avec le suffixe `-mynamespace` :
 
 ```bash
 watch "kubectl get ns | grep '\-mynamespace'"
@@ -566,7 +489,7 @@ watch "kubectl get ns | grep '\-mynamespace'"
   - **GitLab Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Grafana Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Kyverno** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
-- Les cinq composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire même par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces outils, vous pourrez le faire via l'utilisation des tags correspondants :
+- Les cinq composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces outils, vous pourrez le faire via l'utilisation des tags correspondants :
   - Pour Cert-manager : `-t cert-manager`
   - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`)
   - Pour GitLab Operator : `-t gitlab-operator`
@@ -604,7 +527,7 @@ Pour chaque version du socle DSO, les numéros de version de charts utilisés so
 
 Ils peuvent être consultés dans le fichier [versions.md](versions.md), situé à la racine du présent dépôt socle que vous avez initialement cloné.
 
-Vous pouvez également geler les version d'images utilisées par les charts Helm de chaque outil.
+Vous pouvez également geler les versions d'images utilisées par les charts Helm de chaque outil.
 
 Ceci est géré par le champ `values` que vous pourrez spécifier, pour chaque outil concerné, dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
 
@@ -613,11 +536,11 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 **Remarques importantes** :
 
 - Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée.
-- Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
+- Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est-à-dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
 
 ### Modification des versions de charts
 
-Techniquement, la modification des versions de charts utilisés est possible mais elle **n'est pas recommandée**.
+Techniquement, la modification des versions de charts utilisés est possible, mais elle **n'est pas recommandée**.
 
 Ceci parce que la version de la Console Cloud π Native déployée par le socle, composant central qui s'interface avec tous les outils de la chaîne, a été testée et développée avec les versions d'outils telles qu'elles sont fixées au moment de la publication.
 
@@ -625,7 +548,7 @@ Aussi, **nous ne pouvons garantir le bon fonctionnement** de la forge DSO dans u
 
 De plus, et comme indiqué plus haut, les outils cert-manager, CloudNativePG, GitLab Operator, Grafana Operator et Kyverno seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
 
-Si malgré tout vous souhaitez tenter une modification de version d'un chart en particulier, Vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
+Si vous souhaitez malgré tout tenter une modification de version d'un chart en particulier, Vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
 
 Pensez également à effectuer au moins un backup du namespace et des ressources cluster scoped associées.
 
@@ -647,7 +570,7 @@ helm repo update
 helm search repo argo-cd
 ```
 
-Pour une liste détaillée de toutes les versions disponlbles, ajouter l'option `-l` comme ceci, exemple pour Argo CD :
+Pour une liste détaillée de toutes les versions disponibles, ajouter l'option `-l` comme ceci, exemple pour Argo CD :
 
 ```bash
 helm search repo -l argo-cd
@@ -662,7 +585,7 @@ argocd:
 
 ### Gel des versions d'images
 
-Comme indiqué précédemment, le gel des version d'images peut être géré par le champ `values` que vous pourrez spécifier, pour chaque outil concerné, dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
+Comme indiqué précédemment, le gel des versions d'images peut être géré par le champ `values` que vous pourrez spécifier, pour chaque outil concerné, dans la ressource `dsc` de configuration par défaut (`conf-dso`) ou votre propre `dsc`.
 
 Ce champ correspond rigoureusement à ce qui est utilisable pour une version donnée du chart Helm de l'outil en question.
 
@@ -678,7 +601,7 @@ cat ./roles/socle-config/files/releases.yaml
 
 Lors d'une **première installation du socle**, nous vous recommandons toutefois de **ne pas geler immédiatement vos versions d'images dans la `dsc`**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil et utiliseront la version d'image qui correspond à la version du chart définie par défaut.
 
-Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions d'images disponibles et à quelles versions de charts elles sont associées.
+Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions d'images disponibles et à quelles versions de charts, elles sont associées.
 
 Lorsque vous gelez vos images dans la `dsc`, il est **fortement recommandé** d'utiliser un tag d'image en adéquation avec la version de chart utilisée, tel que fourni par la commande `helm search repo -l nom-de-mon-outil-ici --version version-de-chart-ici`.
 
@@ -741,7 +664,7 @@ Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez
 
 La version d'image utilisée par GitLab est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
 
-Par ailleurs le chart Helm de GitLab est déployé via l'opérateur GitLab, lui même déployé via Helm.
+Par ailleurs le chart Helm de GitLab est déployé via l'opérateur GitLab, lui-même déployé via Helm.
 
 Il existe ainsi une correspondance directe entre la version de chart utilisée pour déployer l'opérateur et les versions de charts GitLab que cet opérateur sera en mesure d'installer.
 
@@ -769,7 +692,7 @@ La version d'image utilisée par GitLab Runner est directement liée à la versi
 
 Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez ce que vous faites.
 
-Si toutefois vous souhaitez la modifier, sachez que la version majeure.mineure de l'instance GitLab Runner doit idéalement correspondre à celle de l'instance GitLab, comme expliqué ici :
+Si toutefois vous souhaitez la modifier, sachez que la version `majeure.mineure` de l'instance GitLab Runner doit idéalement correspondre à celle de l'instance GitLab, comme expliqué ici :
 
 https://docs.gitlab.com/runner/#gitlab-runner-versions
 
@@ -796,9 +719,9 @@ Les différents tags utilisables sont disponibles ici :
 - redis : <https://hub.docker.com/r/goharbor/redis-photon/tags>
 - exporter : <https://hub.docker.com/r/goharbor/harbor-exporter/tags>
 
-**Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
+**Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est-à-dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
 
-Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.14.1 du chart :
+Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.14.1 du chart :
 
 ```yaml
 harbor:
@@ -888,7 +811,7 @@ Les différents tags utilisables pour l'image de Keycloak sont disponibles ici :
 
 Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "19.0.3-debian-11-r22" est un tag immutable.
 
-Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
 ```yaml
 keycloak:
@@ -937,9 +860,9 @@ Les tags d'images utilisables sont ceux retournés par la commande suivante, au 
 helm search repo -l sonarqube/sonarqube
 ```
 
-Il faudra juste leur ajouter le suffixe "-community" qui correspond à l'édition utilisée, ou bien le suffixe "-{{ .Values.edition }}" si nous précisons aussi l'édition dans nos values.
+Il faudra juste leur ajouter le suffixe "-community" qui correspond à l'édition utilisée, ou bien le suffixe `-{{ .Values.edition }}` si nous précisons aussi l'édition dans nos values.
 
-Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
+Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
 ```yaml
 sonarqube:
@@ -966,7 +889,7 @@ Les différents tags d'images utilisables sont disponibles ici :
 - Pour le Vault Agent Sidecar Injector : <https://hub.docker.com/r/hashicorp/vault-k8s/tags>
 - Pour le Vault Agent : <https://hub.docker.com/r/hashicorp/vault/tags>
 
-Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
+Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
 ```yaml
 vault:
@@ -1007,7 +930,7 @@ kubectl explain dsc.spec.global.backup.velero
 
 Pour les backups S3 des BDD PostgreSQL déployées via CNPG :
 
-```
+```shell
 kubectl explain dsc.spec.global.backup.cnpg
 ```
 
@@ -1059,7 +982,7 @@ k create secret docker-registry docker-hub-creds \
 
 Notez que du fait de l'utilisation de l'option `dry-run`, le secret n'est pas véritablement créé. La partie qui nous intéresse, encodée en base64, est simplement affichée sur la sortie standard.
 
-Copiez cette sortie, et collez-là dans la section `spec.global.imagePullSecretsData` de votre resource dsc (par défaut conf-dso), exemple :
+Copiez cette sortie, et collez-la dans la section `spec.global.imagePullSecretsData` de votre resource dsc (par défaut conf-dso), exemple :
 
 ```yaml
 global:
@@ -1074,7 +997,7 @@ Si vous constatez que la réplication du secret n'a pas lieu ou qu'elle prend tr
 kubectl delete cpol replace-kubed
 ```
 
-Puis relancez l'installation de Kyverno, qui va simplement recréer puis appliquer immédiatement la policy :
+Puis relancez l'installation de Kyverno, qui va simplement recréer et appliquer immédiatement la policy :
 
 ```bash
 ansible-playbook install.yaml -t kyverno

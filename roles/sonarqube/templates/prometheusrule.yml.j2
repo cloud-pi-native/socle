@@ -39,14 +39,14 @@ spec:
       for: 5m
       labels:
         severity: critical
-    - alert: Sonarqube DB Pods not healthy
+    - alert: Sonarqube DB Pod not healthy
       annotations:
-        message: Some SonarQube CNPG pods in namespace {{ dsc.sonarqube.namespace }} have been unavailable for the last 5 minutes.
-        summary: SonarQube database not healthy (some containers are not ready)
+        message: SonarQube {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ dsc.sonarqube.namespace }} has been unavailable for the last 5 minutes.
+        summary: SonarQube database pod not healthy (container is not ready)
       expr: |
-        sum(kube_pod_container_status_ready{
+        kube_pod_container_status_ready{
         pod=~"pg-cluster-sonar-\\d+",
-        container="postgres", namespace="{{ dsc.sonarqube.namespace }}"}) < 3 > 0
+        container="postgres", namespace="{{ dsc.sonarqube.namespace }}"} == 0
       for: 5m
       labels:
         severity: warning

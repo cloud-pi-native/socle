@@ -48,7 +48,7 @@ spec:
     grafanaPvcSize: 5Gi
   grafanaOperator:
     namespace: dso-grafana-operator
-    ociChartUrl: ghcr.io/grafana/helm-charts/grafana-operator
+    ociChartUrl: oci://ghcr.io/grafana/helm-charts/grafana-operator
   harbor:
     namespace: dso-harbor
     subDomain: harbor

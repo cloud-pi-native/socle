@@ -9,11 +9,13 @@ spec:
     namespace: dso-argocd
     subDomain: argocd
     helmRepoUrl: https://argoproj.github.io/argo-helm
+    values: {}
   certmanager:
     helmRepoUrl: https://charts.jetstack.io
   cloudnativepg:
     namespace: dso-cloudnativepg
     helmRepoUrl: https://cloudnative-pg.github.io/charts
+    values: {}
   console:
     namespace: dso-console
     subDomain: console
@@ -21,6 +23,7 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+    values: {}
   gitlab:
     namespace: dso-gitlab
     subDomain: gitlab
@@ -29,6 +32,7 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+    values: {}
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
   gitlabCiPipelinesExporter:
@@ -36,8 +40,10 @@ spec:
   gitlabOperator:
     namespace: dso-gitlab-operator
     helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+    values: {}
   gitlabRunner:
     helmRepoUrl: https://charts.gitlab.io
+    values: {}
   global:
     backup:
       velero:
@@ -57,6 +63,7 @@ spec:
   grafanaOperator:
     namespace: dso-grafana-operator
     ociChartUrl: oci://ghcr.io/grafana/helm-charts/grafana-operator
+    values: {}
   harbor:
     namespace: dso-harbor
     subDomain: harbor
@@ -69,6 +76,7 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+    values: {}
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
@@ -78,9 +86,11 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+    values: {}
   kyverno:
     namespace: dso-kyverno
     helmRepoUrl: https://kyverno.github.io/kyverno
+    values: {}
   nexus:
     namespace: dso-nexus
     subDomain: nexus
@@ -94,8 +104,10 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+    values: {}
   vault:
     namespace: dso-vault
     subDomain: vault
     helmRepoUrl: https://helm.releases.hashicorp.com
     pvcSize: 23Gi
+    values: {}

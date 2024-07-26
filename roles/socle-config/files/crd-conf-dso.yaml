@@ -407,6 +407,73 @@ spec:
                       required:
                         - enabled
                       type: object
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          type: string
+                          default: primary
+                          enum:
+                            - primary
+                            - replica
+                        keycloak:
+                          description: Configuration for keycloak cnpg cluster.
+                          type: object
+                          properties:
+                            exposed:
+                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                              type: boolean
+                              default: false
+                            nodePort:
+                              description: NodePort used to expose the cnpg cluster instance.
+                              type: string
+                            replicaExtraArgs:
+                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                              type: string
+                        console:
+                          description: Configuration for console cnpg cluster.
+                          type: object
+                          properties:
+                            exposed:
+                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                              type: boolean
+                              default: false
+                            nodePort:
+                              description: NodePort used to expose the cnpg cluster instance.
+                              type: string
+                            replicaExtraArgs:
+                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                              type: string
+                        harbor:
+                          description: Configuration for harbor cnpg cluster.
+                          type: object
+                          properties:
+                            exposed:
+                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                              type: boolean
+                              default: false
+                            nodePort:
+                              description: NodePort used to expose the cnpg cluster instance.
+                              type: string
+                            replicaExtraArgs:
+                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                              type: string
+                        sonarqube:
+                          description: Configuration for sonarqube cnpg cluster.
+                          type: object
+                          properties:
+                            exposed:
+                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                              type: boolean
+                              default: false
+                            nodePort:
+                              description: NodePort used to expose the cnpg cluster instance.
+                              type: string
+                            replicaExtraArgs:
+                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                              type: string
                     backup:
                       description: Configuration for backup feature.
                       properties:

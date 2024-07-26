@@ -22,24 +22,24 @@
       subjects:
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: argo-argo-cd-argocd-repo-server
+          name: argo-argocd-repo-server
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: argo-argo-cd-argocd-server
+          name: argocd-server
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
           name: argo-redis
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: argo-redis-master
+          name: argo-redis-ha
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: argo-redis-replica
+          name: argo-redis-ha-haproxy
 
 - name: Add helm repo
   kubernetes.core.helm_repository:
-    name: bitnami
-    repo_url: https://charts.bitnami.com/bitnami
+    name: argo
+    repo_url: https://argoproj.github.io/argo-helm
 
 - name: Set path fact
   ansible.builtin.set_fact:
@@ -56,7 +56,7 @@
 - name: Deploy helm
   kubernetes.core.helm:
     name: argo
-    chart_ref: bitnami/argo-cd
+    chart_ref: argo/argo-cd
     chart_version: "{{ dsc.argocd.chartVersion }}"
     release_namespace: "{{ dsc.argocd.namespace }}"
     create_namespace: true

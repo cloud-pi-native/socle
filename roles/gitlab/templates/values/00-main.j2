@@ -50,6 +50,14 @@ gitlab:
 {% endif %}
 
 global:
+  psql:
+    serviceName: pg-cluster-gitlab-rw
+    port: 5432
+    database: gitlabhq_production
+    username: gitlab
+    password:
+      secret: pg-cluster-gitlab-app
+      key: password
   registry:
     enabled: false
   certificates:
@@ -98,9 +106,5 @@ global:
 prometheus:
   install: false
 
-{% if dsc.global.backup.velero.enabled %}
 postgresql:
-  primary:
-    podAnnotations:
-      pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD pg_dump -Fc  -U postgres -d gitlabhq_production  > /bitnami/postgresql/data/app.dump"]'
-{% endif %}
+  install: false

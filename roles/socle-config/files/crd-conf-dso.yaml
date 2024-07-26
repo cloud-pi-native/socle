@@ -951,7 +951,7 @@ spec:
                     pluginDownloadUrl:
                       description: Plugins download Url.
                       type: string
-                    PrometheusJavaagentVersion:
+                    prometheusJavaagentVersion:
                       description: Prometheus javaagent version.
                       type: string
                     values:

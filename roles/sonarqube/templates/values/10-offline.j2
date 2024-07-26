@@ -1,8 +1,8 @@
 {% if dsc.global.offline %} 
 prometheusExporter:
-  version: {{ dsc.sonarqube.PrometheusJavaagentVersion }}
+  version: {{ dsc.sonarqube.prometheusJavaagentVersion }}
   noCheckCertificate: true
-  downloadURL: {{ dsc.sonarqube.pluginDownloadUrl }}/jmx_prometheus_javaagent-{{ dsc.sonarqube.PrometheusJavaagentVersion }}.jar 
+  downloadURL: {{ dsc.sonarqube.pluginDownloadUrl }}/jmx_prometheus_javaagent-{{ dsc.sonarqube.prometheusJavaagentVersion }}.jar 
 
 plugins:
   install:

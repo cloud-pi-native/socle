@@ -417,3 +417,8 @@
     - name: Create nexus ServiceMonitor
       kubernetes.core.k8s:
         template: servicemonitor.yml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

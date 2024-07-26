@@ -20,8 +20,8 @@
 - name: Validate dsc.console.helmRepoUrl is different than default
   assert:
     that:
-      - dsc.console.helmRepoUrl != "https://github.com/cloud-pi-native/console.git"
-    fail_msg: "'dsc.console.helmRepoUrl' is same as 'https://github.com/cloud-pi-native/console.git'"
+      - dsc.console.helmRepoUrl != "https://cloud-pi-native.github.io/helm-charts"
+    fail_msg: "'dsc.console.helmRepoUrl' is same as 'https://cloud-pi-native.github.io/helm-charts'"
 
 - name: Validate dsc.argocd.privateGitlabDomain is not empty
   assert:

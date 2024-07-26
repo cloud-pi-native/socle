@@ -34,7 +34,7 @@
           name: argo-redis-ha
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: argocd-redis-haproxy
+          name: argo-redis-ha-haproxy
 
 - name: Add helm repo
   kubernetes.core.helm_repository:

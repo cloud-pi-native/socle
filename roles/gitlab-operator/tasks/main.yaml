@@ -64,7 +64,7 @@
       ansible.builtin.set_fact:
         path: "{{ role_path + '/templates/values' }}"
 
-    - name: Compute Cert-manager Helm values
+    - name: Compute GitLab Operator Helm values
       ansible.builtin.include_role:
         name: combine
       vars:

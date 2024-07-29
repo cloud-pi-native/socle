@@ -34,10 +34,6 @@ spec:
           containers:
           - image: grafana/grafana:{{ dsc.grafana.imageVersion }}
             name: grafana
-{% if use_image_pull_secrets %}
-          imagePullSecrets: 
-            - name: dso-config-pull-secret
-{% endif %}
 {% if dsc.proxy.enabled %}
             env: 
             - name: HTTP_PROXY
@@ -47,4 +43,7 @@ spec:
             - name: NO_PROXY
               value: "{{ dsc.proxy.no_proxy }}"
 {% endif %}
-
+{% if use_image_pull_secrets %}
+          imagePullSecrets: 
+            - name: dso-config-pull-secret
+{% endif %}

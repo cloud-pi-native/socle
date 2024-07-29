@@ -20,6 +20,7 @@ spec:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     cnpg:
       mode: primary
+      exposed: false
   gitlab:
     namespace: dso-gitlab
     subDomain: gitlab
@@ -27,6 +28,7 @@ spec:
     pvcGitalySize: 50Gi
     cnpg:
       mode: primary
+      exposed: false
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
   gitlabCiPipelinesExporter:
@@ -64,6 +66,7 @@ spec:
     pvcTrivySize: 10Gi
     cnpg:
       mode: primary
+      exposed: false
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
@@ -71,6 +74,7 @@ spec:
     postgresPvcSize: 1Gi
     cnpg:
       mode: primary
+      exposed: false
   kyverno:
     namespace: dso-kyverno
     helmRepoUrl: https://kyverno.github.io/kyverno
@@ -86,6 +90,7 @@ spec:
     postgresPvcSize: 5Gi
     cnpg:
       mode: primary
+      exposed: false
   vault:
     namespace: dso-vault
     subDomain: vault

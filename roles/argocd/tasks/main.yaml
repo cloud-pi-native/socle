@@ -39,7 +39,8 @@
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: argo
-    repo_url: https://argoproj.github.io/argo-helm
+    repo_url: "{{ dsc.argocd.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:

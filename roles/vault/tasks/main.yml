@@ -9,7 +9,8 @@
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: hashicorp
-    repo_url: https://helm.releases.hashicorp.com
+    repo_url: "{{ dsc.vault.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:

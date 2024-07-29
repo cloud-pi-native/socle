@@ -8,15 +8,18 @@ spec:
   argocd:
     namespace: dso-argocd
     subDomain: argocd
+    helmRepoUrl: https://charts.bitnami.com/bitnami
+  certmanager:
+    helmRepoUrl: https://charts.jetstack.io
   cloudnativepg:
     namespace: dso-cloudnativepg
+    helmRepoUrl: https://cloudnative-pg.github.io/charts
   console:
     namespace: dso-console
     subDomain: console
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     cnpg:
       mode: primary
-  gitlabOperator:
-    namespace: dso-gitlab-operator
   gitlab:
     namespace: dso-gitlab
     subDomain: gitlab
@@ -26,6 +29,13 @@ spec:
       mode: primary
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
+  gitlabCiPipelinesExporter:
+    helmRepoUrl: https://charts.visonneau.fr
+  gitlabOperator:
+    namespace: dso-gitlab-operator
+    helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+  gitlabRunner:
+    helmRepoUrl: https://charts.gitlab.io
   global:
     backup:
       velero:
@@ -42,9 +52,11 @@ spec:
     grafanaPvcSize: 5Gi
   grafanaOperator:
     namespace: dso-grafana-operator
+    ociChartUrl: oci://ghcr.io/grafana/helm-charts/grafana-operator
   harbor:
     namespace: dso-harbor
     subDomain: harbor
+    helmRepoUrl: https://helm.goharbor.io
     pvcRegistrySize: 50Gi
     pvcJobLogSize: 5Gi
     pvcDatabaseSize: 10Gi
@@ -55,11 +67,13 @@ spec:
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
+    helmRepoUrl: https://charts.bitnami.com/bitnami
     postgresPvcSize: 1Gi
     cnpg:
       mode: primary
   kyverno:
     namespace: dso-kyverno
+    helmRepoUrl: https://kyverno.github.io/kyverno
   nexus:
     namespace: dso-nexus
     subDomain: nexus
@@ -68,10 +82,12 @@ spec:
   sonarqube:
     namespace: dso-sonarqube
     subDomain: sonar
+    helmRepoUrl: https://sonarsource.github.io/helm-chart-sonarqube
     postgresPvcSize: 5Gi
     cnpg:
       mode: primary
   vault:
     namespace: dso-vault
     subDomain: vault
+    helmRepoUrl: https://helm.releases.hashicorp.com
     pvcSize: 23Gi

@@ -29,7 +29,7 @@
       ansible.builtin.set_fact:
         path: "{{ role_path + '/templates/values' }}"
 
-    - name: Compute Vault Helm values
+    - name: Compute Grafana Operator Helm values
       ansible.builtin.include_role:
         name: combine
       vars:

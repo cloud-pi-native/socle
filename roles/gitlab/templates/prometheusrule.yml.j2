@@ -21,14 +21,14 @@ spec:
       for: 5m
       labels:
         severity: critical
-    - alert: GitLab webservice Pod not healthy
+    - alert: GitLab Pod not healthy
       annotations:
         message: GitLab {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ dsc.gitlab.namespace }} has been unavailable for the last 5 minutes.
-        summary: GitLab webservice pod not healthy (container {{"{{"}} $labels.container {{"}}"}} is not ready)
+        summary: GitLab {{"{{"}} $labels.pod {{"}}"}} pod not healthy (container {{"{{"}} $labels.container {{"}}"}} is not ready)
       expr: |
         kube_pod_container_status_ready{
-        pod=~"gitlab-webservice-.*",
-        container!~"[webservice|gitlab-workhorse]", namespace="{{ dsc.gitlab.namespace }}"} == 0
-      for: 5m
+        pod=~"gitlab-.*",
+        container!~"gitlab|kubectl|minio-mc|migrations", namespace="{{ dsc.gitlab.namespace }}"} == 0
+      for: 1m
       labels:
         severity: warning

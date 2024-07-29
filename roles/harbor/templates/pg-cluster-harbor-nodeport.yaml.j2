@@ -1,0 +1,20 @@
+---
+{% if dsc.harbor.cnpg.exposed %}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    cnpg.io/cluster: pg-cluster-harbor
+  name: pg-cluster-harbor-rw-nodeport
+  namespace: {{ dsc.harbor.namespace }}
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    nodePort: {{ dsc.harbor.cnpg.nodePort }}
+  selector:
+    cnpg.io/cluster: pg-cluster-harbor
+    role: primary
+  type: NodePort
+{% endif %}

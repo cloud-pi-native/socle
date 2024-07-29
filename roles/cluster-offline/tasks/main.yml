@@ -5,11 +5,11 @@
       - dsc.sonarqube.pluginDownloadUrl != ""
     fail_msg: "'dsc.sonarqube.pluginDownloadUrl' must not be empty"
 
-- name: Validate dsc.sonarqube.PrometheusJavaagentVersion is not empty
+- name: Validate dsc.sonarqube.prometheusJavaagentVersion is not empty
   assert:
     that:
-      - dsc.sonarqube.PrometheusJavaagentVersion != ""
-    fail_msg: "'dsc.sonarqube.PrometheusJavaagentVersion' must not be empty"
+      - dsc.sonarqube.prometheusJavaagentVersion != ""
+    fail_msg: "'dsc.sonarqube.prometheusJavaagentVersion' must not be empty"
 
 - name: Validate dsc.gitlabCatalog.catalogRepoUrl is different than default
   assert:

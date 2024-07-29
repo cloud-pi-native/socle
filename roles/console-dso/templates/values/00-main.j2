@@ -30,20 +30,35 @@ server:
 cnpg:
   enabled: true
   nameOverride: pg-cluster-console
+  username: dso
+  dbName: dso-console-db
+  mode: "{{ dsc.console.cnpg.mode }}"
+{% if dsc.global.backup.velero.enabled %}
+  annotations:
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  dso-console-db > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/container: postgres
+    pre.hook.backup.velero.io/on-error: Fail
+    pre.hook.backup.velero.io/timeout: 90s
+{% endif %}
 {% if dsc.global.backup.cnpg.enabled %}
   backup:
     enabled: "{{ dsc.global.backup.cnpg.enabled }}"
-    destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}console"
+    destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}"
     endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
+{% if dsc.exposedCA.type != 'none' %}
     endpointCA:
       name: "bundle-cnpg-s3"
       key: "ca.pem"
+{% endif %}
     s3Credentials:
-      name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+      create: true
+      secretName: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
       accessKeyId:
         key: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.key }}"
+        value: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value }}"
       secretAccessKey:
         key: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.key }}"
+        value: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value }}"
     cron: "{{ dsc.global.backup.cnpg.cron }}"
     retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
 {% endif %}

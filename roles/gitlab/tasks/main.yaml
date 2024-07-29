@@ -417,23 +417,11 @@
         namespace: "{{ dsc.gitlab.namespace }}"
       register: gitlab_pods
 
-    - name: Get Gitlab ServiceMonitors
-      kubernetes.core.k8s_info:
-        api_version: monitoring.coreos.com/v1
-        kind: ServiceMonitor
-        namespace: "{{ dsc.gitlab.namespace }}"
-      register: service_monitors
-
     - name: Get Gitlab endpoints
       kubernetes.core.k8s_info:
         kind: Endpoints
         namespace: "{{ dsc.gitlab.namespace }}"
       register: endpoints
-
-    - name: Patch existing ServiceMonitors
-      ansible.builtin.include_tasks:
-        file: patch-servicemonitors.yaml
-      loop: "{{ gitlab_service_monitors }}"
 
     - name: Declare some additionnal ServiceMonitors
       ansible.builtin.include_tasks:

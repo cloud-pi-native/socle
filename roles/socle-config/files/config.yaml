@@ -8,7 +8,7 @@ spec:
   argocd:
     namespace: dso-argocd
     subDomain: argocd
-    helmRepoUrl: https://charts.bitnami.com/bitnami
+    helmRepoUrl: https://argoproj.github.io/argo-helm
   certmanager:
     helmRepoUrl: https://charts.jetstack.io
   cloudnativepg:

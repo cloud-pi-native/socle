@@ -496,7 +496,7 @@ spec:
                               description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
                               type: string
                     alerting:
-                      description: Configuration for Prometheus alerting feature.
+                      description: Configuration for alerting feature.
                       properties:
                         enabled:
                           default: false

@@ -129,6 +129,9 @@ spec:
                     subDomain:
                       description: The subdomain for ArgoCD.
                       type: string
+                    helmRepoUrl:
+                      description: ArgoCD Bitnami helm repository url.
+                      type: string
                     chartVersion:
                       description: ArgoCD Bitnami helm chart version (e.g., "4.7.13").
                       type: string
@@ -148,6 +151,9 @@ spec:
                 certmanager:
                   description: Configuration for Cert Manager.
                   properties:
+                    helmRepoUrl:
+                      description: Cert-manager helm repository url.
+                      type: string
                     chartVersion:
                       description: Cert-manager helm chart version (e.g., "v1.13.1").
                       type: string
@@ -156,7 +162,10 @@ spec:
                   description: Configuration for CloudNativePG.
                   properties:
                     namespace:
-                      description: The namespace for cloudnativepg.
+                      description: The namespace for CloudNativePG.
+                      type: string
+                    helmRepoUrl:
+                      description: CloudNativePG helm repository url.
                       type: string
                     chartVersion:
                       description: CloudNativePG helm chart version (e.g., "0.18.2").
@@ -173,6 +182,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for console.
+                      type: string
+                    helmRepoUrl:
+                      description: Console helm repository url.
                       type: string
                     values:
                       description: Extra helm values for console
@@ -293,6 +305,9 @@ spec:
                 gitlabCiPipelinesExporter:
                   description: Configuration for GitLab CI Pipelines Exporter.
                   properties:
+                    helmRepoUrl:
+                      description: GitLab CI Pipelines Exporter helm repository url.
+                      type: string
                     chartVersion:
                       description: GitLab CI Pipelines Exporter chart version (e.g., "0.3.4").
                       type: string
@@ -300,6 +315,9 @@ spec:
                 gitlabOperator:
                   description: Configuration for GitLab Operator.
                   properties:
+                    helmRepoUrl:
+                      description: GitLab Operator helm repository url.
+                      type: string
                     chartVersion:
                       description: GitLab Operator release version (e.g., "0.24.1").
                       type: string
@@ -318,6 +336,9 @@ spec:
                 gitlabRunner:
                   description: Configuration for GitLab Runner.
                   properties:
+                    helmRepoUrl:
+                      description: GitLab Runner helm repository url.
+                      type: string
                     chartVersion:
                       description: GitLab Runner chart version (e.g., "0.57.0").
                       type: string
@@ -560,7 +581,7 @@ spec:
                       enum:
                         - openshift
                         - kubernetesVanilla
-                        - rke2 
+                        - rke2
                       type: string
                     offline:
                       default: false
@@ -610,6 +631,9 @@ spec:
                 grafanaOperator:
                   description: Configuration for Grafana Operator.
                   properties:
+                    ociChartUrl:
+                      description: Grafana Operator OCI chart url.
+                      type: string
                     chartVersion:
                       description: Grafana Operator release version (e.g., "v5.6.0").
                       type: string
@@ -628,6 +652,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for Harbor.
+                      type: string
+                    helmRepoUrl:
+                      description: Harbor helm repository url.
                       type: string
                     chartVersion:
                       description: Harbor helm chart version (e.g., "1.12.2").
@@ -661,7 +688,7 @@ spec:
                             type: object
                             properties:
                               provider:
-                                description: ID of the provider 
+                                description: ID of the provider
                                 type: string
                                 default: docker-hub
                               endpointUrl:
@@ -823,8 +850,11 @@ spec:
                     subDomain:
                       description: The subdomain for Keycloak.
                       type: string
+                    helmRepoUrl:
+                      description: Keycloak Bitnami helm repository url.
+                      type: string
                     chartVersion:
-                      description: Keycloak chart version (e.g., "16.0.3").
+                      description: Keycloak Bitnami chart version (e.g., "16.0.3").
                       type: string
                     postgresPvcSize:
                       description: Size for postgres' pvc
@@ -866,6 +896,9 @@ spec:
                   properties:
                     namespace:
                       description: The namespace for Kyverno.
+                      type: string
+                    helmRepoUrl:
+                      description: Kyverno helm repository url.
                       type: string
                     chartVersion:
                       description: Kyverno helm chart version (e.g., "3.1.4").
@@ -941,6 +974,9 @@ spec:
                     subDomain:
                       description: The subdomain for SonarQube.
                       type: string
+                    helmRepoUrl:
+                      description: SonarQube helm repository url.
+                      type: string
                     chartVersion:
                       description: SonarQube helm chart version (e.g., "10.2.1+800").
                       type: string
@@ -992,6 +1028,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for Vault.
+                      type: string
+                    helmRepoUrl:
+                      description: Hashicorp Vault helm repository url.
                       type: string
                     chartVersion:
                       description: Hashicorp Vault helm chart version (e.g., "0.25.0").

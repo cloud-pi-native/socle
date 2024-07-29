@@ -439,4 +439,3 @@
       ansible.builtin.include_tasks:
         file: add-servicemonitors.yaml
       loop: "{{ gitlab_additional_service_monitors }}"
-

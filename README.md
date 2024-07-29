@@ -41,6 +41,7 @@
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
 - [Backups](#backups)
+- [Offline / air gap](#Offline--air-gap)
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
@@ -1027,6 +1028,17 @@ Pour les backups S3 des BDD PostgreSQL déployées via CNPG :
 ```
 kubectl explain dsc.spec.global.backup.cnpg
 ```
+
+## Offline / air gap
+
+En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devront être adaptées.
+- `dsc.sonarqube:`
+  - `pluginDownloadUrl` et `PrometheusJavaagentVersion`
+- `dsc.gitlabCatalog.catalogRepoUrl`
+- `dsc.argocd.privateGitlabDomain`
+- `dsc.grafanaOperator.ociChartUrl`
+- `helmRepoUrl` pour chaque service à savoir :
+  - `argocd`, `certmanager`, `cloudnativepg`, `console`, `gitlabCiPipelinesExporter`, `gitlabOperator`, `gitlabRunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
 
 ## Utilisation de credentials Docker Hub pour le pull des images
 

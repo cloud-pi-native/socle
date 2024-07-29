@@ -119,7 +119,8 @@
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: harbor
-    repo_url: https://helm.goharbor.io
+    repo_url: "{{ dsc.harbor.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:

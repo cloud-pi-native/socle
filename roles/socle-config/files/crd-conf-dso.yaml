@@ -428,6 +428,16 @@ spec:
                       required:
                         - enabled
                       type: object
+                    alerting:
+                      description: Configuration for alerting feature.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether alerting should be enabled.
+                          type: boolean
+                      required:
+                        - enabled
+                      type: object
                     backup:
                       description: Configuration for backup feature.
                       properties:

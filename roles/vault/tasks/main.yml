@@ -37,6 +37,7 @@
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
+    - role.yaml.j2
     - ingress.yaml.j2
 
 # Post install

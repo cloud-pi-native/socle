@@ -184,10 +184,10 @@ spec:
       expr: |
         round(
         kubelet_volume_stats_available_bytes{
-        persistentvolumeclaim=~".*-gitlab-.*",
+        persistentvolumeclaim=~"(.*-)*gitlab(-.*)*",
         namespace="{{ dsc.gitlab.namespace }}"}
         / kubelet_volume_stats_capacity_bytes{
-        persistentvolumeclaim=~".*-gitlab-.*",
+        persistentvolumeclaim=~"(.*-)*gitlab(-.*)*",
         namespace="{{ dsc.gitlab.namespace }}"} * 100, 0.01) < 10 > 0
       for: 1m
       labels:
@@ -198,7 +198,7 @@ spec:
         summary: GitLab PVC out of disk space in namespace {{ dsc.gitlab.namespace }}
       expr: |
         kubelet_volume_stats_available_bytes{
-        persistentvolumeclaim=~".*-gitlab-.*",
+        persistentvolumeclaim=~"(.*-)*gitlab(-.*)*",
         namespace="{{ dsc.gitlab.namespace }}"} == 0
       for: 1m
       labels:

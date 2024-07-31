@@ -24,6 +24,7 @@ server:
 {% if dsc.global.metrics.enabled %}
       config: |
         ui = true
+        service_registration "kubernetes" {}
         listener "tcp" {
           tls_disable = 1
           address = "[::]:8200"

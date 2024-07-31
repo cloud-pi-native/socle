@@ -67,7 +67,7 @@ spec:
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: security-context-dso-keycloak
+  name: security-context-dso-keycloak-awx
   annotations:
     policies.kyverno.io/title: Enforce cis profile
     pod-policies.kyverno.io/autogen-controllers: none
@@ -87,6 +87,7 @@ spec:
         - Job
         namespaces:
         - "{{ dsc.keycloak.namespace }}"
+        - "{{ dsc.awx.namespace }}"
     exclude:
       all:
       - resources:
@@ -94,6 +95,7 @@ spec:
           - Job
           namespaces:
           - "{{ dsc.keycloak.namespace }}"
+          - "{{ dsc.awx.namespace }}"
           names: 
           - "pg-cluster-*"
     mutate:

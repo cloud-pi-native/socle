@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration:
+  name: awx-operator
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  destination:
+    namespace: {{ dsc.awx.namespace }}
+    server: https://kubernetes.default.svc
+  project: awx-operator
+  source: 
+    chart: awx-operator
+    repoURL: "{{ dsc.awx.helmRepoUrl }}" 
+    targetRevision: {{ dsc.awx.chartVersion }}
+    helm:
+      releaseName: dso
+      parameters: []
+      values: |-
+{{ awx_values | to_yaml | indent(8, true) }}
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true

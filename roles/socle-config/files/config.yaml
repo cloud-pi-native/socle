@@ -11,6 +11,13 @@ spec:
     helmRepoUrl: https://argoproj.github.io/argo-helm
   certmanager:
     helmRepoUrl: https://charts.jetstack.io
+  awx:
+    namespace: dso-awx
+    subDomain: awx
+    helmRepoUrl: https://ansible.github.io/awx-operator
+    cnpg:
+      mode: primary
+      exposed: false
   cloudnativepg:
     namespace: dso-cloudnativepg
     helmRepoUrl: https://cloudnative-pg.github.io/charts

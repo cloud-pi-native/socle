@@ -1,0 +1,18 @@
+{% if dsc.proxy.enabled %}
+AWX:
+  spec:
+    task_extra_env: |
+      - name: HTTP_PROXY
+        value: {{ dsc.proxy.http_proxy }} 
+      - name: HTTPS_PROXY
+        value: {{ dsc.proxy.https_proxy }} 
+      - name: NO_PROXY
+        value: {{ dsc.proxy.no_proxy }} 
+    web_extra_env: |
+      - name: HTTP_PROXY
+        value: {{ dsc.proxy.http_proxy }} 
+      - name: HTTPS_PROXY
+        value: {{ dsc.proxy.https_proxy }} 
+      - name: NO_PROXY
+        value: {{ dsc.proxy.no_proxy }} 
+{% endif %}

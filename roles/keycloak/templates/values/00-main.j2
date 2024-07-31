@@ -305,13 +305,17 @@ extraEnvVars:
     value: cloudpinative-relations@interieur.gouv.fr
 initContainers:
   - name: realm-ext-provider
+{% if use_private_registry %}
+    image: "{{ dsc.global.registry }}/curlimages/curl:8.8.0"
+{% else %}
     image: docker.io/curlimages/curl:8.8.0
+{% endif %}
     imagePullPolicy: IfNotPresent
     command:
       - sh
     args:
       - -c
-      - curl -L -f -S -o /extensions/keycloak-theme-dsfr.jar https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v1.0.3/retrocompat-keycloak-theme.jar
+      - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}/retrocompat-keycloak-theme.jar
     volumeMounts:
       - name: extensions
         mountPath: /extensions

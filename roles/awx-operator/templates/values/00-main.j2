@@ -1,0 +1,22 @@
+AWX:
+  enabled: true
+  name: awx-operator
+  spec:
+    service_type: ClusterIP
+    ingress_type: ingress
+    ingress_class_name:  {{ dsc.ingress.className | default('') }}
+    ingress_hosts:
+      - hostname: {{ awx_domain }} 
+    ingress_annotations: | 
+      - {{ dsc.ingress.annotations }}
+    #postgres_data_volume_init: true
+
+  postgres:
+    enabled: true
+    host: "pg-cluster-awx-rw"
+    port: 5432
+    dbName: awx
+    username: "{{ pg_awx_db_secret.resources[0].data.username | b64decode }}"
+    password: "{{ pg_awx_db_secret.resources[0].data.password | b64decode }}"
+    sslmode: prefer
+    type: unmanaged

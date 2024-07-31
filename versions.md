@@ -4,10 +4,10 @@
 | certmanager               | 1.14.3           | 1.14.3        | [certmanager](https://github.com/cert-manager/cert-manager/releases)                    |
 | cloudnativepg             | 1.22.1           | 0.20.1        | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)     |
 | console                   | 8.0.2            | 8.0.2         | [console](https://github.com/cloud-pi-native/console/releases)                          |
-| gitlab                    | 16.11.6          | 7.11.6        | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                            |
+| gitlab                    | 17.2.1          | 8.2.1        | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                            |
 | gitlabCiPipelinesExporter | 0.5.8            | 0.3.4         | https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter |
-| gitlabOperator            | 1.1.2            | 1.1.2         | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)     |
-| gitlabRunner              | 16.11.2          | 0.64.2        | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)               |
+| gitlabOperator            | 1.2.1            | 1.2.1         | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)     |
+| gitlabRunner              | 17.2.1          | 0.67.1        | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)               |
 | grafana                   | 9.5.5            | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                      |
 | grafanaOperator           | 5.4.2            | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                     |
 | harbor                    | 2.10.1           | 1.14.1        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                            |

@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: awx-operator
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - name: '*'
+    namespace: {{ dsc.awx.namespace }}
+    server: '*'
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  roles:
+  - description: admin-RO
+    groups:
+    - /admin
+    - admin
+    - ArgoCDAdmins
+    - /ArgoCDAdmins
+    name: admin-RO
+    policies:
+    - p, proj:awx-operator:admin-RO, applications, get, awx-operator/*, allow
+  - description: admin-RW
+    groups:
+    - /admin
+    - admin
+    - ArgoCDAdmins
+    - /ArgoCDAdmins
+    name: admin-RW
+    policies:
+    - p, proj:awx-operator:admin-RW, applications, *, awx-operator/*, allow
+  sourceRepos:
+  - "{{ dsc.awx.helmRepoUrl }}"

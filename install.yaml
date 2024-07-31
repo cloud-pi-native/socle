@@ -124,6 +124,12 @@
         - grafana-stack
         - never
 
+    - name: awx-operator
+      tags:
+        - awx
+        - awx-operator
+        - never
+
   post_tasks:
     - name: Post-Install Disclaimer
       ansible.builtin.debug:

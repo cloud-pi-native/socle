@@ -1,0 +1,32 @@
+---
+- name: Wait awx-operator-service endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.awx.namespace }}"
+    name: awx-operator-service
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 10
+
+- name: Pause for 5 minutes to wait for AWX operator job to start
+  ansible.builtin.pause:
+    minutes: 5
+
+- name: Check the status of the AWX operator job
+  kubernetes.core.k8s_info:
+    kind: Job
+    namespace: "{{ dsc.awx.namespace }}"
+    name: awx-operator-migration-24.6.1
+  register: job_status
+  until: job_status.resources[0].status.succeeded == 1
+  retries: 60
+  delay: 10
+
+- name: Get awx admin password
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.awx.namespace }}"
+    name: awx-operator-admin-password
+  register: awx_admin_password
+  failed_when: awx_admin_password.resources | length == 0

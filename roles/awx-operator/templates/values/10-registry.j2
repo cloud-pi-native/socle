@@ -1,0 +1,14 @@
+{% if use_private_registry %}
+AWX:
+  spec:
+    image: "{{ dsc.global.registry }}/ansible/awx"
+    image_version: "{{ dsc.awx.defaultAwxVersion }}"
+    ee_images:
+      - name: "AWX EE ({{ dsc.awx.defaultAwxVersion }})"
+        image: "{{ dsc.global.registry }}/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}" 
+    redis_image: "{{ dsc.global.registry }}/redis"
+    redis_image_version: "7"
+    control_plane_ee_image: "{{ dsc.global.registry }}/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
+    init_container_image: "{{ dsc.global.registry }}/ansible/awx-ee"
+    init_container_image_version: "{{ dsc.awx.defaultAwxVersion }}"
+{% endif %}

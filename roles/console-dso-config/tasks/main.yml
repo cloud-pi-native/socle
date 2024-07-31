@@ -15,6 +15,7 @@
         namespace: "{{ dsc.console.namespace }}"
       data:
         ARGOCD_URL: "{{ ('https://' + argocd_domain + '/') | b64encode }}"
+        AWX_URL: "{{ ('https://' + awx_domain + '/') | b64encode }}"
         GITLAB_URL: "{{ ('https://' + gitlab_domain + '/') | b64encode }}"
         HARBOR_URL: "{{ ('https://' + harbor_domain + '/') | b64encode }}"
         KEYCLOAK_URL: "{{ ('https://' + keycloak_domain + '/') | b64encode }}"

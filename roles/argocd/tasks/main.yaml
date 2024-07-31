@@ -72,6 +72,7 @@
 
 - name: Create global gitlab secret
   kubernetes.core.k8s:
+    when: ansible_inventory.resources | length > 0 and 'GITLAB_TOKEN' in ansible_inventory.resources[0].data
     definition:
       data:
         password: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN }}"

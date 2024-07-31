@@ -1,0 +1,20 @@
+---
+{% if dsc.awx.cnpg.exposed %}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    cnpg.io/cluster: pg-cluster-awx
+  name: pg-cluster-awx-rw-nodeport
+  namespace: {{ dsc.awx.namespace }}
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    nodePort: {{ dsc.awx.cnpg.nodePort }}
+  selector:
+    cnpg.io/cluster: pg-cluster-awx
+    role: primary
+  type: NodePort
+{% endif %}

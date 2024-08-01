@@ -4,7 +4,7 @@ metadata:
   name: conf-dso
 spec:
   argocd:
-    # https://artifacthub.io/packages/helm/bitnami/argo-cd
+    # https://artifacthub.io/packages/helm/argo-cd-oci/argo-cd
     chartVersion: 7.3.11
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases

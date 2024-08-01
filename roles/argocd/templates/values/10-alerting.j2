@@ -5,7 +5,7 @@ controller:
       enabled: true
       namespace: "{{ dsc.argocd.namespace }}"
       spec:
-        - alert: ArgoAppMissing
+        - alert: Argo CD App Missing
           expr: |
             absent(argocd_app_info) == 1
           for: 15m
@@ -17,7 +17,7 @@ controller:
               Argo CD has not reported any applications data for the past 15 minutes which
               means that it must be down or not functioning properly.  This needs to be
               resolved for this cloud to continue to maintain state.
-        - alert: ArgoAppNotSynced
+        - alert: Argo CD App Not Synced
           expr: |
             argocd_app_info{sync_status!="Synced"} == 1
           for: 12h

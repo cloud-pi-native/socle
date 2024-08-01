@@ -90,3 +90,8 @@
     template: "{{ item }}"
   with_items:
     - ingress.yaml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

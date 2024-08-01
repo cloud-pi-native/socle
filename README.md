@@ -41,7 +41,7 @@
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
 - [Backups](#backups)
-- [Offline / air gap](#Offline--air-gap)
+- [Offline / air gap](#offline--air-gap)
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
@@ -704,32 +704,11 @@ Les sections suivantes détaillent la façon de procéder au gel de version d'im
 
 #### Argo CD
 
-Le composant Argo CD est installé à l'aide du chart Helm Bitnami.
+Le composant Argo CD est installé à l'aide de son chart Helm officiel.
 
-Nous utiliserons un tag dit "[immutable](https://docs.bitnami.com/kubernetes/infrastructure/argo-cd/configuration/understand-rolling-immutable-tags)" (**recommandé en production**).
+La version d'image utilisée est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
 
-Les différents tags utilisables pour l'image d'Argo CD sont disponibles ici : <https://hub.docker.com/r/bitnami/argo-cd/tags>
-
-Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "2.7.6-debian-11-r2" est un tag immutable.
-
-Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
-
-```yaml
-  argocd:
-    admin:
-      enabled: true
-      password: WeAreThePasswords
-    values:
-      image:
-        registry: docker.io
-        repository: bitnami/argo-cd
-        tag: 2.10.7-debian-12-r0
-        imagePullPolicy: IfNotPresent
-```
-
-Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml>
-
-Les releases d'Argo CD et leurs changelogs se trouvent ici : <https://github.com/argoproj/argo-cd/releases>
+Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez ce que vous faites.
 
 #### Cert-manager
 

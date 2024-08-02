@@ -15,8 +15,8 @@
   block:
     - name: Get secret
       kubernetes.core.k8s_info:
-        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
-        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        name: "{{ dsc.global.backup.endpointCa.name }}"
+        namespace: "{{ dsc.global.backup.endpointCa.namespace }}"
         kind: Secret
       register: cnpg_s3_ca_resource
 
@@ -36,14 +36,14 @@
 
 - name: Set cnpg backup secret
   kubernetes.core.k8s:
-    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    name: "{{ dsc.global.backup.s3Credentials.name }}"
     namespace: "{{ dsc.gitlab.namespace }}"
     kind: Secret
     api_version: v1
     definition:
       data:
-        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
-        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+        accessKeyId: "{{ dsc.global.backup.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
 - name: Remove cnpg scheduled backup

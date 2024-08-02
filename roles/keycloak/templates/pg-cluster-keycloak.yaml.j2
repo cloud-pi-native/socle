@@ -48,8 +48,8 @@ spec:
   - name: pg-cluster-keycloak
 {% if dsc.keycloak.cnpg.mode == "restore" %}
     barmanObjectStore:
-      destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}"
-      endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointUrl }}"
 {% if dsc.exposedCA.type != 'none' %}
       endpointCA:
         name: "bundle-cnpg-s3"
@@ -57,11 +57,11 @@ spec:
 {% endif %}
       s3Credentials:
         accessKeyId:
-          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
-          key: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.key }}"
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
         secretAccessKey:
-          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
-          key: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.key }}"
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
 {% endif %}
 {% if dsc.keycloak.cnpg.mode == "replica" %}
 {%- filter indent(width=4) %}
@@ -92,8 +92,8 @@ spec:
 {% if dsc.global.backup.cnpg.enabled %}
   backup:
     barmanObjectStore:
-      destinationPath: "s3://{{ dsc.global.backup.cnpg.destinationPath }}"
-      endpointURL: "{{ dsc.global.backup.cnpg.endpointURL }}"
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointUrl }}"
 {% if dsc.exposedCA.type != 'none' %}
       endpointCA:
         name: "bundle-cnpg-s3"
@@ -101,11 +101,11 @@ spec:
 {% endif %}
       s3Credentials:
         accessKeyId:
-          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
-          key: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.key }}"
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
         secretAccessKey:
-          name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
-          key: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.key }}"
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
     retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
 {% else %}
   backup: null

@@ -1,10 +1,10 @@
 {% if use_private_registry %}
 image:
-  registry: "{{ dsc.global.registry }}"
+  repository: "{{ dsc.global.registry }}"
 
 redis:
   image:
-    registry: "{{ dsc.global.registry }}"
+    repository: "{{ dsc.global.registry }}"
 {% endif %}
 
 {% if use_image_pull_secrets %}

@@ -160,8 +160,8 @@ metrics:
         rules:
           - alert: Keycloak instance not available
             annotations:
-              message: "Keycloak instance in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} has not been available for the last 5 minutes."
-              summary: "Keycloak instance down (no ready container)"
+              message: Keycloak instance in namespace {{ include "common.names.namespace" . }} has not been available for the last 5 minutes.
+              summary: Keycloak instance down (no ready container)
             expr: |
               (absent(kube_pod_container_status_ready{
               pod=~"{{ include "common.names.fullname" . }}-\\d+",
@@ -174,22 +174,22 @@ metrics:
             for: 5m
             labels:
               severity: critical
-          - alert: Keycloak Pods not healthy
+          - alert: Keycloak Pod not healthy
             annotations:
-              message: "Some Keycloak pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have been unavailable for the last 5 minutes."
-              summary: "Keycloak pods not healthy (some containers are not ready)"
+              message: Keycloak {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ include "common.names.namespace" . }} has been unavailable for the last 5 minutes.
+              summary: Keycloak pod not healthy (container is not ready)
             expr: |
-              sum(kube_pod_container_status_ready{
+              kube_pod_container_status_ready{
               pod=~"{{ include "common.names.fullname" . }}-\\d+",
               container="{{ include "common.names.fullname" . }}",
-              namespace="{{ include "common.names.namespace" . }}"}) < {{ int .Values.replicaCount }} > 0
+              namespace="{{ include "common.names.namespace" . }}"} == 0
             for: 5m
             labels:
               severity: warning
           - alert: Keycloak DB not available
             annotations:
-              message: "All Keycloak CNPG pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have been unavailable for the last 5 minutes."
-              summary: "Keycloak database down (containers not ready)"
+              message: All Keycloak CNPG pods in namespace {{ include "common.names.namespace" . }} have been unavailable for the last 5 minutes.
+              summary: Keycloak database down (containers not ready)
             expr: |
               (absent(kube_pod_container_status_ready{
               pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
@@ -200,14 +200,14 @@ metrics:
             for: 5m
             labels:
               severity: critical
-          - alert: Keycloak DB Pods not healthy
+          - alert: Keycloak DB Pod not healthy
             annotations:
-              message: "Some Keycloak CNPG pods in namespace {% endraw %}{{ dsc.keycloak.namespace }}{% raw %} have been unavailable for the last 5 minutes."
-              summary: "Keycloak database not healthy (some containers are not ready)"
+              message: Keycloak {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ include "common.names.namespace" . }} has been unavailable for the last 5 minutes.
+              summary: Keycloak database pod not healthy (container is not ready)
             expr: |
-              sum(kube_pod_container_status_ready{
+              kube_pod_container_status_ready{
               pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
-              container="postgres", namespace="{{ include "common.names.namespace" . }}"}) < 3 > 0
+              container="postgres", namespace="{{ include "common.names.namespace" . }}"} == 0
             for: 5m
             labels:
               severity: warning
@@ -305,13 +305,17 @@ extraEnvVars:
     value: cloudpinative-relations@interieur.gouv.fr
 initContainers:
   - name: realm-ext-provider
+{% if use_private_registry %}
+    image: "{{ dsc.global.registry }}/curlimages/curl:8.8.0"
+{% else %}
     image: docker.io/curlimages/curl:8.8.0
+{% endif %}
     imagePullPolicy: IfNotPresent
     command:
       - sh
     args:
       - -c
-      - curl -L -f -S -o /extensions/keycloak-theme-dsfr.jar https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v1.0.3/retrocompat-keycloak-theme.jar
+      - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}/retrocompat-keycloak-theme.jar
     volumeMounts:
       - name: extensions
         mountPath: /extensions

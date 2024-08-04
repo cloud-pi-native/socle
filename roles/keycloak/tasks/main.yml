@@ -57,7 +57,11 @@
 
 - name: Create PostgreSQL cluster and keycloak database
   kubernetes.core.k8s:
-    template: pg-cluster-keycloak.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-keycloak.yaml.j2
+    - pg-cluster-keycloak-backup.yaml.j2
+    - pg-cluster-keycloak-nodeport.yaml.j2
 
 - name: Wait pg-cluster-keycloak-rw endpoint
   kubernetes.core.k8s_info:
@@ -177,7 +181,8 @@
 - name: Add bitnami helm repo
   kubernetes.core.helm_repository:
     name: bitnami
-    repo_url: https://charts.bitnami.com/bitnami
+    repo_url: "{{ dsc.keycloak.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:

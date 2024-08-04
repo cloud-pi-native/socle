@@ -5,11 +5,11 @@
       - dsc.sonarqube.pluginDownloadUrl != ""
     fail_msg: "'dsc.sonarqube.pluginDownloadUrl' must not be empty"
 
-- name: Validate dsc.sonarqube.PrometheusJavaagentVersion is not empty
+- name: Validate dsc.sonarqube.prometheusJavaagentVersion is not empty
   assert:
     that:
-      - dsc.sonarqube.PrometheusJavaagentVersion != ""
-    fail_msg: "'dsc.sonarqube.PrometheusJavaagentVersion' must not be empty"
+      - dsc.sonarqube.prometheusJavaagentVersion != ""
+    fail_msg: "'dsc.sonarqube.prometheusJavaagentVersion' must not be empty"
 
 - name: Validate dsc.gitlabCatalog.catalogRepoUrl is different than default
   assert:
@@ -17,11 +17,11 @@
       - dsc.gitlabCatalog.catalogRepoUrl != "https://github.com/cloud-pi-native/gitlab-ci-catalog.git"
     fail_msg: "'dsc.gitlabCatalog.catalogRepoUrl' is same as 'https://github.com/cloud-pi-native/gitlab-ci-catalog.git'"
 
-- name: Validate dsc.console.consoleRepoUrl is different than default
+- name: Validate dsc.console.helmRepoUrl is different than default
   assert:
     that:
-      - dsc.console.consoleRepoUrl != "https://github.com/cloud-pi-native/console.git"
-    fail_msg: "'dsc.console.consoleRepoUrl' is same as 'https://github.com/cloud-pi-native/console.git'"
+      - dsc.console.helmRepoUrl != "https://cloud-pi-native.github.io/helm-charts"
+    fail_msg: "'dsc.console.helmRepoUrl' is same as 'https://cloud-pi-native.github.io/helm-charts'"
 
 - name: Validate dsc.argocd.privateGitlabDomain is not empty
   assert:

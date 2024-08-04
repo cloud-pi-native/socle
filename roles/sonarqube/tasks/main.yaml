@@ -55,7 +55,11 @@
 
 - name: Create PostgreSQL cluster and sonar database
   kubernetes.core.k8s:
-    template: pg-cluster-sonar.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-sonar.yaml.j2
+    - pg-cluster-sonar-backup.yaml.j2
+    - pg-cluster-sonar-nodeport.yaml.j2
 
 - name: Wait pg-cluster-sonar-rw endpoint
   kubernetes.core.k8s_info:
@@ -81,7 +85,8 @@
 - name: Add SonarQube helm repo
   kubernetes.core.helm_repository:
     name: sonarqube
-    repo_url: https://SonarSource.github.io/helm-chart-sonarqube
+    repo_url: "{{ dsc.sonarqube.helmRepoUrl }}"
+    force_update: true
 
 - name: Get admin password secret
   kubernetes.core.k8s_info:
@@ -243,3 +248,8 @@
     - name: Create PodMonitor
       kubernetes.core.k8s:
         template: podmonitor.yml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

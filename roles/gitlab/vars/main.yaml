@@ -1,10 +1,4 @@
 ---
-gitlab_service_monitors:
-  - name: postgresql
-    port: 9187
-    path: /metrics
-    metrics_endpoint_name: metrics
-
 gitlab_additional_service_monitors:
   - name: redis
     port: 9121

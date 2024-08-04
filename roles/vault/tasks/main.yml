@@ -9,7 +9,8 @@
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: hashicorp
-    repo_url: https://helm.releases.hashicorp.com
+    repo_url: "{{ dsc.vault.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:
@@ -36,6 +37,7 @@
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
+    - role.yaml.j2
     - ingress.yaml.j2
 
 # Post install

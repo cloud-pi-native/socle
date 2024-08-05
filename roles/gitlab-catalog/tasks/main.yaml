@@ -12,17 +12,6 @@
   when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
   register: set_token_inv
 
-- name: Create Catalog
-  community.general.gitlab_project:
-    api_url: https://{{ gitlab_domain }}
-    api_token: "{{ gitlab_token }}"
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    import_url: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
-    name: Catalog
-    path: catalog
-    group: "{{ dsc.global.projectsRootDir | join('/') }}"
-    visibility: internal
-
 - name: Clone Git repository as bare
   ansible.builtin.git:
     repo: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
@@ -38,3 +27,14 @@
     git push --mirror "https://admin:{{ gitlab_token }}@{{ gitlab_domain }}/{{ dsc.global.projectsRootDir | join('/') }}/catalog"
   args:
     chdir: /tmp/test
+
+- name: Update Catalog visibility and path
+  community.general.gitlab_project:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    import_url: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
+    name: Catalog
+    path: catalog
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    visibility: internal

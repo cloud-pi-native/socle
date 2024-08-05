@@ -59,11 +59,11 @@ runners:
         pull_policy = ["always", "always"]
 {% if dsc.gitlabRunner.resources is defined and dsc.gitlabRunner.resources != 'none' %}
         # request and limit of build pod and override allowed in ci
-  {% if dsc.gitlabRunner.resources.requests != 'none' %}
+  {% if dsc.gitlabRunner.resources.requests is defined and dsc.gitlabRunner.resources.requests != 'none' %}
         cpu_request = "{{ dsc.gitlabRunner.resources.requests.cpu }}"
         memory_request = "{{ dsc.gitlabRunner.resources.requests.memory }}"
   {% endif %}
-  {% if dsc.gitlabRunner.resources.limits != 'none' %}
+  {% if dsc.gitlabRunner.resources.limits is defined and dsc.gitlabRunner.resources.limits != 'none' %}
         cpu_limit = "{{ dsc.gitlabRunner.resources.limits.cpu }}"
         memory_limit = "{{ dsc.gitlabRunner.resources.limits.memory }}"
   {% endif %}

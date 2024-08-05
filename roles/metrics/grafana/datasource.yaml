@@ -7,7 +7,7 @@ spec:
   datasources:
     - access: proxy
       # jsonData:
-      #  tlsSkipVerify: true  
+      #  tlsSkipVerify: true
       basicAuth: true
       basicAuthPassword: mysupersecretpasswd
       basicAuthUser: grafana-user

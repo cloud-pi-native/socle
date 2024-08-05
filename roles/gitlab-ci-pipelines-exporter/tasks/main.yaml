@@ -2,7 +2,7 @@
 
 - name: GitLab CI Pipelines Exporter installation
   when: dsc.global.metrics.enabled
-  block: 
+  block:
     - name: Get Gitlab namespace
       kubernetes.core.k8s_info:
         kind: Namespace

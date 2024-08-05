@@ -38,8 +38,10 @@ spec:
       - forge
     rootDomain:
       .example.com
-    metrics: {}
-    alerting: {}
+    metrics:
+      enabled: false
+    alerting:
+      enabled: false
     backup: {}
   grafana: {}
   grafanaDatasource: {}
@@ -65,7 +67,7 @@ spec:
       type: external
   proxy:
     enabled: false
-  sonarqube: 
+  sonarqube:
     cnpg:
       mode: primary
   vault: {}

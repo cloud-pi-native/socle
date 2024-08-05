@@ -277,10 +277,10 @@
       token_explicit_max_ttl: 60
       bound_claims_type: glob
       user_claim: user_email
-      bound_audiences: 
+      bound_audiences:
         - https://{{ vault_domain }}
       bound_claims:
-        iss: 
+        iss:
           - "https://{{ gitlab_domain }}"
           - "{{ gitlab_domain }}"
       claim_mappings:

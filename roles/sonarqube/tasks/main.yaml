@@ -6,7 +6,7 @@
 
 - name: CNPG s3 CA (secret)
   when: >
-    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.enabled and
     dsc.global.backup.cnpg.endpointCA.namespace is defined and
     dsc.global.backup.cnpg.endpointCA.name is defined and
     dsc.global.backup.cnpg.endpointCA.key is defined
@@ -19,7 +19,7 @@
       register: cnpg_s3_ca_resource
 
     - name: Extract key
-      ansible.builtin.set_fact: 
+      ansible.builtin.set_fact:
         cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
 
     - name: Set cnpg bundle-ca secret

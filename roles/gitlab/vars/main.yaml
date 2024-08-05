@@ -4,4 +4,3 @@ gitlab_additional_service_monitors:
     port: 9121
     path: /metrics
     metrics_endpoint_name: metrics
-

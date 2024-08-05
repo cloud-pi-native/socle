@@ -52,7 +52,7 @@
 
 - name: CNPG s3 CA (secret)
   when: >
-    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.enabled and
     dsc.global.backup.cnpg.endpointCA.namespace is defined and
     dsc.global.backup.cnpg.endpointCA.name is defined and
     dsc.global.backup.cnpg.endpointCA.key is defined
@@ -65,7 +65,7 @@
       register: cnpg_s3_ca_resource
 
     - name: Extract key
-      ansible.builtin.set_fact: 
+      ansible.builtin.set_fact:
         cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
 
     - name: Set cnpg bundle-ca secret
@@ -122,7 +122,7 @@
   kubernetes.core.k8s:
     template: app.yaml.j2
 
-- block: 
+- block:
     - name: Set first_console_deployment to "true"
       ansible.builtin.set_fact:
         first_console_deployment: true
@@ -136,9 +136,9 @@
       until: pg_db_secret.resources[0].data.uri is defined
       retries: 10
       delay: 5
-  when: pg_db_secret.resources[0].data.uri is undefined 
+  when: pg_db_secret.resources[0].data.uri is undefined
 
-- block: 
+- block:
     - name: Compute Console Helm values
       ansible.builtin.include_role:
         name: combine

@@ -216,7 +216,7 @@ spec:
     values: {}
   ingress:
     annotations:
-      route.openshift.io/termination: "edge"
+      route.openshift.io/termination: edge
     tls:
       type: tlsSecret
       tlsSecret:
@@ -234,7 +234,7 @@ spec:
       type: external
   proxy:
     enabled: false
-    host: "192.168.xx.xx"
+    host: 192.168.xx.xx
     http_proxy: http://192.168.xx.xx:3128/
     https_proxy: http://192.168.xx.xx:3128/
     no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
@@ -270,7 +270,7 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [SonarQube](https://github.com/bitnami/charts/tree/main/bitnami/sonarqube)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
-S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.  
+S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.
 
 ## Installation
 
@@ -307,12 +307,12 @@ Pensez également à déclarer pour chaque outil **un `namespace` et un `subDoma
 Exemple pour Argo CD :
 
 ```yaml
-  argocd:
-    namespace: mynamespace-argocd
-    subDomain: argocd-perso
-    admin:
-      enabled: true
-      password: PasswordForEveryone
+argocd:
+  namespace: mynamespace-argocd
+  subDomain: argocd-perso
+  admin:
+    enabled: true
+    password: PasswordForEveryone
 ```
 
 Pour mémoire, les namespaces et subDomains par défaut, déclarés lors de la première installation du socle, peuvent être listés en se positionnant préalablement dans le répertoire socle, puis en affichant le fichier « config.yaml » du role socle-config, exemple en ligne de commande :
@@ -612,7 +612,7 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 - Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée.
 - Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est à dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
 
-### Modification des versions de charts 
+### Modification des versions de charts
 
 Techniquement, la modification des versions de charts utilisés est possible mais elle **n'est pas recommandée**.
 
@@ -653,8 +653,8 @@ helm search repo -l argo-cd
 Pour fixer une version de chart dans la ressource `dsc`, il vous suffira d'ajouter la ligne que vous aurez trouvée dans le fichier « releases.yaml » vu plus haut, au niveau de l'outil concerné, exemple pour Argo CD :
 
 ```yaml
-  argocd:
-    chartVersion: 4.7.19
+argocd:
+  chartVersion: 4.7.19
 ```
 
 ### Gel des versions d'images
@@ -798,62 +798,62 @@ Les différents tags utilisables sont disponibles ici :
 Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.14.1 du chart :
 
 ```yaml
-  harbor:
-    adminPassword: WhoWantsToPassForever
-    pvcRegistrySize: 50Gi
-    values:
-      nginx:
-        image:
-          repository: docker.io/goharbor/nginx-photon
-          tag: v2.10.1
-      portal:
-        image:
-          repository: docker.io/goharbor/harbor-portal
-          tag: v2.10.1
-      core:
-        image:
-          repository: docker.io/goharbor/harbor-core
-          tag: v2.10.1
-      jobservice:
-        image:
-          repository: docker.io/goharbor/harbor-jobservice
-          tag: v2.10.1
+harbor:
+  adminPassword: WhoWantsToPassForever
+  pvcRegistrySize: 50Gi
+  values:
+    nginx:
+      image:
+        repository: docker.io/goharbor/nginx-photon
+        tag: v2.10.1
+    portal:
+      image:
+        repository: docker.io/goharbor/harbor-portal
+        tag: v2.10.1
+    core:
+      image:
+        repository: docker.io/goharbor/harbor-core
+        tag: v2.10.1
+    jobservice:
+      image:
+        repository: docker.io/goharbor/harbor-jobservice
+        tag: v2.10.1
+    registry:
       registry:
-        registry:
-          image:
-            repository: docker.io/goharbor/registry-photon
-            tag: v2.10.1
-        controller:
-          image:
-            repository: docker.io/goharbor/harbor-registryctl
-            tag: v2.10.1
-      trivy:
         image:
-          repository: docker.io/goharbor/trivy-adapter-photon
+          repository: docker.io/goharbor/registry-photon
           tag: v2.10.1
-      notary:
-        server:
-          image:
-            repository: docker.io/goharbor/notary-server-photon
-            tag: v2.10.1
-        signer:
-          image:
-            repository: docker.io/goharbor/notary-signer-photon
-            tag: v2.10.1
-      database:
-        internal:
-          image:
-            repository: docker.io/goharbor/harbor-db
-            tag: v2.10.1
-      redis:
-        internal:
-          image:
-            repository: docker.io/goharbor/redis-photon
-            tag: v2.10.1
-      exporter:
+      controller:
         image:
-          repository: docker.io/goharbor/harbor-exporter
+          repository: docker.io/goharbor/harbor-registryctl
           tag: v2.10.1
+    trivy:
+      image:
+        repository: docker.io/goharbor/trivy-adapter-photon
+        tag: v2.10.1
+    notary:
+      server:
+        image:
+          repository: docker.io/goharbor/notary-server-photon
+          tag: v2.10.1
+      signer:
+        image:
+          repository: docker.io/goharbor/notary-signer-photon
+          tag: v2.10.1
+    database:
+      internal:
+        image:
+          repository: docker.io/goharbor/harbor-db
+          tag: v2.10.1
+    redis:
+      internal:
+        image:
+          repository: docker.io/goharbor/redis-photon
+          tag: v2.10.1
+    exporter:
+      image:
+        repository: docker.io/goharbor/harbor-exporter
+        tag: v2.10.1
 ```
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/goharbor/harbor-helm/tree/master>
@@ -871,8 +871,8 @@ Si toutefois vous souhaitez la modifier, les tags d'images utilisables sont disp
 Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageVersion**. Exemple :
 
 ```yaml
-  grafana:
-    imageVersion: "9.5.6"
+grafana:
+  imageVersion: 9.5.6
 ```
 
 #### Keycloak
@@ -888,12 +888,12 @@ Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequ
 Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
 ```yaml
-  keycloak:
-    values:
-      image:
-        registry: docker.io
-        repository: bitnami/keycloak
-        tag: 23.0.7-debian-12-r4
+keycloak:
+  values:
+    image:
+      registry: docker.io
+      repository: bitnami/keycloak
+      tag: 23.0.7-debian-12-r4
 ```
 
 Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml>
@@ -919,9 +919,9 @@ Si toutefois vous souhaitez la modifier, les tags d'images utilisables sont disp
 Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version d'image désirée au niveau du paramètre **imageTag**. Exemple :
 
 ```yaml
-  nexus:
-    storageSize: 25Gi
-    imageTag: 3.68.1
+nexus:
+  storageSize: 25Gi
+  imageTag: 3.68.1
 ```
 
 #### SonarQube Community Edition
@@ -939,14 +939,14 @@ Il faudra juste leur ajouter le suffixe "-community" qui correspond à l'éditio
 Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
 ```yaml
-  sonarqube:
-    postgresPvcSize: 25Gi
-    values:
-      image:
-        registry: docker.io
-        repository: sonarqube
-        edition: community
-        tag: 10.4.1-{{ .Values.edition }}
+sonarqube:
+  postgresPvcSize: 25Gi
+  values:
+    image:
+      registry: docker.io
+      repository: sonarqube
+      edition: community
+      tag: 10.4.1-{{ .Values.edition }}
 ```
 
 #### Vault
@@ -966,22 +966,22 @@ Les différents tags d'images utilisables sont disponibles ici :
 Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
 ```yaml
-  vault:
-    values:
-      injector:
-        image:
-          repository: "docker.io/hashicorp/vault-k8s"
-          tag: "1.2.1"
-          pullPolicy: IfNotPresent
-        agentImage:
-          repository: "docker.io/hashicorp/vault"
-          tag: "1.14.0"
-      server:
-        image:
-          repository: "docker.io/hashicorp/vault"
-          tag: "1.14.0"
-          pullPolicy: IfNotPresent
-        updateStrategyType: "RollingUpdate"
+vault:
+  values:
+    injector:
+      image:
+        repository: docker.io/hashicorp/vault-k8s
+        tag: 1.2.1
+        pullPolicy: IfNotPresent
+      agentImage:
+        repository: docker.io/hashicorp/vault
+        tag: 1.14.0
+    server:
+      image:
+        repository: docker.io/hashicorp/vault
+        tag: 1.14.0
+        pullPolicy: IfNotPresent
+      updateStrategyType: RollingUpdate
 ```
 
 **Remarque importante** : En cas de tentative de mise à jour des versions d'images, dans la section `server` de vos values, le paramètre `updateStrategyType` doit impérativement être présent et positionné sur "RollingUpdate" pour que l'image du serveur Vault puisse éventuellement se mettre à jour avec le tag que vous avez indiqué.
@@ -1002,7 +1002,7 @@ Pour les backups de namespaces avec Velero :
 kubectl explain dsc.spec.global.backup.velero
 ```
 
-Pour les backups S3 des BDD PostgreSQL déployées via CNPG : 
+Pour les backups S3 des BDD PostgreSQL déployées via CNPG :
 
 ```
 kubectl explain dsc.spec.global.backup.cnpg
@@ -1045,8 +1045,8 @@ Notez que du fait de l'utilisation de l'option `dry-run`, le secret n'est pas v�
 Copiez cette sortie, et collez-là dans la section `spec.global.imagePullSecretsData` de votre resource dsc (par défaut conf-dso), exemple :
 
 ```yaml
-  global:
-    imagePullSecretsData: valeur_récupérée_ici
+global:
+  imagePullSecretsData: valeur_récupérée_ici
 ```
 
 Une fois le changement appliqué à la dsc, relancez l'installation de l'outil souhaité ou de la chaîne DSO complète. Le processus d'installation va maintenant s'appuyer sur le secret `dso-config-pull-secret` créé dans le namespace `default`, utilisant vos identifiants Docker Hub, et répliqué dans le namespace de chaque outil.
@@ -1069,7 +1069,7 @@ Vérifiez la présence du secret `dso-config-pull-secret` dans le(s) namespace(s
 kubectl get secrets -A | egrep 'NAME|dso-config-pull-secret'
 ```
 
-Puis relancez l'installation de l'outil voulu ou de la chaîne complète. 
+Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 ## Contributions
 

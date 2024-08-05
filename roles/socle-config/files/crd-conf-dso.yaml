@@ -63,7 +63,7 @@ spec:
                         name:
                           description: The configmap name
                           type: string
-                        key: 
+                        key:
                           description: The configmap key providing the Private CA cert
                           type: string
                       required:
@@ -197,7 +197,7 @@ spec:
                       default: 10Gi
                     consoleRepoUrl:
                       description: Console repository url.
-                      default: https://cloud-pi-native.github.io/helm-charts 
+                      default: https://cloud-pi-native.github.io/helm-charts
                       type: string
                     cnpg:
                       description: Configuration for cnpg clusters.
@@ -585,7 +585,7 @@ spec:
                       type: string
                     offline:
                       default: false
-                      description: Specifies whether the cluster have access to the 
+                      description: Specifies whether the cluster have access to the
                         internet or not.
                       type: boolean
                     registry:

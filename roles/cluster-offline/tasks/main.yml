@@ -27,4 +27,4 @@
   assert:
     that:
       - dsc.argocd.privateGitlabDomain != ""
-    fail_msg: "'dsc.argocd.privateGitlabDomain' is empty" 
+    fail_msg: "'dsc.argocd.privateGitlabDomain' is empty"

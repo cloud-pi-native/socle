@@ -314,7 +314,7 @@
           when: gcipe_infos.status is not defined
           ansible.builtin.debug:
             msg: "Gitlab-ci-pipelines-exporter n'est pas installé."
- 
+
         - name: Display gitlab-ci-pipelines-exporter version
           when: gcipe_infos.status is defined
           ansible.builtin.debug:

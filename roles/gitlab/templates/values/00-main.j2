@@ -103,6 +103,9 @@ global:
       providers:
         - secret: openid-connect
 
+  extraEnv:
+    GITLAB_ROOT_EMAIL: "admin@example.com"
+
 prometheus:
   install: false
 

@@ -29,7 +29,7 @@ spec:
     pg_hba:
       # To access through TCP/IP you will need to get username
       # and password from the secret pg-cluster-sonar-app
-      - host sonardb dso_admin all md5
+      - host sonardb sonarqube all md5
       - host sonardb streaming_replica all md5
 {% endif %}
   bootstrap:

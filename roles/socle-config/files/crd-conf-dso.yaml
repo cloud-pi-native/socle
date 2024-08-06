@@ -195,10 +195,6 @@ spec:
                       description: Size for postgres' pvc
                       type: string
                       default: 10Gi
-                    consoleRepoUrl:
-                      description: Console repository url.
-                      default: https://cloud-pi-native.github.io/helm-charts
-                      type: string
                     cnpg:
                       description: Configuration for cnpg clusters.
                       type: object
@@ -428,73 +424,6 @@ spec:
                       required:
                         - enabled
                       type: object
-                    cnpg:
-                      description: Configuration for cnpg clusters.
-                      type: object
-                      properties:
-                        mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
-                          type: string
-                          default: primary
-                          enum:
-                            - primary
-                            - replica
-                        keycloak:
-                          description: Configuration for keycloak cnpg cluster.
-                          type: object
-                          properties:
-                            exposed:
-                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
-                              type: boolean
-                              default: false
-                            nodePort:
-                              description: NodePort used to expose the cnpg cluster instance.
-                              type: string
-                            replicaExtraArgs:
-                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
-                              type: string
-                        console:
-                          description: Configuration for console cnpg cluster.
-                          type: object
-                          properties:
-                            exposed:
-                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
-                              type: boolean
-                              default: false
-                            nodePort:
-                              description: NodePort used to expose the cnpg cluster instance.
-                              type: string
-                            replicaExtraArgs:
-                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
-                              type: string
-                        harbor:
-                          description: Configuration for harbor cnpg cluster.
-                          type: object
-                          properties:
-                            exposed:
-                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
-                              type: boolean
-                              default: false
-                            nodePort:
-                              description: NodePort used to expose the cnpg cluster instance.
-                              type: string
-                            replicaExtraArgs:
-                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
-                              type: string
-                        sonarqube:
-                          description: Configuration for sonarqube cnpg cluster.
-                          type: object
-                          properties:
-                            exposed:
-                              description: Whether or not the cnpg cluster shoul be exposed via NodePort.
-                              type: boolean
-                              default: false
-                            nodePort:
-                              description: NodePort used to expose the cnpg cluster instance.
-                              type: string
-                            replicaExtraArgs:
-                              description: Connection args used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
-                              type: string
                     alerting:
                       description: Configuration for alerting feature.
                       properties:
@@ -508,22 +437,39 @@ spec:
                     backup:
                       description: Configuration for backup feature.
                       properties:
-                        velero:
+                        s3:
                           properties:
-                            enabled:
-                              description: Enable Velero backups.
-                              default: false
-                              type: boolean
-                          type: object
-                        cnpg:
-                          properties:
-                            enabled:
-                              description: Enable s3 cnpg backups.
-                              default: false
-                              type: boolean
                             endpointURL:
-                              description: Defines the s3 endpoint for cnpg backups.
+                              description: Defines the s3 endpoint for vault backups.
                               type: string
+                            bucketName:
+                              description: Defines the globally shared s3 bucket name for backups.
+                              type: string
+                              default: ""
+                            credentials:
+                              properties:
+                                name:
+                                  description: Defines the s3 kubernetes secret name used for vault backups.
+                                  type: string
+                                accessKeyId:
+                                  properties:
+                                    key:
+                                      description: Defines the s3 accessKeyId kubernetes secret key used for vault backups.
+                                      type: string
+                                    value:
+                                      description: Defines the s3 accessKeyId value used for vault backups.
+                                      type: string
+                                  type: object
+                                secretAccessKey:
+                                  properties:
+                                    key:
+                                      description: Defines the s3 secretAccessKey kubernetes secret key used for vault backups.
+                                      type: string
+                                    value:
+                                      description: Defines the s3 secretAccessKey value used for vault backups.
+                                      type: string
+                                  type: object
+                              type: object
                             endpointCA:
                               properties:
                                 namespace:
@@ -536,34 +482,52 @@ spec:
                                   description: Defines the secret key containing s3 CA for cnpg backups.
                                   type: string
                               type: object
-                            destinationPath:
-                              description: Defines the globally shared s3 destination path for cnpg backups (it should be set like `<bucket_name>/<optional_dir>`).
+                          type: object
+                        velero:
+                          properties:
+                            enabled:
+                              description: Enable Velero backups.
+                              default: false
+                              type: boolean
+                          type: object
+                        vault:
+                          properties:
+                            enabled:
+                              description: Enable s3 vault backups.
+                              default: false
+                              type: boolean
+                            helmRepoUrl:
+                              description: Vault backup-utils helm repository url.
                               type: string
-                              default: ""
-                            s3Credentials:
-                              properties:
-                                name:
-                                  description: Defines the s3 kuebernetes secret name used for cnpg backups.
-                                  type: string
-                                accessKeyId:
-                                  properties:
-                                    key:
-                                      description: Defines the s3 accessKeyId kubernetes secret key used for cnpg backups.
-                                      type: string
-                                    value:
-                                      description: Defines the s3 accessKeyId value used for cnpg backups.
-                                      type: string
-                                  type: object
-                                secretAccessKey:
-                                  properties:
-                                    key:
-                                      description: Defines the s3 secretAccessKey kubernetes secret key used for cnpg backups.
-                                      type: string
-                                    value:
-                                      description: Defines the s3 secretAccessKey value used for cnpg backups.
-                                      type: string
-                                  type: object
-                              type: object
+                            chartVersion:
+                              description: Vault backup-utils helm chart version (e.g., "1.12.2").
+                              type: string
+                            pathPrefix:
+                              description: Defines the globally shared s3 destination path for cnpg backups.
+                              type: string
+                              default: "vault"
+                            mcExtraArgs:
+                              description: Extra args to pass to minio cli for the backups.
+                              type: string
+                            cron:
+                              description: Defines the cron rule used for vault backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for vault backups recurrences.
+                              type: string
+                              default: "30d"
+                          type: object
+                        cnpg:
+                          properties:
+                            enabled:
+                              description: Enable s3 cnpg backups.
+                              default: false
+                              type: boolean
+                            pathPrefix:
+                              description: Defines the globally shared s3 destination path for cnpg backups.
+                              type: string
+                              default: "cnpg"
                             cron:
                               description: Defines the cron rule used for cnpg backups. By default it runs every 6 hours.
                               type: string

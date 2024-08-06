@@ -44,6 +44,8 @@ spec:
         enabled: false
       cnpg:
         enabled: false
+      vault:
+        enabled: false
     metrics:
       enabled: false
     alerting:

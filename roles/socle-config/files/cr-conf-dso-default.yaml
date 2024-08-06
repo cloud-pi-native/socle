@@ -36,13 +36,18 @@ spec:
     environment: production
     projectsRootDir:
       - forge
-    rootDomain:
-      .example.com
+    rootDomain: .example.com
     metrics:
       enabled: false
     alerting:
       enabled: false
-    backup: {}
+    backup:
+      cnpg:
+        enabled: false
+        pathPrefix: cnpg
+      vault:
+        enabled: false
+        pathPrefix: vault
   grafana: {}
   grafanaDatasource: {}
   grafanaOperator: {}

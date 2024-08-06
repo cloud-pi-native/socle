@@ -938,7 +938,7 @@ kubectl explain dsc.spec.global.backup.cnpg
 
 En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devront être adaptées.
 - `dsc.sonarqube:`
-  - `pluginDownloadUrl` et `PrometheusJavaagentVersion`
+  - `pluginDownloadUrl` et `prometheusJavaagentVersion`
 - `dsc.gitlabCatalog.catalogRepoUrl`
 - `dsc.argocd.privateGitlabDomain`
 - `dsc.grafanaOperator.ociChartUrl`

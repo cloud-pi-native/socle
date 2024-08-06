@@ -63,7 +63,7 @@ spec:
     adminPassword: anotherGreatPassword
   ingress:
     annotations:
-      route.openshift.io/termination: "edge"
+      route.openshift.io/termination: edge
     tls:
       type: none
   keycloak:
@@ -76,7 +76,7 @@ spec:
       type: external
   proxy:
     enabled: false
-  #  host: "192.168.xx.xx"
+  #  host: 192.168.xx.xx
   #  http_proxy: http://192.168.xx.xx:3128/
   #  https_proxy: http://192.168.xx.xx:3128/
   #  no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain

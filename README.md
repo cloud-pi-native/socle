@@ -97,7 +97,7 @@ Vous aurez besoin d'une machine distincte du cluster, tournant sous GNU/Linux av
 Toujours sur votre environnement de déploiement, vous devrez :
 
 - Clôner le présent [dépôt](https://github.com/cloud-pi-native/socle).
-- Disposer d'un fichier de configuration ```~/.kube/config``` paramétré avec les accès administrateur, pour l'appel à l'API du cluster (section users du fichier en question).
+- Disposer d'un fichier de configuration `~/.kube/config` paramétré avec les accès administrateur, pour l'appel à l'API du cluster (section users du fichier en question).
 
 L'installation de la suite des prérequis **sur l'environnement de déploiement** s'effectue à l'aide du playbook nommé `install-requirements.yaml`. Il est mis à disposition dans le répertoire `admin-tools` du dépôt socle que vous aurez clôné.
 
@@ -432,9 +432,9 @@ C'est pourquoi, dans un cluster dédié à une utilisation à jour du socle DSO,
 Les tâches du rôle prometheus ne se lancent que si le paramètre `prometheus.crd.type` de la `dsc` est positionné sur `managed` comme dans l'exemple suivant :
 
 ```yaml
-  prometheus:
-    crd:
-      type: managed
+prometheus:
+  crd:
+    type: managed
 ```
 
 Il faudra positionner cette valeur `managed` dans le cas de figure où l'opérateur Prometheus est installé dans notre cluster.
@@ -924,7 +924,7 @@ Vous pouvez obtenir plus de renseignements sur le paramétrage des champs de bac
 
 Pour les backups de namespaces avec Velero :
 
-```
+```shell
 kubectl explain dsc.spec.global.backup.velero
 ```
 

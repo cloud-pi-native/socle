@@ -1,3 +1,3 @@
 {
-  "*.{yml, yaml}": "pnpm run format"
+  "**/*.{yml,yaml}": "eslint"
 }

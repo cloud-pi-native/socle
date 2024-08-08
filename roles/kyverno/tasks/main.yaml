@@ -15,6 +15,7 @@
     name: combine
   vars:
     combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.kyverno['values'] }}"
     combine_dest_var: "kyverno_values"
 
 - name: Install Kyverno

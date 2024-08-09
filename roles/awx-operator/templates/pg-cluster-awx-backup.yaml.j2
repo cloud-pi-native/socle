@@ -1,0 +1,13 @@
+---
+{% if dsc.global.backup.cnpg.enabled %}
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: pg-cluster-awx
+  namespace: {{ dsc.awx.namespace }}
+spec:
+  schedule: "{{ dsc.global.backup.cnpg.cron }}"
+  backupOwnerReference: self
+  cluster:
+    name: pg-cluster-awx
+{% endif %}

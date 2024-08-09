@@ -11,6 +11,9 @@ spec:
   argocd:
     admin:
       enabled: false
+  awx:
+    cnpg:
+      mode: primary
   cloudnativepg: {}
   console:
     cnpg:

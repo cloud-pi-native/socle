@@ -123,6 +123,7 @@
 - name: Set tools domains facts
   ansible.builtin.set_fact:
     argocd_domain: "{{ dsc.argocd.subDomain }}{{ root_domain }}"
+    awx_domain: "{{ dsc.awx.subDomain }}{{ root_domain }}"
     console_domain: "{{ dsc.console.subDomain }}{{ root_domain }}"
     gitlab_domain: "{{ dsc.gitlab.subDomain }}{{ root_domain }}"
     grafana_domain: "{{ dsc.grafana.subDomain }}{{ root_domain }}"
@@ -136,6 +137,7 @@
   ansible.builtin.debug:
     msg:
       - "argocd_domain: {{ argocd_domain }}"
+      - "awx_domain: {{ awx_domain }}"
       - "console_domain: {{ console_domain }}"
       - "gitlab_domain: {{ gitlab_domain }}"
       - "grafana_domain: {{ grafana_domain }}"

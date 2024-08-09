@@ -1,0 +1,103 @@
+apiVersion: cloud-pi-native.fr/v1alpha
+kind: DsoSocleConfig
+metadata:
+  name: conf-dso
+spec:
+  additionalsCA: []
+  argocd:
+    admin:
+      enabled: false
+    values:
+      config:
+        secret:
+          argocdServerAdminPassword: nPZq4xsCyy
+  certmanager: {}
+  cloudnativepg: {}
+  console:
+    consoleRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    postgresPvcSize: 10Gi
+    values: {}
+  exposedCA:
+    configmap:
+      key: ca.pem
+      name: mkcert
+      namespace: ingress-nginx
+    type: configmap
+  gitlab:
+    extraCIVars: []
+    postgresPvcSize: 10Gi
+    values: {}
+  gitlabCatalog:
+    catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
+  gitlabCiPipelinesExporter: {}
+  gitlabOperator: {}
+  gitlabRunner:
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      overwrite:
+        limits:
+          cpu: "2"
+          memory: 4Gi
+        requests:
+          cpu: "2"
+          memory: 4Gi
+      requests:
+        cpu: "2"
+        memory: 4Gi
+  global:
+    alerting:
+      enabled: false
+    backup: {}
+    environment: production
+    metrics:
+      enabled: false
+    offline: false
+    platform: kubernetesVanilla
+    projectsRootDir:
+    - forge
+    rootDomain: .127.0.0.1.nip.io
+  grafana: {}
+  grafanaDatasource: {}
+  grafanaOperator: {}
+  harbor:
+    adminPassword: anotherGreatPassword
+    postgresPvcSize: 10Gi
+    pvcRegistrySize: 20Gi
+    values: {}
+  ingress:
+    annotations: {}
+    labels: {}
+    tls:
+      type: none
+  keycloak:
+    postgresPvcSize: 10Gi
+    values: {}
+  kyverno: {}
+  nexus:
+    proxyCacheSize: 25Gi
+    storageSize: 25Gi
+  prometheus:
+    crd:
+      type: external
+  proxy:
+    enabled: false
+    no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
+  sonarqube:
+    postgresPvcSize: 10Gi
+    values: {}
+  vault:
+    values:
+      global:
+        enabled: true
+      server:
+        volumeMounts:
+        - mountPath: ./etc/ssl/certs/ca-certificates.crt
+          name: mkcert
+          readOnly: true
+          subPath: ca.pem
+        volumes:
+        - configMap:
+            name: mkcert
+          name: mkcert

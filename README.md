@@ -42,6 +42,7 @@
     - [Vault](#vault)
 - [Backups](#backups)
 - [Offline / air gap](#offline--air-gap)
+- [Platform](#platform)
 - [Profile CIS](#profile-cis)
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
 - [Contributions](#contributions)
@@ -159,7 +160,7 @@ kubectl apply -f ma-conf-dso.yaml
 Pour vous aider à démarrer, voici un **exemple** de fichier de configuration valide, à adapter à partir de la section **spec**, notamment au niveau :
 * du paramètre `global.rootDomain` (votre domaine principal précédé d'un point),
 * des mots de passe de certains outils,
-* du paramètre `global.platform` (à positionner sur `kubernetesVanilla` si vous n'utilisez pas OpenShift),
+* du paramètre `global.platform` (à positionner sur `kubernetes` si vous n'utilisez pas OpenShift),
 * de la taille de certains PVCs,
 * de l'activation ou non des métriques,
 * du proxy ainsi que des sections CA et ingress.
@@ -1019,6 +1020,13 @@ En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devron
 - `dsc.grafanaOperator.ociChartUrl`
 - `helmRepoUrl` pour chaque service à savoir :
   - `argocd`, `certmanager`, `cloudnativepg`, `console`, `gitlabCiPipelinesExporter`, `gitlabOperator`, `gitlabRunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
+
+## Platform
+
+Par défaut, le déploiement du socle DSO se fait sur un cluster de la famille Openshift, mais il est possible de déployer sur les autres types de distribution Kubernetes (Vanilla, K3s, RKE2, EKS, GKE...) en spécifiant comme suit dans la dsc.
+```
+platform: kubernetes
+```
 
 ## Profile CIS
 

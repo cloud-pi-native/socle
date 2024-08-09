@@ -16,7 +16,7 @@ spec:
       labels:
         app: nexus
     spec:
-{% if dsc.global.platform == "kubernetesVanilla" or dsc.global.platform == "rke2" %}
+{% if dsc.global.platform == "kubernetes" %}
       securityContext:
         runAsNonRoot: true
         runAsGroup: 200 

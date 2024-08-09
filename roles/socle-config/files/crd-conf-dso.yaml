@@ -540,12 +540,11 @@ spec:
                       type: object
                     platform:
                       default: openshift
-                      description: Cluster platform only openshift, kubernetesVanilla and rke2
-                        are supported (for now).
+                      description: Cluster platform, either the Openshift family (Openshift, OKD), or the rest
+                        (Kubernetes Vanilla, K3s, RKE2, EKS, GKE...).
                       enum:
                         - openshift
-                        - kubernetesVanilla
-                        - rke2
+                        - kubernetes
                       type: string
                     offline:
                       default: false

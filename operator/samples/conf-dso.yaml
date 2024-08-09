@@ -14,6 +14,8 @@ spec:
   certmanager: {}
   cloudnativepg: {}
   console:
+    cnpg:
+      mode: primary
     consoleRepoUrl: https://cloud-pi-native.github.io/helm-charts
     postgresPvcSize: 10Gi
     values: {}
@@ -24,6 +26,8 @@ spec:
       namespace: ingress-nginx
     type: configmap
   gitlab:
+    cnpg:
+      mode: primary
     extraCIVars: []
     postgresPvcSize: 10Gi
     values: {}
@@ -58,10 +62,13 @@ spec:
     projectsRootDir:
     - forge
     rootDomain: .127.0.0.1.nip.io
+    backup: {}
   grafana: {}
   grafanaDatasource: {}
   grafanaOperator: {}
   harbor:
+    cnpg:
+      mode: primary
     adminPassword: anotherGreatPassword
     postgresPvcSize: 10Gi
     pvcRegistrySize: 20Gi
@@ -72,6 +79,8 @@ spec:
     tls:
       type: none
   keycloak:
+    cnpg:
+      mode: primary
     postgresPvcSize: 10Gi
     values: {}
   kyverno: {}
@@ -85,6 +94,8 @@ spec:
     enabled: false
     no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
   sonarqube:
+    cnpg:
+      mode: primary
     postgresPvcSize: 10Gi
     values: {}
   vault:

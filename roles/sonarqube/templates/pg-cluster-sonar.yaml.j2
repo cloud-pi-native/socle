@@ -36,13 +36,13 @@ spec:
 {% if dsc.sonarqube.cnpg.mode == "primary" %}
     initdb:
       database: sonardb
-      owner: sonarqube
+      owner: dso_admin
     recovery: null
 {% elif dsc.sonarqube.cnpg.mode == "replica" or dsc.sonarqube.cnpg.mode == "restore" %}
     recovery:
       source: pg-cluster-sonar
       database: sonardb
-      owner: sonarqube
+      owner: dso_admin
     initdb: null
   externalClusters:
   - name: pg-cluster-sonar

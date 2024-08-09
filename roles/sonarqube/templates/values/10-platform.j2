@@ -22,7 +22,7 @@ account:
   securityContext: {}
 {% endif %}
 
-{% if dsc.global.platform == "kubernetesVanilla" %}
+{% if dsc.global.platform == "kubernetes" %}
 account:
   securityContext:
     runAsUser: 101

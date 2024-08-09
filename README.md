@@ -42,6 +42,7 @@
     - [Vault](#vault)
 - [Backups](#backups)
 - [Offline / air gap](#offline--air-gap)
+- [Profile CIS](#profile-cis)
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
@@ -1018,6 +1019,13 @@ En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devron
 - `dsc.grafanaOperator.ociChartUrl`
 - `helmRepoUrl` pour chaque service à savoir :
   - `argocd`, `certmanager`, `cloudnativepg`, `console`, `gitlabCiPipelinesExporter`, `gitlabOperator`, `gitlabRunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
+
+## Profile CIS
+
+Pour un déploiement sur un cluster qui n'est pas de la famille d'Openshift, par exemple sur un Kubernetes Vanilla, il est possible d'activer le profil de sécurité CIS pour enforcer la partie securityContext, en spécifiant comme suit dans la dsc.
+```
+profile: cis
+```
 
 ## Utilisation de credentials Docker Hub pour le pull des images
 

@@ -24,6 +24,16 @@
     combine_user_values: "{{ dsc.vault['values'] }}"
     combine_dest_var: "vault_values"
 
+- name: Create exposed_ca Secret
+  kubernetes.core.k8s:
+    kind: Secret
+    namespace: "{{ dsc.vault.namespace }}"
+    name: exposed-ca
+    definition:
+      data:
+        tls.crt: "{{ (dsc.exposedCA.type == 'configmap') | ansible.builtin.ternary(exposed_ca_pem | b64encode, exposed_ca_pem) }}"
+  when: dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret"
+
 - name: Deploy helm
   kubernetes.core.helm:
     name: "{{ dsc_name }}-vault"

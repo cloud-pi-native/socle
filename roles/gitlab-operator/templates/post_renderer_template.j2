@@ -1,5 +1,0 @@
-#!/bin/bash
-
-rm -f /tmp/all.yaml
-cat <&0 > /tmp/all.yaml
-yq eval '.spec.template.spec.containers[1].image = "{{ dsc.global.registry }}/kubebuilder/kube-rbac-proxy:v0.14.1"' /tmp/all.yaml 2> /dev/null && rm /tmp/all.yaml

@@ -1,18 +1,10 @@
 {% if dsc.global.platform == "openshift" %}
-redis:
-  metrics:
-    podSecurityContext:
-      enabled: false
+redis-ha:
+  containerSecurityContext:
+    runAsUser: null
+    runAsGroup: null
+  haproxy:
     containerSecurityContext:
-      enabled: false
-  master:
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
-  replica:
-    podSecurityContext:
-      enabled: false
-    containerSecurityContext:
-      enabled: false
+      runAsUser: null
+      runAsGroup: null
 {% endif %}

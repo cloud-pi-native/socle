@@ -8,20 +8,20 @@
 
 - name: CNPG s3 CA (secret)
   when: >
-    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.enabled and
     dsc.global.backup.cnpg.endpointCA.namespace is defined and
     dsc.global.backup.cnpg.endpointCA.name is defined and
     dsc.global.backup.cnpg.endpointCA.key is defined
   block:
     - name: Get secret
       kubernetes.core.k8s_info:
-        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
-        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        name: "{{ dsc.global.backup.endpointCa.name }}"
+        namespace: "{{ dsc.global.backup.endpointCa.namespace }}"
         kind: Secret
       register: cnpg_s3_ca_resource
 
     - name: Extract key
-      ansible.builtin.set_fact: 
+      ansible.builtin.set_fact:
         cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
 
     - name: Set cnpg bundle-ca secret
@@ -36,14 +36,14 @@
 
 - name: Set cnpg backup secret
   kubernetes.core.k8s:
-    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    name: "{{ dsc.global.backup.s3Credentials.name }}"
     namespace: "{{ dsc.keycloak.namespace }}"
     kind: Secret
     api_version: v1
     definition:
       data:
-        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
-        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+        accessKeyId: "{{ dsc.global.backup.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
 - name: Remove cnpg scheduled backup
@@ -57,7 +57,11 @@
 
 - name: Create PostgreSQL cluster and keycloak database
   kubernetes.core.k8s:
-    template: pg-cluster-keycloak.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-keycloak.yaml.j2
+    - pg-cluster-keycloak-backup.yaml.j2
+    - pg-cluster-keycloak-nodeport.yaml.j2
 
 - name: Wait pg-cluster-keycloak-rw endpoint
   kubernetes.core.k8s_info:
@@ -177,7 +181,8 @@
 - name: Add bitnami helm repo
   kubernetes.core.helm_repository:
     name: bitnami
-    repo_url: https://charts.bitnami.com/bitnami
+    repo_url: "{{ dsc.keycloak.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:
@@ -417,7 +422,7 @@
     auth_password: "{{ keycloak_admin_password }}"
     realm: "{{ item }}"
     brute_force_protected: true
-    failure_factor: 10 
+    failure_factor: 10
   with_items:
     - master
     - dso

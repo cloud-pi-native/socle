@@ -1,0 +1,13 @@
+---
+{% if dsc.global.backup.cnpg.enabled %}
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: pg-cluster-gitlab
+  namespace: {{ dsc.gitlab.namespace }}
+spec:
+  schedule: "{{ dsc.global.backup.cnpg.cron }}"
+  backupOwnerReference: self
+  cluster:
+    name: pg-cluster-gitlab
+{% endif %}

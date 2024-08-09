@@ -38,4 +38,3 @@
   when: (vault_initialized) and (not vault_sealed)
   ansible.builtin.set_fact:
     vault_status: "OK"
-

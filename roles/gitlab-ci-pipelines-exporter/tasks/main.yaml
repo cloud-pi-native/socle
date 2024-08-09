@@ -2,7 +2,7 @@
 
 - name: GitLab CI Pipelines Exporter installation
   when: dsc.global.metrics.enabled
-  block: 
+  block:
     - name: Get Gitlab namespace
       kubernetes.core.k8s_info:
         kind: Namespace
@@ -28,7 +28,8 @@
     - name: Add GitLab CI Pipelines Exporter helm repo
       kubernetes.core.helm_repository:
         name: mvisonneau
-        repo_url: https://charts.visonneau.fr
+        repo_url: "{{ dsc.gitlabCiPipelinesExporter.helmRepoUrl }}"
+        force_update: true
 
     - name: Set path fact
       ansible.builtin.set_fact:

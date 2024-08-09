@@ -32,7 +32,7 @@
     - name: Deploy Grafana Operator helm
       kubernetes.core.helm:
         name: grafana-operator
-        chart_ref: oci://ghcr.io/grafana/helm-charts/grafana-operator
+        chart_ref: "{{ dsc.grafanaOperator.ociChartUrl }}"
         chart_version: "{{ dsc.grafanaOperator.chartVersion }}"
         release_namespace: "{{ dsc.grafanaOperator.namespace }}"
         create_namespace: true

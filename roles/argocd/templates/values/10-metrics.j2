@@ -1,10 +1,21 @@
 {% if dsc.global.metrics.enabled %}
-redis:
-  metrics:
+redis-ha:
+  exporter:
     enabled: true
     serviceMonitor:
       enabled: true
       namespace: "{{ dsc.argocd.namespace }}"
+  haproxy:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: "{{ dsc.argocd.namespace }}"
+redis:
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
 controller:
   metrics:
     enabled: true

@@ -16,3 +16,9 @@ csi:
     image:
       repository: "{{ dsc.global.registry }}/hashicorp/vault"
 {% endif %}
+
+{% if use_image_pull_secrets %}
+global:
+  imagePullSecrets: 
+  - name: dso-config-pull-secret
+{% endif %}

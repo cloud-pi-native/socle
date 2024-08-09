@@ -9,7 +9,7 @@
 - name: Set path fact
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
- 
+
 - name: Compute Kyverno Helm values
   ansible.builtin.include_role:
     name: combine
@@ -23,7 +23,8 @@
     - name: Add helm repo
       kubernetes.core.helm_repository:
         name: kyverno
-        repo_url: https://kyverno.github.io/kyverno/
+        repo_url: "{{ dsc.kyverno.helmRepoUrl }}"
+        force_update: true
 
     - name: Deploy helm
       kubernetes.core.helm:
@@ -57,3 +58,13 @@
 - name: Create replace-kubed ClusterPolicy
   kubernetes.core.k8s:
     template: replace-kubed.yml.j2
+
+- name: Create security-context ClusterPolicy for cis profile
+  kubernetes.core.k8s:
+    template: cis.yml.j2
+  when: dsc.global.profile is defined and dsc.global.profile == "cis"
+
+- name: Create ClusterPolicy for exposedCA
+  kubernetes.core.k8s:
+    template: exposedCA.yml.j2
+  when: dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret"

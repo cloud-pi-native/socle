@@ -26,7 +26,8 @@
     - name: Add CloudNativePG helm repo
       kubernetes.core.helm_repository:
         name: cnpg
-        repo_url: https://cloudnative-pg.github.io/charts
+        repo_url: "{{ dsc.cloudnativepg.helmRepoUrl }}"
+        force_update: true
 
     - name: Set path fact
       ansible.builtin.set_fact:

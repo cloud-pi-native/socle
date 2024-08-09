@@ -76,7 +76,7 @@
       when: (user_profile.stat.exists) and (homebrew_shellenv.stdout | length > 0)
       ansible.builtin.blockinfile:
         path: "{{ user_profile.stat.path }}"
-        block: | 
+        block: |
           {{ homebrew_shellenv.stdout }}
 
     - name: "Install final requirements with Homebrew"

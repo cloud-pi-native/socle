@@ -6,20 +6,20 @@
 
 - name: CNPG s3 CA (secret)
   when: >
-    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.enabled and
     dsc.global.backup.cnpg.endpointCA.namespace is defined and
     dsc.global.backup.cnpg.endpointCA.name is defined and
     dsc.global.backup.cnpg.endpointCA.key is defined
   block:
     - name: Get secret
       kubernetes.core.k8s_info:
-        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
-        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        name: "{{ dsc.global.backup.endpointCa.name }}"
+        namespace: "{{ dsc.global.backup.endpointCa.namespace }}"
         kind: Secret
       register: cnpg_s3_ca_resource
 
     - name: Extract key
-      ansible.builtin.set_fact: 
+      ansible.builtin.set_fact:
         cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
 
     - name: Set cnpg bundle-ca secret
@@ -34,14 +34,14 @@
 
 - name: Set cnpg backup secret
   kubernetes.core.k8s:
-    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    name: "{{ dsc.global.backup.s3Credentials.name }}"
     namespace: "{{ dsc.sonarqube.namespace }}"
     kind: Secret
     api_version: v1
     definition:
       data:
-        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
-        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+        accessKeyId: "{{ dsc.global.backup.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
 - name: Remove cnpg scheduled backup
@@ -55,7 +55,11 @@
 
 - name: Create PostgreSQL cluster and sonar database
   kubernetes.core.k8s:
-    template: pg-cluster-sonar.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-sonar.yaml.j2
+    - pg-cluster-sonar-backup.yaml.j2
+    - pg-cluster-sonar-nodeport.yaml.j2
 
 - name: Wait pg-cluster-sonar-rw endpoint
   kubernetes.core.k8s_info:
@@ -81,7 +85,8 @@
 - name: Add SonarQube helm repo
   kubernetes.core.helm_repository:
     name: sonarqube
-    repo_url: https://SonarSource.github.io/helm-chart-sonarqube
+    repo_url: "{{ dsc.sonarqube.helmRepoUrl }}"
+    force_update: true
 
 - name: Get admin password secret
   kubernetes.core.k8s_info:
@@ -243,3 +248,8 @@
     - name: Create PodMonitor
       kubernetes.core.k8s:
         template: podmonitor.yml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

@@ -41,7 +41,8 @@
 - name: Add GitLab Runner helm repo
   kubernetes.core.helm_repository:
     name: gitlab
-    repo_url: https://charts.gitlab.io
+    repo_url: "{{ dsc.gitlabRunner.helmRepoUrl }}"
+    force_update: true
 
 - name: Create gitlab-runner role
   kubernetes.core.k8s:

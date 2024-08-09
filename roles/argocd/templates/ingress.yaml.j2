@@ -30,6 +30,43 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: argo-argo-cd-server
+                name: argo-argocd-server
                 port:
                   number: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argo-appset-ingress
+  namespace: {{ dsc.argocd.namespace }}
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+spec:
+{% if not dsc.ingress.tls.type == 'none' %}
+  tls:
+  - hosts:
+    - appset.{{ argocd_domain }}
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: argocd-appset-tls-secret
+{% endif %}
+{% endif %}
+  rules:
+    - host: appset.{{ argocd_domain }}
+      http:
+        paths:
+          - path: /api/webhook
+            pathType: Prefix
+            backend:
+              service:
+                name: argo-argocd-applicationset-controller
+                port:
+                  number: 7000

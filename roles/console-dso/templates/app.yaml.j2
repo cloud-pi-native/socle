@@ -12,7 +12,7 @@ spec:
   project: console-pi-native
   source: 
     chart: cpn-console
-    repoURL: "{{ dsc.console.consoleRepoUrl }}" 
+    repoURL: "{{ dsc.console.helmRepoUrl }}"
     targetRevision: {{ dsc.console.release }}
     helm:
       releaseName: dso

@@ -22,7 +22,7 @@ ingress:
   labels:
     app: "sonar"
 
-# Should be kept as false even if dsc.global.platform == "kubernetesVanilla" and it may be best to work with your cluster administrator to either provide specific nodes with the proper kernel settings, or ensure they are set cluster wide : sysctl -a "name=vm.max_map_count value=262144"
+# Should be kept as false even if dsc.global.platform == "kubernetes" and it may be best to work with your cluster administrator to either provide specific nodes with the proper kernel settings, or ensure they are set cluster wide : sysctl -a "name=vm.max_map_count value=262144"
 initSysctl:
   enabled: false
 
@@ -69,7 +69,7 @@ jdbcOverwrite:
   # If enable the JDBC Overwrite, make sure to set `postgresql.enabled=false`
   enable: true
   jdbcUrl: "jdbc:postgresql://pg-cluster-sonar-rw/sonardb?socketTimeout=1500"
-  jdbcUsername: "dso_admin"
+  jdbcUsername: "sonarqube"
   jdbcSecretName: "pg-cluster-sonar-app"
   jdbcSecretPasswordKey: "password"
 

@@ -21,15 +21,15 @@
       tags:
         - always
 
+    - name: kyverno
+      tags:
+        - kyverno
+
     - name: cert-manager
       tags:
         - cert-manager
         - cm
         - always
-
-    - name: kyverno
-      tags:
-        - kyverno
 
     - name: cloudnativepg
       tags:

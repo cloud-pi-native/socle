@@ -7,7 +7,7 @@ prometheusExporter:
 plugins:
   install:
   - {{ dsc.sonarqube.pluginDownloadUrl }}/sonar-auth-oidc-plugin-2.1.1.jar
-  - {{ dsc.sonarqube.pluginDownloadUrl }}/sonarqube-community-branch-plugin-1.19.0.jar
+  - {{ dsc.sonarqube.pluginDownloadUrl }}/sonarqube-community-branch-plugin-1.21.0.jar
   noCheckCertificate: true
 
 {% if use_private_registry %}
@@ -18,5 +18,5 @@ curlContainerImage: "{{ dsc.global.registry }}/curlimages/curl:8.2.1"
 plugins:
   install:
   - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
-  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.19.0/sonarqube-community-branch-plugin-1.19.0.jar
+  - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.21.0/sonarqube-community-branch-plugin-1.21.0.jar
 {% endif %}

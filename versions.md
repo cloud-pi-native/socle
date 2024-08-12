@@ -14,5 +14,5 @@
 | keycloak                  | 23.0.7           | 19.3.4        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                       |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                         |
 | nexus                     | 3.68.1           | N/A           | [nexus](https://hub.docker.com/r/sonatype/nexus3/)                                      |
-| sonarqube                 | 10.4.1-community | 10.4.1+2389   | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube)                   |
+| sonarqube                 | 10.6.1-community | 10.6.1+3163   | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube)                   |
 | vault                     | 1.14.0           | 0.25.0        | [vault](https://artifacthub.io/packages/helm/hashicorp/vault)                           |

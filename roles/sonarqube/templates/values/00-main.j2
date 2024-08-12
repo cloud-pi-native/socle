@@ -40,8 +40,8 @@ prometheusMonitoring:
   podMonitor:
     enabled: false
 
-jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.19.0.jar=web"
-jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.19.0.jar=ce"
+jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.21.0.jar=web"
+jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.21.0.jar=ce"
 
 ## a monitoring passcode needs to be defined in order to get reasonable probe results
 # not setting the monitoring passcode will result in a deployment that will never be ready
@@ -69,7 +69,7 @@ jdbcOverwrite:
   # If enable the JDBC Overwrite, make sure to set `postgresql.enabled=false`
   enable: true
   jdbcUrl: "jdbc:postgresql://pg-cluster-sonar-rw/sonardb?socketTimeout=1500"
-  jdbcUsername: "sonarqube"
+  jdbcUsername: "dso_admin"
   jdbcSecretName: "pg-cluster-sonar-app"
   jdbcSecretPasswordKey: "password"
 

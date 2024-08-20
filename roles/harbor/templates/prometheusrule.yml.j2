@@ -3,7 +3,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app.kubernetes.io/name: gitlab
-  name: gitlab
+  name: harbor
   namespace: {{ dsc.harbor.namespace }}
 spec:
   groups:
@@ -18,7 +18,7 @@ spec:
         pod=~"harbor-core-.*",
         namespace="{{ dsc.harbor.namespace }}",
         condition="true"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor exporter not available
@@ -30,7 +30,7 @@ spec:
         pod=~"harbor-exporter-.*",
         namespace="{{ dsc.harbor.namespace }}",
         condition="true"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor jobservice not available
@@ -42,7 +42,7 @@ spec:
         pod=~"harbor-jobservice-.*",
         namespace="{{ dsc.harbor.namespace }}",
         condition="true"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor portal not available
@@ -54,7 +54,7 @@ spec:
         pod=~"harbor-portal-.*",
         namespace="{{ dsc.harbor.namespace }}",
         condition="true"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor redis not available
@@ -66,7 +66,7 @@ spec:
         pod=~"harbor-redis-.*",
         namespace="{{ dsc.harbor.namespace }}",
         condition="true"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor registry not available
@@ -78,7 +78,7 @@ spec:
         pod=~"harbor-registry-.*",
         namespace="{{ dsc.harbor.namespace }}",
         condition="true"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor trivy not available
@@ -90,7 +90,7 @@ spec:
         pod=~"harbor-trivy-.*",
         namespace="{{ dsc.harbor.namespace }}",
         condition="true"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor Pod not healthy
@@ -101,7 +101,7 @@ spec:
         kube_pod_container_status_ready{
         pod=~"harbor-.*",
         namespace="{{ dsc.harbor.namespace }}"} == 0
-      for: 1m
+      for: 5m
       labels:
         severity: warning
     - alert: Harbor DB not available
@@ -115,7 +115,7 @@ spec:
         or sum(kube_pod_container_status_ready{
         pod=~"pg-cluster-harbor-\\d+",
         container="postgres", namespace="{{ dsc.harbor.namespace }}"}) == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical
     - alert: Harbor DB Pod not healthy
@@ -126,7 +126,7 @@ spec:
         kube_pod_container_status_ready{
         pod=~"pg-cluster-harbor-\\d+",
         container="postgres", namespace="{{ dsc.harbor.namespace }}"} == 0
-      for: 1m
+      for: 5m
       labels:
         severity: warning
     - alert: Harbor PVC almost out of disk space

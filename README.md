@@ -127,6 +127,7 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
   - pyyaml
   - kubernetes
   - python-gitlab
+  - jmespath
 
 - Collection Ansible [kubernetes.core](https://github.com/ansible-collections/kubernetes.core) si elle n'est pas déjà présente.
 

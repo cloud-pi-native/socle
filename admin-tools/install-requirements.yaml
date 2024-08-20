@@ -13,6 +13,7 @@
       - pyyaml
       - kubernetes
       - python-gitlab
+      - jmespath
     apps:
       - kubectl
       - helm

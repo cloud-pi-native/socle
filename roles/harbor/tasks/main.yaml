@@ -277,3 +277,8 @@
         loop_var: proxy_cache
         label: "{{ proxy_cache.name }}"
   when: dsc.harbor.proxyCache is defined
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

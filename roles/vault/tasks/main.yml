@@ -54,31 +54,33 @@
 - name: Post install
   ansible.builtin.include_tasks: post-install.yml
 
-- name: Add helm repo
-  kubernetes.core.helm_repository:
-    name: dso
-    repo_url: "{{ dsc.global.backup.vault.helmRepoUrl }}"
-    force_update: true
+- name: Add backup utils Helm repo and deploy
   when: dsc.global.backup.vault.enabled
+  block:
+    - name: Add Helm repo
+      kubernetes.core.helm_repository:
+        name: dso
+        repo_url: "{{ dsc.global.backup.vault.helmRepoUrl }}"
+        force_update: true
 
-- name: Deploy helm
-  kubernetes.core.helm:
-    name: "{{ dsc_name }}-vault-backup"
-    chart_ref: dso/cpn-backup-utils
-    chart_version: "{{ dsc.global.backup.vault.chartVersion }}"
-    release_namespace: "{{ dsc.vault.namespace }}"
-    values:
-      vault:
-        enabled: true
-        secrets:
-          S3_BUCKET_NAME: "{{ dsc.global.backup.s3.bucketName }}"
-          S3_BUCKET_PREFIX: "{{ dsc.global.backup.vault.pathPrefix }}"
-          S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
-          VAULT_ADDR: "{{ vault_domain }}"
-          VAULT_TOKEN: "{{ vault_token }}"
-          S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
-          S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
-          RETENTION: "{{ dsc.global.backup.vault.retentionPolicy | b64encode }}"
-        job:
-          schedule: "{{ dsc.global.backup.vault.cron }}"
-    state: "{{ dsc.global.backup.vault.enabled | ternary('present', 'absent') }}"
+    - name: Deploy Helm chart
+      kubernetes.core.helm:
+        name: "{{ dsc_name }}-vault-backup"
+        chart_ref: dso/cpn-backup-utils
+        chart_version: "{{ dsc.global.backup.vault.chartVersion }}"
+        release_namespace: "{{ dsc.vault.namespace }}"
+        values:
+          vault:
+            enabled: true
+            secrets:
+              S3_BUCKET_NAME: "{{ dsc.global.backup.s3.bucketName }}"
+              S3_BUCKET_PREFIX: "{{ dsc.global.backup.vault.pathPrefix }}"
+              S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
+              VAULT_ADDR: "{{ vault_domain }}"
+              VAULT_TOKEN: "{{ vault_token }}"
+              S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
+              S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
+              RETENTION: "{{ dsc.global.backup.vault.retentionPolicy | b64encode }}"
+            job:
+              schedule: "{{ dsc.global.backup.vault.cron }}"
+        state: "{{ dsc.global.backup.vault.enabled | ternary('present', 'absent') }}"

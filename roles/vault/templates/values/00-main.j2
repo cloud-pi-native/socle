@@ -143,8 +143,7 @@ serverTelemetry:
           summary: Vault pod not healthy (container is not ready)
         expr: |
           kube_pod_container_status_ready{
-          pod=~"(.*-)*vault(-.*)*",
-          container=~"vault|sidecar-injector",
+          pod!~"backup-utils-vault(-.*)*",
           namespace="{{ dsc.vault.namespace }}"} == 0
         for: 5m
         labels:

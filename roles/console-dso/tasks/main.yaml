@@ -151,3 +151,8 @@
       kubernetes.core.k8s:
         template: app.yaml.j2
   when: first_console_deployment is defined
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

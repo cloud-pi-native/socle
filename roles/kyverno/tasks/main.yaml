@@ -18,7 +18,9 @@
     combine_dest_var: "kyverno_values"
 
 - name: Install Kyverno
-  when: kyverno_pods.resources | length == 0
+  when: >
+    kyverno_pods.resources | length == 0 or
+    dsc.kyverno.forcedInstall
   block:
     - name: Add helm repo
       kubernetes.core.helm_repository:
@@ -34,6 +36,11 @@
         release_namespace: "{{ dsc.kyverno.namespace }}"
         create_namespace: true
         values: "{{ kyverno_values }}"
+
+    - name: Set alerting rules
+      when: dsc.global.alerting.enabled
+      kubernetes.core.k8s:
+        template: prometheusrule.yml.j2
 
 - name: Wait Kyverno service endpoint to be available
   kubernetes.core.k8s_info:
@@ -55,16 +62,41 @@
       | reject('equalto', dsc.kyverno.namespace)
       }}"
 
+- name: Check replace-kubed ClusterPolicy
+  kubernetes.core.k8s_info:
+    kind: ClusterPolicy
+    name: replace-kubed
+  register: replace_kubed_cp
+
 - name: Create replace-kubed ClusterPolicy
+  when: replace_kubed_cp.resources | length == 0
   kubernetes.core.k8s:
     template: replace-kubed.yml.j2
 
+- name: Check security-context ClusterPolicy
+  kubernetes.core.k8s_info:
+    kind: ClusterPolicy
+    name: security-context-dso
+  register: security_context_cp
+
 - name: Create security-context ClusterPolicy for cis profile
+  when: >
+    dsc.global.profile is defined and
+    dsc.global.profile == "cis" and
+    security_context_cp.resources | length == 0
   kubernetes.core.k8s:
     template: cis.yml.j2
-  when: dsc.global.profile is defined and dsc.global.profile == "cis"
+
+- name: Check exposed-ca ClusterPolicy
+  kubernetes.core.k8s_info:
+    kind: ClusterPolicy
+    name: exposed-ca-dso-gitlab-runner
+  register: exposed_ca_cp
 
 - name: Create ClusterPolicy for exposedCA
+  when: >
+    exposed_ca_cp.resources | length == 0 and
+    (dsc.exposedCA.type == "configmap" or
+    dsc.exposedCA.type == "secret")
   kubernetes.core.k8s:
     template: exposedCA.yml.j2
-  when: dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret"

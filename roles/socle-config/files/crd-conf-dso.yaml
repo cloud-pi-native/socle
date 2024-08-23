@@ -866,6 +866,13 @@ spec:
                     namespace:
                       description: The namespace for Kyverno.
                       type: string
+                    forcedInstall:
+                      description: |
+                        Should we force Kyverno installation in the desired namespace ?
+                        Default is false, so it won't install (or reinstall) if it's already there.
+                        Set to true for a forced installation.
+                      default: false
+                      type: boolean
                     helmRepoUrl:
                       description: Kyverno helm repository url.
                       type: string

@@ -81,6 +81,7 @@ spec:
   kyverno:
     namespace: dso-kyverno
     helmRepoUrl: https://kyverno.github.io/kyverno
+    forcedInstall: false
   nexus:
     namespace: dso-nexus
     subDomain: nexus

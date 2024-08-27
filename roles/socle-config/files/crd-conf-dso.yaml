@@ -157,6 +157,13 @@ spec:
                     chartVersion:
                       description: Cert-manager helm chart version (e.g., "v1.13.1").
                       type: string
+                    forcedInstall:
+                      description: |
+                        Should we force Cert-manager installation in the desired namespace ?
+                        Default is false, so it won't install (or reinstall) if it's already there.
+                        Set to true for a forced installation.
+                      default: false
+                      type: boolean
                   type: object
                 cloudnativepg:
                   description: Configuration for CloudNativePG.

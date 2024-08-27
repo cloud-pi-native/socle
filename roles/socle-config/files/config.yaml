@@ -11,6 +11,7 @@ spec:
     helmRepoUrl: https://argoproj.github.io/argo-helm
   certmanager:
     helmRepoUrl: https://charts.jetstack.io
+    forcedInstall: false
   cloudnativepg:
     namespace: dso-cloudnativepg
     helmRepoUrl: https://cloudnative-pg.github.io/charts

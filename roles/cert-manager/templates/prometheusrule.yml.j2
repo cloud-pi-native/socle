@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: gitlab
+  name: certmanager
+  namespace: cert-manager
+spec:
+  groups:
+  - name: Cert-manager
+    rules:
+    - alert: Cert-manager Pod not healthy
+      annotations:
+        message: Cert-manager {{"{{"}} $labels.pod {{"}}"}} pod in namespace cert-manager has been unavailable for the last 5 minutes.
+        summary: Cert-manager {{"{{"}} $labels.pod {{"}}"}} pod not healthy (container {{"{{"}} $labels.container {{"}}"}} is not ready)
+      expr: |
+        kube_pod_container_status_ready{
+        pod=~"cert-manager(-.*)*",
+        namespace="cert-manager"} == 0
+      for: 5m
+      labels:
+        severity: critical

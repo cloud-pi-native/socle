@@ -15,6 +15,7 @@ spec:
   cloudnativepg:
     namespace: dso-cloudnativepg
     helmRepoUrl: https://cloudnative-pg.github.io/charts
+    forcedInstall: false
   console:
     namespace: dso-console
     subDomain: console
@@ -37,6 +38,7 @@ spec:
   gitlabOperator:
     namespace: dso-gitlab-operator
     helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+    forcedInstall: false
   gitlabRunner:
     helmRepoUrl: https://charts.gitlab.io
   global:

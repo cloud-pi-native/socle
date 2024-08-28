@@ -334,6 +334,13 @@ spec:
                     namespace:
                       description: The namespace for GitLab Operator.
                       type: string
+                    forcedInstall:
+                      description: |
+                        Should we force GitLab Operator installation in the desired namespace ?
+                        Default is false, so it won't install (or reinstall) if it's already there.
+                        Set to true for a forced installation.
+                      default: false
+                      type: boolean
                   type: object
                 gitlabCatalog:
                   description: Configuration for GitLab Catalog.

@@ -17,6 +17,6 @@ spec:
         kube_pod_container_status_ready{
         pod=~"cloudnative-pg(-.*)*",
         namespace="{{ dsc.cloudnativepg.namespace }}"} == 0
-      for: 1m
+      for: 5m
       labels:
         severity: critical

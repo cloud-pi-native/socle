@@ -41,7 +41,11 @@
         needs_update: true
 
 - name: Install GitLab Operator
-  when: (gl_api == 'absent') or (gl_vwhc.resources | length == 0) or (needs_update)
+  when: >
+    gl_api == 'absent' or
+    gl_vwhc.resources | length == 0 or
+    needs_update or
+    dsc.gitlabOperator.forcedInstall
   block:
     - name: Create GitLab Operator namespace
       kubernetes.core.k8s:
@@ -77,3 +81,8 @@
       until: endpoint.resources[0].subsets[0].addresses[0] is defined
       retries: 15
       delay: 5
+
+    - name: Set alerting rules
+      when: dsc.global.alerting.enabled
+      kubernetes.core.k8s:
+        template: prometheusrule.yml.j2

@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: gitlab
+  name: gitlab-operator
+  namespace: {{ dsc.gitlabOperator.namespace }}
+spec:
+  groups:
+  - name: GitLab Operator
+    rules:
+    - alert: GitLab Operator Pod not healthy
+      annotations:
+        message: GitLab Operator {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ dsc.gitlabOperator.namespace }} has been unavailable for the last 5 minutes.
+        summary: GitLab Operator {{"{{"}} $labels.pod {{"}}"}} pod not healthy (container {{"{{"}} $labels.container {{"}}"}} is not ready)
+      expr: |
+        kube_pod_container_status_ready{
+        pod=~"gitlab-controller-manager(-.*)*",
+        namespace="{{ dsc.gitlabOperator.namespace }}"} == 0
+      for: 5m
+      labels:
+        severity: critical

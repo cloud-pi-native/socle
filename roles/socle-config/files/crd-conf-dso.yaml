@@ -177,6 +177,13 @@ spec:
                     chartVersion:
                       description: CloudNativePG helm chart version (e.g., "0.18.2").
                       type: string
+                    forcedInstall:
+                      description: |
+                        Should we force CNPG Operator installation in the desired namespace ?
+                        Default is false, so it won't install (or reinstall) if it's already there.
+                        Set to true for a forced installation.
+                      default: false
+                      type: boolean
                   type: object
                 console:
                   description: Configuration for the console.

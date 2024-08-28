@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: gitlab
+  name: cnpg
+  namespace: {{ dsc.cloudnativepg.namespace }}
+spec:
+  groups:
+  - name: CNPG
+    rules:
+    - alert: CNPG Operator Pod not healthy
+      annotations:
+        message: CNPG Operator {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ dsc.cloudnativepg.namespace }} has been unavailable for the last 5 minutes.
+        summary: CNPG Operator {{"{{"}} $labels.pod {{"}}"}} pod not healthy (container {{"{{"}} $labels.container {{"}}"}} is not ready)
+      expr: |
+        kube_pod_container_status_ready{
+        pod=~"cloudnative-pg(-.*)*",
+        namespace="{{ dsc.cloudnativepg.namespace }}"} == 0
+      for: 5m
+      labels:
+        severity: critical

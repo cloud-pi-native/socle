@@ -221,7 +221,7 @@
       register: sonar_migration_status
 
     - name: Trigger DB migration
-      when: '"Database migration is required" in sonar_migration_status.json.message'
+      when: "'Database migration is required' in sonar_migration_status.json.message"
       ansible.builtin.uri:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         url: https://{{ sonar_domain }}/api/system/migrate_db

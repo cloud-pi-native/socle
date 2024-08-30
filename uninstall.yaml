@@ -312,11 +312,33 @@
       tags:
         - vault
 
+    - name: "Suppression de l'intance Argo CD"
+      kubernetes.core.helm:
+        name: "{{ dsc_name }}"
+        release_namespace: "{{ dsc.argocd.namespace }}"
+        release_state: absent
+        wait: true
+      tags:
+        - argocd
+        - argo
+        - gitops
+
     - name: "Suppression du namespace ArgoCD"
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
         name: "{{ dsc.argocd.namespace }}"
+      tags:
+        - argocd
+        - argo
+        - gitops
+
+    - name: "Suppression Argo CD OpenShift scc crb"
+      kubernetes.core.k8s:
+        state: absent
+        kind: ClusterRoleBinding
+        name: "{{ dsc_name }}-argocd-system:openshift:scc:privileged"
+        api_version: rbac.authorization.k8s.io/v1
       tags:
         - argocd
         - argo

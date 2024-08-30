@@ -1,4 +1,30 @@
 ---
+
+#- name: Get Sonarqube admin password secret
+#  kubernetes.core.k8s_info:
+#    namespace: "{{ dsc.sonarqube.namespace }}"
+#    kind: Secret
+#    name: "sonarqube"
+#  register: sonarqube_pwd
+#
+#- name: Get SonarQube migration status
+#  ansible.builtin.uri:
+#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+#    url: https://{{ sonar_domain }}/api/v2/system/migrations-status
+#    user: "admin"
+#    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+#    force_basic_auth: true
+#    method: GET
+#    return_content: true
+#    status_code: 200
+#  register: sonar_migration_status
+#
+#- debug:
+#    msg: "{{ sonar_migration_status.json.message }}"
+#
+#- meta: end_play
+
+
 - name: Create Sonarqube namespace
   kubernetes.core.k8s:
     kind: Namespace
@@ -159,6 +185,31 @@
     combine_user_values: "{{ dsc.sonarqube['values'] }}"
     combine_dest_var: "sonar_values"
 
+- name: Check SonarQube helm release
+  kubernetes.core.helm_info:
+    name: sonarqube
+    namespace: "{{ dsc.sonarqube.namespace }}"
+  register: sonar_helm_release
+
+- name: Set upgrading_chart fact
+  when: sonar_helm_release.status is defined
+  block:
+    - name: Retrieve installed SonarQube chart version
+      ansible.builtin.set_fact:
+        sonar_installed_chart_version: "{{ sonar_helm_release.status.chart | regex_replace('sonarqube-', '') }}"
+
+    - name: Initialize upgrading_chart fact
+      ansible.builtin.set_fact:
+        upgrading_chart: false
+
+    - name: Manage upgrading_chart fact
+      when: sonar_installed_chart_version is defined
+      block:
+        - name: Update upgrading_chart fact
+          when: dsc.sonarqube.chartVersion is version(sonar_installed_chart_version, operator='gt', version_type='loose')
+          ansible.builtin.set_fact:
+            upgrading_chart: true
+
 - name: Deploy helm
   kubernetes.core.helm:
     name: sonarqube
@@ -167,6 +218,14 @@
     release_namespace: "{{ dsc.sonarqube.namespace }}"
     create_namespace: true
     values: "{{ sonar_values }}"
+  ignore_errors: true
+  register: helm_install
+
+- debug:
+    msg: "{{ helm_install }}"
+
+- meta: end_play
+
 
 - name: Wait sonarqube endpoint to initialize
   kubernetes.core.k8s_info:

@@ -1,30 +1,4 @@
 ---
-
-#- name: Get Sonarqube admin password secret
-#  kubernetes.core.k8s_info:
-#    namespace: "{{ dsc.sonarqube.namespace }}"
-#    kind: Secret
-#    name: "sonarqube"
-#  register: sonarqube_pwd
-#
-#- name: Get SonarQube migration status
-#  ansible.builtin.uri:
-#    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-#    url: https://{{ sonar_domain }}/api/v2/system/migrations-status
-#    user: "admin"
-#    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
-#    force_basic_auth: true
-#    method: GET
-#    return_content: true
-#    status_code: 200
-#  register: sonar_migration_status
-#
-#- debug:
-#    msg: "{{ sonar_migration_status.json.message }}"
-#
-#- meta: end_play
-
-
 - name: Create Sonarqube namespace
   kubernetes.core.k8s:
     kind: Namespace
@@ -221,11 +195,56 @@
   ignore_errors: true
   register: helm_install
 
-- debug:
-    msg: "{{ helm_install }}"
+- name: Manage SonarQube upgrade
+  when: >
+    helm_install is failed and
+    upgrading_chart is defined and
+    upgrading_chart
+  block:
+    - name: Get Sonarqube admin password secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        kind: Secret
+        name: "sonarqube"
+      register: sonarqube_pwd
 
-- meta: end_play
+    - name: Get SonarQube migration status
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/v2/system/migrations-status
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: GET
+        return_content: true
+        status_code: 200
+      register: sonar_migration_status
 
+    - name: Trigger DB migration
+      when: '"Database migration is required" in sonar_migration_status.json.message'
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/system/migrate_db
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: POST
+        status_code: [200, 204]
+
+    - name: Wait SonarQube status to be UP
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/system/status
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: GET
+        return_content: true
+        status_code: 200
+      register: sonar_check
+      until: sonar_check.json.status == "UP"
+      retries: 60
+      delay: 5
 
 - name: Wait sonarqube endpoint to initialize
   kubernetes.core.k8s_info:

@@ -8,8 +8,8 @@
 | gitlabCiPipelinesExporter | 0.5.8            | 0.3.4         | https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter |
 | gitlabOperator            | 1.2.1            | 1.2.1         | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)     |
 | gitlabRunner              | 17.2.1           | 0.67.1        | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)               |
-| grafana                   | 9.5.5            | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                      |
-| grafanaOperator           | 5.4.2            | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                     |
+| grafana                   | 10.4.3            | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                      |
+| grafanaOperator           | 5.10.0            | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                     |
 | harbor                    | 2.10.1           | 1.14.1        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                            |
 | keycloak                  | 23.0.7           | 19.3.4        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                       |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                         |

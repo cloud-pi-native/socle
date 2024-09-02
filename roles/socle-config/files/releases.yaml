@@ -29,10 +29,10 @@ spec:
     chartVersion: "0.67.1"
   grafana:
     # https://github.com/grafana/grafana/tags
-    imageVersion: "9.5.5"
+    imageVersion: "10.4.3"
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
-    chartVersion: "v5.4.2"
+    chartVersion: "v5.10.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.14.1

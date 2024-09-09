@@ -136,8 +136,20 @@
             namespace: cert-manager
           register: cert_manager_infos
 
+        - name: Warning message
+          when: >
+            cm_ns.resources | length > 0 and
+            cert_manager_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Cert-manager n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
         - name: Display cert-manager version
-          when: cm_ns.resources | length > 0
+          when: >
+            cm_ns.resources | length > 0 and
+            cert_manager_infos.status is defined
           ansible.builtin.debug:
             msg:
               - "Version de cert-manager : {{ cert_manager_infos.status.app_version }}"
@@ -211,8 +223,20 @@
             namespace: "{{ dsc.cloudnativepg.namespace }}"
           register: cnpg_infos
 
+        - name: Warning message
+          when: >
+            cnpg_ns.resources | length > 0 and
+            cnpg_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "L'opérateur CNPG n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
         - name: Display CNPG Operator version
-          when: cnpg_ns.resources | length > 0
+          when: >
+            cnpg_ns.resources | length > 0 and
+            cnpg_infos.status is defined
           ansible.builtin.debug:
             msg:
               - "Version de l'opérateur CNPG : {{ cnpg_infos.status.app_version }}"
@@ -514,8 +538,20 @@
             namespace: "{{ dsc.grafanaOperator.namespace }}"
           register: gop_infos
 
+        - name: Warning message
+          when: >
+            gop_ns.resources | length > 0 and
+            gop_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "L'opérateur Grafana n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
         - name: Display Grafana Operator version
-          when: gop_ns.resources | length > 0
+          when: >
+            gop_ns.resources | length > 0 and
+            gop_infos.status is defined
           ansible.builtin.debug:
             msg:
               - "Version de l'opérateur Grafana : {{ gop_infos.status.app_version }}"

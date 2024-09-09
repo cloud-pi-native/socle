@@ -50,6 +50,8 @@
 
     - name: Check socle_config_custom and exit if empty
       when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
+      tags:
+        - always
       block:
         - name: Warning message
           ansible.builtin.debug:
@@ -71,8 +73,6 @@
 
         - name: Exit playbook
           ansible.builtin.meta: end_play
-      tags:
-        - always
 
     - name: Set socle_config fact when dsc_cr defined and not empty
       ansible.builtin.set_fact:
@@ -93,18 +93,21 @@
       tags:
         - always
 
-    - ansible.builtin.set_fact:
+    - name: Set facts
+      ansible.builtin.set_fact:
         dsc_default_config: "{{ lookup('ansible.builtin.file', '../roles/socle-config/files/config.yaml') | from_yaml }}"
         dsc_default_releases: "{{ lookup('ansible.builtin.file', '../roles/socle-config/files/releases.yaml') | from_yaml }}"
       tags:
         - always
 
-    - ansible.builtin.set_fact:
+    - name: Set dsc fact
+      ansible.builtin.set_fact:
         dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
       tags:
         - always
 
-    - ansible.builtin.set_fact:
+    - name: Adjust dsc fact
+      ansible.builtin.set_fact:
         dsc: "{{ dsc.spec }}"
       tags:
         - always
@@ -133,8 +136,20 @@
             namespace: cert-manager
           register: cert_manager_infos
 
+        - name: Warning message
+          when: >
+            cm_ns.resources | length > 0 and
+            cert_manager_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Cert-manager n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
         - name: Display cert-manager version
-          when: cm_ns.resources | length > 0
+          when: >
+            cm_ns.resources | length > 0 and
+            cert_manager_infos.status is defined
           ansible.builtin.debug:
             msg:
               - "Version de cert-manager : {{ cert_manager_infos.status.app_version }}"
@@ -161,11 +176,23 @@
           when: kyverno_ns.resources | length > 0
           kubernetes.core.helm_info:
             name: kyverno
-            namespace: "{{ dsc.kyverno.namespace  }}"
+            namespace: "{{ dsc.kyverno.namespace }}"
           register: kyverno_infos
 
+        - name: Warning message
+          when: >
+            kyverno_ns.resources | length > 0 and
+            kyverno_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Kyverno n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
         - name: Display Kyverno version
-          when: kyverno_ns.resources | length > 0
+          when: >
+            kyverno_ns.resources | length > 0 and
+            kyverno_infos.status is defined
           ansible.builtin.debug:
             msg:
               - "Version de Kyverno : {{ kyverno_infos.status.app_version }}"
@@ -193,11 +220,23 @@
           when: cnpg_ns.resources | length > 0
           kubernetes.core.helm_info:
             name: cloudnative-pg
-            namespace: "{{ dsc.cloudnativepg.namespace  }}"
+            namespace: "{{ dsc.cloudnativepg.namespace }}"
           register: cnpg_infos
 
+        - name: Warning message
+          when: >
+            cnpg_ns.resources | length > 0 and
+            cnpg_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "L'opérateur CNPG n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
         - name: Display CNPG Operator version
-          when: cnpg_ns.resources | length > 0
+          when: >
+            cnpg_ns.resources | length > 0 and
+            cnpg_infos.status is defined
           ansible.builtin.debug:
             msg:
               - "Version de l'opérateur CNPG : {{ cnpg_infos.status.app_version }}"
@@ -210,7 +249,7 @@
         - name: Retrieve Keycloak infos
           kubernetes.core.helm_info:
             name: keycloak
-            namespace: "{{ dsc.keycloak.namespace  }}"
+            namespace: "{{ dsc.keycloak.namespace }}"
           register: keycloak_infos
 
         - name: Display Keycloak version
@@ -248,7 +287,7 @@
         - name: Retrieve SonarQube infos
           kubernetes.core.helm_info:
             name: sonarqube
-            namespace: "{{ dsc.sonarqube.namespace  }}"
+            namespace: "{{ dsc.sonarqube.namespace }}"
           register: sonarqube_infos
 
         - name: Display SonarQube version
@@ -307,7 +346,7 @@
         - name: Retrieve gitlab-ci-pipelines-exporter infos
           kubernetes.core.helm_info:
             name: gitlab-ci-pipelines-exporter
-            namespace: "{{ dsc.gitlab.namespace  }}"
+            namespace: "{{ dsc.gitlab.namespace }}"
           register: gcipe_infos
 
         - name: Warning message
@@ -330,7 +369,7 @@
         - name: Retrieve gitlab-operator infos
           kubernetes.core.helm_info:
             name: gitlab-operator
-            namespace: "{{ dsc.gitlabOperator.namespace  }}"
+            namespace: "{{ dsc.gitlabOperator.namespace }}"
           register: gop_infos
 
         - name: Display gitlab-operator version
@@ -347,7 +386,7 @@
         - name: Retrieve gitlab-runner infos
           kubernetes.core.helm_info:
             name: gitlab-runner
-            namespace: "{{ dsc.gitlab.namespace  }}"
+            namespace: "{{ dsc.gitlab.namespace }}"
           register: grunner_infos
 
         - name: Display gitlab-runner version
@@ -363,7 +402,7 @@
         - name: Retrieve Vault infos
           kubernetes.core.helm_info:
             name: "{{ dsc_name }}-vault"
-            namespace: "{{ dsc.vault.namespace  }}"
+            namespace: "{{ dsc.vault.namespace }}"
           register: vault_infos
 
         - name: Display Vault version
@@ -379,8 +418,8 @@
       block:
         - name: Retrieve Argo CD infos
           kubernetes.core.helm_info:
-            name: "argo"
-            namespace: "{{ dsc.argocd.namespace  }}"
+            name: "{{ dsc_name }}"
+            namespace: "{{ dsc.argocd.namespace }}"
           register: argocd_infos
 
         - name: Display Argo CD version
@@ -396,7 +435,7 @@
         - name: Retrieve Harbor infos
           kubernetes.core.helm_info:
             name: "harbor"
-            namespace: "{{ dsc.harbor.namespace  }}"
+            namespace: "{{ dsc.harbor.namespace }}"
           register: harbor_infos
 
         - name: Display Harbor version
@@ -496,11 +535,23 @@
           when: gop_ns.resources | length > 0
           kubernetes.core.helm_info:
             name: grafana-operator
-            namespace: "{{ dsc.grafanaOperator.namespace  }}"
+            namespace: "{{ dsc.grafanaOperator.namespace }}"
           register: gop_infos
 
+        - name: Warning message
+          when: >
+            gop_ns.resources | length > 0 and
+            gop_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "L'opérateur Grafana n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
         - name: Display Grafana Operator version
-          when: gop_ns.resources | length > 0
+          when: >
+            gop_ns.resources | length > 0 and
+            gop_infos.status is defined
           ansible.builtin.debug:
             msg:
               - "Version de l'opérateur Grafana : {{ gop_infos.status.app_version }}"

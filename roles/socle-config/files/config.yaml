@@ -8,46 +8,83 @@ spec:
   argocd:
     namespace: dso-argocd
     subDomain: argocd
+    helmRepoUrl: https://argoproj.github.io/argo-helm
+  certmanager:
+    helmRepoUrl: https://charts.jetstack.io
+    forcedInstall: false
   cloudnativepg:
     namespace: dso-cloudnativepg
+    helmRepoUrl: https://cloudnative-pg.github.io/charts
+    forcedInstall: false
   console:
     namespace: dso-console
     subDomain: console
-  gitlabOperator:
-    namespace: dso-gitlab-operator
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    cnpg:
+      mode: primary
+      exposed: false
   gitlab:
     namespace: dso-gitlab
     subDomain: gitlab
     insecureCI: false
     pvcGitalySize: 50Gi
+    cnpg:
+      mode: primary
+      exposed: false
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
+  gitlabCiPipelinesExporter:
+    helmRepoUrl: https://charts.visonneau.fr
+  gitlabOperator:
+    namespace: dso-gitlab-operator
+    helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+    forcedInstall: false
+  gitlabRunner:
+    helmRepoUrl: https://charts.gitlab.io
   global:
     backup:
       velero:
         enabled: false
       cnpg:
         enabled: false
+      vault:
+        enabled: false
+    metrics:
+      enabled: false
+    alerting:
+      enabled: false
   grafana:
     namespace: dso-grafana
     subDomain: grafana
     grafanaPvcSize: 5Gi
   grafanaOperator:
     namespace: dso-grafana-operator
+    ociChartUrl: oci://ghcr.io/grafana/helm-charts/grafana-operator
   harbor:
     namespace: dso-harbor
     subDomain: harbor
+    helmRepoUrl: https://helm.goharbor.io
     pvcRegistrySize: 50Gi
     pvcJobLogSize: 5Gi
     pvcDatabaseSize: 10Gi
     pvcRedisSize: 5Gi
     pvcTrivySize: 10Gi
+    cnpg:
+      mode: primary
+      exposed: false
   keycloak:
     namespace: dso-keycloak
     subDomain: keycloak
+    helmRepoUrl: https://charts.bitnami.com/bitnami
     postgresPvcSize: 1Gi
+    pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v1.0.3
+    cnpg:
+      mode: primary
+      exposed: false
   kyverno:
     namespace: dso-kyverno
+    helmRepoUrl: https://kyverno.github.io/kyverno
+    forcedInstall: false
   nexus:
     namespace: dso-nexus
     subDomain: nexus
@@ -56,8 +93,13 @@ spec:
   sonarqube:
     namespace: dso-sonarqube
     subDomain: sonar
+    helmRepoUrl: https://sonarsource.github.io/helm-chart-sonarqube
     postgresPvcSize: 5Gi
+    cnpg:
+      mode: primary
+      exposed: false
   vault:
     namespace: dso-vault
     subDomain: vault
+    helmRepoUrl: https://helm.releases.hashicorp.com
     pvcSize: 23Gi

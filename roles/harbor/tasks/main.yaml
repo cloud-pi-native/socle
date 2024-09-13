@@ -8,20 +8,20 @@
 
 - name: CNPG s3 CA (secret)
   when: >
-    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.enabled and
     dsc.global.backup.cnpg.endpointCA.namespace is defined and
     dsc.global.backup.cnpg.endpointCA.name is defined and
     dsc.global.backup.cnpg.endpointCA.key is defined
   block:
     - name: Get secret
       kubernetes.core.k8s_info:
-        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
-        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        name: "{{ dsc.global.backup.endpointCa.name }}"
+        namespace: "{{ dsc.global.backup.endpointCa.namespace }}"
         kind: Secret
       register: cnpg_s3_ca_resource
 
     - name: Extract key
-      ansible.builtin.set_fact: 
+      ansible.builtin.set_fact:
         cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
 
     - name: Set cnpg bundle-ca secret
@@ -36,14 +36,14 @@
 
 - name: Set cnpg backup secret
   kubernetes.core.k8s:
-    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    name: "{{ dsc.global.backup.s3Credentials.name }}"
     namespace: "{{ dsc.harbor.namespace }}"
     kind: Secret
     api_version: v1
     definition:
       data:
-        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
-        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+        accessKeyId: "{{ dsc.global.backup.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
 - name: Remove cnpg scheduled backup
@@ -57,7 +57,11 @@
 
 - name: Create PostgreSQL cluster and harbor database
   kubernetes.core.k8s:
-    template: pg-cluster-harbor.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-harbor.yaml.j2
+    - pg-cluster-harbor-backup.yaml.j2
+    - pg-cluster-harbor-nodeport.yaml.j2
 
 - name: Wait pg-cluster-harbor-rw endpoint
   kubernetes.core.k8s_info:
@@ -115,7 +119,8 @@
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: harbor
-    repo_url: https://helm.goharbor.io
+    repo_url: "{{ dsc.harbor.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:
@@ -272,3 +277,8 @@
         loop_var: proxy_cache
         label: "{{ proxy_cache.name }}"
   when: dsc.harbor.proxyCache is defined
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

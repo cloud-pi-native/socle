@@ -6,20 +6,20 @@
 
 - name: CNPG s3 CA (secret)
   when: >
-    dsc.global.backup.cnpg.enabled and 
+    dsc.global.backup.cnpg.enabled and
     dsc.global.backup.cnpg.endpointCA.namespace is defined and
     dsc.global.backup.cnpg.endpointCA.name is defined and
     dsc.global.backup.cnpg.endpointCA.key is defined
   block:
     - name: Get secret
       kubernetes.core.k8s_info:
-        name: "{{ dsc.global.backup.cnpg.endpointCA.name }}"
-        namespace: "{{ dsc.global.backup.cnpg.endpointCA.namespace }}"
+        name: "{{ dsc.global.backup.endpointCa.name }}"
+        namespace: "{{ dsc.global.backup.endpointCa.namespace }}"
         kind: Secret
       register: cnpg_s3_ca_resource
 
     - name: Extract key
-      ansible.builtin.set_fact: 
+      ansible.builtin.set_fact:
         cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
 
     - name: Set cnpg bundle-ca secret
@@ -34,14 +34,14 @@
 
 - name: Set cnpg backup secret
   kubernetes.core.k8s:
-    name: "{{ dsc.global.backup.cnpg.s3Credentials.name }}"
+    name: "{{ dsc.global.backup.s3Credentials.name }}"
     namespace: "{{ dsc.sonarqube.namespace }}"
     kind: Secret
     api_version: v1
     definition:
       data:
-        accessKeyId: "{{ dsc.global.backup.cnpg.s3Credentials.accessKeyId.value | b64encode }}"
-        secretAccessKey: "{{ dsc.global.backup.cnpg.s3Credentials.secretAccessKey.value | b64encode }}"
+        accessKeyId: "{{ dsc.global.backup.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3Credentials.secretAccessKey.value | b64encode }}"
   when: dsc.global.backup.cnpg.enabled
 
 - name: Remove cnpg scheduled backup
@@ -55,7 +55,11 @@
 
 - name: Create PostgreSQL cluster and sonar database
   kubernetes.core.k8s:
-    template: pg-cluster-sonar.yaml.j2
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-sonar.yaml.j2
+    - pg-cluster-sonar-backup.yaml.j2
+    - pg-cluster-sonar-nodeport.yaml.j2
 
 - name: Wait pg-cluster-sonar-rw endpoint
   kubernetes.core.k8s_info:
@@ -81,7 +85,8 @@
 - name: Add SonarQube helm repo
   kubernetes.core.helm_repository:
     name: sonarqube
-    repo_url: https://SonarSource.github.io/helm-chart-sonarqube
+    repo_url: "{{ dsc.sonarqube.helmRepoUrl }}"
+    force_update: true
 
 - name: Get admin password secret
   kubernetes.core.k8s_info:
@@ -154,6 +159,31 @@
     combine_user_values: "{{ dsc.sonarqube['values'] }}"
     combine_dest_var: "sonar_values"
 
+- name: Check SonarQube helm release
+  kubernetes.core.helm_info:
+    name: sonarqube
+    namespace: "{{ dsc.sonarqube.namespace }}"
+  register: sonar_helm_release
+
+- name: Set upgrading_chart fact
+  when: sonar_helm_release.status is defined
+  block:
+    - name: Retrieve installed SonarQube chart version
+      ansible.builtin.set_fact:
+        sonar_installed_chart_version: "{{ sonar_helm_release.status.chart | regex_replace('sonarqube-', '') }}"
+
+    - name: Initialize upgrading_chart fact
+      ansible.builtin.set_fact:
+        upgrading_chart: false
+
+    - name: Manage upgrading_chart fact
+      when: sonar_installed_chart_version is defined
+      block:
+        - name: Update upgrading_chart fact
+          when: dsc.sonarqube.chartVersion is version(sonar_installed_chart_version, operator='gt', version_type='loose')
+          ansible.builtin.set_fact:
+            upgrading_chart: true
+
 - name: Deploy helm
   kubernetes.core.helm:
     name: sonarqube
@@ -162,6 +192,59 @@
     release_namespace: "{{ dsc.sonarqube.namespace }}"
     create_namespace: true
     values: "{{ sonar_values }}"
+  ignore_errors: true
+  register: helm_install
+
+- name: Manage SonarQube upgrade
+  when: >
+    helm_install is failed and
+    upgrading_chart is defined and
+    upgrading_chart
+  block:
+    - name: Get Sonarqube admin password secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        kind: Secret
+        name: "sonarqube"
+      register: sonarqube_pwd
+
+    - name: Get SonarQube migration status
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/v2/system/migrations-status
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: GET
+        return_content: true
+        status_code: 200
+      register: sonar_migration_status
+
+    - name: Trigger DB migration
+      when: "'Database migration is required' in sonar_migration_status.json.message"
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/system/migrate_db
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: POST
+        status_code: [200, 204]
+
+    - name: Wait SonarQube status to be UP
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/system/status
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: GET
+        return_content: true
+        status_code: 200
+      register: sonar_check
+      until: sonar_check.json.status == "UP"
+      retries: 60
+      delay: 5
 
 - name: Wait sonarqube endpoint to initialize
   kubernetes.core.k8s_info:
@@ -243,3 +326,8 @@
     - name: Create PodMonitor
       kubernetes.core.k8s:
         template: podmonitor.yml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

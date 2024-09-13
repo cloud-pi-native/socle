@@ -29,8 +29,8 @@ jobs:
       - name: Checks-out repository
         uses: actions/checkout@v4
 
-      - name: Pre release new version
-        uses: google-github-actions/release-please-action@v4
+      - name: Release new version
+        uses: googleapis/release-please-action@v4
         id: release
         with:
           target-branch: main

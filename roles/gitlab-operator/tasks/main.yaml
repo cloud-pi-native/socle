@@ -41,7 +41,11 @@
         needs_update: true
 
 - name: Install GitLab Operator
-  when: (gl_api == 'absent') or (gl_vwhc.resources | length == 0) or (needs_update)
+  when: >
+    gl_api == 'absent' or
+    gl_vwhc.resources | length == 0 or
+    needs_update or
+    dsc.gitlabOperator.forcedInstall
   block:
     - name: Create GitLab Operator namespace
       kubernetes.core.k8s:
@@ -53,7 +57,8 @@
     - name: Add GitLab Operator helm repo
       kubernetes.core.helm_repository:
         name: gitlab-operator
-        repo_url: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
+        repo_url: "{{ dsc.gitlabOperator.helmRepoUrl }}"
+        force_update: true
 
     - name: Set GitLab Operator helm values
       ansible.builtin.set_fact:
@@ -66,24 +71,6 @@
         chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
         release_namespace: "{{ dsc.gitlabOperator.namespace }}"
         values: "{{ operator_values }}"
-      when: not use_private_registry
-
-    - name: Generate post_renderer script
-      template:
-        src: post_renderer_template.j2
-        dest: /tmp/yq_script.sh
-        mode: 0755
-      when: use_private_registry
-
-    - name: Deploy GitLab Operator helm
-      kubernetes.core.helm:
-        name: gitlab-operator
-        chart_ref: gitlab-operator/gitlab-operator
-        chart_version: "{{ dsc.gitlabOperator.chartVersion }}"
-        release_namespace: "{{ dsc.gitlabOperator.namespace }}"
-        values: "{{ operator_values }}"
-        post_renderer: /tmp/yq_script.sh 
-      when: use_private_registry
 
     - name: Wait gitlab-webhook-service endpoint
       kubernetes.core.k8s_info:
@@ -94,3 +81,8 @@
       until: endpoint.resources[0].subsets[0].addresses[0] is defined
       retries: 15
       delay: 5
+
+    - name: Set alerting rules
+      when: dsc.global.alerting.enabled
+      kubernetes.core.k8s:
+        template: prometheusrule.yml.j2

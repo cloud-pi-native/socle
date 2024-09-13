@@ -4,8 +4,8 @@ metadata:
   name: conf-dso
 spec:
   argocd:
-    # https://artifacthub.io/packages/helm/bitnami/argo-cd
-    chartVersion: 6.0.10
+    # https://artifacthub.io/packages/helm/argo/argo-cd
+    chartVersion: 7.3.11
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
     chartVersion: v1.14.3
@@ -17,22 +17,22 @@ spec:
     release: "1.*.*"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "7.9.2"
+    chartVersion: "8.2.1"
   gitlabCiPipelinesExporter:
     # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
     chartVersion: "0.3.4"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "0.29.2"
+    chartVersion: "1.2.1"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.62.0"
+    chartVersion: "0.67.1"
   grafana:
     # https://github.com/grafana/grafana/tags
-    imageVersion: "9.5.5"
+    imageVersion: "10.4.3"
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
-    chartVersion: "v5.4.2"
+    chartVersion: "v5.10.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.14.1
@@ -47,7 +47,7 @@ spec:
     imageTag: 3.68.1
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
-    chartVersion: 10.4.1+2389
+    chartVersion: 10.6.1+3163
   vault:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.25.0

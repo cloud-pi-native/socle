@@ -14,7 +14,10 @@
   register: cnpg_mwhc
 
 - name: Install CloudNativePG operator
-  when: (cnpg_api == 'absent') or (cnpg_mwhc.resources | length == 0)
+  when: >
+    cnpg_api == 'absent' or
+    cnpg_mwhc.resources | length == 0 or
+    dsc.cloudnativepg.forcedInstall
   block:
     - name: Create CloudNativePG namespace
       kubernetes.core.k8s:
@@ -26,7 +29,8 @@
     - name: Add CloudNativePG helm repo
       kubernetes.core.helm_repository:
         name: cnpg
-        repo_url: https://cloudnative-pg.github.io/charts
+        repo_url: "{{ dsc.cloudnativepg.helmRepoUrl }}"
+        force_update: true
 
     - name: Set path fact
       ansible.builtin.set_fact:
@@ -56,3 +60,8 @@
       until: endpoint.resources[0].subsets[0].addresses[0] is defined
       retries: 15
       delay: 5
+
+    - name: Set alerting rules
+      when: dsc.global.alerting.enabled
+      kubernetes.core.k8s:
+        template: prometheusrule.yml.j2

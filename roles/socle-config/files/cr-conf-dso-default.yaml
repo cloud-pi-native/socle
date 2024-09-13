@@ -13,31 +13,56 @@ spec:
       enabled: false
   cloudnativepg: {}
   console:
+    cnpg:
+      mode: primary
     values: {}
-  gitlab: {}
+  gitlab:
+    cnpg:
+      mode: primary
   gitlabCiPipelinesExporter: {}
   gitlabOperator: {}
-  gitlabRunner: {}
+  gitlabRunner:
+    resources:
+      overwrite:
+        requests:
+          memory: "6Gi"
+          cpu: "2"
+        limits:
+          memory: "6Gi"
+          cpu: "2"
   global:
+    platform: openshift
+    offline: false
     environment: production
     projectsRootDir:
       - forge
-    rootDomain:
-      .example.com
+    rootDomain: .example.com
     metrics:
       enabled: false
-    backup: {}
+    alerting:
+      enabled: false
+    backup:
+      cnpg:
+        enabled: false
+        pathPrefix: cnpg
+      vault:
+        enabled: false
+        pathPrefix: vault
   grafana: {}
   grafanaDatasource: {}
   grafanaOperator: {}
   harbor:
+    cnpg:
+      mode: primary
     adminPassword: anotherGreatPassword
     pvcRegistrySize: 20Gi
   ingress:
     tls:
       type: none
   kubed: {}
-  keycloak: {}
+  keycloak:
+    cnpg:
+      mode: primary
   kyverno: {}
   nexus:
     storageSize: 25Gi
@@ -47,5 +72,7 @@ spec:
       type: external
   proxy:
     enabled: false
-  sonarqube: {}
+  sonarqube:
+    cnpg:
+      mode: primary
   vault: {}

@@ -61,6 +61,8 @@ jobservice:
   serviceAccountName: harbor-sa
   image:
     repository: docker.io/goharbor/harbor-jobservice
+  jobLoggers:
+  - stdout
 registry:
   replicas: 3
   serviceAccountName: harbor-sa

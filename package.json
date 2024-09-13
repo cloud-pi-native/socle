@@ -3,16 +3,15 @@
   "version": "2.7.0",
   "private": true,
   "scripts": {
-    "format": "eslint ./ --ext .js,.yaml,.yml --fix",
-    "lint": "eslint ./ --ext .js,.yaml,.yml"
+    "format": "eslint . --fix",
+    "lint": "eslint ."
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.2.0",
-    "@commitlint/config-conventional": "^18.1.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.0.2",
-    "eslint": "^8.53.0",
-    "eslint-plugin-yml": "^1.10.0",
-    "yaml-eslint-parser": "^1.2.2"
+    "@antfu/eslint-config": "^2.24.1",
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "eslint": "^9.8.0",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.8"
   }
 }

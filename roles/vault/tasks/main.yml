@@ -9,7 +9,8 @@
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: hashicorp
-    repo_url: https://helm.releases.hashicorp.com
+    repo_url: "{{ dsc.vault.helmRepoUrl }}"
+    force_update: true
 
 - name: Set path fact
   ansible.builtin.set_fact:
@@ -22,6 +23,16 @@
     combine_path: "{{ path }}"
     combine_user_values: "{{ dsc.vault['values'] }}"
     combine_dest_var: "vault_values"
+
+- name: Create exposed_ca Secret
+  kubernetes.core.k8s:
+    kind: Secret
+    namespace: "{{ dsc.vault.namespace }}"
+    name: exposed-ca
+    definition:
+      data:
+        tls.crt: "{{ (dsc.exposedCA.type == 'configmap') | ansible.builtin.ternary(exposed_ca_pem | b64encode, exposed_ca_pem) }}"
+  when: dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret"
 
 - name: Deploy helm
   kubernetes.core.helm:
@@ -36,8 +47,40 @@
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
+    - role.yaml.j2
     - ingress.yaml.j2
 
 # Post install
 - name: Post install
   ansible.builtin.include_tasks: post-install.yml
+
+- name: Add backup utils Helm repo and deploy
+  when: dsc.global.backup.vault.enabled
+  block:
+    - name: Add Helm repo
+      kubernetes.core.helm_repository:
+        name: dso
+        repo_url: "{{ dsc.global.backup.vault.helmRepoUrl }}"
+        force_update: true
+
+    - name: Deploy Helm chart
+      kubernetes.core.helm:
+        name: "{{ dsc_name }}-vault-backup"
+        chart_ref: dso/cpn-backup-utils
+        chart_version: "{{ dsc.global.backup.vault.chartVersion }}"
+        release_namespace: "{{ dsc.vault.namespace }}"
+        values:
+          vault:
+            enabled: true
+            secrets:
+              S3_BUCKET_NAME: "{{ dsc.global.backup.s3.bucketName }}"
+              S3_BUCKET_PREFIX: "{{ dsc.global.backup.vault.pathPrefix }}"
+              S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
+              VAULT_ADDR: "{{ vault_domain }}"
+              VAULT_TOKEN: "{{ vault_token }}"
+              S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
+              S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
+              RETENTION: "{{ dsc.global.backup.vault.retentionPolicy | b64encode }}"
+            job:
+              schedule: "{{ dsc.global.backup.vault.cron }}"
+        state: "{{ dsc.global.backup.vault.enabled | ternary('present', 'absent') }}"

@@ -1,0 +1,112 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-gitlab
+  namespace: {{ dsc.gitlab.namespace }}
+{% if dsc.global.backup.velero.enabled %}
+  annotations:
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  gitlabhq_production > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/container: postgres
+    pre.hook.backup.velero.io/on-error: Fail
+    pre.hook.backup.velero.io/timeout: 90s
+{% endif %}
+spec:
+  instances: 3
+  # Parameters and pg_hba configuration will be append
+  # to the default ones to make the cluster work
+{% if use_private_registry %}
+  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% endif %}
+{% if use_image_pull_secrets %}
+  imagePullSecrets:
+  - name: dso-config-pull-secret
+{% endif %}
+  postgresql:
+    parameters:
+      max_worker_processes: "60"
+{% if dsc.gitlab.cnpg.mode == "primary" %}
+    pg_hba:
+      # To access through TCP/IP you will need to get username
+      # and password from the secret pg-cluster-gitlab-app
+      - host gitlabhq_production gitlab all md5
+      - host gitlabhq_production streaming_replica all md5
+{% endif %}
+  bootstrap:
+{% if dsc.gitlab.cnpg.mode == "primary" %}
+    initdb:
+      database: gitlabhq_production
+      owner: gitlab
+    recovery: null
+{% elif dsc.gitlab.cnpg.mode == "replica" or dsc.gitlab.cnpg.mode == "restore" %}
+    recovery:
+      source: pg-cluster-gitlab
+      database: gitlabhq_production
+      owner: gitlab
+    initdb: null
+  externalClusters:
+  - name: pg-cluster-gitlab
+{% if dsc.gitlab.cnpg.mode == "restore" %}
+    barmanObjectStore:
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointUrl }}"
+{% if dsc.exposedCA.type != 'none' %}
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+{% endif %}
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
+{% endif %}
+{% if dsc.gitlab.cnpg.mode == "replica" %}
+{%- filter indent(width=4) %}
+{{ dsc.gitlab.cnpg.connectionParameters }}
+{%- endfilter %}
+{% endif %}
+{% endif %}
+
+{% if dsc.gitlab.cnpg.mode == "replica" %}
+  replica:
+    enabled: true
+    source: pg-cluster-gitlab
+{% endif %}
+
+  enableSuperuserAccess: true
+  # Example of rolling update strategy:
+  # - unsupervised: automated update of the primary once all
+  #                 replicas have been upgraded (default)
+  # - supervised: requires manual supervision to perform
+  #               the switchover of the primary
+  primaryUpdateStrategy: unsupervised
+  # Require 1Gi of space per instance using default storage class
+  storage:
+    size: {{ dsc.gitlab.postgresPvcSize }}
+  monitoring:
+    enablePodMonitor: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled %}
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointUrl }}"
+{% if dsc.exposedCA.type != 'none' %}
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+{% endif %}
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
+    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+{% else %}
+  backup: null
+{% endif %}

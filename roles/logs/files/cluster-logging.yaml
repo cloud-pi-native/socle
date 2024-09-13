@@ -1,13 +1,13 @@
 apiVersion: "logging.openshift.io/v1"
 kind: "ClusterLogging"
 metadata:
-  name: "instance" 
+  name: "instance"
   namespace: "openshift-logging"
 spec:
-  managementState: "Managed"  
+  managementState: "Managed"
   logStore:
-    type: "elasticsearch"  
-    retentionPolicy: 
+    type: "elasticsearch"
+    retentionPolicy:
       application:
         maxAge: 1d
       infra:
@@ -15,16 +15,16 @@ spec:
       audit:
         maxAge: 7d
     elasticsearch:
-      nodeCount: 3 
+      nodeCount: 3
       storage:
         storageClassName: "ocs-storagecluster-ceph-rbd"
         size: 50G
-      resources: 
+      resources:
         limits:
           memory: "4Gi"
         requests:
           memory: "4Gi"
-      proxy: 
+      proxy:
         resources:
           limits:
             memory: 256Mi
@@ -32,10 +32,10 @@ spec:
             memory: 256Mi
       redundancyPolicy: "SingleRedundancy"
   visualization:
-    type: "kibana"  
+    type: "kibana"
     kibana:
       replicas: 1
   collection:
     logs:
-      type: "fluentd"  
+      type: "fluentd"
       fluentd: {}

@@ -6,6 +6,95 @@
     kind: Namespace
     state: present
 
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and
+    dsc.global.backup.cnpg.endpointCA.namespace is defined and
+    dsc.global.backup.cnpg.endpointCA.name is defined and
+    dsc.global.backup.cnpg.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.endpointCa.name }}"
+        namespace: "{{ dsc.global.backup.endpointCa.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact:
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.cnpg.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.gitlab.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+- name: Set cnpg backup secret
+  kubernetes.core.k8s:
+    name: "{{ dsc.global.backup.s3Credentials.name }}"
+    namespace: "{{ dsc.gitlab.namespace }}"
+    kind: Secret
+    api_version: v1
+    definition:
+      data:
+        accessKeyId: "{{ dsc.global.backup.s3Credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3Credentials.secretAccessKey.value | b64encode }}"
+  when: dsc.global.backup.cnpg.enabled
+
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.gitlab.namespace }}"
+    name: pg-cluster-gitlab
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
+- name: Create PostgreSQL cluster and gitlab database
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-gitlab.yaml.j2
+    - pg-cluster-gitlab-backup.yaml.j2
+    - pg-cluster-gitlab-nodeport.yaml.j2
+
+- name: Wait pg-cluster-gitlab-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.gitlab.namespace }}"
+    name: pg-cluster-gitlab-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-gitlab-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.gitlab.namespace }}"
+    name: pg-cluster-gitlab-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-gitlab-2-join to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.gitlab.namespace }}"
+    name: pg-cluster-gitlab-2-join
+  register: job2
+  until: job2.resources | length == 0
+  retries: 30
+  delay: 5
+
 - name: Get existing control-plane deployments
   kubernetes.core.k8s_info:
     kind: Deployment
@@ -328,26 +417,18 @@
         namespace: "{{ dsc.gitlab.namespace }}"
       register: gitlab_pods
 
-    - name: Get Gitlab ServiceMonitors
-      kubernetes.core.k8s_info:
-        api_version: monitoring.coreos.com/v1
-        kind: ServiceMonitor
-        namespace: "{{ dsc.gitlab.namespace }}"
-      register: service_monitors
-
     - name: Get Gitlab endpoints
       kubernetes.core.k8s_info:
         kind: Endpoints
         namespace: "{{ dsc.gitlab.namespace }}"
       register: endpoints
 
-    - name: Patch existing ServiceMonitors
-      ansible.builtin.include_tasks:
-        file: patch-servicemonitors.yaml
-      loop: "{{ gitlab_service_monitors }}"
-
     - name: Declare some additionnal ServiceMonitors
       ansible.builtin.include_tasks:
         file: add-servicemonitors.yaml
       loop: "{{ gitlab_additional_service_monitors }}"
 
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2

@@ -1,4 +1,4 @@
-FROM quay.io/operator-framework/ansible-operator:v1.35.0
+FROM quay.io/operator-framework/ansible-operator:v1.35.0 AS prod
 
 ARG TARGETARCH
 

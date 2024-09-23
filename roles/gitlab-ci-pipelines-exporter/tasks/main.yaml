@@ -40,6 +40,7 @@
         name: combine
       vars:
         combine_path: "{{ path }}"
+        combine_user_values: "{{ dsc.gitlabCiPipelinesExporter['values'] }}"
         combine_dest_var: "gl_ci_pipelines_exporter_values"
 
     - name: Deploy GitLab CI Pilelines helm

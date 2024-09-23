@@ -48,6 +48,7 @@
         name: combine
       vars:
         combine_path: "{{ path }}"
+        combine_user_values: "{{ dsc.certmanager['values'] }}"
         combine_dest_var: "cm_values"
 
     - name: Deploy helm

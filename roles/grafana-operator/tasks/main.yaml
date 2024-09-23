@@ -25,9 +25,17 @@
         kind: Namespace
         state: present
 
-    - name: Set Grafana Operator helm values
+    - name: Set path fact
       ansible.builtin.set_fact:
-        operator_values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+        path: "{{ role_path + '/templates/values' }}"
+
+    - name: Compute Grafana Operator Helm values
+      ansible.builtin.include_role:
+        name: combine
+      vars:
+        combine_path: "{{ path }}"
+        combine_user_values: "{{ dsc.grafanaOperator['values'] }}"
+        combine_dest_var: "operator_values"
 
     - name: Deploy Grafana Operator helm
       kubernetes.core.helm:

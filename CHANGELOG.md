@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.9.0](https://github.com/cloud-pi-native/socle/compare/v2.8.0...v2.9.0) (2024-09-24)
+
+
+### Features
+
+* :arrow_up: Upgrade GitLab Operator and GitLab instance ([c538677](https://github.com/cloud-pi-native/socle/commit/c538677d45d207cefeb6f7e7c39d4cfc91735ee4))
+
+
+### Bug Fixes
+
+* :wrench: add .conf-dso-vault-internal in no_proxy ([61e1423](https://github.com/cloud-pi-native/socle/commit/61e14236a123bbc56104d6555cfa15a78f89f3cb))
+
 ## [2.8.0](https://github.com/cloud-pi-native/socle/compare/v2.7.0...v2.8.0) (2024-09-13)
 
 

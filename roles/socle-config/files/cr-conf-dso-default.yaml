@@ -35,8 +35,7 @@ spec:
     admin:
       enabled: false
   #    password: WeAreThePasswords
-  certmanager:
-    values: {}
+  certmanager: {}
   cloudnativepg: {}
   console:
     cnpg:

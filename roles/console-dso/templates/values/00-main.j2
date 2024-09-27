@@ -33,6 +33,10 @@ cnpg:
   username: dso
   dbName: dso-console-db
   mode: "{{ dsc.console.cnpg.mode }}"
+  pvcSize: "{{ dsc.console.postgresPvcSize }}"
+{% if dsc.console.postgresWalPvcSize %}
+  walPvcSize: "{{ dsc.console.postgresWalPvcSize }}"
+{% endif %}
 {% if dsc.global.backup.velero.enabled %}
   annotations:
     pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  dso-console-db > /var/lib/postgresql/data/app.dump-${index}"]'
@@ -45,6 +49,9 @@ cnpg:
     enabled: "{{ dsc.global.backup.cnpg.enabled }}"
     destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
     endpointURL: "{{ dsc.global.backup.s3.endpointUrl }}"
+{% if dsc.global.backup.cnpg.compression != 'none' %}
+    compression: "{{ dsc.global.backup.cnpg.compression }}"
+{% endif %}
 {% if dsc.exposedCA.type != 'none' %}
     endpointCA:
       name: "bundle-cnpg-s3"

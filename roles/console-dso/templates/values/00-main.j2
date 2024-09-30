@@ -34,7 +34,7 @@ cnpg:
   dbName: dso-console-db
   mode: "{{ dsc.console.cnpg.mode }}"
   pvcSize: "{{ dsc.console.postgresPvcSize }}"
-{% if dsc.console.postgresWalPvcSize %}
+{% if dsc.console.postgresWalPvcSize is defined %}
   walPvcSize: "{{ dsc.console.postgresWalPvcSize }}"
 {% endif %}
 {% if dsc.global.backup.velero.enabled %}

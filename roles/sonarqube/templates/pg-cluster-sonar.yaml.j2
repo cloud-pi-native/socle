@@ -86,7 +86,7 @@ spec:
   # Require 1Gi of space per instance using default storage class
   storage:
     size: {{ dsc.sonarqube.postgresPvcSize }}
-{% if dsc.sonarqube.postgresWalPvcSize %}
+{% if dsc.sonarqube.postgresWalPvcSize is defined %}
   walStorage:
     size: {{ dsc.sonarqube.postgresWalPvcSize }}
 {% endif %}

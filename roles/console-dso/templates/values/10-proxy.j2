@@ -1,10 +1,10 @@
-{% if dsc.proxy.enabled and dsc.global.offline != true %}
+{% if dsc.proxy.enabled %}
 global:
   env:
     HTTP_PROXY: {{ dsc.proxy.http_proxy }}
     HTTPS_PROXY: {{ dsc.proxy.https_proxy }}
-    NO_PROXY: {{ dsc.proxy.no_proxy }}
+    NO_PROXY: {{ dsc.proxy.no_proxy }},{{ kubernetes_service_clusterip | from_yaml | json_query('resources[0].spec.clusterIP')}}
     http_proxy: {{ dsc.proxy.http_proxy }}
     https_proxy: {{ dsc.proxy.https_proxy }}
-    no_proxy: {{ dsc.proxy.no_proxy }}
+    no_proxy: {{ dsc.proxy.no_proxy }},{{ kubernetes_service_clusterip | from_yaml | json_query('resources[0].spec.clusterIP')}}
 {% endif %}

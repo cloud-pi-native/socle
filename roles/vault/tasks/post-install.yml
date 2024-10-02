@@ -382,6 +382,7 @@
       "X-Vault-Token": "{{ vault_token }}"
     body:
       "oidc_discovery_url": "https://{{ keycloak_domain }}/realms/dso"
+      "oidc_discovery_ca_pem": "{{ exposed_ca_pem }}"
       "oidc_client_id": "{{ vault_secret.resources[0].data.CLIENT_ID | b64decode }}"
       "oidc_client_secret": "{{ vault_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
       "default_role": "default"

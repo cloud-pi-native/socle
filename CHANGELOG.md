@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.10.0](https://github.com/cloud-pi-native/socle/compare/v2.9.0...v2.10.0) (2024-10-02)
+
+
+### Features
+
+* :sparkles: handle cnpg compression and dedicated wal pvc ([25436b5](https://github.com/cloud-pi-native/socle/commit/25436b5ecd4f7428b3f2b59b973fa1b6d8375d4f))
+
+
+### Bug Fixes
+
+* :bug: correctly handle certs on vault oidc config ([f476694](https://github.com/cloud-pi-native/socle/commit/f476694782c869aa74cf26f4c510b83ea69de7f4))
+* :bug: Fix certmanager install failure when values are empty ([b2ee1be](https://github.com/cloud-pi-native/socle/commit/b2ee1bee76d2e85362db3b8a6d1f489b83cb9192))
+* :bug: postgresWalPvcSize definition check ([168ff03](https://github.com/cloud-pi-native/socle/commit/168ff03f94afc9aeff682365408fdbb9e42b1fbf))
+* :wrench: add default dictionary values for certmanager ([5f5d5a0](https://github.com/cloud-pi-native/socle/commit/5f5d5a07bbb26150fa573fad255b41358fe2bc92))
+* :wrench: add kube-apiserver clusterIP in no_proxy ([2f072ec](https://github.com/cloud-pi-native/socle/commit/2f072ec6b95c57b242715e5f6a0d80363dab4433))
+
 ## [2.9.0](https://github.com/cloud-pi-native/socle/compare/v2.8.0...v2.9.0) (2024-09-24)
 
 

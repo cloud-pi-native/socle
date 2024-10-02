@@ -86,6 +86,10 @@ spec:
   # Require 1Gi of space per instance using default storage class
   storage:
     size: {{ dsc.keycloak.postgresPvcSize }}
+{% if dsc.keycloak.postgresWalPvcSize is defined %}
+  walStorage:
+    size: {{ dsc.keycloak.postgresWalPvcSize }}
+{% endif %}
   monitoring:
     enablePodMonitor: {{ dsc.global.metrics.enabled }}
 
@@ -107,6 +111,12 @@ spec:
           name: "{{ dsc.global.backup.s3.credentials.name }}"
           key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
     retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+{% if dsc.global.backup.cnpg.compression != 'none' %}
+      data:
+        compression: "{{ dsc.global.backup.cnpg.compression }}"
+      wal:
+        compression: "{{ dsc.global.backup.cnpg.compression }}"
+{% endif %}
 {% else %}
   backup: null
 {% endif %}

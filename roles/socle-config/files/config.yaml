@@ -13,6 +13,7 @@ spec:
   certmanager:
     helmRepoUrl: https://charts.jetstack.io
     forcedInstall: false
+    values: {}
   cloudnativepg:
     namespace: dso-cloudnativepg
     helmRepoUrl: https://cloudnative-pg.github.io/charts

@@ -216,9 +216,12 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     postgresPvcSize:
-                      description: Size for postgres' pvc
+                      description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
                     cnpg:
                       description: Configuration for cnpg clusters.
                       type: object
@@ -295,9 +298,12 @@ spec:
                           - name
                           - value
                     postgresPvcSize:
-                      description: Size for postgres' pvc
+                      description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
                     cnpg:
                       description: Configuration for cnpg clusters.
                       type: object
@@ -585,6 +591,15 @@ spec:
                               description: Defines retention policy for cnpg backups recurrences.
                               type: string
                               default: "30d"
+                            compression:
+                              description: Defines which compression algorithm should be used for cnpg backups.
+                              type: string
+                              enum:
+                                - none
+                                - gzip
+                                - bzip2
+                                - snappy
+                              default: "none"
                           type: object
                       type: object
                     platform:
@@ -744,9 +759,12 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     postgresPvcSize:
-                      description: Size for postgres' pvc
+                      description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
                     cnpg:
                       description: Configuration for cnpg clusters.
                       type: object
@@ -877,9 +895,12 @@ spec:
                       description: Keycloak Bitnami chart version (e.g., "16.0.3").
                       type: string
                     postgresPvcSize:
-                      description: Size for postgres' pvc
+                      description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
                     pluginDownloadUrl:
                       description: Plugins download Url.
                       type: string
@@ -1016,9 +1037,12 @@ spec:
                       description: SonarQube helm chart version (e.g., "10.2.1+800").
                       type: string
                     postgresPvcSize:
-                      description: Size for postgres' pvc
+                      description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
                     pluginDownloadUrl:
                       description: Plugins download Url.
                       type: string

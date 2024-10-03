@@ -1,0 +1,2 @@
+---
+{{include "grafana-dashboards.rules" .}}

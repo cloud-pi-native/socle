@@ -493,6 +493,7 @@ spec:
                       description: Configuration for backup feature.
                       properties:
                         s3:
+                          description: S3 configuration to use for backups.
                           properties:
                             endpointURL:
                               description: Defines the s3 endpoint for vault backups.

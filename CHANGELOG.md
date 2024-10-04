@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.10.1](https://github.com/cloud-pi-native/socle/compare/v2.10.0...v2.10.1) (2024-10-04)
+
+
+### Bug Fixes
+
+* :bug: backup system using ansible and dsc ([d8dd0a6](https://github.com/cloud-pi-native/socle/commit/d8dd0a6fb48b5a091566ae8abca3f5452b37026e))
+
 ## [2.10.0](https://github.com/cloud-pi-native/socle/compare/v2.9.0...v2.10.0) (2024-10-02)
 
 

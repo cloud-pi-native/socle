@@ -49,8 +49,8 @@ spec:
 {% if dsc.harbor.cnpg.mode == "restore" %}
     barmanObjectStore:
       destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
-      endpointURL: "{{ dsc.global.backup.s3.endpointUrl }}"
-{% if dsc.exposedCA.type != 'none' %}
+      endpointURL: "{{ dsc.global.backup.s3.endpointURL }}"
+{% if dsc.global.backup.s3.endpointCA.key is defined %}
       endpointCA:
         name: "bundle-cnpg-s3"
         key: "ca.pem"
@@ -97,8 +97,8 @@ spec:
   backup:
     barmanObjectStore:
       destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
-      endpointURL: "{{ dsc.global.backup.s3.endpointUrl }}"
-{% if dsc.exposedCA.type != 'none' %}
+      endpointURL: "{{ dsc.global.backup.s3.endpointURL }}"
+{% if dsc.global.backup.s3.endpointCA.key is defined %}
       endpointCA:
         name: "bundle-cnpg-s3"
         key: "ca.pem"

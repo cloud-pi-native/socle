@@ -76,11 +76,12 @@
               S3_BUCKET_NAME: "{{ dsc.global.backup.s3.bucketName }}"
               S3_BUCKET_PREFIX: "{{ dsc.global.backup.vault.pathPrefix }}"
               S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
-              VAULT_ADDR: "{{ vault_domain }}"
+              VAULT_ADDR: "https://{{ vault_domain }}"
               VAULT_TOKEN: "{{ vault_token }}"
-              S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
-              S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
-              RETENTION: "{{ dsc.global.backup.vault.retentionPolicy | b64encode }}"
+              S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
+              S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+            env:
+              RETENTION: "{{ dsc.global.backup.vault.retentionPolicy }}"
             job:
               schedule: "{{ dsc.global.backup.vault.cron }}"
         state: "{{ dsc.global.backup.vault.enabled | ternary('present', 'absent') }}"

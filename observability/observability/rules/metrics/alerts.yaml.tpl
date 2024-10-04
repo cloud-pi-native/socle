@@ -34,7 +34,7 @@ groups:
           pod=~"(.*-)*argo-redis-ha-server-.*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Argo CD Redis HA Haproxy not available
@@ -46,7 +46,7 @@ groups:
           pod=~"(.*-)*argo-redis-ha-haproxy-.*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Argo CD Server not available
@@ -58,7 +58,7 @@ groups:
           pod=~"(.*-)*argo-argocd-server-.*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Argo CD Repo Server not available
@@ -70,7 +70,7 @@ groups:
           pod=~"(.*-)*argo-argocd-repo-server-.*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Argo CD Applicationset Controller not available
@@ -82,7 +82,7 @@ groups:
           pod=~"(.*-)*argocd-applicationset-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Argo CD Application Controller not available
@@ -94,7 +94,7 @@ groups:
           pod=~"(.*-)*argocd-application-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Argo CD Pod not healthy
@@ -106,6 +106,6 @@ groups:
           pod=~".*",
           container!~"secret-init",
           namespace="{{ .Values.app.namespacePrefix }}argocd"} == 0
-        for: 1m
+        for: 5m
         labels:
           severity: warning

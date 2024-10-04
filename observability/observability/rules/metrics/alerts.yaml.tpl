@@ -22,7 +22,7 @@ groups:
         annotations:
           summary: Application not synchronized
           description: |
-            Argo CD instance in namespace {{`{{`}} $labels.namespace {{`}}`}} : The application {{`{{`}} $labels.name {{`}}`}}
+            Argo CD instance in namespace {{ $labels.namespace }} : The application {{`{{`}} $labels.name {{`}}`}}
             in namespace {{`{{`}} $labels.dest_namespace {{`}}`}} has not been synchronized for over 12 hours,
             which means that the state of this cloud has drifted away from the state inside Git.
       - alert: Argo CD Redis HA not available

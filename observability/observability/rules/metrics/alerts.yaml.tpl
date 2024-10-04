@@ -104,7 +104,7 @@ groups:
         expr: |
           kube_pod_container_status_ready{
           pod=~".*",
-          container!~"secret-init", namespace="{{ .Values.namespace_prefix }}argocd"} == 1
+          container!~"secret-init", namespace="{{ .namespace_prefix }}argocd"} == 1
         for: 5m
         labels:
           severity: warning

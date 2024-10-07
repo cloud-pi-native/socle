@@ -29,6 +29,9 @@ configs:
       g, cluster-admins, role:admin
       g, /ArgoCDAdmins, role:admin
       g, ArgoCDAdmins, role:admin
+{% if dsc.global.environment == 'development' %}
+      p, cpin-sa, applications, *, *, allow
+{% endif %}
     scopes: "[groups]"
     policy.default: role:nada
     admin.enabled: "false"
@@ -56,6 +59,9 @@ configs:
         kinds:
         - TaskRun
         - PipelineRun
+{% if dsc.global.environment == 'development' %}
+    accounts.cpin-sa: apiKey
+{% endif %}
 redis-ha:
   enabled: true
 controller:

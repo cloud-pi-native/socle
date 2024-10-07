@@ -1,3 +1,4 @@
+{
         {
           "datasource": {
             "type": "prometheus",

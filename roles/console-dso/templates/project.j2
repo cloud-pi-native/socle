@@ -11,6 +11,11 @@ spec:
   - name: '*'
     namespace: {{ dsc.console.namespace }}
     server: '*'
+{% if dsc.global.environment == 'development' %}
+  - name: '*'
+    namespace: '*'
+    server: '*'
+{% endif %}
   namespaceResourceWhitelist:
   - group: '*'
     kind: '*'

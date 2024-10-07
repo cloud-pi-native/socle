@@ -113,8 +113,8 @@ groups:
     rules:
       - alert: CNPG Operator Pod not healthy
         annotations:
-          message: CNPG Operator {{`{{`}} $labels.pod {{"}}"}} pod in namespace {{ dsc.cloudnativepg.namespace }} has been unavailable for the last 5 minutes.
-          summary: CNPG Operator {{`{{`}} $labels.pod {{`}}`}} pod not healthy (container {{`{{`}} $labels.container {{"}}"}} is not ready)
+          message: CNPG Operator {{`{{`}} $labels.pod {{`}}`}} pod in namespace {{ dsc.cloudnativepg.namespace }} has been unavailable for the last 5 minutes.
+          summary: CNPG Operator {{`{{`}} $labels.pod {{`}}`}} pod not healthy (container {{`{{`}} $labels.container {{`}}`}} is not ready)
         expr: |
           kube_pod_container_status_ready{
           pod=~"cloudnative-pg(-.*)*",

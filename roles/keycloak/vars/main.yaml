@@ -14,8 +14,8 @@ keycloak_clients:
   - clientId: console-frontend
     standardFlowEnabled: true
     directAccessGrantsEnabled: true
-    redirectUris: "{{ lookup('ansible.builtin.template', 'console-frontend-redirectUris.yaml.j2') | from_yaml }}"
-    webOrigins: "{{ lookup('ansible.builtin.template', 'console-frontend-webOrigins.yaml.j2') | from_yaml }}"
+    redirectUris: "{{ lookup('ansible.builtin.template', 'console-redirectUris.yaml.j2') | from_yaml }}"
+    webOrigins: "{{ lookup('ansible.builtin.template', 'console-webOrigins.yaml.j2') | from_yaml }}"
     defaultClientScopes:
       - generic
     publicClient: true
@@ -23,11 +23,8 @@ keycloak_clients:
   - clientId: console-backend
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
-    redirectUris:
-      - https://{{ console_domain }}/*
-      - https://{{ console_domain }}/
-    webOrigins:
-      - https://{{ console_domain }}
+    redirectUris: "{{ lookup('ansible.builtin.template', 'console-redirectUris.yaml.j2') | from_yaml }}"
+    webOrigins: "{{ lookup('ansible.builtin.template', 'console-webOrigins.yaml.j2') | from_yaml }}"
     defaultClientScopes:
       - generic
     publicClient: false

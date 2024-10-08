@@ -122,7 +122,7 @@ groups:
         for: 5m
         labels:
           severity: critical
-  - name: Console DSO
+  - name: DSO_Console
     rules:
       - alert: DSO Console client not available
         annotations:

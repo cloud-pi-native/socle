@@ -1,5 +1,5 @@
 groups:
-  - name: Kyverno
+  - name: DSO_Kyverno
     rules:
       - alert: Kyverno admission controler not available
         annotations:

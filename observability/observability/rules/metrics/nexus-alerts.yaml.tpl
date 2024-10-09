@@ -1,5 +1,5 @@
 groups:
-  - name: Nexus
+  - name: DSO_Nexus
     rules:
       - alert: Nexus instance not available
         annotations:

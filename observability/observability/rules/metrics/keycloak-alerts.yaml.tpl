@@ -1,5 +1,5 @@
 groups:
-  - name: Keycloak
+  - name: DSO_Keycloak
     rules:
       - alert: Keycloak instance not available
         annotations:

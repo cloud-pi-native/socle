@@ -219,6 +219,14 @@ spec:
                       description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
+                        You can for instance set it to "9GB".
+                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
                     postgresWalPvcSize:
                       description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
                       type: string
@@ -301,6 +309,14 @@ spec:
                       description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
+                        You can for instance set it to "9GB".
+                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
                     postgresWalPvcSize:
                       description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
                       type: string
@@ -763,6 +779,14 @@ spec:
                       description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
+                        You can for instance set it to "9GB".
+                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
                     postgresWalPvcSize:
                       description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
                       type: string
@@ -899,6 +923,14 @@ spec:
                       description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
+                        You can for instance set it to "9GB".
+                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
                     postgresWalPvcSize:
                       description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
                       type: string
@@ -1041,6 +1073,14 @@ spec:
                       description: Size for postgres data pvc.
                       type: string
                       default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
+                        You can for instance set it to "9GB".
+                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
                     postgresWalPvcSize:
                       description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
                       type: string

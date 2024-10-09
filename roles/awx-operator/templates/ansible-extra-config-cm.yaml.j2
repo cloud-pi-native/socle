@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ansible-extra-config
+  namespace: "{{ dsc.awx.namespace }}"
+data:
+  ansible.cfg: |
+    [defaults]
+    force_color = 1
+    local_tmp = $HOME/.ansible-${USER}/tmp
+    remote_tmp = $HOME/.ansible-${USER}/tmp
+    timeout = 60
+    host_key_checking = False
+    callbacks_enabled = timer, profile_tasks, profile_roles
+    gathering = smart
+    fact_caching = jsonfile
+    fact_caching_connection = /tmp/ansible-facts
+    [ssh_connection]
+    pipelining = True
+    ssh_args = -o ControlMaster=auto -o ControlPersist=600s -F /runner/.ssh/config
+  ssh.config: |
+    Host *
+        ServerAliveInterval 10
+        ServerAliveCountMax 3
+        StrictHostKeyChecking no
+    Host services.bastion-s*
+        User {{ dsc.awx.privateConfiguration.serviceAccount }}
+        StrictHostKeyChecking no
+        UserKnownHostsFile /dev/null
+        IdentityFile /runner/.ssh/id_rsa
+        ProxyCommand ssh -i /runner/.ssh/bastion {{ dsc.awx.privateConfiguration.bastionUser }}@{{ dsc.awx.privateConfiguration.bastionPrivateIp }} -t -W %h:%p

@@ -12,6 +12,7 @@
 - [Récupération des secrets](#récupération-des-secrets)
 - [Debug](#debug)
   - [Réinstallation](#réinstallation)
+  - [AWX Operator et instance AWX](#awx-operator-et-instance-awx)
   - [Cert-manager](#cert-manager)
   - [CloudNativePG](#cloudnativepg)
   - [GitLab Operator](#gitlab-operator)
@@ -34,6 +35,7 @@
     - [GitLab CI pipelines exporter](#gitlab-ci-pipelines-exporter)
     - [GitLab Runner](#gitlab-runner)
     - [Harbor](#harbor)
+    - [Instance AWX](#instance-awx)
     - [Instance Grafana](#instance-grafana)
     - [Keycloak](#keycloak)
     - [Kyverno](#kyverno-1)
@@ -58,6 +60,7 @@ Les éléments déployés seront les suivants :
 | Outil                                | Site officiel                                                                                                                                               |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Argo CD                              | <https://argo-cd.readthedocs.io>                                                                                                                            |
+| AWX-Operator (optionnel)             | <https://github.com/ansible/awx-operator>                                                                                                                   |
 | Cert-manager                         | <https://cert-manager.io>                                                                                                                                   |
 | CloudNativePG                        | <https://cloudnative-pg.io>                                                                                                                                 |
 | Console Cloud π Native               | <https://github.com/cloud-pi-native/console>                                                                                                                |
@@ -81,6 +84,7 @@ Certains outils peuvent prendre un peu de temps pour s'installer. Ce sera le cas
 Vous pouvez trouver la version des outils installés dans le fichier [versions.md](versions.md).
 
 Comme précisé dans le tableau ci-dessus, certains éléments sont optionnels :
+* L'opérateur AWX et l'instance AWX ne s'installeront que sur demande explicite, via l'utilisation des tags appropriés. Ceci afin de vous permettre d'opter ou non pour cette solution pour gérer vos serveurs distants.
 * L'opérateur Grafana et l'instance Grafana ne s'installeront que sur demande explicite, via l'utilisation des tags appropriés. Ceci afin de vous permettre d'opter ou non pour cette solution d'affichage des métriques.
 * Les CRDs de l'opérateur Prometheus ne s'installent que s'il est déjà présent dans le cluster (paramètre `managed` dans notre configuration).
 
@@ -341,6 +345,18 @@ Si vous voulez en faire autant sur une autre chaîne DSO, paramétrée avec votr
 ansible-playbook install.yaml -e dsc_cr=ma-dsc -t keycloak,console
 ```
 
+### AWX Operator et instance AWX
+
+Toute instance d'AWX sera installé en s'appuyant sur l'[opérateur AWX](https://github.com/ansible/awx-operator/), via le role `awx-operator`.
+
+Rappel : l'installation de l'opérateur AWX et de l'instance AWX sont optionnels. Ils ne s'installeront que sur demande, via l'utilisation des tags appropriés.
+
+Suite à une première installation du socle, l'instance AWX et les ressources AWX par défaut pourront s'installer via la commande suivante :
+
+```bash
+ansible-playbook install.yaml -t awx
+```
+
 ### Cert-manager
 
 L'outil cert-manager est installé à l'aide de son [chart helm officiel](https://cert-manager.io/docs/installation/helm), via le role `cert-manager`.
@@ -484,12 +500,14 @@ watch "kubectl get ns | grep '\-mynamespace'"
 **Remarques importantes** :
 
 - Par défaut le playbook de désinstallation, s'il est lancé sans aucun tag, ne supprimera pas les ressources suivantes :
+  - **AWX Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Cert-manager** déployé dans le namespace `cert-manager`.
   - **CloudNativePG** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **GitLab Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Grafana Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **Kyverno** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
 - Les cinq composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces outils, vous pourrez le faire via l'utilisation des tags correspondants :
+  - Pour AWX Operator : `-t awx-operator` (ou bien `-t awx`)
   - Pour Cert-manager : `-t cert-manager`
   - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`)
   - Pour GitLab Operator : `-t gitlab-operator`
@@ -621,6 +639,7 @@ Les sections suivantes détaillent la façon de procéder au gel de version d'im
   - [GitLab](#gitlab)
   - [GitLab Runner](#gitlab-runner)
   - [Harbor](#harbor)
+  - [Instance AWX](#instance-awx)
   - [Instance Grafana](#instance-grafana)
   - [Keycloak](#keycloak)
   - [Kyverno](#kyverno-1)
@@ -784,6 +803,24 @@ harbor:
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/goharbor/harbor-helm/tree/master>
 
+#### Instance AWX
+
+L'instance AWX est déployée par l'opérateur AWX.
+
+L'image utilisée est déjà gelée. Son numéro de version est spécifié dans le fichier [versions.md](versions.md) situé à la racine du socle.
+
+Il est recommandé de ne pas modifier cette version, sauf si vous savez ce que vous faites.
+
+Si toutefois vous souhaitez la modifier, les tags d'images utilisables sont disponibles ici : <https://github.com/ansible/awx-operator/tags>
+
+Pour déployer une autre version, il suffira d'éditer la `dsc`, de préférence avec le fichier YAML que vous avez initialement utilisé pendant l'installation, puis modifier la section suivante en y indiquant la version du chart désirée au niveau du paramètre **chartVersion** et la version de l'image AWX associée au niveau du paramètre **defaultAwxVersion**. Exemple :
+
+```yaml
+awx:
+  chartVersion: 2.19.1
+  defaultAwxVersion: 24.6.1
+```
+
 #### Instance Grafana
 
 L'instance Grafana est déployée par l'opérateur Grafana.
@@ -943,7 +980,7 @@ En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devron
 - `dsc.argocd.privateGitlabDomain`
 - `dsc.grafanaOperator.ociChartUrl`
 - `helmRepoUrl` pour chaque service à savoir :
-  - `argocd`, `certmanager`, `cloudnativepg`, `console`, `gitlabCiPipelinesExporter`, `gitlabOperator`, `gitlabRunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
+  - `argocd`, `awx`, `certmanager`, `cloudnativepg`, `console`, `gitlabCiPipelinesExporter`, `gitlabOperator`, `gitlabRunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
 
 ## Platform
 

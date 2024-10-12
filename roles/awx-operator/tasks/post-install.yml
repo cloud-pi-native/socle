@@ -1,0 +1,81 @@
+---
+- name: Create ansible-extra-config configmap
+  kubernetes.core.k8s:
+    template: ansible-extra-config-cm.yaml.j2
+
+- name: Create ansible-extra-config secret
+  kubernetes.core.k8s:
+    template: ansible-extra-config-secret.yaml.j2
+
+- name: Customize pod specification for 'default' Container Instance Group
+  awx.awx.instance_group:
+    name: "default"
+    controller_host: "https://{{ awx_domain }}"
+    controller_password: "{{ awx_admin_password.resources[0].data.password | b64decode }}"
+    controller_username: admin
+    is_container_group: True
+    pod_spec_override: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        namespace: "{{ dsc.awx.namespace }}"
+      spec:
+        serviceAccountName: awx-operator
+        automountServiceAccountToken: true
+        containers:
+          - image: quay.io/ansible/awx-ee:24.6.1
+            name: worker
+            args:
+              - ansible-runner
+              - worker
+              - '--private-data-dir=/runner'
+            resources:
+              requests:
+                cpu: 250m
+                memory: 100Mi
+            volumeMounts:
+            - mountPath: /etc/ansible/ansible.cfg
+              name: ansible-cfg
+              subPath: ansible.cfg
+            - mountPath: /runner/.ssh/config
+              name: ssh-config
+              subPath: ssh.config
+            - mountPath: /runner/.ssh/bastion
+              name: sshkey-bastion
+              subPath: sshkey.bastion
+            - mountPath: /runner/.ssh/id_rsa
+              name: sshkey-idrsa
+              subPath: sshkey.idrsa
+        volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: ansible.cfg
+              path: ansible.cfg
+            name: ansible-extra-config
+          name: ansible-cfg
+        - configMap:
+            defaultMode: 384
+            items:
+            - key: ssh.config
+              path: ssh.config
+            name: ansible-extra-config
+          name: ssh-config
+        - name: sshkey-bastion
+          secret:
+            defaultMode: 384
+            items:
+            - key: sshkey.bastion
+              path: sshkey.bastion
+            secretName: ansible-extra-config
+        - name: sshkey-idrsa
+          secret:
+            defaultMode: 384
+            items:
+            - key: sshkey.idrsa
+              path: sshkey.idrsa
+            secretName: ansible-extra-config
+        securityContext:
+          fsGroup: 1000
+          runAsUser: 1000
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"

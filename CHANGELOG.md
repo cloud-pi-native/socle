@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.11.0](https://github.com/cloud-pi-native/socle/compare/v2.10.1...v2.11.0) (2024-10-14)
+
+
+### Features
+
+* :zap: Add postgresWalMaxSlotKeepSize parameter ([780834a](https://github.com/cloud-pi-native/socle/commit/780834a229d5c04bfde69d9f149f8a1a4a810aaa))
+
+
+### Bug Fixes
+
+* :bug: disable cnpg backup on restore mode ([96d13c0](https://github.com/cloud-pi-native/socle/commit/96d13c06c630734f35930b93cef7111fe3bf6756))
+* :bug: fix argocd install with proxy ([ba8d833](https://github.com/cloud-pi-native/socle/commit/ba8d83349b932103ed42b9c883f991879c9b8c09))
+
 ## [2.10.1](https://github.com/cloud-pi-native/socle/compare/v2.10.0...v2.10.1) (2024-10-04)
 
 

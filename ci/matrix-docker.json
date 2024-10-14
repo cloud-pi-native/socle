@@ -1,0 +1,10 @@
+[
+  {
+    "name": "operator",
+    "build": {
+      "context": "./",
+      "dockerfile": "./operator/Dockerfile",
+      "target": "prod"
+    }
+  }
+]

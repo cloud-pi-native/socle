@@ -8,8 +8,36 @@ on:
 env:
   REGISTRY: ghcr.io
   NAMESPACE: "${{ github.repository }}"
-  PLATFORM: "linux/amd64,linux/arm64"
+  MULTI_ARCH: true
+  USE_QEMU: false
 
 jobs:
+  expose-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      REGISTRY: ${{ env.REGISTRY }}
+      NAMESPACE: ${{ env.NAMESPACE }}
+      MULTI_ARCH: ${{ env.MULTI_ARCH }}
+      USE_QEMU: ${{ env.USE_QEMU }}
+    steps:
+      - name: Exposing env vars
+        run: echo "Exposing env vars"
+
   release:
     uses: ./.github/workflows/release.yml
+
+  build:
+    uses: ./.github/workflows/build.yml
+    if: ${{ needs.release.outputs.release-created == 'true' }}
+    needs:
+      - expose-vars
+      - release
+    with:
+      REGISTRY: ${{ needs.expose-vars.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.expose-vars.outputs.NAMESPACE }}
+      TAG: ${{ needs.release.outputs.major-tag }}.${{ needs.release.outputs.minor-tag }}.${{ needs.release.outputs.patch-tag }}
+      MAJOR_TAG: ${{ needs.release.outputs.major-tag }}
+      MINOR_TAG: ${{ needs.release.outputs.minor-tag }}
+      PATCH_TAG: ${{ needs.release.outputs.patch-tag }}
+      MULTI_ARCH: ${{ needs.expose-vars.outputs.MULTI_ARCH == 'true' }}
+      USE_QEMU: ${{ needs.expose-vars.outputs.USE_QEMU == 'true' }}

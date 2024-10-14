@@ -1,0 +1,201 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      REGISTRY:
+        required: true
+        type: string
+      NAMESPACE:
+        required: true
+        type: string
+      MULTI_ARCH:
+        required: true
+        type: boolean
+      TAG:
+        required: true
+        type: string
+      MAJOR_TAG:
+        required: false
+        type: string
+      MINOR_TAG:
+        required: false
+        type: string
+      PATCH_TAG:
+        required: false
+        type: string
+      USE_QEMU:
+        required: true
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      REGISTRY:
+        description: Target registry to push images
+        required: true
+        type: string
+        default: ghcr.io
+      NAMESPACE:
+        description: Target namespace to the given registry
+        required: true
+        type: string
+        default: cloud-pi-native/socle
+      MULTI_ARCH:
+        description: Build for both amd64 and arm64
+        required: true
+        type: boolean
+        default: false
+      USE_QEMU:
+        description: Use QEMU emulator for arm64
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  matrix:
+    name: Generate matrix
+    runs-on: ubuntu-latest
+    outputs:
+      build-matrix: ${{ steps.build-matrix.outputs.BUILD_MATRIX }}
+      lower-branch: ${{ steps.lower-branch.outputs.LOWER_BRANCH }}
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v4
+
+      - name: Generate matrix
+        id: build-matrix
+        run: |
+          echo "BUILD_MATRIX=$(jq -c . < ./ci/matrix-docker.json)" >> $GITHUB_OUTPUT
+
+      - name: Get lowercase branch name
+        id: lower-branch
+        run: |
+          echo "LOWER_BRANCH=$(echo '${{ github.head_ref || github.ref_name }}' | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build application
+    runs-on: ${{ matrix.runners }}
+    needs:
+      - matrix
+    strategy:
+      matrix:
+        runners: ${{ inputs.MULTI_ARCH && !inputs.USE_QEMU && fromJson('["ubuntu-latest", "ARM64"]') || fromJson('["ubuntu-latest"]') }}
+        images: ${{ fromJSON(needs.matrix.outputs.build-matrix) }}
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v4
+
+      - name: Get short SHA
+        id: short-sha
+        run: |
+          echo "SHORT_SHA=sha-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ format('buildx-{0}-{1}-{2}-{3}', runner.os, runner.arch, matrix.images.name, hashFiles('operator/**,roles/**,filter_plugins/**,admin-tools/**,requirements.yml,install.yaml,uninstall.yaml')) }}
+          restore-keys: |
+            buildx-${{ runner.os }}-${{ runner.arch }}-${{ matrix.images.name }}-
+
+      - name: Set up QEMU (for multi platform build)
+        uses: docker/setup-qemu-action@v3
+        if: ${{ inputs.USE_QEMU }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          logout: true
+
+      - name: Build and push docker image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.images.build.context }}
+          file: ${{ matrix.images.build.dockerfile }}
+          provenance: false
+          platforms: ${{ inputs.MULTI_ARCH && inputs.USE_QEMU && 'linux/amd64,linux/arm64' || (contains(runner.arch, 'ARM') && 'linux/arm64' || 'linux/amd64') }}
+          outputs: type=image,name=${{ inputs.REGISTRY }}/${{ inputs.NAMESPACE }}/${{ matrix.images.name }},push-by-digest=true,name-canonical=true,push=true
+          build-args: |
+            APP_VERSION=${{ inputs.TAG || steps.short-sha.outputs.SHORT_SHA }}
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      # Necessary to avoid forever growing cache
+      # https://github.com/docker/build-push-action/issues/252
+      # https://github.com/moby/buildkit/issues/1896
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests/${{ matrix.images.name }}
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${{ matrix.images.name }}/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.images.name }}-${{ inputs.MULTI_ARCH && inputs.USE_QEMU && 'multiarch' || (contains(runner.arch, 'ARM') && 'arm64' || 'amd64') }}
+          path: /tmp/digests/${{ matrix.images.name }}/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    name: Merge digest
+    runs-on: ubuntu-latest
+    needs:
+      - matrix
+      - build
+    strategy:
+      matrix:
+        images: ${{ fromJSON(needs.matrix.outputs.build-matrix) }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: digests-${{ matrix.images.name }}-*
+          path: /tmp/digests/${{ matrix.images.name }}
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.REGISTRY }}/${{ inputs.NAMESPACE }}/${{ matrix.images.name }}
+          tags: |
+            type=raw,value=${{ needs.matrix.outputs.lower-branch }},enable=${{ github.head_ref != 'main' }}
+            type=raw,value=${{ inputs.TAG }},enable=${{ inputs.TAG != '' }}
+            type=raw,value=${{ inputs.MAJOR_TAG }}.${{ inputs.MINOR_TAG }},enable=${{ inputs.MAJOR_TAG != '' && inputs.MINOR_TAG != '' }}
+            type=raw,value=${{ inputs.MAJOR_TAG }},enable=${{ inputs.MAJOR_TAG != '' }}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          logout: true
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests/${{ matrix.images.name }}
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ inputs.REGISTRY }}/${{ inputs.NAMESPACE }}/${{ matrix.images.name }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ inputs.REGISTRY }}/${{ inputs.NAMESPACE }}/${{ matrix.images.name }}:${{ steps.meta.outputs.version }}

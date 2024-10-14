@@ -25,6 +25,9 @@ spec:
   postgresql:
     parameters:
       max_worker_processes: "60"
+{% if dsc.sonarqube.postgresWalMaxSlotKeepSize is defined %}
+      max_slot_wal_keep_size: {{ dsc.sonarqube.postgresWalMaxSlotKeepSize }}
+{% endif %}
 {% if dsc.sonarqube.cnpg.mode == "primary" %}
     pg_hba:
       # To access through TCP/IP you will need to get username
@@ -93,7 +96,7 @@ spec:
   monitoring:
     enablePodMonitor: {{ dsc.global.metrics.enabled }}
 
-{% if dsc.global.backup.cnpg.enabled %}
+{% if dsc.global.backup.cnpg.enabled and dsc.sonarqube.cnpg.mode != "restore" %}
   backup:
     barmanObjectStore:
       destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"

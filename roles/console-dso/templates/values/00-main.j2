@@ -44,7 +44,7 @@ cnpg:
     pre.hook.backup.velero.io/on-error: Fail
     pre.hook.backup.velero.io/timeout: 90s
 {% endif %}
-{% if dsc.global.backup.cnpg.enabled %}
+{% if dsc.global.backup.cnpg.enabled and dsc.console.cnpg.mode != "restore" %}
   backup:
     enabled: "{{ dsc.global.backup.cnpg.enabled }}"
     destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"

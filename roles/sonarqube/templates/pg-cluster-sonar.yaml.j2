@@ -96,7 +96,7 @@ spec:
   monitoring:
     enablePodMonitor: {{ dsc.global.metrics.enabled }}
 
-{% if dsc.global.backup.cnpg.enabled %}
+{% if dsc.global.backup.cnpg.enabled and dsc.sonarqube.cnpg.mode != "restore" %}
   backup:
     barmanObjectStore:
       destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"

@@ -332,6 +332,11 @@
         "type": "datasource"
       },
       {
+        "current": {
+          "selected": false,
+          "text": "dso-console",
+          "value": "dso-console"
+        },
         "allValue": ".*",
         "definition": "label_values(kube_pod_info,namespace)",
         "hide": 0,

@@ -307,6 +307,85 @@
       ],
       "title": "Container memory usage",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "$datasource"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 15
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "exemplar": true,
+          "expr": "round(kubelet_volume_stats_available_bytes{persistentvolumeclaim=~\"(.*-)*console(-.*)*\",namespace=\"$namespace\"}/kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~\"(.*-)*console(-.*)*\",namespace=\"$namespace\"} * 100, 0.01)",
+          "format": "time_series",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{persistentvolumeclaim}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "PVC available space (%)",
+      "type": "stat"
     }
   ],
   "schemaVersion": 39,
@@ -332,12 +411,16 @@
         "type": "datasource"
       },
       {
+        "allValue": ".*",
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "dso-console",
           "value": "dso-console"
         },
-        "allValue": ".*",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
         "definition": "label_values(kube_pod_info,namespace)",
         "hide": 0,
         "includeAll": true,
@@ -358,13 +441,13 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Console",
   "uid": "be0uusvz5tekge",
-  "version": 6,
+  "version": 8,
   "weekStart": ""
 }

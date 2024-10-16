@@ -1,5 +1,148 @@
 # Changelog
 
+## [2.11.0](https://github.com/cloud-pi-native/socle/compare/v2.10.1...v2.11.0) (2024-10-14)
+
+
+### Features
+
+* :zap: Add postgresWalMaxSlotKeepSize parameter ([780834a](https://github.com/cloud-pi-native/socle/commit/780834a229d5c04bfde69d9f149f8a1a4a810aaa))
+
+
+### Bug Fixes
+
+* :bug: disable cnpg backup on restore mode ([96d13c0](https://github.com/cloud-pi-native/socle/commit/96d13c06c630734f35930b93cef7111fe3bf6756))
+* :bug: fix argocd install with proxy ([ba8d833](https://github.com/cloud-pi-native/socle/commit/ba8d83349b932103ed42b9c883f991879c9b8c09))
+
+## [2.10.1](https://github.com/cloud-pi-native/socle/compare/v2.10.0...v2.10.1) (2024-10-04)
+
+
+### Bug Fixes
+
+* :bug: backup system using ansible and dsc ([d8dd0a6](https://github.com/cloud-pi-native/socle/commit/d8dd0a6fb48b5a091566ae8abca3f5452b37026e))
+
+## [2.10.0](https://github.com/cloud-pi-native/socle/compare/v2.9.0...v2.10.0) (2024-10-02)
+
+
+### Features
+
+* :sparkles: handle cnpg compression and dedicated wal pvc ([25436b5](https://github.com/cloud-pi-native/socle/commit/25436b5ecd4f7428b3f2b59b973fa1b6d8375d4f))
+
+
+### Bug Fixes
+
+* :bug: correctly handle certs on vault oidc config ([f476694](https://github.com/cloud-pi-native/socle/commit/f476694782c869aa74cf26f4c510b83ea69de7f4))
+* :bug: Fix certmanager install failure when values are empty ([b2ee1be](https://github.com/cloud-pi-native/socle/commit/b2ee1bee76d2e85362db3b8a6d1f489b83cb9192))
+* :bug: postgresWalPvcSize definition check ([168ff03](https://github.com/cloud-pi-native/socle/commit/168ff03f94afc9aeff682365408fdbb9e42b1fbf))
+* :wrench: add default dictionary values for certmanager ([5f5d5a0](https://github.com/cloud-pi-native/socle/commit/5f5d5a07bbb26150fa573fad255b41358fe2bc92))
+* :wrench: add kube-apiserver clusterIP in no_proxy ([2f072ec](https://github.com/cloud-pi-native/socle/commit/2f072ec6b95c57b242715e5f6a0d80363dab4433))
+
+## [2.9.0](https://github.com/cloud-pi-native/socle/compare/v2.8.0...v2.9.0) (2024-09-24)
+
+
+### Features
+
+* :arrow_up: Upgrade GitLab Operator and GitLab instance ([c538677](https://github.com/cloud-pi-native/socle/commit/c538677d45d207cefeb6f7e7c39d4cfc91735ee4))
+
+
+### Bug Fixes
+
+* :wrench: add .conf-dso-vault-internal in no_proxy ([61e1423](https://github.com/cloud-pi-native/socle/commit/61e14236a123bbc56104d6555cfa15a78f89f3cb))
+
+## [2.8.0](https://github.com/cloud-pi-native/socle/compare/v2.7.0...v2.8.0) (2024-09-13)
+
+
+### Features
+
+* :sparkles: Add alert rules + fix some alert names ([cf43e63](https://github.com/cloud-pi-native/socle/commit/cf43e6350b2cf2cd231f616fe4eee8ec2c5af604))
+* :sparkles: Add alerting rule ([e4b819f](https://github.com/cloud-pi-native/socle/commit/e4b819f4c8d143eb8fd191a3868163dec5508683))
+* :sparkles: Add alerts for critical events and PVCs ([e0653fb](https://github.com/cloud-pi-native/socle/commit/e0653fb00030a3d1c31f0ec155519f0f4aba2b9b))
+* :sparkles: Add alerts for sealed Vault + refactor ([11c005e](https://github.com/cloud-pi-native/socle/commit/11c005e4289f08b84e71a8af9eafbb2611b58ea0))
+* :sparkles: Add and adapt alerting rules ([083c9eb](https://github.com/cloud-pi-native/socle/commit/083c9ebd325dbba52347da9b32766d90b4a6cecb))
+* :sparkles: Add Cert-manager alerting rule ([ee335a2](https://github.com/cloud-pi-native/socle/commit/ee335a233f45a397c6e79dec841739472a078f29))
+* :sparkles: Add CNPG Operator alerting rule ([aafc4fd](https://github.com/cloud-pi-native/socle/commit/aafc4fd56b76212d2cabeb5072b87a47b1c5de3c))
+* :sparkles: Add controller alerting rules + fix redis metrics ([0bdf461](https://github.com/cloud-pi-native/socle/commit/0bdf4610f5d43c7d214dc5a78dc73e8bb0c343b2))
+* :sparkles: Add database containes alerting rule ([bb99b3e](https://github.com/cloud-pi-native/socle/commit/bb99b3e1cbd9adfecaf8158c23bc33943bbf25c3))
+* :sparkles: add dsc.global.profile: cis ([e1f6622](https://github.com/cloud-pi-native/socle/commit/e1f662216c7495200124c7ec7f29f9ddc73d55c5))
+* :sparkles: Add DSO Console alerting ([8992444](https://github.com/cloud-pi-native/socle/commit/89924441f733638815d982a6ef69e2eefc1ceb4e))
+* :sparkles: Add GitLab Operator alerting rules ([37521a8](https://github.com/cloud-pi-native/socle/commit/37521a8bc87efcbd05c3f4d8dd16e3d0261efd68))
+* :sparkles: Add Harbor alerting rules ([8bc687b](https://github.com/cloud-pi-native/socle/commit/8bc687bae41486b2eb08e11407c9e79d171fdd8a))
+* :sparkles: Add Kyverno alerting rules + new crd parameter ([5634d9f](https://github.com/cloud-pi-native/socle/commit/5634d9f97a97a5e9d0eac0e8a126c80e465d3714))
+* :sparkles: add pluginDownloadUrl for Keycloak ([79c92f9](https://github.com/cloud-pi-native/socle/commit/79c92f93bd8670952cc294e3db95a06f44e47c2b))
+* :sparkles: Add summary to alert rule ([2c7e366](https://github.com/cloud-pi-native/socle/commit/2c7e366f045e92455bc7e07ba2cf8dbe1d956c07))
+* :sparkles: Adding Nexus alerting rules ([740dac8](https://github.com/cloud-pi-native/socle/commit/740dac84fe739c05af317eab2f8e3d95628ff8cb))
+* :sparkles: Adding SonarQube alerting rules ([c1a4558](https://github.com/cloud-pi-native/socle/commit/c1a455879ff8bcab335f83af35bec75cec468887))
+* :sparkles: Change value format on PVC alerting message ([8f7a2e1](https://github.com/cloud-pi-native/socle/commit/8f7a2e13d7090d8e5d98140b595a8636b60cfe68))
+* :sparkles: enable argocd applicationset ingress ([ba50e45](https://github.com/cloud-pi-native/socle/commit/ba50e45274885df21bad77575ee01fa3626a63cb))
+* :sparkles: Finalizing auto upgrade feature ([593454e](https://github.com/cloud-pi-native/socle/commit/593454e1a02b0f97b9b2dcd07cd90a25a410fd26))
+* :sparkles: GitLab webservice alerting rules ([ba294b2](https://github.com/cloud-pi-native/socle/commit/ba294b20ede2e4b7efe8420dfdfb5c4f7e12e423))
+* :sparkles: handle cnpg replication and add exposure option ([ddae834](https://github.com/cloud-pi-native/socle/commit/ddae834117394970dd21c21cd5cd877c00bdda4b))
+* :sparkles: handle cnpg restore mode ([aa60d15](https://github.com/cloud-pi-native/socle/commit/aa60d15803cbdce606ceb61a7322af5ead2245e4))
+* :sparkles: handle global image pull secret ([6d71f5e](https://github.com/cloud-pi-native/socle/commit/6d71f5e1561a247bb48260a223515d14784a79bf))
+* :sparkles: handle vault backups ([31cc428](https://github.com/cloud-pi-native/socle/commit/31cc428b62dc665aebf455c4d063d8b414ed45f4))
+* :sparkles: Introducing Manage Sonarqube upgrade when needed ([fa79512](https://github.com/cloud-pi-native/socle/commit/fa795123ee6bc5925cd86bada891092f04266c87))
+* :sparkles: Keycloak DB PVC alerting + alerts renaming ([8b05f90](https://github.com/cloud-pi-native/socle/commit/8b05f90de7ed7a196ff1d49326562ed03859027f))
+* :sparkles: Set alerting default config + enable Keycloak prometheusRule ([5174005](https://github.com/cloud-pi-native/socle/commit/5174005f2ab910b21e40ea1a3b0205eef08086de))
+* :sparkles: Vault alerting rules. ([968324c](https://github.com/cloud-pi-native/socle/commit/968324c2e0227336ae1a6b03443598668e79b3f3))
+* :wrench: Add overwrite limit for gitlab runner ([d210f0a](https://github.com/cloud-pi-native/socle/commit/d210f0a54a64fa14af11126b63797156e9c815fc))
+* :wrench: enable approle authentication on vault ([69ae8bb](https://github.com/cloud-pi-native/socle/commit/69ae8bbe81b13d6b027575e09abdf844ccf0acc7))
+* :zap: use cnpg cluster for gitlab ([e5fdd12](https://github.com/cloud-pi-native/socle/commit/e5fdd12b6d0b923775ed04d6180873ec9d8be3d6))
+* ✨ add helm repo url ([#279](https://github.com/cloud-pi-native/socle/issues/279)) ([bd15c97](https://github.com/cloud-pi-native/socle/commit/bd15c973ee62b7aafe1bd2bf9b670ea1fff39730))
+* upgrade sonarqube to v10.6.1 ([1f31f98](https://github.com/cloud-pi-native/socle/commit/1f31f988407fc009e254e242e378cbbb1941429b))
+
+
+### Bug Fixes
+
+* :ambulance: Fix use_image_pull_secret fact definition ([7137beb](https://github.com/cloud-pi-native/socle/commit/7137beb187a23d3a05bf51c319ca6d1458249460))
+* :art: Change alert severity level ([96509fe](https://github.com/cloud-pi-native/socle/commit/96509fe5c4134d5347452ea58c9f606ed32d1848))
+* :art: Fix alerting message ([b33b501](https://github.com/cloud-pi-native/socle/commit/b33b501f75970de1ba8eedeea56b96aae817906b))
+* :art: Fix Argo CD dashboard to prevent deprecation ([5210ad9](https://github.com/cloud-pi-native/socle/commit/5210ad93ac9b184959d2c53c44bac3b70553f532))
+* :art: Fix Gitaly dashboard to prevent deprecation ([1d64fbb](https://github.com/cloud-pi-native/socle/commit/1d64fbb66322d730dccb4759c5d7093a732463a8))
+* :art: Fix GitLab CI Pipelines dashboard to prevent deprecation ([e94d142](https://github.com/cloud-pi-native/socle/commit/e94d14255f9baebf0dc8d045df9bb6654cae10b2))
+* :art: Fix Keycloak dashboard to prevent deprecation ([f5d12c9](https://github.com/cloud-pi-native/socle/commit/f5d12c9ed9dd9ef5418cbf1330f5aede84d23d38))
+* :art: Fix Nexus dashboard to prevent deprecation ([d6b1620](https://github.com/cloud-pi-native/socle/commit/d6b16208664521d24695f902e9924a079d31dbcd))
+* :art: Fix Vault dashboard to prevent deprecation ([bf19a80](https://github.com/cloud-pi-native/socle/commit/bf19a8042637161e8e2e308398a38fefc2c7013e))
+* :art: Remove Vault dashboard unnecessary panel ([8eff4cf](https://github.com/cloud-pi-native/socle/commit/8eff4cf27d71309b45c506681ed980762b885fd1))
+* :art: Set alert time ([234888a](https://github.com/cloud-pi-native/socle/commit/234888abbc683101250c506ee3cdbb2b18d11c52))
+* :art: Update condition for alert deployment ([369244f](https://github.com/cloud-pi-native/socle/commit/369244f80db70bda55fa13c9989c4f643fb8f261))
+* :bug: Adapt Argo crb task for haproxy SA ([742ea3a](https://github.com/cloud-pi-native/socle/commit/742ea3a0f4d727f992793d274ecccb6218895baf))
+* :bug: Adapt PVCs alerting rules ([9850f6a](https://github.com/cloud-pi-native/socle/commit/9850f6af1e2d888d11d33801e7afa806493e7d07))
+* :bug: Add missing requirement (jmespath) ([e7d03cd](https://github.com/cloud-pi-native/socle/commit/e7d03cd0cc8ffcfc3f6d8098f10e715fc3092e94))
+* :bug: Adjust time before alerts triggering ([e2d5a6c](https://github.com/cloud-pi-native/socle/commit/e2d5a6c1402816abfbbf81aacb27108019745e35))
+* :bug: dispatch ingress requests to vault active node ([b3e43e6](https://github.com/cloud-pi-native/socle/commit/b3e43e6b3771752caba30528f84b4e93ccbcaa80))
+* :bug: Fix "Vault Pod not healthy" alert rule. ([715030d](https://github.com/cloud-pi-native/socle/commit/715030df84acbbad5eccb13942e6e3cad6fec87e))
+* :bug: Fix Argo CD dashboard ([6fe788d](https://github.com/cloud-pi-native/socle/commit/6fe788d76fc70a2cc5816fbb9f03e6d5718fc9ae))
+* :bug: Fix Argo CD dashboard refs ([4219f01](https://github.com/cloud-pi-native/socle/commit/4219f0101d632d77a89f0a3e8f6912c7ab7b5400))
+* :bug: Fix Argo CD Helm repo URL ([ed50f06](https://github.com/cloud-pi-native/socle/commit/ed50f06c0b46db9e0d0ff8d09fca44403453bfb8))
+* :bug: Fix Argo CD naming + uninstall ([12d821b](https://github.com/cloud-pi-native/socle/commit/12d821b4c1ba5b356ecfba8bfa5432f92e926a5e))
+* :bug: Fix default CNPG config ([27df125](https://github.com/cloud-pi-native/socle/commit/27df1254ab967f029fed92f3fd08dec488b5cfdc))
+* :bug: Fix get-versions admin playbook ([afd3dd0](https://github.com/cloud-pi-native/socle/commit/afd3dd096e67f8ac53ab67a110a7a6685e95860e))
+* :bug: Fix get-versions for cert-manager, CNPG Operator and Grafana Operator ([f580b2e](https://github.com/cloud-pi-native/socle/commit/f580b2e87e952cdb025ddca6a9da31c5b28f9261))
+* :bug: Fix grafana template blocs order ([26caac2](https://github.com/cloud-pi-native/socle/commit/26caac2ce202c24b6729faa0799d69c521c94d80))
+* :bug: Fix Harbor prometheusrule (name + time) ([4d97dfd](https://github.com/cloud-pi-native/socle/commit/4d97dfd9c30ed48bed10d857a13837ad0d1dee80))
+* :bug: Fix missing cnpg default configs ([c05c1a0](https://github.com/cloud-pi-native/socle/commit/c05c1a0ed690d1fdcadb3f75850124b6b81de26a))
+* :bug: Fix some alerts duration ([42c07b5](https://github.com/cloud-pi-native/socle/commit/42c07b51a20ea44287f2788a6a998f5b00229304))
+* :bug: Fix some Keycloak alerting rules ([bfe0c61](https://github.com/cloud-pi-native/socle/commit/bfe0c61ba483783ca3364a3f19c9a25746feae3b))
+* :bug: Fix typo + missing type in CRD ([2201d51](https://github.com/cloud-pi-native/socle/commit/2201d517b09787992987e355b1d00cb5c8395558))
+* :bug: Fix Vault backup utils deployment tasks ([3969433](https://github.com/cloud-pi-native/socle/commit/39694338717cac42bd5e4533d9875ddb6743dccc))
+* :bug: Get back global.alerting spec in CRD ([2f6c48e](https://github.com/cloud-pi-native/socle/commit/2f6c48ee3397538a38de85d2439209e6146f7d9b))
+* :bug: Namespace name in alert message ([9306395](https://github.com/cloud-pi-native/socle/commit/93063956c3489140f6177b14d5d80ac46063e134))
+* :bug: Remove legacy GitLab postgresql ServiceMonitor ([961a221](https://github.com/cloud-pi-native/socle/commit/961a221cc34a6755cd4740bd2e218b1231e7e9b5))
+* :memo: Fix Argo CD chart refs ([e807345](https://github.com/cloud-pi-native/socle/commit/e807345bf7c789b400f5c993f06945d39fc88c14))
+* :memo: Fix Argo CD chart refs + README ([f09cd81](https://github.com/cloud-pi-native/socle/commit/f09cd81c970a2ef257d9b6235eeda34aa0547857))
+* :rotating_light: Obvious lint is obvious ([842894b](https://github.com/cloud-pi-native/socle/commit/842894bc1d69ead15b2220b56586655b4153e27f))
+* :wrench: argocd ca yaml indent ([80fd035](https://github.com/cloud-pi-native/socle/commit/80fd035f73fc0de3108db09533f32e897dc118fc))
+* :wrench: enable the use of proxy for grafana pod ([98f7cc0](https://github.com/cloud-pi-native/socle/commit/98f7cc029616bce2db281d69426e4b2319ca3a84))
+* :wrench: enforce gitlab root user email ([2c0515d](https://github.com/cloud-pi-native/socle/commit/2c0515d709456c676fc81446da9ce75a234a20e2))
+* :wrench: PascaleCase to camelCase ([45ae3fa](https://github.com/cloud-pi-native/socle/commit/45ae3fa481fdd53ee32cfc3a9a51f824f648c58d))
+* :wrench: remove post renderer ([26da2ce](https://github.com/cloud-pi-native/socle/commit/26da2ce698c1a186891cf96a92612e0d2082bc35))
+* :wrench: sonarqube db owner ([a494398](https://github.com/cloud-pi-native/socle/commit/a4943985d8615d865dcc86866c87c30da9516b41))
+
+
+### Performance Improvements
+
+* :zap: Adjusting alert rule ([6745254](https://github.com/cloud-pi-native/socle/commit/67452547cbb836bc4455bfce1abfbf742e3ca42b))
+* :zap: One Pod alert to rule them all. ([743d549](https://github.com/cloud-pi-native/socle/commit/743d549e3407c5882897077a24220d059165aa4a))
+
 ## [2.7.0](https://github.com/cloud-pi-native/socle/compare/v2.6.0...v2.7.0) (2024-07-09)
 
 

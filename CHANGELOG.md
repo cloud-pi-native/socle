@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.2](https://github.com/cloud-pi-native/socle/compare/v2.11.1...v2.11.2) (2024-10-16)
+
+
+### Bug Fixes
+
+* :bug: fix compression on cnpg clusters ([5998632](https://github.com/cloud-pi-native/socle/commit/59986327ae1646b563ea3a4f0d9f749675c15316))
+
 ## [2.11.1](https://github.com/cloud-pi-native/socle/compare/v2.11.0...v2.11.1) (2024-10-16)
 
 

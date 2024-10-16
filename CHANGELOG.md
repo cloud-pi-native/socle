@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.1](https://github.com/cloud-pi-native/socle/compare/v2.11.0...v2.11.1) (2024-10-16)
+
+
+### Bug Fixes
+
+* :lock: Upgrade GitLab due to CVE-2024-9164 ([25dfeff](https://github.com/cloud-pi-native/socle/commit/25dfeff420e00f17105ab5229cc8b37c984509df))
+
 ## [2.11.0](https://github.com/cloud-pi-native/socle/compare/v2.10.1...v2.11.0) (2024-10-14)
 
 

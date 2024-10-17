@@ -492,6 +492,10 @@ spec:
                           default: false
                           description: Specifies whether metrics should be enabled.
                           type: boolean
+                        additionalLabels:
+                          description: Adds aditionnal labels if needed, when metrics are enabled
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                       required:
                         - enabled
                       type: object

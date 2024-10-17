@@ -1,0 +1,4 @@
+---
+app:
+  name: "dso-obs"
+  namespacePrefix: "dso-"

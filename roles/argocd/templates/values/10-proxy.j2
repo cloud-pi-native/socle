@@ -8,6 +8,8 @@ server:
     - name: NO_PROXY
       value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argocd-repo-server"
 
+controller:
+  env: *extraEnvVars
 repoServer:
   env: *extraEnvVars
 {% endif %}

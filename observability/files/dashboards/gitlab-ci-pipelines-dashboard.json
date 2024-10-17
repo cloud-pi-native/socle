@@ -83,7 +83,7 @@
   "panels": [
     {
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -112,7 +112,7 @@
     {
       "cacheTimeout": null,
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -193,7 +193,7 @@
     {
       "cacheTimeout": null,
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -278,7 +278,7 @@
     {
       "cacheTimeout": null,
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -364,7 +364,7 @@
         "#4040a0"
       ],
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -515,7 +515,7 @@
     {
       "cacheTimeout": null,
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -600,7 +600,7 @@
     {
       "cacheTimeout": null,
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -688,7 +688,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "description": "",
       "fieldConfig": {
@@ -797,7 +797,7 @@
     },
     {
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1105,7 +1105,7 @@
     },
     {
       "datasource": {
-          "uid:": "${DS_PROMETHEUS}"
+        "uid:": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1546,7 +1546,7 @@
         "allValue": ".*",
         "current": {},
         "datasource": {
-            "uid:": "${DS_PROMETHEUS}"
+          "uid:": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(gitlab_ci_pipeline_id, project)",
         "error": null,
@@ -1571,7 +1571,7 @@
         "allValue": ".*",
         "current": {},
         "datasource": {
-            "uid:": "${DS_PROMETHEUS}"
+          "uid:": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(gitlab_ci_pipeline_id{project=~\"$OWNER.*\"}, project)",
         "error": null,
@@ -1596,7 +1596,7 @@
         "allValue": ".*",
         "current": {},
         "datasource": {
-            "uid:": "${DS_PROMETHEUS}"
+          "uid:": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(gitlab_ci_pipeline_id{project=~\"$PROJECT\"}, ref)",
         "error": null,

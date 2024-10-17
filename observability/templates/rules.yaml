@@ -1,1 +1,1 @@
-{{- include "grafana-dashboards.rules" . -}}
+{{ include "grafana-dashboards.rules" . }}

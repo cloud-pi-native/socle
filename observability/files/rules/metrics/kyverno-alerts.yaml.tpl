@@ -10,7 +10,7 @@ groups:
           pod=~"kyverno-admission-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Kyverno background controler not available
@@ -22,7 +22,7 @@ groups:
           pod=~"kyverno-background-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Kyverno cleanup controller not available
@@ -34,7 +34,7 @@ groups:
           pod=~"kyverno-cleanup-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Kyverno reports controller not available
@@ -46,7 +46,7 @@ groups:
           pod=~"kyverno-reports-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0
-        for: 1m
+        for: 5m
         labels:
           severity: critical
       - alert: Kyverno Pod not healthy
@@ -57,6 +57,6 @@ groups:
           kube_pod_container_status_ready{
           pod!~"(.*-)*admission-reports(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno"} == 0
-        for: 1m
+        for: 5m
         labels:
           severity: warning

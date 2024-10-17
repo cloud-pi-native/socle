@@ -1,1 +1,1 @@
-{{ include "grafana-dashboards.dashboards" . }}
+{{- include "grafana-dashboards.dashboards" . -}}

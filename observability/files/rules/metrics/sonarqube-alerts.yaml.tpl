@@ -42,6 +42,21 @@ groups:
         for: 5m
         labels:
           severity: warning
+      - alert: SonarQube DB PVC has low remaining disk space
+        annotations:
+          message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is running out of disk space (< 20% left). VALUE = {{`{{`}} $value {{`}}`}}%
+          summary: SonarQube CNPG PVC is running out of disk space in namespace {{`{{`}} $labels.namespace {{`}}`}}
+        expr: |
+          round(
+          kubelet_volume_stats_available_bytes{
+          persistentvolumeclaim=~"pg-cluster-sonar-\\d+",
+          namespace="{{ .Values.app.namespacePrefix }}sonarqube"}
+          / kubelet_volume_stats_capacity_bytes{
+          persistentvolumeclaim=~"pg-cluster-sonar-\\d+",
+          namespace="{{ .Values.app.namespacePrefix }}sonarqube"} * 100, 0.01) < 20 > 10
+        for: 1m
+        labels:
+          severity: warning
       - alert: SonarQube DB PVC almost out of disk space
         annotations:
           message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is almost full (< 10% left). VALUE = {{`{{`}} $value {{`}}`}}%
@@ -56,7 +71,7 @@ groups:
           namespace="{{ .Values.app.namespacePrefix }}sonarqube"} * 100, 0.01) < 10 > 0
         for: 1m
         labels:
-          severity: warning
+          severity: critical
       - alert: SonarQube DB PVC out of disk space
         annotations:
           message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is full (0% left).

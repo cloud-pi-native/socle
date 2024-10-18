@@ -432,3 +432,59 @@
   when: dsc.global.alerting.enabled
   kubernetes.core.k8s:
     template: prometheusrule.yml.j2
+
+- name: Patch serviceMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get serviceMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        namespace: "{{ dsc.gitlab.namespace }}"
+      register: service_monitors
+
+    - name: Get service_monitors names
+      ansible.builtin.set_fact:
+        service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch serviceMonitors
+      kubernetes.core.k8s:
+        kind: ServiceMonitor
+        namespace: "{{ dsc.gitlab.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ service_monitors_names }}"
+
+- name: Patch podMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get podMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: PodMonitor
+        namespace: "{{ dsc.gitlab.namespace }}"
+      register: pod_monitors
+
+    - name: Get pod_monitors names
+      ansible.builtin.set_fact:
+        pod_monitors_names: "{{ pod_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch podMonitors
+      kubernetes.core.k8s:
+        kind: PodMonitor
+        namespace: "{{ dsc.gitlab.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ pod_monitors_names }}"

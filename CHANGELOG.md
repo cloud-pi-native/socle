@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.12.1](https://github.com/cloud-pi-native/socle/compare/v2.12.0...v2.12.1) (2024-10-18)
+
+
+### Bug Fixes
+
+* :bug: always b64 encode exposed_ca_pem because it is decoded ([2237f93](https://github.com/cloud-pi-native/socle/commit/2237f9395d33c78513a2c2bde5eb6e6f96ef9e9b))
+
 ## [2.12.0](https://github.com/cloud-pi-native/socle/compare/v2.11.2...v2.12.0) (2024-10-18)
 
 

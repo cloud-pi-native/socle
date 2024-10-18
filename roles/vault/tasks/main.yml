@@ -82,6 +82,7 @@
               S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
             env:
               RETENTION: "{{ dsc.global.backup.vault.retentionPolicy }}"
+              MC_EXTRA_ARGS: "{{ dsc.global.backup.vault.mcExtraArgs }}"
             job:
               schedule: "{{ dsc.global.backup.vault.cron }}"
         state: "{{ dsc.global.backup.vault.enabled | ternary('present', 'absent') }}"

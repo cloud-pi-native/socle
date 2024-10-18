@@ -62,6 +62,21 @@ groups:
         for: 5m
         labels:
           severity: warning
+      - alert: Vault PVC has low remaining disk space
+        annotations:
+          message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is running out of disk space (< 20% left). VALUE = {{`{{`}} $value {{`}}`}}%
+          summary: Vault PVC is running out of disk space in namespace {{`{{`}} $labels.namespace {{`}}`}}
+        expr: |
+          round(
+          kubelet_volume_stats_available_bytes{
+          persistentvolumeclaim=~"(.*-)*vault(-.*)*",
+          namespace="{{ .Values.app.namespacePrefix }}vault"}
+          / kubelet_volume_stats_capacity_bytes{
+          persistentvolumeclaim=~"(.*-)*vault(-.*)*",
+          namespace="{{ .Values.app.namespacePrefix }}vault"} * 100, 0.01) < 20 > 10
+        for: 1m
+        labels:
+          severity: warning
       - alert: Vault PVC almost out of disk space
         annotations:
           message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is almost full (< 10% left). VALUE = {{`{{`}} $value {{`}}`}}%
@@ -76,7 +91,7 @@ groups:
           namespace="{{ .Values.app.namespacePrefix }}vault"} * 100, 0.01) < 10 > 0
         for: 1m
         labels:
-          severity: warning
+          severity: critical
       - alert: Vault PVC out of disk space
         annotations:
           message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is full (0% left).

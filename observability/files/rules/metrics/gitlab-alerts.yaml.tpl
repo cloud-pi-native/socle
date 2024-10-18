@@ -169,6 +169,21 @@ groups:
         for: 5m
         labels:
           severity: warning
+      - alert: GitLab PVC has low remaining disk space
+        annotations:
+          message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is running out of disk space (< 20% left). VALUE = {{`{{`}} $value {{`}}`}}%
+          summary: GitLab PVC is running out of disk space in namespace {{`{{`}} $labels.namespace {{`}}`}}
+        expr: |
+          round(
+          kubelet_volume_stats_available_bytes{
+          persistentvolumeclaim=~"(.*-)*gitlab(-.*)*",
+          namespace="{{ .Values.app.namespacePrefix }}gitlab"}
+          / kubelet_volume_stats_capacity_bytes{
+          persistentvolumeclaim=~"(.*-)*gitlab(-.*)*",
+          namespace="{{ .Values.app.namespacePrefix }}gitlab"} * 100, 0.01) < 20 > 10
+        for: 1m
+        labels:
+          severity: warning
       - alert: GitLab PVC almost out of disk space
         annotations:
           message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is almost full (< 10% left). VALUE = {{`{{`}} $value {{`}}`}}%
@@ -183,7 +198,7 @@ groups:
           namespace="{{ .Values.app.namespacePrefix }}gitlab"} * 100, 0.01) < 10 > 0
         for: 1m
         labels:
-          severity: warning
+          severity: critical
       - alert: GitLab PVC out of disk space
         annotations:
           message: PVC {{`{{`}} $labels.persistentvolumeclaim {{`}}`}} in namespace {{`{{`}} $labels.namespace {{`}}`}} is full (0% left).

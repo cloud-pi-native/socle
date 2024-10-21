@@ -1009,6 +1009,9 @@ spec:
                     storageSize:
                       description: Size for nexus persistent volume.
                       type: string
+                    proxyEnabled:
+                      description: Whether or not to enable the nexus docker proxy cache.
+                      type: boolean
                     proxyCacheSize:
                       description: Size for nexus proxy cache persistent volume.
                       type: string

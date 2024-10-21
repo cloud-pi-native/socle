@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.12.2](https://github.com/cloud-pi-native/socle/compare/v2.12.1...v2.12.2) (2024-10-21)
+
+
+### Bug Fixes
+
+* :bug: configure nexus docker proxy only if enabled in dsc ([f7546cf](https://github.com/cloud-pi-native/socle/commit/f7546cf2de6f01d2950d69f1998f4f57746194bb))
+* :bug: handle proxies for gitlab-ci-pipeline-exporter ([63e66b1](https://github.com/cloud-pi-native/socle/commit/63e66b13cfe94da9e12bc04001bb13a3b44db190))
+
 ## [2.12.1](https://github.com/cloud-pi-native/socle/compare/v2.12.0...v2.12.1) (2024-10-18)
 
 

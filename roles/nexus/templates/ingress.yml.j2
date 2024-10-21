@@ -5,7 +5,7 @@ metadata:
   name: nexus-alternative
   namespace: {{ dsc.nexus.namespace }}
   annotations:
-{% for key, val in dsc.ingress.annotations.items() %}
+{% for key, val in (dsc.ingress.annotations | combine(dsc.nexus['values'].server.ingress.annotations | default([]))).items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:

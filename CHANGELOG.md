@@ -1,26 +1,5 @@
 # Changelog
 
-## [2.12.1](https://github.com/cloud-pi-native/socle/compare/v2.12.0...v2.12.1) (2024-10-18)
-
-
-### Bug Fixes
-
-* :bug: always b64 encode exposed_ca_pem because it is decoded ([2237f93](https://github.com/cloud-pi-native/socle/commit/2237f9395d33c78513a2c2bde5eb6e6f96ef9e9b))
-
-## [2.12.0](https://github.com/cloud-pi-native/socle/compare/v2.11.2...v2.12.0) (2024-10-18)
-
-
-### Features
-
-* :sparkles: Add gitops observability ([bbe43f6](https://github.com/cloud-pi-native/socle/commit/bbe43f6bd916c28dffe3a5ca86cb657d9b29d7c6))
-* :sparkles: Improve PVC alerting ([2ada7d7](https://github.com/cloud-pi-native/socle/commit/2ada7d741c0a4ad7066ab6c9b11bd06aee8cc44b))
-
-
-### Bug Fixes
-
-* :bug: argocd controller needs proxy envVar ([c6c2a65](https://github.com/cloud-pi-native/socle/commit/c6c2a65326e963be654d13123517946e749edb50))
-* :bug: handle minio cli extra args from dsc ([d89f278](https://github.com/cloud-pi-native/socle/commit/d89f2780e15334e058876b86a9227184b581d76f))
-
 ## [2.11.2](https://github.com/cloud-pi-native/socle/compare/v2.11.1...v2.11.2) (2024-10-16)
 
 

@@ -1015,6 +1015,11 @@ spec:
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
+                    values:
+                      description: |
+                        WIP: Aims to store nexus values.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 prometheus:
                   description: Minimal configuration for prometheus CRDs

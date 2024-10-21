@@ -4,7 +4,7 @@ metadata:
   name: argo-ingress
   namespace: {{ dsc.argocd.namespace }}
   annotations:
-{% for key, val in dsc.ingress.annotations.items() %}
+{% for key, val in (dsc.ingress.annotations | combine(dsc.argocd['values'].server.ingress.annotations | default([]))).items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:

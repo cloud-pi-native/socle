@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.12.3](https://github.com/cloud-pi-native/socle/compare/v2.12.2...v2.12.3) (2024-10-22)
+
+
+### Bug Fixes
+
+* :bug: add default values for nexus and gitlab-ci-pipelines-exporter ([58895d5](https://github.com/cloud-pi-native/socle/commit/58895d510aea666c0ede255f9cf4029d6e48f3dd))
+
 ## [2.12.2](https://github.com/cloud-pi-native/socle/compare/v2.12.1...v2.12.2) (2024-10-21)
 
 

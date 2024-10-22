@@ -40,6 +40,7 @@ spec:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
   gitlabCiPipelinesExporter:
     helmRepoUrl: https://charts.visonneau.fr
+    values: {}
   gitlabOperator:
     namespace: dso-gitlab-operator
     helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
@@ -100,6 +101,7 @@ spec:
     namespace: dso-nexus
     subDomain: nexus
     storageSize: 25Gi
+    proxyEnabled: false
     proxyCacheSize: 25Gi
   sonarqube:
     namespace: dso-sonarqube

@@ -353,6 +353,20 @@
         - harbor
         - registry
 
+    - name: "Suppression de l'application et du projet console sur argocd"
+      kubernetes.core.k8s:
+        state: absent
+        api_version: argoproj.io/v1alpha1
+        kind: "{{ item.kind }}"
+        name: "console-pi-native"
+        namespace: "{{ dsc.argocd.namespace }}"
+      loop:
+        - {kind: "Application"}
+        - {kind: "AppProject"}
+      tags:
+        - console-dso
+        - console
+
     - name: "Suppression du namespace Console"
       kubernetes.core.k8s:
         state: absent
@@ -478,3 +492,28 @@
       tags:
         - never
         - grafana-operator
+
+    - name: "Suppression de l'application et du projet awx sur argocd"
+      kubernetes.core.k8s:
+        state: absent
+        api_version: argoproj.io/v1alpha1
+        kind: "{{ item.kind }}"
+        name: "awx-operator"
+        namespace: "{{ dsc.argocd.namespace }}"
+      loop:
+        - {kind: "Application"}
+        - {kind: "AppProject"}
+      tags:
+        - never
+        - awx
+        - awx-operator
+
+    - name: "Suppression du namespace awx"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.awx.namespace }}"
+      tags:
+        - never
+        - awx
+        - awx-operator

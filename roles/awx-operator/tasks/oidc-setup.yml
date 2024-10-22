@@ -1,0 +1,25 @@
+---
+- name: Get awx client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: keycloak-client-secret-awx-client
+  register: awx_secret
+  failed_when: awx_secret.resources | length == 0
+
+- name: Configure oidc auth method
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ awx_domain }}/api/v2/settings/oidc/"
+    method: PUT
+    status_code: [200, 204]
+    password: "{{ awx_admin_password.resources[0].data.password | b64decode }}"
+    user: admin
+    force_basic_auth: true
+    follow_redirects: "all"
+    body:
+      "SOCIAL_AUTH_OIDC_KEY": "{{ awx_secret.resources[0].data.CLIENT_ID | b64decode }}"
+      "SOCIAL_AUTH_OIDC_OIDC_ENDPOINT": "https://{{ keycloak_domain }}/realms/dso"
+      "SOCIAL_AUTH_OIDC_SECRET": "{{ awx_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
+      "SOCIAL_AUTH_OIDC_VERIFY_SSL": false
+    body_format: "json"

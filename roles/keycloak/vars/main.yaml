@@ -98,3 +98,15 @@ keycloak_clients:
     defaultClientScopes:
       - generic
     publicClient: false
+
+  - clientId: awx-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ awx_domain }}/sso/complete/oidc/
+    webOrigins:
+      - https://{{ awx_domain }}
+    defaultClientScopes:
+      - email
+      - profile
+    publicClient: false

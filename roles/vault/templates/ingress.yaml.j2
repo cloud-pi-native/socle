@@ -4,7 +4,7 @@ metadata:
   name: vault-ingress
   namespace: {{ dsc.vault.namespace }}
   annotations:
-{% for key, val in dsc.ingress.annotations.items() %}
+{% for key, val in (dsc.ingress.annotations | combine(dsc.vault['values'].server.ingress.annotations | default([]))).items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
@@ -32,6 +32,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ dsc_name }}-vault-active
+                name: {{ dsc_name }}-vault{% if dsc.vault['values'].server.ha.enabled | default(true) %}-active{% endif +%}
                 port:
                   number: 8200

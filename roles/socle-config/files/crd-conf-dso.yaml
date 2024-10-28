@@ -1015,9 +1015,9 @@ spec:
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
-                    values:
+                    ingressAnnotations:
                       description: |
-                        WIP: Aims to store nexus values.
+                        You can put here custom annotations for nexus ingress, they will be pushed into the nexus ingress rule combined to `dsc.ingress.annotations`
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object

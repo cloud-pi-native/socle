@@ -1018,6 +1018,11 @@ spec:
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
+                    ingressAnnotations:
+                      description: |
+                        You can put here custom annotations for nexus ingress, they will be pushed into the nexus ingress rule combined to `dsc.ingress.annotations`
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 prometheus:
                   description: Minimal configuration for prometheus CRDs

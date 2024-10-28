@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.12.4](https://github.com/cloud-pi-native/socle/compare/v2.12.3...v2.12.4) (2024-10-28)
+
+
+### Bug Fixes
+
+* :recycle: improve customization for ingress annotations ([d15fc30](https://github.com/cloud-pi-native/socle/commit/d15fc30596ebc661ba90c0576340884985b572fb))
+
 ## [2.12.3](https://github.com/cloud-pi-native/socle/compare/v2.12.2...v2.12.3) (2024-10-22)
 
 

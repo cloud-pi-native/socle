@@ -6,7 +6,7 @@ metadata:
   namespace: infra-argo
 spec:
   goTemplate: true
-#  goTemplateOptions: ["missingkey=error"]
+  goTemplateOptions: ["missingkey=error"]
 #  ignoreApplicationDifferences:
 #  - jqPathExpressions:
 #    - .spec.source.plugin.env[] | select(.name == "HELM_VALUES").value
@@ -19,8 +19,7 @@ spec:
             files:
             - path: './gitops/envs/*'
         - list:
-            elements:
-              - "{{ .apps | toJson }}"
+            elementsYaml: "{{ .apps | toJson }}"
           selector:
             matchExpressions:
             - key: enabled

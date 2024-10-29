@@ -1,0 +1,9 @@
+---
+- name: Create kubeview application
+  kubernetes.core.k8s:
+    name: kubeview
+    namespace: "{{ dsc.global.argoInfraNamespace }}"
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    state: present
+    template: kubeview.yaml.j2

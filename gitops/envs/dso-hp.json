@@ -1,0 +1,13 @@
+{
+  "env": "dso-hp",
+  "provider": "self-hosted",
+  "region": "fr-par",
+  "prefix": "dso-",
+  "destination": {
+    "server": "https://kubernetes.default.svc"
+  },
+  "targetRevision": "main",
+  "apps": [
+    { "app": "kubeview", "enabled": "true", "namespace": "kubeview", "syncWave": 10 },
+  ]
+}

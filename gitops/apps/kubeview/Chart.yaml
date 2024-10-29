@@ -1,0 +1,11 @@
+---
+apiVersion: v2
+name: kubeview
+type: application
+version: 0.1.31
+appVersion: "0.1.31"
+dependencies:
+- name: kubeview
+  alias: kubeview
+  version: 0.1.31
+  repository: https://benc-uk.github.io/kubeview/charts

@@ -1,0 +1,26 @@
+---
+spec:
+  destination:
+    namespace: testcm-kubeview
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kubeview
+    helm:
+      parameters:
+      - name: ingress.className
+        value: openshift-default
+      - name: loadBalancer.enabled
+        value: "false"
+      - name: ingress.hosts[0].host
+        value: testcm-kubeview.apps.dso.hp.numerique-interieur.com
+      - name: ingress.enabled
+        value: "false"
+    repoURL: https://benc-uk.github.io/kubeview/charts
+    targetRevision: 0.1.31
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true

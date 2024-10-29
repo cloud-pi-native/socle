@@ -576,6 +576,9 @@ spec:
                 global:
                   description: Global configuration not specific to one service.
                   properties:
+                    argoInfraNamespace:
+                      description: The namespace of Argo CD instance that will be used to deploy everything else. 
+                      type: string
                     environment:
                       default: production
                       description: Defines DSO environment type, i.e. development or production.
@@ -760,6 +763,7 @@ spec:
                       description: Specifies security profile (e.g., cis).
                       type: string
                   required:
+                    - argoInfraNamespace
                     - projectsRootDir
                     - rootDomain
                     - environment

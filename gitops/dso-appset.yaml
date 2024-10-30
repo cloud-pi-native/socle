@@ -39,7 +39,7 @@ spec:
       finalizers:
       - resources-finalizer.argocd.argoproj.io
     spec:
-      project: admin
+      project: default
       revisionHistoryLimit: 3
       source:
         repoURL: https://github.com/cloud-pi-native/socle.git

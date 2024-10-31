@@ -12,6 +12,7 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
+  ingressClassName: {{ dsc.ingress.className | default('') }}
 {% if not dsc.ingress.tls.type == 'none' %}
   tls:
   - hosts:
@@ -49,6 +50,7 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
+  ingressClassName: {{ dsc.ingress.className | default('') }}
 {% if not dsc.ingress.tls.type == 'none' %}
   tls:
   - hosts:

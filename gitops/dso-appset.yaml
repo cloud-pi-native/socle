@@ -43,7 +43,7 @@ spec:
       revisionHistoryLimit: 3
       source:
         repoURL: https://github.com/cloud-pi-native/socle.git
-        path: './argo-cd/apps/{{.app}}'
+        path: './gitops/apps/{{.app}}'
         targetRevision: '{{.targetRevision}}'
         plugin:
           env:

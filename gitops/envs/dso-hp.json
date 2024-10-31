@@ -6,7 +6,7 @@
   "destination": {
     "server": "https://kubernetes.default.svc"
   },
-  "targetRevision": "main",
+  "targetRevision": "refactor/gitops-install",
   "apps": [
     { "app": "kubeview", "enabled": "true", "namespace": "kubeview", "syncWave": 10 },
   ]

@@ -45,14 +45,14 @@ spec:
         repoURL: https://github.com/cloud-pi-native/socle.git
         path: './gitops/apps/{{.app}}'
         targetRevision: '{{.targetRevision}}'
-        plugin:
-          env:
-          - name: AVP_SECRET
-            value: vault-plugin-secret
-          - name: HELM_ARGS
-            value: -f values/{{.env}}.yaml
-          - name: HELM_VALUES
-            value: ''
+#        plugin:
+#          env:
+#          - name: AVP_SECRET
+#            value: vault-plugin-secret
+#          - name: HELM_ARGS
+#            value: -f values/{{.env}}.yaml
+#          - name: HELM_VALUES
+#            value: ''
       destination:
         server: '{{.destination.server}}'
         namespace: '{{.prefix}}{{.namespace}}'

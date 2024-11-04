@@ -28,7 +28,6 @@ ingress:
 
 # If you want to expose the kubeview service directly
 loadBalancer:
-  IP: ""
   enabled: false
 
 # Note.

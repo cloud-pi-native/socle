@@ -16,6 +16,11 @@
       tags:
         - always
 
+    - name: imagepullsecret
+      tags:
+        - always
+      when: use_image_pull_secrets
+
     - name: gitops/kubeview
       tags:
         - kubeview

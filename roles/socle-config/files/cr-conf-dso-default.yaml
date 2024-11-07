@@ -35,6 +35,10 @@ spec:
     admin:
       enabled: false
   #    password: WeAreThePasswords
+  argocdInfra:
+    admin:
+      enabled: false
+  #    password: WeAreThePasswords
   certmanager: {}
   cloudnativepg: {}
   console:
@@ -69,6 +73,9 @@ spec:
   keycloak:
     cnpg:
       mode: primary
+  keycloakInfra:
+    cnpg:
+      mode: primary
   kyverno: {}
   nexus: {}
   prometheus:
@@ -85,3 +92,4 @@ spec:
     cnpg:
       mode: primary
   vault: {}
+  vaultInfra: {}

@@ -2,7 +2,7 @@
 - name: Create kubeview application
   kubernetes.core.k8s:
     name: kubeview
-    namespace: "{{ dsc.global.argoInfraNamespace }}"
+    namespace: "{{ dsc.global.argocdInfra.namespace }}"
     api_version: argoproj.io/v1alpha1
     kind: Application
     state: present

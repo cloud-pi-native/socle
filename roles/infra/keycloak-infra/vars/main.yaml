@@ -1,0 +1,37 @@
+---
+keycloak_clients:
+  - clientId: argoinfra-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    redirectUris:
+      - https://{{ argocdinfra_domain }}/auth/callback
+      - "*"
+    webOrigins:
+      - https://{{ argocdinfra_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: portail-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - "*"
+    webOrigins:
+      - "*"
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: vaultinfra-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ vaultinfra_domain }}/ui/vault/auth/oidc/oidc/callback
+      - https://{{ vaultinfra_domain }}/oidc/callback
+    webOrigins:
+      - https://{{ vaultinfra_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false

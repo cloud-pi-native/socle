@@ -1,7 +1,7 @@
 ---
 - name: Create Keycloak namespace
   kubernetes.core.k8s:
-    name: "{{ dsc.keycloak.namespace }}"
+    name: "{{ dsc.keycloakInfra.namespace }}"
     api_version: v1
     kind: Namespace
     state: present
@@ -27,7 +27,7 @@
     - name: Set cnpg bundle-ca secret
       kubernetes.core.k8s:
         name: "bundle-cnpg-s3"
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
         kind: Secret
         api_version: v1
         definition:
@@ -37,7 +37,7 @@
 - name: Set cnpg backup secret
   kubernetes.core.k8s:
     name: "{{ dsc.global.backup.s3.credentials.name }}"
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     kind: Secret
     api_version: v1
     definition:
@@ -50,7 +50,7 @@
   kubernetes.core.k8s:
     api_version: v1
     kind: ScheduledBackup
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     name: pg-cluster-keycloak
     state: absent
   when: not dsc.global.backup.cnpg.enabled
@@ -66,7 +66,7 @@
 - name: Wait pg-cluster-keycloak-rw endpoint
   kubernetes.core.k8s_info:
     kind: Endpoints
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     name: pg-cluster-keycloak-rw
   register: endpoint
   until: endpoint.resources[0].subsets[0].addresses[0] is defined
@@ -77,7 +77,7 @@
   kubernetes.core.k8s_info:
     kind: Job
     api_version: batch/v1
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     name: pg-cluster-keycloak-1-initdb
   register: job1
   until: job1.resources | length == 0
@@ -88,7 +88,7 @@
   kubernetes.core.k8s_info:
     kind: Job
     api_version: batch/v1
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     name: pg-cluster-keycloak-2-join
   register: job2
   until: job2.resources | length == 0
@@ -97,7 +97,7 @@
 
 - name: Get Keycloak admin password secret
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     kind: Secret
     name: keycloak
   register: kc_adm_pass_secret
@@ -113,13 +113,13 @@
         admin-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
       metadata:
         name: keycloak
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
       type: Opaque
 
 - name: Check Keycloak helm release
   kubernetes.core.helm_info:
     name: keycloak
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
   register: kc_helm_release
 
 - name: Reset Keycloak admin password
@@ -130,7 +130,7 @@
     - name: Get Keycloak primary BDD pod
       kubernetes.core.k8s_info:
         kind: Pod
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
         label_selectors:
           - "cnpg.io/cluster=pg-cluster-keycloak"
           - "cnpg.io/instanceRole=primary"
@@ -139,7 +139,7 @@
     - name: Get Keycloak admin ID from database
       kubernetes.core.k8s_exec:
         pod: "{{ kc_bdd_pod.resources[0].metadata.name }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
         command: >
           psql -U postgres -d keycloak --csv -c "\x" -c "select id from user_entity where username = 'admin';"
       register: kc_admin_id
@@ -151,7 +151,7 @@
     - name: Delete Keycloak admin in database
       kubernetes.core.k8s_exec:
         pod: "{{ kc_bdd_pod.resources[0].metadata.name }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
         command: >
           psql -U postgres -d keycloak -c "delete from credential where user_id = '"{{ kc_admin_id }}"';"
           -c "delete from user_role_mapping where user_id = '"{{ kc_admin_id }}"';"
@@ -161,7 +161,7 @@
     - name: Restart Keycloak pods to reset admin password
       kubernetes.core.k8s:
         kind: Pod
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
         label_selectors:
           - "app.kubernetes.io/component=keycloak"
           - "app.kubernetes.io/instance=keycloak"
@@ -169,7 +169,7 @@
 
     - name: Wait Keycloak URL
       ansible.builtin.uri:
-        url: https://{{ keycloak_domain }}
+        url: https://{{ keycloakinfra_domain }}
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         method: GET
         status_code: [200, 202]
@@ -182,7 +182,7 @@
 - name: Add bitnami helm repo
   kubernetes.core.helm_repository:
     name: bitnami
-    repo_url: "{{ dsc.keycloak.helmRepoUrl }}"
+    repo_url: "{{ dsc.keycloakInfra.helmRepoUrl }}"
     force_update: true
 
 - name: Set path fact
@@ -194,20 +194,20 @@
     name: combine
   vars:
     combine_path: "{{ path }}"
-    combine_user_values: "{{ dsc.keycloak['values'] }}"
+    combine_user_values: "{{ dsc.keycloakInfra['values'] }}"
     combine_dest_var: "kc_values"
 
 - name: Deploy helm
   kubernetes.core.helm:
     name: keycloak
     chart_ref: bitnami/keycloak
-    chart_version: "{{ dsc.keycloak.chartVersion }}"
-    release_namespace: "{{ dsc.keycloak.namespace }}"
+    chart_version: "{{ dsc.keycloakInfra.chartVersion }}"
+    release_namespace: "{{ dsc.keycloakInfra.namespace }}"
     values: "{{ kc_values }}"
 
 - name: Wait Keycloak URL
   ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}
+    url: https://{{ keycloakinfra_domain }}
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
     status_code: [200, 202]
@@ -219,7 +219,7 @@
 
 - name: Get Keycloak admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     kind: Secret
     name: keycloak
   register: kc_adm_pass
@@ -229,20 +229,20 @@
     keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password'] | b64decode }}"
     keycloak_admin: admin
 
-- name: Update console inventory
-  kubernetes.core.k8s:
-    kind: Secret
-    name: dso-config
-    namespace: "{{ dsc.console.namespace }}"
-    state: patched
-    definition:
-      data:
-        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password | b64encode }}"
-        KEYCLOAK_ADMIN: "{{ keycloak_admin | b64encode }}"
+#- name: Update console inventory
+#  kubernetes.core.k8s:
+#    kind: Secret
+#    name: dso-config
+#    namespace: "{{ dsc.console.namespace }}"
+#    state: patched
+#    definition:
+#      data:
+#        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password | b64encode }}"
+#        KEYCLOAK_ADMIN: "{{ keycloak_admin | b64encode }}"
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}/realms/master/protocol/openid-connect/token
+    url: https://{{ keycloakinfra_domain }}/realms/master/protocol/openid-connect/token
     method: POST
     status_code: [200, 202]
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -254,18 +254,18 @@
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
 
-- name: Create dso realm
+- name: Create infra realm
   community.general.keycloak_realm:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
     auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     state: present
-    id: dso
-    realm: dso
-    display_name: Dso Realm
+    id: infra
+    realm: infra
+    display_name: Infra Realm
     loginWithEmailAllowed: true
     registration_email_as_username: false
     loginTheme: dsfr
@@ -286,20 +286,20 @@
   community.general.keycloak_group:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
     auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     state: present
-    realm: dso
+    realm: infra
     name: "{{ item }}"
   with_items:
     - admin
     - ArgoCDAdmins
 
-- name: Get keycloak dso realm users from API
+- name: Get keycloak infra realm users from API
   ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}/admin/realms/dso/users
+    url: https://{{ keycloakinfra_domain }}/admin/realms/infra/users
     method: GET
     status_code: [200, 202]
     return_content: true
@@ -307,58 +307,58 @@
     body_format: json
     headers:
       Authorization: bearer {{ kc_access_token }}
-  register: kc_dso_users
+  register: kc_infra_users
 
-- name: Find dso admin secret
+- name: Find infra admin secret
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
     kind: Secret
-    name: dso-admin-user-secret
-  register: dso_admin_secret
+    name: infra-admin-user-secret
+  register: infra_admin_secret
 
-- name: Create dso admin secret and user
+- name: Create infra admin secret and user
   when: >
-    (dso_admin_secret.resources | length == 0) or
-    (kc_dso_users.json | selectattr('username', 'equalto', dso_admin_secret.resources[0].data.ADMIN_USER|b64decode) | length == 0)
+    (infra_admin_secret.resources | length == 0) or
+    (kc_infra_users.json | selectattr('username', 'equalto', infra_admin_secret.resources[0].data.ADMIN_USER|b64decode) | length == 0)
   block:
     - name: Generate admin user password
       ansible.builtin.set_fact:
         admin_user_password: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
 
-    - name: Create dso secret
+    - name: Create infra secret
       kubernetes.core.k8s:
         definition:
           kind: Secret
           metadata:
-            namespace: "{{ dsc.keycloak.namespace }}"
-            name: dso-admin-user-secret
+            namespace: "{{ dsc.keycloakInfra.namespace }}"
+            name: infra-admin-user-secret
           data:
             ADMIN_USER: "{{ 'admin@example.com' | b64encode }}"
             ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"
           type: Opaque
 
-    - name: Remove dso admin user
+    - name: Remove infra admin user
       community.general.keycloak_user:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
-        auth_keycloak_url: https://{{ keycloak_domain }}
+        auth_keycloak_url: https://{{ keycloakinfra_domain }}
         auth_realm: master
         auth_username: "{{ keycloak_admin }}"
         auth_password: "{{ keycloak_admin_password }}"
         state: absent
-        realm: dso
+        realm: infra
         username: admin@example.com
 
-    - name: Create dso admin user
+    - name: Create infra admin user
       community.general.keycloak_user:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
-        auth_keycloak_url: https://{{ keycloak_domain }}
+        auth_keycloak_url: https://{{ keycloakinfra_domain }}
         auth_realm: master
         auth_username: "{{ keycloak_admin }}"
         auth_password: "{{ keycloak_admin_password }}"
         state: present
-        realm: dso
+        realm: infra
         credentials:
           - temporary: false
             type: password
@@ -376,9 +376,9 @@
             state: present
 #        force: true  ## Ne fontionne pas quand user supprimé via la GUI et tâche relancée.
 
-- name: Get dso keycloak client scopes from API
+- name: Get infra keycloak client scopes from API
   ansible.builtin.uri:
-    url: https://{{ keycloak_domain }}/admin/realms/dso/client-scopes
+    url: https://{{ keycloakinfra_domain }}/admin/realms/infra/client-scopes
     method: GET
     status_code: [200, 202]
     return_content: true
@@ -393,12 +393,12 @@
   community.general.keycloak_clientscope:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
     auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     name: generic
-    realm: dso
+    realm: infra
     description: Generic client scope
     protocol: openid-connect
     attributes:
@@ -417,7 +417,7 @@
   community.general.keycloak_realm:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
     auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
@@ -426,17 +426,17 @@
     failure_factor: 10
   with_items:
     - master
-    - dso
+    - infra
 
 - name: Set OTP policy algorithm in dso realm
   community.general.keycloak_realm:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
     auth_realm: master
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
-    realm: dso
+    realm: infra
     otp_policy_algorithm: SHA256
 
 - name: Patch serviceMonitors
@@ -448,7 +448,7 @@
       kubernetes.core.k8s_info:
         api_version: monitoring.coreos.com/v1
         kind: ServiceMonitor
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
       register: service_monitors
 
     - name: Get service_monitors names
@@ -458,7 +458,7 @@
     - name: Patch serviceMonitors
       kubernetes.core.k8s:
         kind: ServiceMonitor
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
         state: patched
         name: "{{ item }}"
         definition:
@@ -476,7 +476,7 @@
       kubernetes.core.k8s_info:
         api_version: monitoring.coreos.com/v1
         kind: PodMonitor
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
       register: pod_monitors
 
     - name: Get pod_monitors names
@@ -486,7 +486,7 @@
     - name: Patch podMonitors
       kubernetes.core.k8s:
         kind: PodMonitor
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
         state: patched
         name: "{{ item }}"
         definition:

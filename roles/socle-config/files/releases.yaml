@@ -6,6 +6,9 @@ spec:
   argocd:
     # https://artifacthub.io/packages/helm/argo/argo-cd
     chartVersion: 7.3.11
+  argocdInfra:
+    # https://artifacthub.io/packages/helm/argo/argo-cd
+    chartVersion: 7.3.11
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
     chartVersion: v1.14.3
@@ -39,6 +42,9 @@ spec:
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 19.3.4
+  keycloakInfra:
+    # https://artifacthub.io/packages/helm/bitnami/keycloak
+    chartVersion: 19.3.4
   kyverno:
     # https://artifacthub.io/packages/helm/kyverno/kyverno
     chartVersion: 3.1.4
@@ -49,5 +55,8 @@ spec:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.6.1+3163
   vault:
+    # https://artifacthub.io/packages/helm/hashicorp/vault
+    chartVersion: 0.25.0
+  vaultInfra:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.25.0

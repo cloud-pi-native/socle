@@ -1,0 +1,103 @@
+---
+- name: Get argo client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: keycloak-client-secret-argoinfra-client
+  register: argocd_secret
+  failed_when: argocd_secret.resources | length == 0
+
+- name: Argo CD OpenShift scc crb
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        creationTimestamp:
+        name: "{{ dsc_name }}-argocd-system:openshift:scc:privileged"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:openshift:scc:privileged
+      subjects:
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-argocd-repo-server"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: argocd-server
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-redis"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-redis-ha"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-redis-ha-haproxy"
+
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
+    force_update: true
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Compute ArgoCD Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.argocdInfra['values'] }}"
+    combine_dest_var: "argo_values"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: "{{ dsc_name }}"
+    chart_ref: argo/argo-cd
+    chart_version: "{{ dsc.argocdInfra.chartVersion }}"
+    release_namespace: "{{ dsc.argocdInfra.namespace }}"
+    create_namespace: true
+    values: "{{ argo_values }}"
+
+- name: Install routes
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - ingress.yaml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2
+
+- name: Patch serviceMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get serviceMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+      register: service_monitors
+
+    - name: Get service_monitors names
+      ansible.builtin.set_fact:
+        service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch serviceMonitors
+      kubernetes.core.k8s:
+        kind: ServiceMonitor
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ service_monitors_names }}"

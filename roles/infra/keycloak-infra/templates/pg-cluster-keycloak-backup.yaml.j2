@@ -1,0 +1,13 @@
+---
+{% if dsc.global.backup.cnpg.enabled %}
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: pg-cluster-keycloak
+  namespace: {{ dsc.keycloakInfra.namespace }}
+spec:
+  schedule: "{{ dsc.global.backup.cnpg.cron }}"
+  backupOwnerReference: self
+  cluster:
+    name: pg-cluster-keycloak
+{% endif %}

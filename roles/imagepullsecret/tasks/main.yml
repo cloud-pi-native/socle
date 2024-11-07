@@ -1,0 +1,13 @@
+---
+- name: Create imagePullSecret secret
+  kubernetes.core.k8s:
+    definition:
+      kind: Secret
+      metadata:
+        name: dso-config-pull-secret
+        labels:
+          ns.kyverno.io/all-sync: "" # Share secret for all dso namespaces
+        namespace: "default"
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: "{{ dsc.global.imagePullSecretsData }}"

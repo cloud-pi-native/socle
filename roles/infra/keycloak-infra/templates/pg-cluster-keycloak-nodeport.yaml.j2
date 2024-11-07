@@ -1,0 +1,20 @@
+---
+{% if dsc.keycloakInfra.cnpg.exposed %}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    cnpg.io/cluster: pg-cluster-keycloak
+  name: pg-cluster-keycloak-rw-nodeport
+  namespace: {{ dsc.keycloakInfra.namespace }}
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    nodePort: {{ dsc.keycloakInfra.cnpg.nodePort }}
+  selector:
+    cnpg.io/cluster: pg-cluster-keycloak
+    role: primary
+  type: NodePort
+{% endif %}

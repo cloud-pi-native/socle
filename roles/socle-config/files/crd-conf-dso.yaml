@@ -293,6 +293,51 @@ spec:
                     - admin
                     - installEnabled
                   type: object
+                argocdInfra:
+                  description: Configuration for Argo CD infrastructure instance that will be used to deploy everything else.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Argo CD infrastructure instance.
+                      type: boolean
+                    admin:
+                      description: Configuration for the Argo CD infrastructure instance admin user.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether the Argo CD infrastructure instance admin user is enabled.
+                          type: boolean
+                        password:
+                          description: The password for the Argo CD infrastructure instance admin user.
+                          type: string
+                      required:
+                        - enabled
+                      type: object
+                    namespace:
+                      description: The namespace for Argo CD infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Argo CD infrastructure instance .
+                      type: string
+                    helmRepoUrl:
+                      description: Argo CD community maintained helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Argo CD community maintained helm chart version (e.g., "7.3.11").
+                      type: string
+                    values:
+                      description: |
+                        You can merge customs values for argocd, it will be merged with roles/argocd/templates/values/
+                        See https://github.com/bitnami/charts/tree/main/bitnami/argo-cd
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    privateGitlabDomain:
+                      description: Private Gitlab repository for argocd to access.
+                      type: string
+                  required:
+                    - admin
+                    - installEnabled
+                  type: object
                 certmanager:
                   description: Configuration for Cert Manager.
                   properties:
@@ -628,9 +673,6 @@ spec:
                 global:
                   description: Global configuration not specific to one service.
                   properties:
-                    argoInfraNamespace:
-                      description: The namespace of Argo CD instance that will be used to deploy everything else. 
-                      type: string
                     environment:
                       default: production
                       description: Defines DSO environment type, i.e. development or production.
@@ -815,7 +857,6 @@ spec:
                       description: Specifies security profile (e.g., cis).
                       type: string
                   required:
-                    - argoInfraNamespace
                     - projectsRootDir
                     - rootDomain
                     - environment

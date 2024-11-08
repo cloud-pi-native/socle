@@ -1269,6 +1269,35 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
+                vaultInfra:
+                  description: Configuration for Vault infrastructure instance.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Vault infrastructure instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Vault infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Vault infrastructure instance.
+                      type: string
+                    helmRepoUrl:
+                      description: Hashicorp Vault helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                      type: string
+                    pvcSize:
+                      description: Size for Vault infrastructure instance persistent volume.
+                      type: string
+                    values:
+                      description: |
+                        You can merge customs values for vault, it will be merged with roles/vault/templates/values/
+                        See https://github.com/hashicorp/vault-helm
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
               required:
                 - additionalsCA
                 - argocd
@@ -1294,6 +1323,7 @@ spec:
                 - proxy
                 - sonarqube
                 - vault
+                - vaultInfra
               type: object
           required:
             - spec

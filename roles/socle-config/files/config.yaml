@@ -99,6 +99,7 @@ spec:
       exposed: false
     values: {}
   keycloakInfra:
+    installEnabled: false
     namespace: infra-keycloak
     subDomain: infra-keycloak
     helmRepoUrl: https://charts.bitnami.com/bitnami
@@ -135,6 +136,7 @@ spec:
     pvcSize: 23Gi
     values: {}
   vaultInfra:
+    installEnabled: false
     namespace: infra-vault
     subDomain: infra-vault
     helmRepoUrl: https://helm.releases.hashicorp.com

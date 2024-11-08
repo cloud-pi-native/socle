@@ -95,6 +95,11 @@
       tags:
         - vault
 
+    - name: infra/vault-infra
+      tags:
+        - vault-infra
+      when: dsc.vaultInfra.installEnabled
+
     - name: argocd
       tags:
         - gitops

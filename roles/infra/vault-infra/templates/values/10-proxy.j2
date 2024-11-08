@@ -1,0 +1,7 @@
+{% if dsc.proxy.enabled %}
+server:
+  extraEnvironmentVars:
+    HTTP_PROXY: "{{ dsc.proxy.http_proxy }}"
+    HTTPS_PROXY: "{{ dsc.proxy.https_proxy }}"
+    NO_PROXY: "{{ dsc.proxy.no_proxy }},.{{ dsc_name }}-vault-internal"
+{% endif %}

@@ -14,6 +14,7 @@
           - "kyverno"
           - "cnpg (or cloudNativePG)"
           - "keycloak"
+          - "keycloak-infra"
           - "nexus"
           - "sonar (or sonarqube)"
           - "gitlab"
@@ -21,7 +22,9 @@
           - "gitlabOperator (or gitlab-operator)"
           - "gitlabRunner (or gitlab-runner)"
           - "vault"
+          - "vault-infra"
           - "argo (or argocd)"
+          - "argo-infra (or argocd-infra)"
           - "harbor"
           - "console (or console-dso)"
           - "grafana"
@@ -142,7 +145,7 @@
             cert_manager_infos.status is not defined
           ansible.builtin.debug:
             msg:
-              - "Cert-manager n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cert-manager n'est pas installé en tant que chart Helm dans le namespace cert-manager."
               - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
               - "Nous ne pouvons en déterminer la version de manière fiable."
 
@@ -229,7 +232,7 @@
             cnpg_infos.status is not defined
           ansible.builtin.debug:
             msg:
-              - "L'opérateur CNPG n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "L'opérateur CNPG n'est pas installé en tant que chart Helm dans le namespace {{ dsc.cloudnativepg.namespace }}."
               - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
               - "Nous ne pouvons en déterminer la version de manière fiable."
 
@@ -257,6 +260,54 @@
             msg:
               - "Version de Keycloak : {{ keycloak_infos.status.app_version }}"
               - "Version de chart Helm Keycloak : {{ keycloak_infos.status.chart }}"
+
+    - name: Get Keycloak infra app and chart versions
+      tags:
+        - keycloak-infra
+      block:
+        - name: Get Keycloak infra namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.keycloakInfra.namespace }}"
+          register: keycloak_infra_ns
+
+        - name: Warning message
+          when: keycloak_infra_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Le namespace {{ dsc.keycloakInfra.namespace }} n'existe pas."
+              - "Cela peut signifier que le Keycloak d'infra n'est pas installé, ou bien qu'il se trouve"
+              - "dans un namespace différent de celui spécifié par votre ressource de configuration dsc."
+              - "Vérifiez s'il est éventuellement déclaré dans une autre ressource dsc,"
+              - "ou bien s'il a été installé indépendamment des roles du socle."
+
+        - name: Retrieve Keycloak infra infos
+          when: keycloak_infra_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: "keycloak"
+            namespace: "{{ dsc.keycloakInfra.namespace }}"
+          register: keycloak_infra_infos
+
+        - name: Warning message
+          when: >
+            keycloak_infra_ns.resources | length > 0 and
+            keycloak_infra_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Les infos de chart Helm pour le Keycloak d'infra n'ont pas pu être déterminées."
+              - "Cela signifie soit :"
+              - "- qu'il n'est pas installé en tant que chart Helm dans le namespace {{ dsc.keycloakInfra.namespace }},"
+              - "- qu'il n'a pas été installé via la ressource dsc spécifiée."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
+        - name: Display Keycloak infra version
+          when: >
+            keycloak_infra_ns.resources | length > 0 and
+            keycloak_infra_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version de Keycloak infra : {{ keycloak_infra_infos.status.app_version }}"
+              - "Version de chart Helm Keycloak infra : {{ keycloak_infra_infos.status.chart }}"
 
     - name: Get Nexus app version
       tags:
@@ -411,6 +462,54 @@
               - "Version de Vault : {{ vault_infos.status.app_version }}"
               - "Version de chart Helm Vault : {{ vault_infos.status.chart }}"
 
+    - name: Get Vault infra app and chart versions
+      tags:
+        - vault-infra
+      block:
+        - name: Get Vault infra namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.vaultInfra.namespace }}"
+          register: vault_infra_ns
+
+        - name: Warning message
+          when: vault_infra_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Le namespace {{ dsc.vaultInfra.namespace }} n'existe pas."
+              - "Cela peut signifier que le Vault d'infra n'est pas installé, ou bien qu'il se trouve"
+              - "dans un namespace différent de celui spécifié par votre ressource de configuration dsc."
+              - "Vérifiez s'il est éventuellement déclaré dans une autre ressource dsc,"
+              - "ou bien s'il a été installé indépendamment des roles du socle."
+
+        - name: Retrieve Vault infra infos
+          when: vault_infra_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: "{{ dsc_name }}-vault-infra"
+            namespace: "{{ dsc.vaultInfra.namespace }}"
+          register: vault_infra_infos
+
+        - name: Warning message
+          when: >
+            vault_infra_ns.resources | length > 0 and
+            vault_infra_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Les infos de chart Helm pour le Vault d'infra n'ont pas pu être déterminées."
+              - "Cela signifie soit :"
+              - "- qu'il n'est pas installé en tant que chart Helm dans le namespace {{ dsc.vaultInfra.namespace }},"
+              - "- qu'il n'a pas été installé via la ressource dsc spécifiée."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
+        - name: Display Vault infra version
+          when: >
+            vault_infra_ns.resources | length > 0 and
+            vault_infra_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version de Vault infra : {{ vault_infra_infos.status.app_version }}"
+              - "Version de chart Helm Vault infra : {{ vault_infra_infos.status.chart }}"
+
     - name: Get Argo CD app and chart versions
       tags:
         - argo
@@ -427,6 +526,55 @@
             msg:
               - "Version d'Argo CD : {{ argocd_infos.status.app_version }}"
               - "Version de chart Helm Argo CD : {{ argocd_infos.status.chart }}"
+
+    - name: Get Argo CD infra app and chart versions
+      tags:
+        - argo-infra
+        - argocd-infra
+      block:
+        - name: Get Argo CD infra namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.argocdInfra.namespace }}"
+          register: argo_infra_ns
+
+        - name: Warning message
+          when: argo_infra_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Le namespace {{ dsc.argocdInfra.namespace }} n'existe pas."
+              - "Cela peut signifier que l'Argo CD d'infra n'est pas installé, ou bien qu'il se trouve"
+              - "dans un namespace différent de celui spécifié par votre ressource de configuration dsc."
+              - "Vérifiez s'il est éventuellement déclaré dans une autre ressource dsc,"
+              - "ou bien s'il a été installé indépendamment des roles du socle."
+
+        - name: Retrieve Argo CD infra infos
+          when: argo_infra_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: "{{ dsc_name }}"
+            namespace: "{{ dsc.argocdInfra.namespace }}"
+          register: argo_infra_infos
+
+        - name: Warning message
+          when: >
+            argo_infra_ns.resources | length > 0 and
+            argo_infra_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Les infos de chart Helm pour l'Argo CD d'infra n'ont pas pu être déterminées."
+              - "Cela signifie soit :"
+              - "- qu'il n'est pas installé en tant que chart Helm dans le namespace {{ dsc.argocdInfra.namespace }},"
+              - "- qu'il n'a pas été installé via la ressource dsc spécifiée."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
+        - name: Display Argo CD infra version
+          when: >
+            argo_infra_ns.resources | length > 0 and
+            argo_infra_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version d'Argo CD infra : {{ argo_infra_infos.status.app_version }}"
+              - "Version de chart Helm Argo CD infra : {{ argo_infra_infos.status.chart }}"
 
     - name: Get Harbor app and chart versions
       tags:

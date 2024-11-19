@@ -2,12 +2,13 @@
   "env": "dso-hp",
   "provider": "self-hosted",
   "region": "fr-par",
-  "prefix": "dso-",
+  "prefix": "testcm-",
   "destination": {
     "server": "https://kubernetes.default.svc"
   },
   "targetRevision": "refactor/gitops-install",
   "apps": [
-    { "app": "keycloak", "enabled": "false", "namespace": "keycloak","syncWave": 10 }
+    { "app": "keycloak", "enabled": "false", "namespace": "keycloak","syncWave": 10 },
+    { "app": "kubeview", "enabled": "true", "namespace": "kubeview", "syncWave": 10 }
   ]
 }

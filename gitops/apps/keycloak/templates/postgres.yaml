@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/basic-auth
+metadata:
+  name: keycloak-pg-cluster-admin
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+data:
+  username: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.admin.username} | base64encode>
+  password: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.admin.password} | base64encode>
+
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/basic-auth
+metadata:
+  name: keycloak-pg-cluster-app
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+data:
+  username: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.username} | base64encode>
+  password: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.password} | base64encode>
+
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: keycloak-pg-cluster-infos
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+data:
+  host: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.host} | base64encode>
+  port: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.port} | base64encode>
+  database: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.database} | base64encode>
+  username: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.username} | base64encode>
+  password: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.password} | base64encode>
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: keycloak-pg-cluster
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:15.4
+  instances: 3
+  primaryUpdateStrategy: unsupervised
+  bootstrap:
+    initdb:
+      database: keycloak
+      owner: keycloak
+      secret:
+        name: keycloak-pg-cluster-app
+  superuserSecret:
+    name: keycloak-pg-cluster-admin
+  storage:
+    size: 7Gi
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 2Gi
+      cpu: 500m
+  affinity:
+    enablePodAntiAffinity: true
+  monitoring:
+    enablePodMonitor: true
+
+# ---
+# apiVersion: v1
+# kind: Secret
+# type: Opaque
+# metadata:
+#   name: keycloak-pg-cluster-backup
+#   annotations:
+#     avp.kubernetes.io/remove-missing: "true"
+# data:
+#   DB_HOST: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.host} | base64encode>
+#   DB_PORT: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.port} | base64encode>
+#   DB_NAME: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.database} | base64encode>
+#   DB_USER: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.username} | base64encode>
+#   DB_PASS: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.password} | base64encode>
+#   S3_ENDPOINT: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.s3.endpoint} | base64encode>
+#   S3_ACCESS_KEY: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.s3.accessKey} | base64encode>
+#   S3_SECRET_KEY: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.s3.secretKey} | base64encode>
+#   S3_BUCKET_NAME: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.s3.bucketName} | base64encode>
+#   S3_BUCKET_PREFIX: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.s3.bucketPrefix} | base64encode>
+#   RETENTION_DAYS: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.s3.retentionDay} | base64encode>
+
+# ---
+# apiVersion: batch/v1
+# kind: CronJob
+# metadata:
+#   name: keycloak-pg-cluster-backup
+#   labels:
+#     jobgroup: keycloak-pg-cluster-backup
+# spec:
+#   schedule: "0 1 * * *"
+#   successfulJobsHistoryLimit: 1
+#   failedJobsHistoryLimit: 3
+#   concurrencyPolicy: Forbid
+#   jobTemplate:
+#     metadata:
+#       name: keycloak-pg-cluster-backup
+#       labels:
+#         jobgroup: keycloak-pg-cluster-backup
+#     spec:
+#       backoffLimit: 0
+#       template:
+#         spec:
+#           containers:
+#           - name: keycloak-pg-cluster-backup
+#             image: ghcr.io/this-is-tobi/tools/pg-backup:latest
+#             imagePullPolicy: Always
+#             envFrom:
+#             - secretRef:
+#                 name: keycloak-pg-cluster-backup
+#           restartPolicy: Never

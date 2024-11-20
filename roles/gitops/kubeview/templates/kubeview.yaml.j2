@@ -7,15 +7,9 @@ spec:
   source:
     chart: kubeview
     helm:
-      parameters:
-      - name: ingress.className
-        value: openshift-default
-      - name: loadBalancer.enabled
-        value: "false"
-      - name: ingress.hosts[0].host
-        value: testcm-kubeview.apps.dso.hp.numerique-interieur.com
-      - name: ingress.enabled
-        value: "false"
+      fileParameters:
+      - name: config
+        path: ./roles/gitops/kubeview/files/values.yaml
     repoURL: https://benc-uk.github.io/kubeview/charts
     targetRevision: 0.1.31
   syncPolicy:

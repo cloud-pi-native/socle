@@ -1,0 +1,19 @@
+---
+spec:
+  destination:
+    namespace: {{ dsc.argocd.namespace }}
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: argo
+    helm:
+      parameters:
+        # Voir si OK pour les passer via un fichier
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: 7.3.11
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true

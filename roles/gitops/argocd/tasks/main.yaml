@@ -1,9 +1,9 @@
 ---
-- name: Create kubeview application
+- name: Create Argo CD application
   kubernetes.core.k8s:
-    name: kubeview
+    name: "{{ dsc_name }}-argocd"
     namespace: "{{ dsc.argocdInfra.namespace }}"
     api_version: argoproj.io/v1alpha1
     kind: Application
     state: present
-    template: kubeview.yaml.j2
+    template: argocd.yaml.j2

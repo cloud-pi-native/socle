@@ -7,6 +7,7 @@
     command: vault status -format=json
   register: vault_status
   ignore_errors: true
+  changed_when: false
 
 - name: Set vault_initialized fact
   ansible.builtin.set_fact:

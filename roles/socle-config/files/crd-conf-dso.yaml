@@ -235,7 +235,7 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
@@ -243,7 +243,7 @@ spec:
                             - replica
                             - restore
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
@@ -325,7 +325,7 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
@@ -333,7 +333,7 @@ spec:
                             - replica
                             - restore
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
@@ -480,8 +480,8 @@ spec:
                       minItems: 1
                       type: array
                     rootDomain:
-                      description: The top level of your domain. To expose Argo as "argo.mycompany.com",
-                        the value should be ".mycompany.com" (notice the leading dot).
+                      description: The top level of your domain. To expose Argo as "argo.example.com",
+                        the value should be ".example.com" (notice the leading dot).
                       type: string
                       default: .example.com
                       pattern: "^\\..*$"
@@ -493,7 +493,7 @@ spec:
                           description: Specifies whether metrics should be enabled.
                           type: boolean
                         additionalLabels:
-                          description: Adds aditionnal labels if needed, when metrics are enabled
+                          description: Adds additional labels if needed, when metrics are enabled
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                       required:
@@ -799,7 +799,7 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
@@ -807,7 +807,7 @@ spec:
                             - replica
                             - restore
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
@@ -826,7 +826,7 @@ spec:
                     annotations:
                       x-kubernetes-preserve-unknown-fields: true
                       default: {}
-                      description: Additionals annotations to add to all tools' ingresses
+                      description: Additional annotations to add to all tools' ingresses
                       type: object
                     className:
                       description: Ingress class name to use for all ingresses
@@ -834,13 +834,13 @@ spec:
                     labels:
                       x-kubernetes-preserve-unknown-fields: true
                       default: {}
-                      description: Additionals labels to add to all tools' ingresses
+                      description: Additional labels to add to all tools' ingresses
                       type: object
                     tls:
                       description: TLS configuration for ingresses.
                       properties:
                         acme:
-                          description: acme/let'sencrypt configuration, only http challenge
+                          description: acme/Let'sEncrypt configuration, only http challenge
                           properties:
                             email:
                               description: User email used for ACME
@@ -953,7 +953,7 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
@@ -961,7 +961,7 @@ spec:
                             - replica
                             - restore
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
@@ -1061,7 +1061,7 @@ spec:
                         so easy to configure. \nExample: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain\n"
                       type: string
                     port:
-                      description: Distant proxy port listenning
+                      description: Distant proxy port listening
                       type: string
                   required:
                     - enabled
@@ -1113,7 +1113,7 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
@@ -1121,7 +1121,7 @@ spec:
                             - replica
                             - restore
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:

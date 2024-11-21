@@ -22,7 +22,7 @@
   ansible.builtin.fail:
     msg: "Missing Grafana instance. Please execute 'ansible-playbook install.yaml -t grafana' before trying to install the default datasource."
 
-- name: Manage missing defaut datasource URL
+- name: Manage missing default datasource URL
   when: dsc.grafanaDatasource.defaultPrometheusDatasourceUrl is not defined
   block:
     - name: Disclaimer when missing datasource URL in dsc

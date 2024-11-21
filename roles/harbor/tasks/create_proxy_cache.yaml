@@ -17,8 +17,8 @@
 - name: Create or Update registry
   vars:
     x_total_count_test: "{{ (result_registry.x_total_count | int) == 0 }}"
-    method: "{{ x_total_count_test | ternary('POST', 'PUT')  }}"
-    url_id_param: "{{ x_total_count_test | ternary('', result_registry.json[0].id)  }}"
+    method: "{{ x_total_count_test | ternary('POST', 'PUT') }}"
+    url_id_param: "{{ x_total_count_test | ternary('', result_registry.json[0].id) }}"
 
     # Harbor n'attend pas la même structure de paramètre pour une création ou une modification
     body_post:
@@ -38,11 +38,11 @@
       name: "{{ proxy_cache.name }}"
       type: "{{ proxy_cache.registry.provider }}"
       url: "{{ proxy_cache.registry.endpointUrl }}"
-    body: "{{ x_total_count_test | ternary(body_post, body_put)  }}"
+    body: "{{ x_total_count_test | ternary(body_post, body_put) }}"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: "{{ method }}"
-    url: https://{{ harbor_domain }}/api/v2.0/registries/{{url_id_param}}
+    url: https://{{ harbor_domain }}/api/v2.0/registries/{{ url_id_param }}
     password: "{{ dsc.harbor.adminPassword }}"
     user: admin
     force_basic_auth: true
@@ -88,8 +88,8 @@
   vars:
     x_total_count_test: "{{ (result_project.x_total_count | int) == 0 }}"
     project_id: "{{ result_project.json[0].project_id | default('-1') }}"
-    method: "{{ x_total_count_test | ternary('POST', 'PUT')  }}"
-    url_id_param: "{{ x_total_count_test | ternary('', project_id)  }}"
+    method: "{{ x_total_count_test | ternary('POST', 'PUT') }}"
+    url_id_param: "{{ x_total_count_test | ternary('', project_id) }}"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: "{{ method }}"

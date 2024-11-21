@@ -7,7 +7,7 @@ metadata:
     pod-policies.kyverno.io/autogen-controllers: none
     policies.kyverno.io/category: Prod
     policies.kyverno.io/severity: medium
-    policies.kyverno.io/subject: Pod 
+    policies.kyverno.io/subject: Pod
 spec:
   validationFailureAction: Enforce
 spec:
@@ -19,7 +19,7 @@ spec:
         - Pod
         namespaces:
         - "{{ dsc.gitlab.namespace }}"
-        names: 
+        names:
         - "runner-*"
     mutate:
       patchStrategicMerge:
@@ -64,7 +64,7 @@ spec:
         - StatefulSet
         namespaces:
         - "{{ dsc.vault.namespace }}"
-        names: 
+        names:
         - "conf-dso-vault"
     mutate:
       patchStrategicMerge:

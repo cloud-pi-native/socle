@@ -79,6 +79,6 @@ redis:
 {% if use_image_pull_secrets %}
 global:
   image:
-    pullSecrets: 
+    pullSecrets:
     - name: dso-config-pull-secret
 {% endif %}

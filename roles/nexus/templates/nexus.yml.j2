@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: {{ dsc.nexus.namespace }}
-  name: nexus  # Sets Deployment name
+  name: nexus # Sets Deployment name
 spec:
   replicas: 1
   strategy:
@@ -19,7 +19,7 @@ spec:
 {% if dsc.global.platform == "kubernetes" %}
       securityContext:
         runAsNonRoot: true
-        runAsGroup: 200 
+        runAsGroup: 200
         runAsUser: 200
         fsGroup: 200
 {% endif %}
@@ -36,8 +36,8 @@ spec:
 {% endif %}
           imagePullPolicy: "IfNotPresent"
           ports:
-            - containerPort: 8081  # Exposes container port
-            - containerPort: 5000  # Exposes container port
+            - containerPort: 8081 # Exposes container port
+            - containerPort: 5000 # Exposes container port
           volumeMounts:
             - mountPath: /nexus-data
               name: nexus-data-volume

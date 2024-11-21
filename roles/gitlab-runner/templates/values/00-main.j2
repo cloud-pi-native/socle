@@ -74,7 +74,7 @@ runners:
     {% endif %}
     {% if dsc.gitlabRunner.resources.overwrite.limits != 'none' %}
         memory_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.cpu }}"
-        cpu_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.memory }}"        
+        cpu_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.memory }}"
     {% endif %}
   {% endif %}
 {% endif %}

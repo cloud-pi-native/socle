@@ -28,7 +28,7 @@ image:
 
 # -- image pull secrets
 {% if use_image_pull_secrets %}
-imagePullSecrets: 
+imagePullSecrets:
 - name: dso-config-pull-secret
 {% else %}
 imagePullSecrets: []

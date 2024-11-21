@@ -423,7 +423,7 @@
         namespace: "{{ dsc.gitlab.namespace }}"
       register: endpoints
 
-    - name: Declare some additionnal ServiceMonitors
+    - name: Declare some additional ServiceMonitors
       ansible.builtin.include_tasks:
         file: add-servicemonitors.yaml
       loop: "{{ gitlab_additional_service_monitors }}"

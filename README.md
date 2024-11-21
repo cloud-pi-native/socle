@@ -101,7 +101,7 @@ Toujours sur votre environnement de déploiement, vous devrez :
 
 L'installation de la suite des prérequis **sur l'environnement de déploiement** s'effectue à l'aide du playbook nommé `install-requirements.yaml`. Il est mis à disposition dans le répertoire `admin-tools` du dépôt socle que vous aurez clôné.
 
-Si l'utilisateur avec lequel vous exécutez ce playbook dispose des droits sudo sans mot de passe (option `NOPASSWD` du fichier sudoers), vous pourrez le lancer directement sans options :
+Si l'utilisateur avec lequel vous exécutez ce playbook dispose des droits sudo sans mots de passe (option `NOPASSWD` du fichier sudoers), vous pourrez le lancer directement sans options :
 
 ```bash
 ansible-playbook admin-tools/install-requirements.yaml
@@ -136,7 +136,7 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
 - Commandes installées avec Homebrew :
   - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
   - [helm](https://helm.sh/docs/intro/install/)
-  - [yq](https://github.com/mikefarah/yq/#install) (Facultative mais utile pour debug.)
+  - [yq](https://github.com/mikefarah/yq/#install) (Facultative, mais utile pour debug)
 
 ## Configuration
 
@@ -146,7 +146,7 @@ Lorsque vous avez cloné le présent dépôt socle, lancez une première fois la
 ansible-playbook install.yaml
 ```
 
-Elle vous signalera que vous n'avez encore jamais installé le socle sur votre cluster, puis vous invitera à modifier la ressource de scope cluster et de type **dsc** nommée **conf-dso** via la commande suivante :
+Elle vous signalera que vous n'avez encore jamais installé le socle sur votre cluster, puis vous invitera à modifier la ressource de scope cluster et de type `dsc` nommée `conf-dso` via la commande suivante :
 
 ```bash
 kubectl edit dsc conf-dso
@@ -202,7 +202,7 @@ S'agissant du gel des versions de charts ou d'images pour les outils en question
 
 ### Lancement
 
-Dès que votre [configuration](#configuration) est prête, c'est-à-dire que la ressource `dsc` par défaut  `conf-dso` a bien été mise à jour avec les éléments nécessaires et souhaités, relancez la commande suivante :
+Dès que votre [configuration](#configuration) est prête, c'est-à-dire que la ressource `dsc` par défaut `conf-dso` a bien été mise à jour avec les éléments nécessaires et souhaités, relancez la commande suivante :
 
 ```bash
 ansible-playbook install.yaml
@@ -253,7 +253,7 @@ Lorsque votre nouvelle configuration est prête, et déclarée par exemple dans 
 kubectl apply -f ma-conf-perso.yaml
 ```
 
-Vous pourrer ensuite la retrouver via la commande :
+Vous pourrez ensuite la retrouver via la commande :
 
 ```bash
 kubectl get dsc
@@ -535,8 +535,8 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 
 **Remarques importantes** :
 
-- Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par l'[extra variable](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée.
-- Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est-à-dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo`.
+- Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par la [variable supplémentaire](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée (avec `--extra-vars` ou `-e`).
+- Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est-à-dire d'utiliser le numéro `APP VERSION` retourné par la commande `helm search repo`.
 
 ### Modification des versions de charts
 
@@ -544,11 +544,11 @@ Techniquement, la modification des versions de charts utilisés est possible, ma
 
 Ceci parce que la version de la Console Cloud π Native déployée par le socle, composant central qui s'interface avec tous les outils de la chaîne, a été testée et développée avec les versions d'outils telles qu'elles sont fixées au moment de la publication.
 
-Aussi, **nous ne pouvons garantir le bon fonctionnement** de la forge DSO dans un contexte où les versions de charts seraient modifiées.
+Aussi, **nous ne pouvons garantir le bon fonctionnement** de la forge DSO dans un contexte avec lequel les versions de charts seraient modifiées.
 
 De plus, et comme indiqué plus haut, les outils cert-manager, CloudNativePG, GitLab Operator, Grafana Operator et Kyverno seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
 
-Si vous souhaitez malgré tout tenter une modification de version d'un chart en particulier, Vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
+Si vous souhaitez malgré tout tenter une modification de version d'un chart en particulier, vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
 
 Pensez également à effectuer au moins un backup du namespace et des ressources cluster scoped associées.
 
@@ -644,7 +644,7 @@ Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez
 
 #### CloudNativePG
 
-Comme avec cert-manager, il existe une correspondance biunivoque entre la version de chart utilisée et la version d'application ("APP VERSION") de l'opérateur.
+Comme avec cert-manager, il existe une correspondance biunivoque entre la version de chart utilisée et la version d'application (`APP VERSION`) de l'opérateur.
 
 Ainsi, spécifier une version de chart est suffisant pour geler la version d'image au niveau de l'opérateur.
 
@@ -652,7 +652,7 @@ Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez
 
 Comme indiqué dans sa [documentation officielle](https://cloudnative-pg.io/documentation/1.20/quickstart/#part-3-deploy-a-postgresql-cluster), par défaut CloudNativePG installera la dernière version mineure disponible de la dernière version majeure de PostgreSQL au moment de la publication de l'opérateur.
 
-De plus, comme l'indique la [FAQ officielle](https://cloudnative-pg.io/documentation/1.20/faq/), CloudNativePG utilise des conteneurs d'application immutables. Cela signifie que le conteneur ne sera pas modifié durant tout son cycle de vie (aucun patch, aucune mise à jour ni changement de configuration).
+De plus, comme l'indique la [FAQ officielle](https://cloudnative-pg.io/documentation/1.20/faq/), CloudNativePG utilise des conteneurs d'application immuables. Cela signifie que le conteneur ne sera pas modifié durant tout son cycle de vie (aucun patch, aucune mise à jour ni changement de configuration).
 
 #### Console Cloud π Native
 
@@ -682,7 +682,7 @@ Il est donc recommandé de ne pas modifier les versions de charts déjà fixées
 
 #### GitLab CI pipelines exporter
 
-La version d'image utilisée par GitLab CI pipelines exporter est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
+La version d'image utilisée par _GitLab CI pipelines exporter_ est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
 
 Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez ce que vous faites.
 
@@ -698,7 +698,7 @@ https://docs.gitlab.com/runner/#gitlab-runner-versions
 
 #### Harbor
 
-Fixer le numéro de version du chart Helm sera normalement suffisant pour fixer aussi le numéro de version des images associées. Le numéro de version de ces images sera celui visible dans la colonne "APP VERSION" de la commande `helm search repo -l harbor/harbor`.
+Fixer le numéro de version du chart Helm sera normalement suffisant pour fixer aussi le numéro de version des images associées. Le numéro de version de ces images sera celui visible dans la colonne `APP VERSION` de la commande `helm search repo -l harbor/harbor`.
 
 Il est toutefois possible de fixer les versions d'images pour Harbor de façon plus fine (**recommandé en production**).
 
@@ -719,7 +719,7 @@ Les différents tags utilisables sont disponibles ici :
 - redis : <https://hub.docker.com/r/goharbor/redis-photon/tags>
 - exporter : <https://hub.docker.com/r/goharbor/harbor-exporter/tags>
 
-**Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est-à-dire d'utiliser le numéro "APP VERSION" retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
+**Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est-à-dire d'utiliser le numéro `APP VERSION` retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
 
 Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.14.1 du chart :
 
@@ -809,7 +809,7 @@ Nous utiliserons un tag dit "[immutable](https://docs.bitnami.com/kubernetes/app
 
 Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : <https://hub.docker.com/r/bitnami/keycloak/tags>
 
-Les tags dits "immutables" sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple le tag "19.0.3-debian-11-r22" est un tag immutable.
+Les _immutable tags_ sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple, `19.0.3-debian-11-r22` est un _immutable tag_.
 
 Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
@@ -854,13 +854,13 @@ nexus:
 
 Le composant SonarQube est installé via son [chart Helm officiel](https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube).
 
-Les tags d'images utilisables sont ceux retournés par la commande suivante, au niveau de la colonne "APP VERSION" :
+Les tags d'images utilisables sont ceux retournés par la commande suivante, au niveau de la colonne `APP VERSION` :
 
 ```bash
 helm search repo -l sonarqube/sonarqube
 ```
 
-Il faudra juste leur ajouter le suffixe "-community" qui correspond à l'édition utilisée, ou bien le suffixe `-{{ .Values.edition }}` si nous précisons aussi l'édition dans nos values.
+Il faudra juste leur ajouter le suffixe `-community` qui correspond à l'édition utilisée, ou bien le suffixe `-{{ .Values.edition }}` si nous précisons aussi l'édition dans nos values.
 
 Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
 
@@ -982,7 +982,7 @@ k create secret docker-registry docker-hub-creds \
 
 Notez que du fait de l'utilisation de l'option `dry-run`, le secret n'est pas véritablement créé. La partie qui nous intéresse, encodée en base64, est simplement affichée sur la sortie standard.
 
-Copiez cette sortie, et collez-la dans la section `spec.global.imagePullSecretsData` de votre resource dsc (par défaut conf-dso), exemple :
+Copiez cette sortie, et collez-la dans la section `spec.global.imagePullSecretsData` de votre resource dsc (par défaut `conf-dso`), exemple :
 
 ```yaml
 global:
@@ -1019,7 +1019,7 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 # Lancer la vérification syntaxique
 pnpm install && pnpm run lint
 
-# Lancer le formattage du code
+# Lancer le formatage du code
 pnpm install && pnpm run format
 ```
 

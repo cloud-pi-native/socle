@@ -261,11 +261,11 @@ for tbl in `psql -U postgres -qAt -c "select tablename from pg_tables where sche
   psql -U postgres -c "alter table \"$tbl\" owner to harbor" registry
 done
 
-for tbl in `psql -U postgres -qAt -c "select sequence_name from information_schema.sequences where sequence_schema = 'public';" registry`; do  
+for tbl in `psql -U postgres -qAt -c "select sequence_name from information_schema.sequences where sequence_schema = 'public';" registry`; do
   psql -U postgres -c "alter sequence \"$tbl\" owner to harbor" registry
 done
 
-for tbl in `psql  -U postgres -qAt -c "select table_name from information_schema.views where table_schema = 'public';" registry`; do  
+for tbl in `psql  -U postgres -qAt -c "select table_name from information_schema.views where table_schema = 'public';" registry`; do
   psql -U postgres -c "alter view \"$tbl\" owner to harbor" registry
 done
 ```
@@ -472,7 +472,7 @@ If the Vault cluster finds itself in a state where none of the nodes is a leader
 ### Features
 
 * :sparkles: Enable directAccessGrants for argo-client ([be0843f](https://github.com/cloud-pi-native/socle/commit/be0843f3871a937e45c42c5b5645eead7f86abd0))
-* :sparkles: Enable postgres super user (as we might need it) ([08a64ad](https://github.com/cloud-pi-native/socle/commit/08a64ad836d39448c1516a70215dfaa3a434a9e6))
+* :sparkles: Enable postgres superuser (as we might need it) ([08a64ad](https://github.com/cloud-pi-native/socle/commit/08a64ad836d39448c1516a70215dfaa3a434a9e6))
 * :sparkles: Enabling brute force detection ([c3d8f50](https://github.com/cloud-pi-native/socle/commit/c3d8f50bc67204ac578a57e9f838e0d2019cfe99))
 * :sparkles: Set failureFactor for brute force protection ([dbe7b20](https://github.com/cloud-pi-native/socle/commit/dbe7b2034878ca8e1efdfd7ef1ba767d908b8709))
 
@@ -544,7 +544,7 @@ If the Vault cluster finds itself in a state where none of the nodes is a leader
 * :sparkles: ([9487622](https://github.com/cloud-pi-native/socle/commit/94876223048655cf4420842a1fc2db8f3714c6c7))
 * :sparkles: Activate keycloak basic metrics ([e7630fd](https://github.com/cloud-pi-native/socle/commit/e7630fd158fb4e12e9f8f98bc4724cef91645cb2))
 * :sparkles: Activate metrics when dsc.global.metric.enabled ([49e91f8](https://github.com/cloud-pi-native/socle/commit/49e91f82a1447e1b38e8f633bab669f8cda8f7a1))
-* :sparkles: Activate monitoring  for additionnal resources + refactor ([9c9f979](https://github.com/cloud-pi-native/socle/commit/9c9f979b05e23a0130371cecc02d216570664de5))
+* :sparkles: Activate monitoring  for additional resources + refactor ([9c9f979](https://github.com/cloud-pi-native/socle/commit/9c9f979b05e23a0130371cecc02d216570664de5))
 * :sparkles: Activate monitoring + small refactor ([255bb56](https://github.com/cloud-pi-native/socle/commit/255bb5657ad3dded213e8aa055c42f5b03b65f22))
 * :sparkles: Activate Nexus metrics scraping ([0e53610](https://github.com/cloud-pi-native/socle/commit/0e53610ce121caa244e868154a67a5f8db3eaa28))
 * :sparkles: Activate Vault metrics ([63ade45](https://github.com/cloud-pi-native/socle/commit/63ade457c10c5553df35ed08c097d87d01c7c5fb))
@@ -632,7 +632,7 @@ If the Vault cluster finds itself in a state where none of the nodes is a leader
 
 ### Bug Fixes
 
-* :adhesive_bandage: Ajout du user dso admin dans les bons groupes ([14f9ee4](https://github.com/cloud-pi-native/socle/commit/14f9ee405abd921d8467c80588496a7959f705c5))
+* :adhesive_bandage: Ajout de l'user dso admin dans les bons groupes ([14f9ee4](https://github.com/cloud-pi-native/socle/commit/14f9ee405abd921d8467c80588496a7959f705c5))
 * :ambulance: Correctif cert-manager sur récupération des CRDS ([c77e78b](https://github.com/cloud-pi-native/socle/commit/c77e78bc57aa31d791e5042060b4d0ef7335cd6b))
 * :ambulance: correctif du role nexus ([6763075](https://github.com/cloud-pi-native/socle/commit/67630759cd1e46f1c245f8b5784d5ed243c8e767))
 * :bug: Correctif désinstallation GitLab ([d233e61](https://github.com/cloud-pi-native/socle/commit/d233e6179177ad3c415a136240dba57579eed9d2))

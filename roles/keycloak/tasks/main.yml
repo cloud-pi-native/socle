@@ -373,7 +373,7 @@
             state: present
           - name: ArgoCDAdmins
             state: present
-#        force: true  ## Ne fontionne pas quand user supprimé via la GUI et tâche relancée.
+#        force: true # Ne fonctionne pas quand user supprimé via l'interface graphique et tâche relancée.
 
 - name: Get dso keycloak client scopes from API
   ansible.builtin.uri:

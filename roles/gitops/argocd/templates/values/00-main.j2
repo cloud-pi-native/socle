@@ -1,0 +1,79 @@
+crds:
+  install: true
+  keep: true
+{% if dsc.global.platform == "openshift" %}
+openshift:
+  enabled: true
+{% endif %}
+configs:
+{% if dsc.argocd.admin.enabled %}
+  secret:
+    argocdServerAdminPassword: "{{ dsc.argocd.admin.password }}"
+{% endif %}
+  params:
+    server.insecure: true
+  rbac:
+    policy.csv: |
+      p, role:admin, *, *, */*, allow
+      p, role:nada, applicationsets, *, */*, deny
+      p, role:nada, applications, *, */*, deny
+      p, role:nada, logs, *, */*, deny
+      p, role:nada, exec, *, */*, deny
+      p, role:nada, certificates, *, *, deny
+      p, role:nada, accounts, *, *, deny
+      p, role:nada, gpgkeys, *, *, deny
+      p, role:nada, projects, *, *, deny
+      p, role:nada, clusters, *, *, deny
+      p, role:nada, repositories, get, *, allow
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+      g, /ArgoCDAdmins, role:admin
+      g, ArgoCDAdmins, role:admin
+{% if dsc.global.environment == 'development' %}
+      p, cpin-sa, applications, *, *, allow
+{% endif %}
+    scopes: "[groups]"
+    policy.default: role:nada
+    admin.enabled: "false"
+  cm:
+    clusterResources: "true"
+    url: "https://{{ argocd_domain }}"
+    users.anonymous.enabled: "false"
+    admin.enabled: "{{ dsc.argocd.admin.enabled }}"
+    kustomize.buildOptions: "--enable-helm"
+    resource.exclusions: |
+      - apiGroups:
+        - tekton.dev
+        clusters:
+        - '*'
+        kinds:
+        - TaskRun
+        - PipelineRun
+{% if dsc.global.environment == 'development' %}
+    accounts.cpin-sa: apiKey
+{% endif %}
+redis-ha:
+  enabled: true
+controller:
+  replicas: 3
+dex:
+  enabled: false
+server:
+  replicas: 3
+  ingress:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
+  ingressGrpc:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
+repoServer:
+  replicas: 3
+applicationSet:
+  enabled: false
+  replicas: 2
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className | default('') }}
+notifications:
+  enabled: false
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className | default('') }}

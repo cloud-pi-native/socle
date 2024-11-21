@@ -1,0 +1,7 @@
+{% if dsc.global.offline %}
+configs:
+  tls:
+    certificates:
+      {{ dsc.argocd.privateGitlabDomain }}: |
+        {{ exposed_ca_pem | indent(width=8, first=False) }}
+{% endif %}

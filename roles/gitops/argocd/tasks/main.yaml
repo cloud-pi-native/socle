@@ -1,9 +1,110 @@
 ---
+- name: Argo CD OpenShift scc crb
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        creationTimestamp:
+        name: "{{ dsc_name }}-socle-argocd-system:openshift:scc:privileged"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:openshift:scc:privileged
+      subjects:
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocd.namespace }}"
+          name: "{{ dsc_name }}-socle-argocd-repo-server"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocd.namespace }}"
+          name: argocd-server
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocd.namespace }}"
+          name: "{{ dsc_name }}-socle-redis"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocd.namespace }}"
+          name: "{{ dsc_name }}-socle-redis-ha"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocd.namespace }}"
+          name: "{{ dsc_name }}-socle-redis-ha-haproxy"
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Compute ArgoCD Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.argocd['values'] }}"
+    combine_dest_var: "argo_values"
+
 - name: Create Argo CD application
   kubernetes.core.k8s:
-    name: "{{ dsc_name }}-argocd"
+    name: "{{ dsc_name }}-socle"
     namespace: "{{ dsc.argocdInfra.namespace }}"
     api_version: argoproj.io/v1alpha1
     kind: Application
     state: present
-    template: argocd.yaml.j2
+    template: argocd-app-spec.yaml.j2
+
+- name: Wait Argo CD namespace
+  kubernetes.core.k8s_info:
+    kind: Namespace
+    name: "{{ dsc.argocd.namespace }}"
+  register: argocd_ns
+  until: argocd_ns.resources | length > 0
+  retries: 25
+  delay: 5
+
+- name: Install routes
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - ingress.yaml.j2
+
+- name: Wait Argo CD URL
+  ansible.builtin.uri:
+    url: https://{{ argocd_domain }}
+    method: GET
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    status_code: [200, 202]
+    return_content: false
+  register: argocd_response
+  until: argocd_response is not failed
+  retries: 25
+  delay: 5
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2
+
+- name: Patch serviceMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get serviceMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        namespace: "{{ dsc.argocd.namespace }}"
+      register: service_monitors
+
+    - name: Get service_monitors names
+      ansible.builtin.set_fact:
+        service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch serviceMonitors
+      kubernetes.core.k8s:
+        kind: ServiceMonitor
+        namespace: "{{ dsc.argocd.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ service_monitors_names }}"

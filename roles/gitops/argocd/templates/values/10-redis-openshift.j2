@@ -1,0 +1,10 @@
+{% if dsc.global.platform == "openshift" %}
+redis-ha:
+  containerSecurityContext:
+    runAsUser: null
+    runAsGroup: null
+  haproxy:
+    containerSecurityContext:
+      runAsUser: null
+      runAsGroup: null
+{% endif %}

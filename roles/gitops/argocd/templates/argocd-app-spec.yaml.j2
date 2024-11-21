@@ -5,12 +5,12 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: argo
+    chart: argo-cd
     helm:
-      parameters:
-        # Voir si OK pour les passer via un fichier
+      valuesObject:
+{{ argo_values | to_yaml | indent(8, true) }}
     repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: 7.3.11
+    targetRevision: {{ dsc.argocd.chartVersion }}
   syncPolicy:
     automated:
       prune: true

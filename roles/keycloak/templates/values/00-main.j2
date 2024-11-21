@@ -75,16 +75,16 @@ service:
     http: ""
     https: ""
   sessionAffinity: "None"
-  sessionAffinityConfig: 
+  sessionAffinityConfig:
   clusterIP: ""
   loadBalancerIP: ""
   loadBalancerSourceRanges: []
   externalTrafficPolicy: "Cluster"
-  annotations: 
+  annotations:
   extraPorts: []
   extraHeadlessPorts: []
   headless:
-    annotations: 
+    annotations:
     extraPorts: []
 
 ingress:
@@ -100,7 +100,7 @@ ingress:
     {{ key }}: "{{ val }}"
 {% endfor %}
     route.openshift.io/termination: "edge"
-  labels: 
+  labels:
     app: "keycloak"
 {% for key, val in dsc.ingress.labels.items() %}
     {{ key }}: "{{ val }}"

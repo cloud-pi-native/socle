@@ -126,7 +126,7 @@
     combine_user_values: "{{ dsc.console['values'] }}"
     combine_dest_var: "console_values"
 
-- name: Apply app
+- name: Apply app (argoCD project)
   kubernetes.core.k8s:
     template: app.yaml.j2
 
@@ -155,7 +155,7 @@
         combine_user_values: "{{ dsc.console['values'] }}"
         combine_dest_var: "console_values"
 
-    - name: Apply app
+    - name: Apply app (argoCD project)
       kubernetes.core.k8s:
         template: app.yaml.j2
   when: first_console_deployment is defined

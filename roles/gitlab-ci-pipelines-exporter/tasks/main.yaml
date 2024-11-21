@@ -43,7 +43,7 @@
         combine_user_values: "{{ dsc.gitlabCiPipelinesExporter['values'] }}"
         combine_dest_var: "gl_ci_pipelines_exporter_values"
 
-    - name: Deploy GitLab CI Pilelines helm
+    - name: Deploy GitLab CI Pipelines helm
       kubernetes.core.helm:
         name: gitlab-ci-pipelines-exporter
         chart_ref: mvisonneau/gitlab-ci-pipelines-exporter

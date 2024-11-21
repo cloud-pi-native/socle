@@ -6,7 +6,7 @@
       kind: ClusterRoleBinding
       metadata:
         creationTimestamp:
-        name: "{{ dsc_name }}-socle-argocd-system:openshift:scc:privileged"
+        name: "{{ dsc_name }}-argo-socle-argocd-system:openshift:scc:privileged"
       roleRef:
         apiGroup: rbac.authorization.k8s.io
         kind: ClusterRole
@@ -14,19 +14,19 @@
       subjects:
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: "{{ dsc_name }}-socle-argocd-repo-server"
+          name: "{{ dsc_name }}-argo-socle-argocd-repo-server"
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
           name: argocd-server
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: "{{ dsc_name }}-socle-redis"
+          name: "{{ dsc_name }}-argo-socle-redis"
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: "{{ dsc_name }}-socle-redis-ha"
+          name: "{{ dsc_name }}-argo-socle-redis-ha"
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
-          name: "{{ dsc_name }}-socle-redis-ha-haproxy"
+          name: "{{ dsc_name }}-argo-socle-redis-ha-haproxy"
 
 - name: Set path fact
   ansible.builtin.set_fact:
@@ -42,7 +42,7 @@
 
 - name: Create Argo CD application
   kubernetes.core.k8s:
-    name: "{{ dsc_name }}-socle"
+    name: "{{ dsc_name }}-argo-socle"
     namespace: "{{ dsc.argocdInfra.namespace }}"
     api_version: argoproj.io/v1alpha1
     kind: Application

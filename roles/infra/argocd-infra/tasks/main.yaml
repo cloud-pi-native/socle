@@ -14,7 +14,7 @@
       kind: ClusterRoleBinding
       metadata:
         creationTimestamp:
-        name: "{{ dsc_name }}-argocd-system:openshift:scc:privileged"
+        name: "{{ dsc_name }}-argo-infra-argocd-system:openshift:scc:privileged"
       roleRef:
         apiGroup: rbac.authorization.k8s.io
         kind: ClusterRole
@@ -22,19 +22,19 @@
       subjects:
         - kind: ServiceAccount
           namespace: "{{ dsc.argocdInfra.namespace }}"
-          name: "{{ dsc_name }}-argocd-repo-server"
+          name: "{{ dsc_name }}-argo-infra-argocd-repo-server"
         - kind: ServiceAccount
           namespace: "{{ dsc.argocdInfra.namespace }}"
           name: argocd-server
         - kind: ServiceAccount
           namespace: "{{ dsc.argocdInfra.namespace }}"
-          name: "{{ dsc_name }}-redis"
+          name: "{{ dsc_name }}-argo-infra-redis"
         - kind: ServiceAccount
           namespace: "{{ dsc.argocdInfra.namespace }}"
-          name: "{{ dsc_name }}-redis-ha"
+          name: "{{ dsc_name }}-argo-infra-redis-ha"
         - kind: ServiceAccount
           namespace: "{{ dsc.argocdInfra.namespace }}"
-          name: "{{ dsc_name }}-redis-ha-haproxy"
+          name: "{{ dsc_name }}-argo-infra-redis-ha-haproxy"
 
 - name: Add helm repo
   kubernetes.core.helm_repository:
@@ -56,7 +56,7 @@
 
 - name: Deploy helm
   kubernetes.core.helm:
-    name: "{{ dsc_name }}"
+    name: "{{ dsc_name }}-argo-infra"
     chart_ref: argo/argo-cd
     chart_version: "{{ dsc.argocdInfra.chartVersion }}"
     release_namespace: "{{ dsc.argocdInfra.namespace }}"

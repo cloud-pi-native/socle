@@ -31,7 +31,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ dsc_name }}-socle-argocd-server
+                name: {{ dsc_name }}-argo-socle-argocd-server
                 port:
                   number: 80
 
@@ -69,6 +69,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ dsc_name }}-socle-argocd-applicationset-controller
+                name: {{ dsc_name }}-argo-socle-argocd-applicationset-controller
                 port:
                   number: 7000

@@ -1153,7 +1153,7 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
@@ -1161,7 +1161,7 @@ spec:
                             - replica
                             - restore
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:

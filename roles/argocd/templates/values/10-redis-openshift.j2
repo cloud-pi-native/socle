@@ -1,10 +1,7 @@
 {% if dsc.global.platform == "openshift" %}
 redis-ha:
-  containerSecurityContext:
-    runAsUser: null
-    runAsGroup: null
-  haproxy:
-    containerSecurityContext:
-      runAsUser: null
-      runAsGroup: null
+  global:
+    compatibility:
+      openshift:
+        adaptSecurityContext: auto
 {% endif %}

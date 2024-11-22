@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.12.5](https://github.com/cloud-pi-native/socle/compare/v2.12.4...v2.12.5) (2024-11-22)
+
+
+### Bug Fixes
+
+* :art: Add missing Argo CD ingressClassName ([bc39fe0](https://github.com/cloud-pi-native/socle/commit/bc39fe0e768c480e92483ffdc313367dfeada16f))
+
 ## [2.12.4](https://github.com/cloud-pi-native/socle/compare/v2.12.3...v2.12.4) (2024-10-28)
 
 

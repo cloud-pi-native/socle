@@ -8,7 +8,7 @@
   },
   "targetRevision": "refactor/gitops-install",
   "apps": [
-    { "app": "keycloak", "enabled": "false", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "keycloak", "enabled": "false", "namespace": "keycloak", "keycloakPluginDownloadURL": "https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v1.0.3", "syncWave": 10 },
     { "app": "kubeview", "enabled": "true", "namespace": "kubeview", "syncWave": 10 }
   ]
 }

@@ -1,60 +1,30 @@
-apiVersion: v1
-kind: Secret
-type: kubernetes.io/basic-auth
-metadata:
-  name: keycloak-pg-cluster-admin
-  annotations:
-    avp.kubernetes.io/remove-missing: "true"
-data:
-  username: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.admin.username} | base64encode>
-  password: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.admin.password} | base64encode>
-
----
-apiVersion: v1
-kind: Secret
-type: kubernetes.io/basic-auth
-metadata:
-  name: keycloak-pg-cluster-app
-  annotations:
-    avp.kubernetes.io/remove-missing: "true"
-data:
-  username: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.username} | base64encode>
-  password: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.password} | base64encode>
-
----
-apiVersion: v1
-kind: Secret
-type: Opaque
-metadata:
-  name: keycloak-pg-cluster-infos
-  annotations:
-    avp.kubernetes.io/remove-missing: "true"
-data:
-  host: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.host} | base64encode>
-  port: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.port} | base64encode>
-  database: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.database} | base64encode>
-  username: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.username} | base64encode>
-  password: <path:secret/data/platforms/production/apps/keycloak#postgres | jsonPath {.app.password} | base64encode>
-
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: keycloak-pg-cluster
+  name: pg-cluster-keycloak
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:15.4
   instances: 3
-  primaryUpdateStrategy: unsupervised
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.1
+  postgresql:
+    parameters:
+      max_worker_processes: "60"
+      max_slot_wal_keep_size: 5GB
+    pg_hba:
+      # To access through TCP/IP you will need to get username
+      # and password from the secret pg-cluster-keycloak-app
+      - host keycloak keycloak all md5
+      - host keycloak streaming_replica all md5
   bootstrap:
     initdb:
       database: keycloak
       owner: keycloak
-      secret:
-        name: keycloak-pg-cluster-app
-  superuserSecret:
-    name: keycloak-pg-cluster-admin
+    recovery: null
+  primaryUpdateStrategy: unsupervised
   storage:
-    size: 7Gi
+    size: 6Gi
+  walStorage:
+    size: 6Gi
   resources:
     requests:
       memory: 512Mi
@@ -62,10 +32,9 @@ spec:
     limits:
       memory: 2Gi
       cpu: 500m
-  affinity:
-    enablePodAntiAffinity: true
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
+
 
 # ---
 # apiVersion: v1

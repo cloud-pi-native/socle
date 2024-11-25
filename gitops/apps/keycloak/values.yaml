@@ -299,7 +299,7 @@ keycloak:
         - sh
       args:
         - -c
-        - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}/retrocompat-keycloak-theme.jar
+        - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ .Values.keycloakPluginDownloadURL }}/retrocompat-keycloak-theme.jar
       volumeMounts:
         - name: extensions
           mountPath: /extensions

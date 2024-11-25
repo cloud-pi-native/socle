@@ -1,0 +1,10 @@
+---
+exclude_paths:
+  - .cache/ # implicit unless exclude_paths is defined in config
+  - .github/
+  - .idea/
+  - .vscode/
+  - pnpm-lock.yaml
+
+skip_list:
+  - role-name

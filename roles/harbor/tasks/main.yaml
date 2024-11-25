@@ -268,6 +268,7 @@
   when: get_trivy_schedule_config.json is undefined
 
 - name: Activate proxy cache
+  when: dsc.harbor.proxyCache is defined
   block:
     - name: Enable proxy cache for another registry loop
       ansible.builtin.include_tasks:
@@ -276,7 +277,6 @@
       loop_control:
         loop_var: proxy_cache
         label: "{{ proxy_cache.name }}"
-  when: dsc.harbor.proxyCache is defined
 
 - name: Set alerting rules
   when: dsc.global.alerting.enabled

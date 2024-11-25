@@ -8,8 +8,8 @@
     file: get-ca.yaml
   with_items: "{{ dsc.additionalsCA }}"
   vars:
-    kind: "{{ item.kind }}"
-    name: "{{ item.name }}"
+    ca_kind: "{{ item.kind }}"
+    ca_name: "{{ item.name }}"
     key: "{{ item.key | default('') }}"
 
 - name: Set empty ca fact

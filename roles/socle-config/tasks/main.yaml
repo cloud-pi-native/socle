@@ -108,11 +108,11 @@
   ansible.builtin.set_fact:
     dsc: "{{ dsc.spec }}"
 
-- name: set private registry
+- name: Set private registry
   ansible.builtin.set_fact:
     use_private_registry: "{{ dsc.global.registry is defined and dsc.global.registry | length > 0 | bool }}"
 
-- name: use imagePullSecrets
+- name: Use imagePullSecrets
   ansible.builtin.set_fact:
     use_image_pull_secrets: "{{ dsc.global.imagePullSecretsData is defined and dsc.global.imagePullSecretsData | length > 0 | bool }}"
 

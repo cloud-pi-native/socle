@@ -1,5 +1,6 @@
 ---
-- debug:
+- name: Display proxy cache name
+  ansible.builtin.debug:
     msg: "Proxy cache: {{ proxy_cache.name }}"
 
 - name: Check if registry exists
@@ -75,12 +76,12 @@
   register: result_project
 
 - name: Debug result_project
-  debug:
+  ansible.builtin.debug:
     var: result_project
     verbosity: 1
 
 - name: Debug result_registry
-  debug:
+  ansible.builtin.debug:
     var: result_registry
     verbosity: 1
 
@@ -99,4 +100,4 @@
     force_basic_auth: true
     body_format: json
     status_code: [200, 201]
-    body: "{{ {'project_name': proxy_cache.name, 'metadata': {'public': 'true'},'storage_limit': -1,'registry_id': (result_registry.json[0].id | int)} }}"
+    body: "{{ {'project_name': proxy_cache.name, 'metadata': {'public': 'true'}, 'storage_limit': -1, 'registry_id': (result_registry.json[0].id | int)} }}"

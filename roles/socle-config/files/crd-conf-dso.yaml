@@ -135,8 +135,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for argocd, they will be merged with roles/argocd/templates/values/
-                        See: https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
-                        And: https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
+                        ttps://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:

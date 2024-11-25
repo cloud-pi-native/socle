@@ -136,8 +136,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for argocd, they will be merged with roles/argocd/templates/values/
-                        See: https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
-                        And: https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
+                        ttps://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:
@@ -165,8 +165,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for cert-manager, they will be merged with roles/cert-manager/templates/values/
-                        See: https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
-                        And: https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
+                        ttps://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
+                        https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -192,8 +192,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for CloudNativePG, they will be merged with roles/cloudnativepg/templates/values/
-                        See: https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
-                        And: https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
+                        ttps://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
+                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -226,7 +226,7 @@ spec:
                         the pg_wal directory at checkpoint time.
                         Default is -1, meaning that replication slots may retain an unlimited amount
                         of WAL files. You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        ttps://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -256,7 +256,7 @@ spec:
                           description: |
                             Connection parameters used for replication, it should contain
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            See: https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                            ttps://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 gitlab:
@@ -277,8 +277,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/
-                        See: https://docs.gitlab.com/charts/charts/globals.html
-                        And: https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
+                        ttps://docs.gitlab.com/charts/charts/globals.html
+                        https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     insecureCI:
@@ -321,7 +321,7 @@ spec:
                         the pg_wal directory at checkpoint time.
                         Default is -1, meaning that replication slots may retain an unlimited amount
                         of WAL files. You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        ttps://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -351,7 +351,7 @@ spec:
                           description: |
                             Connection parameters used for replication, it should contain
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            See: https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                            ttps://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 gitlabCiPipelinesExporter:
@@ -367,8 +367,8 @@ spec:
                       description: |
                         You can add custom values for gitLab-ci-pipelines-exporter, they will be
                         merged with roles/gitlab-ci-pipelines-exporter/templates/values/
-                        See: https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter
-                        And: https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter/values.yaml
+                        ttps://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter
+                        https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -394,8 +394,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for GitLab Operator, they will be merged with roles/gitlab-operator/templates/values/
-                        See: https://docs.gitlab.com/operator/
-                        And: https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/master/deploy/chart/values.yaml
+                        ttps://docs.gitlab.com/operator/
+                        https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/master/deploy/chart/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -467,8 +467,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for GitLab Runner, they will be merged with roles/gitlab-runner/templates/values/
-                        See: https://docs.gitlab.com/runner/
-                        And: https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
+                        ttps://docs.gitlab.com/runner/
+                        https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -708,8 +708,8 @@ spec:
                       description: |
                         You can add custom values for Grafana Operator,
                         they will be merged with roles/grafana-operator/templates/values/
-                        See: https://grafana.github.io/grafana-operator/docs/installation/helm/#values
-                        And: https://github.com/grafana/grafana-operator/tree/master/deploy/helm/grafana-operator
+                        ttps://grafana.github.io/grafana-operator/docs/installation/helm/#values
+                        https://github.com/grafana/grafana-operator/tree/master/deploy/helm/grafana-operator
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -760,7 +760,7 @@ spec:
                             type: object
                             properties:
                               provider:
-                                description: Specifies the registry provider. Default: docker-hub
+                                description: Specifies the registry provider. Default is docker-hub.
                                 type: string
                                 default: docker-hub
                               endpointUrl:
@@ -768,7 +768,7 @@ spec:
                                 type: string
                                 default: ""
                               insecure:
-                                description: Allows insecure connections. Default: false
+                                description: Allows insecure connections. Default is false.
                                 default: false
                                 type: boolean
                               credential:
@@ -791,8 +791,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for harbor, they will be merged with roles/harbor/templates/values/
-                        See: https://github.com/goharbor/harbor-helm
-                        And: https://github.com/goharbor/harbor-helm/blob/main/values.yaml
+                        ttps://github.com/goharbor/harbor-helm
+                        https://github.com/goharbor/harbor-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     postgresPvcSize:
@@ -805,7 +805,7 @@ spec:
                         the pg_wal directory at checkpoint time.
                         Default is -1, meaning that replication slots may retain an unlimited amount
                         of WAL files. You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        ttps://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -835,7 +835,7 @@ spec:
                           description: |
                             Connection parameters used for replication, it should contain
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            See: https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                            ttps://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   required:
                     - adminPassword
@@ -870,10 +870,10 @@ spec:
                               description: |
                                 Let's Encrypt environment to use for issuing certificates:
                                 - production : Use this value for production ready certificates.
-                                  Beware of rate limits. See: https://letsencrypt.org/docs/rate-limits/
+                                  Beware of rate limits. See: https://letsencrypt.org/docs/rate-limits/
                                 - staging : Use this value for testing purposes. It has significantly higher
                                   rate limits. Beware of root certificates.
-                                  See: https://letsencrypt.org/docs/staging-environment/
+                                  See: https://letsencrypt.org/docs/staging-environment/
                               enum:
                                 - production
                                 - staging
@@ -955,7 +955,7 @@ spec:
                         the pg_wal directory at checkpoint time.
                         Default is -1, meaning that replication slots may retain an unlimited amount
                         of WAL files. You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        ttps://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -967,8 +967,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for keycloak, they will be merged with roles/keycloak/templates/values/
-                        See: https://github.com/bitnami/charts/tree/main/bitnami/keycloak
-                        And: https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                        ttps://github.com/bitnami/charts/tree/main/bitnami/keycloak
+                        https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     cnpg:
@@ -995,7 +995,7 @@ spec:
                           description: |
                             Connection parameters used for replication, it should contain
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            See: https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                            ttps://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 kyverno:
@@ -1020,8 +1020,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for Kyverno, they will be merged with roles/kyverno/templates/values/
-                        See: https://github.com/kyverno/kyverno/blob/main/charts/kyverno
-                        And: https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
+                        ttps://github.com/kyverno/kyverno/blob/main/charts/kyverno
+                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -1078,16 +1078,16 @@ spec:
                       description: Distant proxy ip/hostname.
                       type: string
                     http_proxy:
-                      description: URL for http traffic. Format: http://<host>:<port>/
+                      description: URL for http traffic. Format http://<host>:<port>/
                       type: string
                     https_proxy:
-                      description: URL for https traffic. Format: http://<host>:<port>/
+                      description: URL for https traffic. Format http://<host>:<port>/
                       type: string
                     no_proxy:
                       default: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
                       description: |
                         Networks destination excluded by the proxy. Not so easy to configure.
-                        Default: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
+                        Default is .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
                       type: string
                     port:
                       description: Distant proxy port listening.
@@ -1120,7 +1120,7 @@ spec:
                         the pg_wal directory at checkpoint time.
                         Default is -1, meaning that replication slots may retain an unlimited amount
                         of WAL files. You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        ttps://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -1135,8 +1135,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for sonarqube, they will be merged with roles/sonarqube/templates/values/
-                        See: https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
-                        And: https://github.com/SonarSource/helm-chart-sonarqube/blob/master/charts/sonarqube/values.yaml
+                        ttps://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
+                        https://github.com/SonarSource/helm-chart-sonarqube/blob/master/charts/sonarqube/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     cnpg:
@@ -1163,7 +1163,7 @@ spec:
                           description: |
                             Connection parameters used for replication, it should contain
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            See: https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                            ttps://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 vault:
@@ -1187,8 +1187,8 @@ spec:
                     values:
                       description: |
                         You can add custom values for vault, they will be merged with roles/vault/templates/values/
-                        See: https://developer.hashicorp.com/vault/docs/platform/k8s/helm
-                        And: https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+                        ttps://developer.hashicorp.com/vault/docs/platform/k8s/helm
+                        https://github.com/hashicorp/vault-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object

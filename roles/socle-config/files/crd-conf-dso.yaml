@@ -134,8 +134,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for argocd, it will be merged with roles/argocd/templates/values/
-                        See https://github.com/bitnami/charts/tree/main/bitnami/argo-cd
+                        You can add custom values for argocd, they will be merged with roles/argocd/templates/values/
+                        See: https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        And: https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:

@@ -188,12 +188,12 @@ Il s'agit de valeurs de chart [Helm](https://helm.sh/fr). Vous pouvez les utilis
 
 Voici les liens vers les documentations de chart Helm pour les outils concernés :
 
-- [Argo CD](https://github.com/bitnami/charts/tree/main/bitnami/argo-cd)
+- [Argo CD](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd)
 - [Console Cloud π Native](https://github.com/cloud-pi-native/console#readme)
 - [GitLab](https://gitlab.com/gitlab-org/charts/gitlab)
 - [Harbor](https://github.com/goharbor/harbor-helm)
 - [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
-- [SonarQube](https://github.com/bitnami/charts/tree/main/bitnami/sonarqube)
+- [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
 S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.

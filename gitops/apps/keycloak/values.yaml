@@ -148,7 +148,7 @@ keycloak:
         - path: '/realms/dso/metrics'
     prometheusRule:
       enabled: false
-      namespace: {{ .Values.apps.keycloak.namespace }}
+      namespace: {{ .Params.apps.0.namespace }}
       labels: {}
       groups:
         - name: Keycloak
@@ -299,7 +299,7 @@ keycloak:
         - sh
       args:
         - -c
-        - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ .Values.apps.keycloak.keycloakPluginDownloadURL }}/retrocompat-keycloak-theme.jar
+        - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ .Params.apps.0.keycloakPluginDownloadURL }}/retrocompat-keycloak-theme.jar
       volumeMounts:
         - name: extensions
           mountPath: /extensions

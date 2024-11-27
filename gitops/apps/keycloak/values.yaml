@@ -284,7 +284,7 @@ keycloak:
       name: extensions
   extraEnvVars:
     - name: DSFR_THEME_HOME_URL
-      value: https://{{ console_domain }}
+      value: https://testcm-console.apps.dso.hp.numerique-interieur.com
     - name: DSFR_THEME_SERVICE_TITLE
       value: Cloud π Native
     - name: DSFR_THEME_BRAND_TOP

@@ -230,7 +230,7 @@ spec:
                     values:
                       description: |
                         You can add custom values for argocd, they will be merged with roles/argocd/templates/values/
-                        ttps://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
@@ -1134,7 +1134,7 @@ spec:
                         the pg_wal directory at checkpoint time.
                         Default is -1, meaning that replication slots may retain an unlimited amount
                         of WAL files. You can for instance set it to "9GB".
-                        ttps://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -1146,7 +1146,7 @@ spec:
                     values:
                       description: |
                         You can add custom values for keycloak, they will be merged with roles/keycloak/templates/values/
-                        ttps://github.com/bitnami/charts/tree/main/bitnami/keycloak
+                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak
                         https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
@@ -1174,7 +1174,7 @@ spec:
                           description: |
                             Connection parameters used for replication, it should contain
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            ttps://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   required:
                     - installEnabled

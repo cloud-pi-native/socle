@@ -147,6 +147,59 @@ spec:
                   required:
                     - admin
                   type: object
+                awx:
+                  description: Configuration for AWX.
+                  properties:
+                    namespace:
+                      description: The namespace for AWX.
+                      type: string
+                    subDomain:
+                      description: The subdomain for AWX.
+                      type: string
+                    chartVersion:
+                      description: AWX Operator helm chart version (e.g., "2.19.1").
+                      type: string
+                    defaultAwxVersion:
+                      description: AWX default version related to chartVersion is required only
+                        when use_private_registry is true (e.g., "24.6.1").
+                      type: string
+                    values:
+                      description: |
+                        You can merge customs values for awx, it will be merged with roles/awx/tasks/main.yaml
+                        See https://artifacthub.io/packages/helm/awx-operator/awx-operator
+                      type: object
+                      default: {}
+                      x-kubernetes-preserve-unknown-fields: true
+                    postgresPvcSize:
+                      description: Size for postgres' pvc
+                      type: string
+                      default: 10Gi
+                    helmRepoUrl:
+                      description: AWX repository url.
+                      type: string
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          type: string
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          type: string
+                  type: object
                 certmanager:
                   description: Configuration for Cert Manager.
                   properties:

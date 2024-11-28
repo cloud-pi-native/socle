@@ -1,4 +1,13 @@
 ---
+- name: Create Argo CD namespace
+  kubernetes.core.k8s:
+    name: "{{ dsc.argocd.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+# OpenShift CRB
+
 - name: Argo CD OpenShift scc crb
   kubernetes.core.k8s:
     definition:
@@ -27,6 +36,64 @@
         - kind: ServiceAccount
           namespace: "{{ dsc.argocd.namespace }}"
           name: "{{ dsc_name }}-argo-socle-redis-ha-haproxy"
+
+# Vault plugin setup
+
+- name: Get Argo CD app version
+  block:
+    - name: Add Argo CD helm repo
+      kubernetes.core.helm_repository:
+        name: argo
+        repo_url: "{{ dsc.argocd.helmRepoUrl }}"
+        force_update: true
+
+    - name: Retrieve Argo CD Helm infos
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          helm search repo -l argo --version "{{ dsc.argocd.chartVersion }}" | tail -n 1
+        executable: /bin/bash
+      register: argo_infos
+
+    - name: Set argo_app_version fact
+      ansible.builtin.set_fact:
+        argo_app_version: "{{ argo_infos.stdout | regex_search('v([0-9]*\\.)+([0-9]+)') }}"
+
+- name: Retrieve Vault infra token
+  block:
+    - name: Get Vault infra secrets
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+      register: vault_infra_secrets
+
+    - name: Get Vault infra keys secret name
+      ansible.builtin.set_fact:
+        vault_infra_keys_secret: "{{ vault_infra_secrets.resources
+          | map(attribute='metadata.name')
+          | select('contains', 'vault-keys') | first }}"
+
+    - name: Find Vault infra keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+        name: "{{ vault_infra_keys_secret }}"
+      register: vault_infra_keys
+
+    - name: Set fact for Vault infra secrets
+      ansible.builtin.set_fact:
+        vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
+
+- name: Deploy Argo CD Vault plugin config
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+    state: present
+  with_items:
+    - vault-plugin-cm.yml.j2
+    - vault-plugin-secret.yml.j2
+
+# Argo CD installation
 
 - name: Set path fact
   ansible.builtin.set_fact:
@@ -75,6 +142,8 @@
   until: argocd_response is not failed
   retries: 25
   delay: 5
+
+# Alerting and monitoring setup
 
 - name: Set alerting rules
   when: dsc.global.alerting.enabled

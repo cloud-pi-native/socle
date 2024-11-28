@@ -66,6 +66,107 @@ server:
     ingressClassName: {{ dsc.ingress.className | default('') }}
 repoServer:
   replicas: 3
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 75
+  initContainers:
+  - name: download-tools
+    image: registry.access.redhat.com/ubi8
+    env:
+    - name: AVP_VERSION
+      value: {{ dsc.argocd.vaultPluginVersion }}
+    command: [sh, -c]
+    args:
+    - >-
+      OS="$(uname | tr '[:upper:]' '[:lower:]')" && [ "$(uname -m)" = "aarch64" ] && ARCH="arm64" || ARCH="amd64" &&
+      curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o argocd-vault-plugin &&
+      chmod +x argocd-vault-plugin &&
+      mv argocd-vault-plugin /custom-tools/
+    volumeMounts:
+    - mountPath: /custom-tools
+      name: custom-tools
+  extraContainers:
+  - name: avp
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  - name: avp-helm
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp-helm.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  - name: avp-kustomize
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp-kustomize.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  volumes:
+  - configMap:
+      name: cmp-plugin
+    name: cmp-plugin
+  - name: custom-tools
+    emptyDir: {}
 applicationSet:
   enabled: false
   replicas: 2

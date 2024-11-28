@@ -243,6 +243,11 @@ spec:
                     privateGitlabDomain:
                       description: Private Gitlab repository for argocd to access.
                       type: string
+                    vaultPluginVersion:
+                      description: |
+                        Argo CD Vault plugin version (e.g., "1.18.1").
+                        See https://github.com/argoproj-labs/argocd-vault-plugin/releases
+                      type: string
                   required:
                     - admin
                     - installEnabled

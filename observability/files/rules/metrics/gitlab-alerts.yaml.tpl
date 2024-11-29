@@ -6,7 +6,7 @@ groups:
           message: GitLab webservice in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab webservice down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-webservice-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -18,7 +18,7 @@ groups:
           message: GitLab toolbox in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab toolbox down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-toolbox-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -30,7 +30,7 @@ groups:
           message: GitLab sidekiq in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab sidekiq down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-sidekiq-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -42,7 +42,7 @@ groups:
           message: GitLab runner in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab runner down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-runner-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -54,7 +54,7 @@ groups:
           message: GitLab redis in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab redis down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-redis-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -66,7 +66,7 @@ groups:
           message: GitLab minio in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab minio down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-minio-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -78,7 +78,7 @@ groups:
           message: GitLab kas in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab kas down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-kas-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -90,7 +90,7 @@ groups:
           message: GitLab shell in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab shell down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-gitlab-shell-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -102,7 +102,7 @@ groups:
           message: GitLab exporter in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab exporter down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-gitlab-exporter-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -114,7 +114,7 @@ groups:
           message: GitLab gitaly in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab gitaly down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-gitaly-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
@@ -126,7 +126,7 @@ groups:
           message: GitLab ci-pipelines-exporter in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: GitLab ci-pipelines-exporter down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"gitlab-ci-pipelines-exporter-.*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0

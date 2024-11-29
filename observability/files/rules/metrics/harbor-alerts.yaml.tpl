@@ -6,7 +6,7 @@ groups:
           message: Harbor core in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Harbor core down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"harbor-core-.*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
@@ -18,7 +18,7 @@ groups:
           message: Harbor exporter in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Harbor exporter down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"harbor-exporter-.*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
@@ -30,7 +30,7 @@ groups:
           message: Harbor jobservice in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Harbor jobservice down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"harbor-jobservice-.*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
@@ -42,7 +42,7 @@ groups:
           message: Harbor portal in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Harbor portal down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"harbor-portal-.*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
@@ -54,7 +54,7 @@ groups:
           message: Harbor redis in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Harbor redis down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"harbor-redis-.*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
@@ -66,7 +66,7 @@ groups:
           message: Harbor registry in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Harbor registry down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"harbor-registry-.*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
@@ -78,7 +78,7 @@ groups:
           message: Harbor trivy in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Harbor trivy down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"harbor-trivy-.*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0

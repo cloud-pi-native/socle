@@ -23,13 +23,13 @@
   vars:
     vault_pod: "{{ dsc_name }}-vault-0"
 
-- name: Check if vaul is coherent
+- name: Check if vault is coherent
   ansible.builtin.assert:
     that:
       - ((vault_status in ['sealed', 'OK']) and (vaut_keys.resources | length > 0)) or ((vault_status == 'not init') and (vaut_keys.resources | length == 0))
     fail_msg:
       - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}
-      - Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation
+      - Veuillez le supprimer et relancer si vous souhaitez lancer une initialisation
       - Soit le vault est initialisé mais vous n'avez pas de secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !
 
 # Init Vault - node 1
@@ -478,7 +478,7 @@
       "canonical_id": "{{ user_group.json.data.id }}"
     body_format: json
 
-- name: set oidc method as default
+- name: Set oidc method as default
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: "https://{{ vault_domain }}/v1/sys/auth/oidc/tune"

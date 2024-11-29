@@ -6,11 +6,11 @@
     method: GET
     user: admin
     password: "{{ nexus_admin_password }}"
-  register: Clean_Docker_unused_stuff_task_script
+  register: clean_docker_unused_stuff_task_script
   ignore_errors: true
 
 - name: Add Clean_Docker_unused_stuff_task script
-  when: Clean_Docker_unused_stuff_task_script.status != 200
+  when: clean_docker_unused_stuff_task_script.status != 200
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     force_basic_auth: true

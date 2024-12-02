@@ -294,6 +294,9 @@ spec:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
                           description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
@@ -389,6 +392,9 @@ spec:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
                           description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
@@ -873,6 +879,9 @@ spec:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
                           description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
@@ -1033,6 +1042,9 @@ spec:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
                           description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
@@ -1270,6 +1282,9 @@ spec:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
                           description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean

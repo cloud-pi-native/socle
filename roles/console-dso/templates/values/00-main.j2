@@ -37,6 +37,11 @@ cnpg:
 {% if dsc.console.postgresWalPvcSize is defined %}
   walPvcSize: "{{ dsc.console.postgresWalPvcSize }}"
 {% endif %}
+{% if use_private_registry %}
+  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% elif dsc.console.cnpg.imageName %}
+  imageName: "{{ dsc.console.cnpg.imageName }}"
+{% endif %}
 {% if dsc.global.backup.velero.enabled %}
   annotations:
     pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  dso-console-db > /var/lib/postgresql/data/app.dump-${index}"]'

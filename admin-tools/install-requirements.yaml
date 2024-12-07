@@ -26,7 +26,7 @@
       ansible.builtin.package:
         name: "{{ item }}"
         state: present
-      loop: "{{ packages  }}"
+      loop: "{{ packages }}"
 
     - name: "Install Python modules"
       ansible.builtin.pip:

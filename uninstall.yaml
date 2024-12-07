@@ -312,7 +312,7 @@
       tags:
         - vault
 
-    - name: "Suppression de l'intance Argo CD"
+    - name: "Suppression de l'instance Argo CD"
       kubernetes.core.helm:
         name: "{{ dsc_name }}"
         release_namespace: "{{ dsc.argocd.namespace }}"

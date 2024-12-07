@@ -309,7 +309,7 @@
       register: sonarqube_pod
 
     - name: Set metrics ports names facts
-      loop: "{{ metrics_ports_names_facts }}"
+      loop: "{{ sonarqube_metrics_ports_names_facts }}"
       ansible.builtin.set_fact:
         "{{ item.fact_name }}": "{{ sonarqube_pod.resources
           | map(attribute='spec.containers') | first
@@ -319,7 +319,7 @@
           | map(attribute='name') | first }}"
 
     - name: Set metrics paths facts
-      loop: "{{ metrics_paths_facts }}"
+      loop: "{{ sonarqube_metrics_paths_facts }}"
       ansible.builtin.set_fact:
         "{{ item.fact_name }}": "{{ item.path }}"
 

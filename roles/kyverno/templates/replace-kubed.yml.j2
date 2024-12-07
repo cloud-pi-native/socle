@@ -12,10 +12,10 @@ metadata:
     policies.kyverno.io/minversion: 1.10.0
     kyverno.io/kubernetes-version: "1.23"
     policies.kyverno.io/description: >-
-      Secrets and Configmap like registry credentials, certificates often need 
-      to exist in multiple Namespaces so Pods there have access. Manually 
-      duplicating those Secrets and Configmap is time consuming and error prone. 
-      This policy will copy a Secret and Configmap with label kyverno.io/sync.   
+      Secrets and Configmap like registry credentials, certificates often need
+      to exist in multiple Namespaces so Pods there have access. Manually
+      duplicating those Secrets and Configmap is time consuming and error prone.
+      This policy will copy a Secret and Configmap with label kyverno.io/sync.
 spec:
   validationFailureAction: Enforce
   generateExisting: true
@@ -40,7 +40,7 @@ spec:
           - {{ dsc.kyverno.namespace }}
     generate:
 {% raw %}
-      namespace: "{{request.object.metadata.name}}"
+      namespace: "{{ request.object.metadata.name }}"
 {% endraw %}
       synchronize: true # Cascading deletion form the parent
       cloneList:

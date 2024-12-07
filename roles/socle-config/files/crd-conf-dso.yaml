@@ -22,25 +22,22 @@ spec:
             spec:
               properties:
                 additionalsCA:
-                  description: Additional CAs to inject into tools; the resources should
-                    be available in all namespaces
+                  description: Additional CAs to inject into tools; the resources should be available in all namespaces.
                   items:
                     properties:
                       key:
-                        description: CA Resource key, optional, if not set, all keys
-                          will be imported
+                        description: Optional CA Resource key. If not set, all keys will be imported.
                         type: string
                       kind:
                         default: ConfigMap
-                        description: CA Resource kind only ConfigMap and Secret are
-                          supported
+                        description: CA Resource kind. Only ConfigMap and Secret are supported.
                         enum:
                           - ConfigMap
                           - Secret
                         type: string
                       name:
                         default: kube-root-ca.crt
-                        description: CA Resource name
+                        description: CA Resource name.
                         type: string
                     required:
                       - kind
@@ -54,41 +51,41 @@ spec:
                     - type
                   properties:
                     configmap:
-                      description: The configmap with private CA
+                      description: The configmap with private CA.
                       type: object
                       properties:
                         namespace:
-                          description: The configmap namespace
+                          description: The configmap namespace.
                           type: string
                         name:
-                          description: The configmap name
+                          description: The configmap name.
                           type: string
                         key:
-                          description: The configmap key providing the Private CA cert
+                          description: The configmap key providing the Private CA cert.
                           type: string
                       required:
                         - namespace
                         - name
                         - key
                     secret:
-                      description: The secret with private CA
+                      description: The secret with private CA.
                       type: object
                       properties:
                         namespace:
-                          description: The secret namespace
+                          description: The secret namespace.
                           type: string
                         name:
-                          description: The secret name
+                          description: The secret name.
                           type: string
                         key:
-                          description: The secret key providing the Private CA cert
+                          description: The secret key providing the Private CA cert.
                           type: string
                       required:
                         - namespace
                         - name
                         - key
                     url:
-                      description: An URL providing the private CA cert (it should be plain text)
+                      description: URL providing the plain text private CA cert.
                       type: string
                     type:
                       description: |
@@ -97,7 +94,8 @@ spec:
                         - configmap: Private CA cert is stored as a configmap
                         - secret: Private CA cert is stored as a secret
                         - url: Private CA cert comes from an external URL
-                        - certmanager: Private CA cert is managed by certmanager, please use ingress.tls.ca accordingly
+                        - certmanager: Private CA cert is managed by cert-manager, please use
+                          ingress.tls.ca accordingly
                       type: string
                       enum:
                         - none
@@ -130,15 +128,16 @@ spec:
                       description: The subdomain for ArgoCD.
                       type: string
                     helmRepoUrl:
-                      description: ArgoCD Bitnami helm repository url.
+                      description: ArgoCD helm repository url.
                       type: string
                     chartVersion:
-                      description: ArgoCD Bitnami helm chart version (e.g., "4.7.13").
+                      description: ArgoCD helm chart version (e.g., "4.7.13").
                       type: string
                     values:
                       description: |
-                        You can merge customs values for argocd, it will be merged with roles/argocd/templates/values/
-                        See https://github.com/bitnami/charts/tree/main/bitnami/argo-cd
+                        You can add custom values for argocd, they will be merged with roles/argocd/templates/values/
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:
@@ -158,15 +157,16 @@ spec:
                       type: string
                     forcedInstall:
                       description: |
-                        Should we force Cert-manager installation in the desired namespace ?
-                        Default is false, so it won't install (or reinstall) if it's already there.
-                        Set to true for a forced installation.
+                        If set to true, cert-manager will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                        The default value is false, which means no forced installation will occur.
                       default: false
                       type: boolean
                     values:
                       description: |
-                        You can merge customs values for CloudNativePG, it will be merged with roles/cert-manager/templates/values/
-                        See https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/README.md#values
+                        You can add custom values for cert-manager, they will be merged with roles/cert-manager/templates/values/
+                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
+                        https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -184,15 +184,16 @@ spec:
                       type: string
                     forcedInstall:
                       description: |
-                        Should we force CNPG Operator installation in the desired namespace ?
-                        Default is false, so it won't install (or reinstall) if it's already there.
-                        Set to true for a forced installation.
+                        If set to true, CNPG Operator will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                        The default value is false, which means no forced installation will occur.
                       default: false
                       type: boolean
                     values:
                       description: |
-                        You can merge customs values for CloudNativePG, it will be merged with roles/cloudnativepg/templates/values/
-                        See https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/README.md#values
+                        You can add custom values for CloudNativePG, they will be merged with roles/cloudnativepg/templates/values/
+                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
+                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -212,7 +213,7 @@ spec:
                       description: Console helm repository url.
                       type: string
                     values:
-                      description: Extra helm values for console
+                      description: Extra helm values for console.
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     postgresPvcSize:
@@ -221,10 +222,11 @@ spec:
                       default: 10Gi
                     postgresWalMaxSlotKeepSize:
                       description: |
-                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
-                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
-                        You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -235,22 +237,29 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed as a primary cluster
+                            (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
                           description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
-                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          description: |
+                            Connection parameters used for replication, it should contain
+                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
+                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 gitlab:
@@ -270,9 +279,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for gitlab, it will be merged with roles/gitlab/templates/values/
-                        See https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
-                        And https://docs.gitlab.com/charts/charts/globals.html
+                        You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/
+                        https://docs.gitlab.com/charts/charts/globals.html
+                        https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     insecureCI:
@@ -281,8 +290,8 @@ spec:
                         Configuring tools in pipelines container is not an easy job.
                       type: boolean
                     extraCIVars:
-                      description: |
-                        A key value object to inject additional variables into gitlab root group for CI/CD pipelines
+                      description: A key value object to inject additional variables into gitlab root group for
+                        CI/CD pipelines.
                       type: array
                       default: []
                       items:
@@ -311,10 +320,11 @@ spec:
                       default: 10Gi
                     postgresWalMaxSlotKeepSize:
                       description: |
-                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
-                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
-                        You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -325,22 +335,29 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed as a primary cluster
+                            (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
                           description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
-                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          description: |
+                            Connection parameters used for replication, it should contain
+                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
+                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 gitlabCiPipelinesExporter:
@@ -354,7 +371,10 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for GitLab-ci-pipeline-exporter, they will be merged with roles/gitlab-ci-pipeline-exporter/templates/values/
+                        You can add custom values for gitLab-ci-pipelines-exporter, they will be
+                        merged with roles/gitlab-ci-pipelines-exporter/templates/values/
+                        https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter
+                        https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -372,16 +392,16 @@ spec:
                       type: string
                     forcedInstall:
                       description: |
-                        Should we force GitLab Operator installation in the desired namespace ?
-                        Default is false, so it won't install (or reinstall) if it's already there.
-                        Set to true for a forced installation.
+                        If set to true, GitLab Operator will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                        The default value is false, which means no forced installation will occur.
                       default: false
                       type: boolean
                     values:
                       description: |
-                        You can merge customs values for GitLab Operator, it will be merged with roles/gitlab-operator/templates/values/
-                        See https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/
-                        And https://docs.gitlab.com/operator/
+                        You can add custom values for GitLab Operator, they will be merged with roles/gitlab-operator/templates/values/
+                        https://docs.gitlab.com/operator/
+                        https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/master/deploy/chart/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -452,36 +472,35 @@ spec:
                                   type: string
                     values:
                       description: |
-                        You can merge customs values for GitLab Runner, it will be merged with roles/gitlab-runner/templates/values/
-                        See https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
-                        And https://docs.gitlab.com/runner/
+                        You can add custom values for GitLab Runner, they will be merged with roles/gitlab-runner/templates/values/
+                        https://docs.gitlab.com/runner/
+                        https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
                 global:
-                  description: Global configuration not specific to one service
+                  description: Global configuration not specific to one service.
                   properties:
                     environment:
                       default: production
-                      description: |
-                        Defines DSO environment type, i.e. development or production.
+                      description: Defines DSO environment type, i.e. development or production.
                       type: string
                     projectsRootDir:
                       default:
                         - forge
                       description: |
-                        Defines root directory for projects in Gitlab and Vault
+                        Defines root directory for projects in Gitlab and Vault.
                         These values should NEVER be changed once a project is used !
-                        projects will not be migrated automatically
-                        Represented as array of strings (ex: ['company', 'forge', 'projects'])
+                        Projects will not be migrated automatically.
+                        Represented as array of strings (e.g., ['company', 'forge', 'projects'])
                         Cannot be an empty Array
                       items:
                         type: string
                       minItems: 1
                       type: array
                     rootDomain:
-                      description: The top level of your domain. To expose Argo as "argo.mycompany.com",
-                        the value should be ".mycompany.com" (notice the leading dot).
+                      description: The top level of your domain. To expose Argo as "argo.example.com",
+                        the value should be ".example.com" (notice the leading dot).
                       type: string
                       default: .example.com
                       pattern: "^\\..*$"
@@ -493,7 +512,7 @@ spec:
                           description: Specifies whether metrics should be enabled.
                           type: boolean
                         additionalLabels:
-                          description: Adds aditionnal labels if needed, when metrics are enabled
+                          description: Adds additional labels if needed, when metrics are enabled.
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                       required:
@@ -549,7 +568,8 @@ spec:
                             endpointCA:
                               properties:
                                 namespace:
-                                  description: Defines in which namespace is located the secret containing CA bundle for cnpg backups (it will be copy into each namespace that use cnpg).
+                                  description: Defines the namespace in which the secret containing cnpg backups' CA bundle
+                                    is located. This secret will be copied into each namespace which uses cnpg.
                                   type: string
                                 name:
                                   description: Defines the secret name containing s3 CA for cnpg backups.
@@ -633,8 +653,7 @@ spec:
                       type: string
                     offline:
                       default: false
-                      description: Specifies whether the cluster have access to the
-                        internet or not.
+                      description: Specifies whether the cluster have access to the internet or not.
                       type: boolean
                     registry:
                       description: Specifies the internal registry to use.
@@ -643,7 +662,7 @@ spec:
                       description: Specifies the credentials to use for pulling image, encoded in base64.
                       type: string
                     profile:
-                      description: Specifies security profile (e.g. cis).
+                      description: Specifies security profile (e.g., cis).
                       type: string
                   required:
                     - projectsRootDir
@@ -693,8 +712,10 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for Grafana Operator, it will be merged with roles/grafana-operator/templates/values/
-                        See https://grafana.github.io/grafana-operator/docs/installation/helm/#values
+                        You can add custom values for Grafana Operator,
+                        they will be merged with roles/grafana-operator/templates/values/
+                        https://grafana.github.io/grafana-operator/docs/installation/helm/#values
+                        https://github.com/grafana/grafana-operator/tree/master/deploy/helm/grafana-operator
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -732,28 +753,28 @@ spec:
                       description: Size for trivy persistent volume.
                       type: string
                     proxyCache:
-                      description: Array of proxy cache
+                      description: Array of proxy cache configurations.
                       type: array
                       items:
                         type: object
                         properties:
                           name:
-                            description: Name of project and registry
+                            description: Name of project and registry.
                             type: string
                           registry:
-                            description: registry configuration
+                            description: Registry configuration.
                             type: object
                             properties:
                               provider:
-                                description: ID of the provider
+                                description: Specifies the registry provider. Default is docker-hub.
                                 type: string
                                 default: docker-hub
                               endpointUrl:
-                                description: URL of the registry
+                                description: URL of the registry endpoint.
                                 type: string
                                 default: ""
                               insecure:
-                                description: Insecure connection
+                                description: Allows insecure connections. Default is false.
                                 default: false
                                 type: boolean
                               credential:
@@ -775,8 +796,9 @@ spec:
                           - registry
                     values:
                       description: |
-                        You can merge customs values for harbor, it will be merged with roles/harbor/templates/values/
-                        See https://github.com/goharbor/harbor-helm
+                        You can add custom values for harbor, they will be merged with roles/harbor/templates/values/
+                        https://github.com/goharbor/harbor-helm
+                        https://github.com/goharbor/harbor-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     postgresPvcSize:
@@ -785,10 +807,11 @@ spec:
                       default: 10Gi
                     postgresWalMaxSlotKeepSize:
                       description: |
-                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
-                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
-                        You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -799,22 +822,29 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed as a primary cluster
+                            (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
                           description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
-                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          description: |
+                            Connection parameters used for replication, it should contain
+                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
+                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   required:
                     - adminPassword
@@ -826,32 +856,33 @@ spec:
                     annotations:
                       x-kubernetes-preserve-unknown-fields: true
                       default: {}
-                      description: Additionals annotations to add to all tools' ingresses
+                      description: Additional annotations to add to all tools' ingresses.
                       type: object
                     className:
-                      description: Ingress class name to use for all ingresses
+                      description: Ingress class name to use for all ingresses.
                       type: string
                     labels:
                       x-kubernetes-preserve-unknown-fields: true
                       default: {}
-                      description: Additionals labels to add to all tools' ingresses
+                      description: Additional labels to add to all tools' ingresses.
                       type: object
                     tls:
                       description: TLS configuration for ingresses.
                       properties:
                         acme:
-                          description: acme/let'sencrypt configuration, only http challenge
+                          description: acme/Let'sEncrypt configuration, only http challenge.
                           properties:
                             email:
-                              description: User email used for ACME
+                              description: User email used for ACME.
                               type: string
                             environment:
                               description: |
-                                Let's encrypt environment to use for issuing certificates:
+                                Let's Encrypt environment to use for issuing certificates:
                                 - production : Use this value for production ready certificates.
                                   Beware of rate limits. See: https://letsencrypt.org/docs/rate-limits/
-                                - staging : Use this value for testing purposes. It has significantly higher rate limits.
-                                  Beware of root certificates. See: https://letsencrypt.org/docs/staging-environment/
+                                - staging : Use this value for testing purposes. It has significantly higher
+                                  rate limits. Beware of root certificates.
+                                  See: https://letsencrypt.org/docs/staging-environment/
                               enum:
                                 - production
                                 - staging
@@ -862,29 +893,27 @@ spec:
                             - environment
                           type: object
                         ca:
-                          description: CA configuration, need a valid CA key/cert in
-                            cert-manager namespace
+                          description: CA configuration, need a valid CA key/cert in cert-manager namespace.
                           properties:
                             secretName:
-                              description: The TLS secret name available in cert-manager
-                                namespace
+                              description: The TLS secret name available in cert-manager namespace.
                               type: string
                           required:
                             - secretName
                           type: object
                         tlsSecret:
-                          description: Define the tls secret name to use in ingress
+                          description: Define the TLS secret name to use in ingress.
                           properties:
                             method:
                               description: |
                                 How to retrieve the secret names:
-                                - in-namespace: you are in charge to replicate the secret in tools' namespaces
+                                - in-namespace: you are in charge of secret replication in tools' namespaces
                               enum:
                                 - in-namespace
                               type: string
                               default: in-namespace
                             name:
-                              description: tls secret name
+                              description: TLS secret name.
                               type: string
                           required:
                             - name
@@ -892,12 +921,14 @@ spec:
                           type: object
                         type:
                           default: none
-                          description: "- none: no TLS (seems like a bad idea, unstable
-                            deployment). \n- acme: TLS with HTTP ACME challenge -> https://cert-manager.io/docs/configuration/acme/http01/\n-
-                            ca: TLS with custom CA -> https://cert-manager.io/docs/configuration/ca/\n-
-                            tlsSecret: TLS with a custom TLS secret name specified in
-                            ingress.spec.tls.secretName, should be wildcard or include
-                            all hosts -> https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets\n"
+                          description: |
+                            - none: no TLS (seems like a bad idea, unstable deployment).
+                            - acme: TLS with HTTP ACME challenge ->
+                              https://cert-manager.io/docs/configuration/acme/http01/
+                            - ca: TLS with custom CA -> https://cert-manager.io/docs/configuration/ca/
+                            - tlsSecret: TLS with a custom TLS secret name specified in
+                              `ingress.spec.tls.secretName`, should be wildcard or include all hosts ->
+                              https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
                           enum:
                             - none
                             - acme
@@ -929,10 +960,11 @@ spec:
                       default: 10Gi
                     postgresWalMaxSlotKeepSize:
                       description: |
-                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
-                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
-                        You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -943,9 +975,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for keycloak, they will be merged with roles/keycloak/templates/values/
-                        See https://github.com/bitnami/charts/tree/main/bitnami/keycloak
-                        And https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                        You can add custom values for keycloak, they will be merged with roles/keycloak/templates/values/
+                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak
+                        https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     cnpg:
@@ -953,22 +985,29 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed as a primary cluster
+                            (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
                           description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
-                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          description: |
+                            Connection parameters used for replication, it should contain
+                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
+                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 kyverno:
@@ -979,9 +1018,9 @@ spec:
                       type: string
                     forcedInstall:
                       description: |
-                        Should we force Kyverno installation in the desired namespace ?
-                        Default is false, so it won't install (or reinstall) if it's already there.
-                        Set to true for a forced installation.
+                        If set to true, Kyverno will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                        The default value is false, which means no forced installation will occur.
                       default: false
                       type: boolean
                     helmRepoUrl:
@@ -992,8 +1031,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for Kyverno, they will be merged with roles/kyverno/templates/values/
-                        See https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
+                        You can add custom values for Kyverno, they will be merged with roles/kyverno/templates/values/
+                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno
+                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -1019,13 +1059,13 @@ spec:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
                     ingressAnnotations:
-                      description: |
-                        You can put here custom annotations for nexus ingress, they will be pushed into the nexus ingress rule combined to `dsc.ingress.annotations`
+                      description: Custom annotations for nexus ingress, they will be pushed into the nexus
+                        ingress rule combined to `dsc.ingress.annotations`.
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
                 prometheus:
-                  description: Minimal configuration for prometheus CRDs
+                  description: Minimal configuration for prometheus CRDs.
                   properties:
                     crd:
                       properties:
@@ -1047,21 +1087,22 @@ spec:
                       description: Enable or disable proxy on tools.
                       type: boolean
                     host:
-                      description: Distant proxy ip/hostname
+                      description: Distant proxy ip/hostname.
                       type: string
                     http_proxy:
-                      description: URL for http traffic, (http://<host>:<port>/)
+                      description: URL for http traffic. Format http://<host>:<port>/
                       type: string
                     https_proxy:
-                      description: URL for https traffic, (http://<host>:<port>/)
+                      description: URL for https traffic. Format http://<host>:<port>/
                       type: string
                     no_proxy:
                       default: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
-                      description: "Networks destination excluded by the proxy. Not
-                        so easy to configure. \nExample: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain\n"
+                      description: |
+                        Networks destination excluded by the proxy. Not so easy to configure.
+                        Default is .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,localhost,svc.cluster.local,localdomain
                       type: string
                     port:
-                      description: Distant proxy port listenning
+                      description: Distant proxy port listening.
                       type: string
                   required:
                     - enabled
@@ -1087,10 +1128,11 @@ spec:
                       default: 10Gi
                     postgresWalMaxSlotKeepSize:
                       description: |
-                        Maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory at checkpoint time.
-                        Default is -1, meaning that replication slots may retain an unlimited amount of WAL files.
-                        You can for instance set it to "9GB".
-                        See: https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
                         Refer to postgresql.conf for memory units.
                       type: string
                     postgresWalPvcSize:
@@ -1104,8 +1146,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for sonarqube, it will be merged with roles/sonarqube/templates/values/
-                        See https://github.com/bitnami/charts/tree/main/bitnami/sonarqube
+                        You can add custom values for sonarqube, they will be merged with roles/sonarqube/templates/values/
+                        https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
+                        https://github.com/SonarSource/helm-chart-sonarqube/blob/master/charts/sonarqube/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     cnpg:
@@ -1113,22 +1156,29 @@ spec:
                       type: object
                       properties:
                         mode:
-                          description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
+                          description: Determines whether cnpg clusters should be deployed as a primary cluster
+                            (initdb from scratch) or replica cluster (initdb from external source).
                           default: primary
                           type: string
                           enum:
                             - primary
                             - replica
                             - restore
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:
                           description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
-                          description: Connection parameters used for replication, it should contains 'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert' (see. https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup)
+                          description: |
+                            Connection parameters used for replication, it should contain
+                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
+                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
                 vault:
@@ -1151,8 +1201,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for vault, it will be merged with roles/vault/templates/values/
-                        See https://github.com/hashicorp/vault-helm
+                        You can add custom values for vault, they will be merged with roles/vault/templates/values/
+                        https://developer.hashicorp.com/vault/docs/platform/k8s/helm
+                        https://github.com/hashicorp/vault-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object

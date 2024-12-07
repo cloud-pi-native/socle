@@ -6,7 +6,7 @@ groups:
           message: DSO Console client in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: DSO Console client down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"dso-cpn-console-client-.*",
           namespace="{{ .Values.app.namespacePrefix }}console",
           condition="true"}) == 0
@@ -18,7 +18,7 @@ groups:
           message: DSO Console server in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: DSO Console server down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"dso-cpn-console-server-.*",
           namespace="{{ .Values.app.namespacePrefix }}console",
           condition="true"}) == 0

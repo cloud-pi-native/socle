@@ -69,7 +69,7 @@
               - ""
               - "Puis relancez le playbook avec une resource dsc existante."
               - ""
-              - "Rappel : le présent playbook lancé seul, sans extra vars, founira les credentials associés à la configuration dsc par défaut (conf-dso)"
+              - "Rappel : le présent playbook lancé seul, sans extra vars, fournira les credentials associés à la configuration dsc par défaut (conf-dso)"
 
         - name: Exit playbook
           ansible.builtin.meta: end_play

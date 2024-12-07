@@ -1,15 +1,15 @@
 ---
-- name: Set empty ca fact
+- name: Set empty CA fact
   ansible.builtin.set_fact:
     additionals_ca_pem_array: []
 
-- name: Get a ca resource
+- name: Get a CA resource
   ansible.builtin.include_tasks:
     file: get-ca.yaml
   with_items: "{{ dsc.additionalsCA }}"
   vars:
-    kind: "{{ item.kind }}"
-    name: "{{ item.name }}"
+    ca_kind: "{{ item.kind }}"
+    ca_name: "{{ item.name }}"
     key: "{{ item.key | default('') }}"
 
 - name: Set empty ca fact

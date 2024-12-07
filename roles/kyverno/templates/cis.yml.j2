@@ -31,7 +31,7 @@ spec:
           - Job
           namespaces:
           - "dso-*"
-          names: 
+          names:
           - "pg-cluster-*"
     mutate:
       patchStrategicMerge:
@@ -94,7 +94,7 @@ spec:
           - Job
           namespaces:
           - "{{ dsc.keycloak.namespace }}"
-          names: 
+          names:
           - "pg-cluster-*"
     mutate:
       patchStrategicMerge:
@@ -136,7 +136,7 @@ metadata:
     pod-policies.kyverno.io/autogen-controllers: none
     policies.kyverno.io/category: Prod
     policies.kyverno.io/severity: medium
-    policies.kyverno.io/subject: Pod 
+    policies.kyverno.io/subject: Pod
 spec:
   validationFailureAction: Enforce
 spec:
@@ -148,7 +148,7 @@ spec:
         - Pod
         namespaces:
         - "{{ dsc.gitlab.namespace }}"
-        names: 
+        names:
         - "runner-*"
     mutate:
       patchStrategicMerge:
@@ -222,7 +222,7 @@ spec:
           - Job
           namespaces:
           - "{{ dsc.gitlab.namespace }}"
-          names: 
+          names:
           - "pg-cluster-*"
           - "gitlab-shared-secrets-*-selfsign"
     mutate:
@@ -274,7 +274,7 @@ spec:
         - Job
         namespaces:
         - "{{ dsc.gitlab.namespace }}"
-        names: 
+        names:
         - "gitlab-shared-secrets-*-selfsign"
     mutate:
       patchStrategicMerge:
@@ -337,7 +337,7 @@ spec:
           - Job
           namespaces:
           - "dso-*"
-          names: 
+          names:
           - "pg-cluster-*"
     mutate:
       patchStrategicMerge:
@@ -400,7 +400,7 @@ spec:
           - Job
           namespaces:
           - "dso-*"
-          names: 
+          names:
           - "pg-cluster-*"
     mutate:
       patchStrategicMerge:
@@ -463,7 +463,7 @@ spec:
           - Job
           namespaces:
           - "dso-*"
-          names: 
+          names:
           - "pg-cluster-*"
     preconditions:
       any:
@@ -519,9 +519,9 @@ spec:
       resources:
         kinds:
         - Job
-        names: 
+        names:
         - "gitlab-minio-create-buckets-*"
-        namespaces: 
+        namespaces:
         - "{{ dsc.gitlab.namespace }}"
     mutate:
       patchStrategicMerge:

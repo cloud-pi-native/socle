@@ -4,20 +4,20 @@
   gather_facts: false
 
   roles:
-    - role: socle-config
+    - name: socle-config
       tags:
         - always
 
-    - role: cluster-offline
+    - name: cluster-offline
       tags:
         - always
       when: dsc.global.offline
 
-    - role: ca
+    - name: ca
       tags:
         - always
 
-    - role: console-dso-config
+    - name: console-dso-config
       tags:
         - always
 
@@ -30,24 +30,24 @@
       tags:
         - kyverno
 
-    - role: cert-manager
+    - name: cert-manager
       tags:
         - cert-manager
         - cm
         - always
 
-    - role: cloudnativepg
+    - name: cloudnativepg
       tags:
         - cloudnativepg
         - cnpg
 
-    - role: prometheus
+    - name: prometheus
       tags:
         - prometheus
         - prom
       when: dsc.prometheus.crd.type == 'managed'
 
-    - role: keycloak
+    - name: keycloak
       tags:
         - keycloak
         - sso
@@ -62,36 +62,36 @@
       tags:
         - nexus
 
-    - role: sonarqube
+    - name: sonarqube
       tags:
         - sonarqube
         - sonar
 
-    - role: gitlab-operator
+    - name: gitlab-operator
       tags:
         - gitlab-operator
 
-    - role: gitlab
+    - name: gitlab
       tags:
         - gitlab
 
-    - role: gitlab-catalog
+    - name: gitlab-catalog
       tags:
         - catalog
         - gitlab-catalog
 
-    - role: gitlab-runner
+    - name: gitlab-runner
       tags:
         - runner
         - gitlab-runner
 
-    - role: gitlab-ci-pipelines-exporter
+    - name: gitlab-ci-pipelines-exporter
       tags:
         - ci-pipelines-exporter
         - gitlab-ci-pipelines-exporter
       when: not dsc.global.offline
 
-    - role: vault
+    - name: vault
       tags:
         - vault
 
@@ -118,30 +118,30 @@
         - harbor
         - registry
 
-    - role: console-dso
+    - name: console-dso
       tags:
         - console
         - console-dso
 
-    - role: grafana-operator
+    - name: grafana-operator
       tags:
         - grafana-operator
         - grafana-stack
         - never
 
-    - role: grafana
+    - name: grafana
       tags:
         - grafana
         - grafana-stack
         - never
 
-    - role: grafana-datasource
+    - name: grafana-datasource
       tags:
         - grafana-datasource
         - grafana-stack
         - never
 
-    - role: grafana-dashboards
+    - name: grafana-dashboards
       tags:
         - grafana-dashboards
         - grafana-stack

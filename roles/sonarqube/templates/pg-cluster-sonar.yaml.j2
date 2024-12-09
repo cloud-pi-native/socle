@@ -6,7 +6,7 @@ metadata:
   namespace: {{ dsc.sonarqube.namespace }}
 {% if dsc.global.backup.velero.enabled %}
   annotations:
-    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  sonardb > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d sonardb > /var/lib/postgresql/data/app.dump-${index}"]'
     pre.hook.backup.velero.io/container: postgres
     pre.hook.backup.velero.io/on-error: Fail
     pre.hook.backup.velero.io/timeout: 90s
@@ -17,6 +17,8 @@ spec:
   # to the default ones to make the cluster work
 {% if use_private_registry %}
   imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% elif dsc.sonarqube.cnpg.imageName %}
+  imageName: "{{ dsc.sonarqube.cnpg.imageName }}"
 {% endif %}
 {% if use_image_pull_secrets %}
   imagePullSecrets:

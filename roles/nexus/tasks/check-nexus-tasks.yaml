@@ -20,7 +20,7 @@
       | selectattr('name', 'equalto', 'Clean Docker uploads')
       | map(attribute='name') | first | default('missing') }}"
 
-- name: Set Compact_Blob_Stores_task fact
+- name: Set Compact_DSO_Blob_Store_task fact
   ansible.builtin.set_fact:
     Compact_DSO_Blob_Store_task: "{{ nexus_tasks.json['items']
       | selectattr('name', 'equalto', 'Compact DSO Blob Store')

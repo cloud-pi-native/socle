@@ -16,7 +16,7 @@
   ansible.builtin.git:
     repo: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
     dest: /tmp/test
-    bare: yes
+    bare: true
   environment:
     GIT_SSL_NO_VERIFY: "1"
 

@@ -1,24 +1,24 @@
 groups:
   - name: DSO_Kyverno
     rules:
-      - alert: Kyverno admission controler not available
+      - alert: Kyverno admission controller not available
         annotations:
-          message: Kyverno admission controler in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
-          summary: Kyverno admission controler down (no ready pod)"
+          message: Kyverno admission controller in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
+          summary: Kyverno admission controller down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"kyverno-admission-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0
         for: 5m
         labels:
           severity: critical
-      - alert: Kyverno background controler not available
+      - alert: Kyverno background controller not available
         annotations:
-          message: Kyverno background controler in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
-          summary: Kyverno background controler down (no ready pod)"
+          message: Kyverno background controller in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
+          summary: Kyverno background controller down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"kyverno-background-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0
@@ -30,7 +30,7 @@ groups:
           message: Kyverno cleanup controller in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Kyverno cleanup controller down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"kyverno-cleanup-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0
@@ -42,7 +42,7 @@ groups:
           message: Kyverno reports controller in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.
           summary: Kyverno reports controller down (no ready pod)"
         expr: |
-          sum(kube_pod_status_ready{
+          sum by(namespace) (kube_pod_status_ready{
           pod=~"kyverno-reports-controller-.*",
           namespace="{{ .Values.app.namespacePrefix }}kyverno",
           condition="true"}) == 0

@@ -14,7 +14,7 @@ spec:
       key: ""
     interval: 30s
     path: {{ item.path }}
-    port: {{ additionnal_metrics_port_name }}
+    port: {{ additional_metrics_port_name }}
   selector:
     matchLabels:
       app: {{ item.name }}

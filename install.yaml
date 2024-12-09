@@ -4,121 +4,121 @@
   gather_facts: false
 
   roles:
-    - name: socle-config
+    - role: socle-config
       tags:
         - always
 
-    - name: cluster-offline
+    - role: cluster-offline
       tags:
         - always
       when: dsc.global.offline
 
-    - name: ca
+    - role: ca
       tags:
         - always
 
-    - name: console-dso-config
+    - role: console-dso-config
       tags:
         - always
 
-    - name: kyverno
+    - role: kyverno
       tags:
         - kyverno
 
-    - name: cert-manager
+    - role: cert-manager
       tags:
         - cert-manager
         - cm
         - always
 
-    - name: cloudnativepg
+    - role: cloudnativepg
       tags:
         - cloudnativepg
         - cnpg
 
-    - name: prometheus
+    - role: prometheus
       tags:
         - prometheus
         - prom
       when: dsc.prometheus.crd.type == 'managed'
 
-    - name: keycloak
+    - role: keycloak
       tags:
         - keycloak
         - sso
 
-    - name: nexus
+    - role: nexus
       tags:
         - nexus
 
-    - name: sonarqube
+    - role: sonarqube
       tags:
         - sonarqube
         - sonar
 
-    - name: gitlab-operator
+    - role: gitlab-operator
       tags:
         - gitlab-operator
 
-    - name: gitlab
+    - role: gitlab
       tags:
         - gitlab
 
-    - name: gitlab-catalog
+    - role: gitlab-catalog
       tags:
         - catalog
         - gitlab-catalog
 
-    - name: gitlab-runner
+    - role: gitlab-runner
       tags:
         - runner
         - gitlab-runner
 
-    - name: gitlab-ci-pipelines-exporter
+    - role: gitlab-ci-pipelines-exporter
       tags:
         - ci-pipelines-exporter
         - gitlab-ci-pipelines-exporter
       when: not dsc.global.offline
 
-    - name: vault
+    - role: vault
       tags:
         - vault
 
-    - name: argocd
+    - role: argocd
       tags:
         - gitops
         - argocd
         - argo
 
-    - name: harbor
+    - role: harbor
       tags:
         - harbor
         - registry
 
-    - name: console-dso
+    - role: console-dso
       tags:
         - console
         - console-dso
 
-    - name: grafana-operator
+    - role: grafana-operator
       tags:
         - grafana-operator
         - grafana-stack
         - never
 
-    - name: grafana
+    - role: grafana
       tags:
         - grafana
         - grafana-stack
         - never
 
-    - name: grafana-datasource
+    - role: grafana-datasource
       tags:
         - grafana-datasource
         - grafana-stack
         - never
 
-    - name: grafana-dashboards
+    - role: grafana-dashboards
       tags:
         - grafana-dashboards
         - grafana-stack

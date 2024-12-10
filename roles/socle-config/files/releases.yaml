@@ -5,7 +5,7 @@ metadata:
 spec:
   argocd:
     # https://artifacthub.io/packages/helm/argo/argo-cd
-    chartVersion: 7.3.11
+    chartVersion: 7.7.8
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
     chartVersion: v1.14.3
@@ -35,7 +35,7 @@ spec:
     chartVersion: "v5.10.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
-    chartVersion: 1.14.1
+    chartVersion: 1.16.0
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.2.3
@@ -47,7 +47,7 @@ spec:
     imageTag: 3.68.1
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
-    chartVersion: 10.6.1+3163
+    chartVersion: 10.7.0+3598
   vault:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.29.1

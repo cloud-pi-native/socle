@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.13.0](https://github.com/cloud-pi-native/socle/compare/v2.12.4...v2.13.0) (2024-12-10)
+
+
+### Features
+
+* :arrow_up: upgrade keycloak to v26.0.5 ([2c1401e](https://github.com/cloud-pi-native/socle/commit/2c1401efdbf9f3424310bc637c94bbf9057b7236))
+* :arrow_up: Upgrade Vault version from 1.14.0 to 1.18.1 ([a2bb7c0](https://github.com/cloud-pi-native/socle/commit/a2bb7c082672d6421e9bba33111d4fb0dd9d3ac9))
+* :sparkles: add sonar cnes report allowing exports ([8021d91](https://github.com/cloud-pi-native/socle/commit/8021d91b6c7d6676f50165bfb385add55035fe4c))
+* :sparkles: handle CNPG cluster images override ([a28088e](https://github.com/cloud-pi-native/socle/commit/a28088efd7f4b1f4ba7f6ea3eeec10148613bcb0))
+
+
+### Bug Fixes
+
+* :art: Add missing Argo CD ingressClassName ([bc39fe0](https://github.com/cloud-pi-native/socle/commit/bc39fe0e768c480e92483ffdc313367dfeada16f))
+* :bug: correctly handle imageName variable ([db04671](https://github.com/cloud-pi-native/socle/commit/db04671d8819bf5ee2b17c6cd813e2d0c8b6c3ea))
+* :bug: Fix some alert rules (missing namespace label) ([6a91a7f](https://github.com/cloud-pi-native/socle/commit/6a91a7fc0f768aeb800924044c33b8a576317768))
+* :pencil2: ansible-lint ([5278669](https://github.com/cloud-pi-native/socle/commit/527866962aa6cfac688806ca4088a9ce8fedd546))
+* :pencil2: grammar, description's 76 char width and full stop, fix urls, remove ref to bitnami for argocd & sonarqube ([f57aceb](https://github.com/cloud-pi-native/socle/commit/f57aceb8ecb36a10bf602fc121a98c418dfa6758))
+* :pencil2: https links ([80412d6](https://github.com/cloud-pi-native/socle/commit/80412d6328325e7425da78a820c24562fbd15634))
+* :pencil2: typos, grammar, double/end-of-line spaces ([fa8fecb](https://github.com/cloud-pi-native/socle/commit/fa8fecbadb1db692fa8bec66dc9131ff862162bc))
+* :rotating_light: eslint ([16492de](https://github.com/cloud-pi-native/socle/commit/16492de973f50d488f4975ccc9f4f5144e7541d5))
+
+
+### Reverts
+
+* :rewind: CHANGELOG.md ([7483100](https://github.com/cloud-pi-native/socle/commit/7483100310ac8959b677df0cae6270d3cbbd543a))
+
 ## [2.12.4](https://github.com/cloud-pi-native/socle/compare/v2.12.3...v2.12.4) (2024-10-28)
 
 

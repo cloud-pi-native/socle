@@ -267,10 +267,10 @@
     display_name: Dso Realm
     loginWithEmailAllowed: true
     registration_email_as_username: false
-    loginTheme: dsfr
-    accountTheme: dsfr
-    adminTheme: dsfr
-    emailTheme: dsfr
+    loginTheme: DSFR
+    accountTheme: DSFR
+    adminTheme: DSFR
+    emailTheme: DSFR
     internationalizationEnabled: true
     supportedLocales:
       - en

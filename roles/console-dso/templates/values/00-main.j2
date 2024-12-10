@@ -39,7 +39,7 @@ cnpg:
 {% endif %}
 {% if use_private_registry %}
   imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
-{% elif dsc.console.cnpg.imageName %}
+{% elif dsc.console.cnpg.imageName is defined %}
   imageName: "{{ dsc.console.cnpg.imageName }}"
 {% endif %}
 {% if dsc.global.backup.velero.enabled %}

@@ -17,7 +17,7 @@ spec:
   # to the default ones to make the cluster work
 {% if use_private_registry %}
   imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
-{% elif dsc.harbor.cnpg.imageName %}
+{% elif dsc.harbor.cnpg.imageName is defined %}
   imageName: "{{ dsc.harbor.cnpg.imageName }}"
 {% endif %}
 {% if use_image_pull_secrets %}

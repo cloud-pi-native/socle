@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.14.0](https://github.com/cloud-pi-native/socle/compare/v2.13.0...v2.14.0) (2024-12-10)
+
+
+### Features
+
+* :arrow_up: upgrade argo-cd to v2.13.1 ([975db7d](https://github.com/cloud-pi-native/socle/commit/975db7d97322fa7d38692b5a60d169d3c33edb49))
+* :arrow_up: upgrade harbor to v2.12.0 ([35d9487](https://github.com/cloud-pi-native/socle/commit/35d94872737615841a9f5ccf1004e2de0e851856))
+* :arrow_up: upgrade sonarqube to v10.7.0 ([466f60c](https://github.com/cloud-pi-native/socle/commit/466f60c20ef70877b2b4943ddafd013a68f038f9))
+
 ## [2.13.0](https://github.com/cloud-pi-native/socle/compare/v2.12.4...v2.13.0) (2024-12-10)
 
 

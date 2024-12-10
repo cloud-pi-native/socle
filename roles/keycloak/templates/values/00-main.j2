@@ -11,7 +11,7 @@ tls:
   enabled: false
 
 production: true
-proxy: "edge"
+proxyHeaders: xforwarded
 httpRelativePath: "/"
 configuration: ""
 existingConfigmap: ""
@@ -303,19 +303,13 @@ logging:
   output: "default"
   level: "INFO"
 
-extraVolumes:
-  - name: extensions
-    emptyDir: {}
-extraVolumeMounts:
-  - mountPath: /opt/bitnami/keycloak/providers
-    name: extensions
 extraEnvVars:
   - name: DSFR_THEME_HOME_URL
     value: https://{{ console_domain }}
   - name: DSFR_THEME_SERVICE_TITLE
-    value: Cloud π Native
+    value: Cloud Pi Native
   - name: DSFR_THEME_BRAND_TOP
-    value: "Ministère<br/>de l'intérieur<br/>et des outre-mer"
+    value: "Ministere<br/>de l'interieur"
   - name: DSFR_THEME_CONTACT_EMAIL
     value: cloudpinative-relations@interieur.gouv.fr
 initContainers:
@@ -330,10 +324,10 @@ initContainers:
       - sh
     args:
       - -c
-      - curl -k -L -f -S -o /extensions/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}/retrocompat-keycloak-theme.jar
+      - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
     volumeMounts:
-      - name: extensions
-        mountPath: /extensions
+      - name: empty-dir
+        mountPath: /emptydir
 {% if dsc.proxy.enabled %}
     env:
       - name: HTTP_PROXY

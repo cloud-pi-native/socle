@@ -4,11 +4,11 @@
   "region": "fr-par",
   "prefix": "testcm-",
   "destination": {
-    "server": "https://kubernetes.default.svc"
+    "clusterName": "dso-hp"
   },
   "targetRevision": "refactor/gitops-install",
   "apps": [
-    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "keycloak", "enabled": "false", "namespace": "keycloak", "syncWave": 10 },
     { "app": "kubeview", "enabled": "true", "namespace": "kubeview", "syncWave": 10 }
   ]
 }

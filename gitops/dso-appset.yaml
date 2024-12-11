@@ -2,8 +2,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: dso-manager
-  namespace: testcm-argocd
+  name: dso-install-manager
+  namespace: infra-argo
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
@@ -54,7 +54,7 @@ spec:
 #          - name: HELM_VALUES
 #            value: ''
       destination:
-        server: '{{.destination.server}}'
+        name: '{{.destination.clusterName}}'
         namespace: '{{.prefix}}{{.namespace}}'
       syncPolicy:
         automated:

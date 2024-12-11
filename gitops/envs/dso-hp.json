@@ -4,7 +4,7 @@
   "region": "fr-par",
   "prefix": "dso-",
   "destination": {
-    "server": "https://kubernetes.default.svc"
+    "clusterName": "dso-hp"
   },
   "targetRevision": "refactor/gitops-install",
   "apps": [

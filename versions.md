@@ -11,7 +11,7 @@
 | grafana                   | 10.4.3           | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
 | grafanaOperator           | 5.10.0           | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                                                  |
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
-| keycloak                  | 26.0.5           | 24.2.3        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |
+| keycloak                  | 26.0.7           | 24.2.3        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                                                      |
 | nexus                     | 3.68.1           | N/A           | [nexus](https://hub.docker.com/r/sonatype/nexus3/)                                                                   |
 | sonarqube                 | 10.7.0-community | 10.7.0+3598   | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube)                                                |

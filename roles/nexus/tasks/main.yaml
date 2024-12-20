@@ -40,32 +40,8 @@
   retries: 25
   delay: 5
 
-- name: Find nexus admin password in inventory
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.console.namespace }}"
-    kind: Secret
-    name: dso-config
-  register: ansible_inventory
-
-- name: Cache admin password
-  ansible.builtin.set_fact:
-    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
-  register: set_nx_pass
-  when: ansible_inventory.resources | length > 0 and ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined
-
-- name: Change Nexus password
-  when: set_nx_pass.skipped is defined and set_nx_pass.skipped
+- name: Retrieve initial admin password on first install
   block:
-    - name: Wait nexus to initialize
-      kubernetes.core.k8s_info:
-        kind: Endpoints
-        namespace: "{{ dsc.nexus.namespace }}"
-        name: nexus
-      register: endpoint
-      until: endpoint.resources[0].subsets is defined and endpoint.resources[0].subsets | selectattr('addresses')
-      retries: 30
-      delay: 5
-
     - name: Get nexus pod's name
       kubernetes.core.k8s_info:
         kind: Endpoints
@@ -77,38 +53,17 @@
       ansible.builtin.set_fact:
         nx_pod: "{{ nx_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
 
-    - name: Set default_pass fact
-      ansible.builtin.set_fact:
-        default_pass: "\\\\\\$shiro1\\\\\\$SHA-512\\\\\\$1024\\\\\\$NE+wqQq/TmjZMvfI7ENh/g==\\\\\\$V4yPw8T64UQ6GfJfxYq2hLsVrBY8D1v+bktfOxGdt4b/9BthpWPNUy/CBk6V9iA0nHpzYzJFWO8v/tZFtES8CA=="
-
-    - name: Temporarily reset admin password to admin123
+    - name: Get initial admin password
       kubernetes.core.k8s_exec:
         pod: "{{ nx_pod }}"
         namespace: "{{ dsc.nexus.namespace }}"
-        command: |
-          sh -c "cd /nexus-data ; \
-          java -jar $NEXUS_HOME/lib/support/nexus-orient-console.jar \
-          connect plocal:./db/security admin admin \; update user SET password=\\\""{{ default_pass }}"\\\" UPSERT WHERE id=\\\"admin\\\" \;"
+        command: cat /nexus-data/admin.password
+      register: initial_admin_password
+      ignore_errors: true
 
-    - name: Restart Nexus pod
-      kubernetes.core.k8s:
-        kind: Pod
-        namespace: "{{ dsc.nexus.namespace }}"
-        name: "{{ nx_pod }}"
-        state: absent
-
-    - name: Wait Nexus URL
-      ansible.builtin.uri:
-        url: https://{{ nexus_domain }}
-        method: GET
-        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        status_code: [200, 202]
-        return_content: false
-      register: nexus_response
-      until: nexus_response is not failed
-      retries: 60
-      delay: 5
-
+- name: Change Nexus password on first install
+  when: initial_admin_password.stdout | length > 0
+  block:
     - name: Generate random password
       ansible.builtin.set_fact:
         new_pass: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters') }}"
@@ -120,7 +75,7 @@
         url: https://{{ nexus_domain }}/service/rest/v1/security/users/admin/change-password
         method: PUT
         user: admin
-        password: admin123
+        password: "{{ initial_admin_password.stdout }}"
         body: "{{ new_pass }}"
         body_format: raw
         headers:

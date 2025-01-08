@@ -109,6 +109,9 @@
     kind: Secret
     name: pg-cluster-console-app
   register: pg_db_secret
+  until: pg_db_secret.resources[0].data.uri is defined
+  retries: 10
+  delay: 5
 
 - name: Get kubernetes service
   kubernetes.core.k8s_info:
@@ -129,31 +132,6 @@
 - name: Apply app (argoCD project)
   kubernetes.core.k8s:
     template: app.yaml.j2
-
-- name: First console deployment
-  when: pg_db_secret.resources[0].data.uri is undefined
-  block:
-    - name: Get pg-cluster-console-app secret
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.console.namespace }}"
-        kind: Secret
-        name: pg-cluster-console-app
-      register: pg_db_secret
-      until: pg_db_secret.resources[0].data.uri is defined
-      retries: 10
-      delay: 5
-
-    - name: Compute Console Helm values
-      ansible.builtin.include_role:
-        name: combine
-      vars:
-        combine_path: "{{ path }}"
-        combine_user_values: "{{ dsc.console['values'] }}"
-        combine_dest_var: "console_values"
-
-    - name: Apply app (argoCD project)
-      kubernetes.core.k8s:
-        template: app.yaml.j2
 
 - name: Set alerting rules
   when: dsc.global.alerting.enabled

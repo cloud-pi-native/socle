@@ -1,4 +1,21 @@
 ---
+- name: Check if first install
+  block:
+    - name: Initialize first_install fact
+      ansible.builtin.set_fact:
+        first_install: false
+
+    - name: Check Nexus Pod
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "{{ dsc.nexus.namespace }}"
+      register: check_nx_pod
+
+    - name: Set first_install fact
+      when: check_nx_pod.resources | length == 0
+      ansible.builtin.set_fact:
+        first_install: true
+
 - name: Create nexus Namespace
   kubernetes.core.k8s:
     definition:
@@ -41,6 +58,7 @@
   delay: 5
 
 - name: Retrieve initial admin password on first install
+  when: first_install
   block:
     - name: Get nexus pod's name
       kubernetes.core.k8s_info:
@@ -62,7 +80,7 @@
       ignore_errors: true
 
 - name: Change Nexus password on first install
-  when: initial_admin_password.stdout | length > 0
+  when: first_install
   block:
     - name: Generate random password
       ansible.builtin.set_fact:

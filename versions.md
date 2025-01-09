@@ -13,6 +13,6 @@
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
 | keycloak                  | 26.0.7           | 24.2.3        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                                                      |
-| nexus                     | 3.75.1           | N/A           | [nexus](https://hub.docker.com/r/sonatype/nexus3/)                                                                   |
+| nexus                     | 3.76.0           | N/A           | [nexus](https://hub.docker.com/r/sonatype/nexus3/)                                                                   |
 | sonarqube                 | 10.7.0-community | 10.7.0+3598   | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube)                                                |
 | vault                     | 1.18.1           | 0.29.1        | [vault](https://artifacthub.io/packages/helm/hashicorp/vault)                                                        |

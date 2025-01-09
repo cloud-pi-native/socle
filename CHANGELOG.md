@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0](https://github.com/cloud-pi-native/socle/compare/v2.14.0...v3.0.0) (2025-01-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* :boom: Upgrade Nexus version to 3.76.0
+
+### Features
+
+* :boom: Upgrade Nexus version to 3.76.0 ([db44dfd](https://github.com/cloud-pi-native/socle/commit/db44dfda0f5c5cd54169cf4921ce364603d1b4e8))
+
+
+### Bug Fixes
+
+* :bug: Add first install check to prevent failures on upgrades ([e1cc7b3](https://github.com/cloud-pi-native/socle/commit/e1cc7b30ba249bb12fe1017aecf9fad457095b25))
+
+
 ## [2.14.0](https://github.com/cloud-pi-native/socle/compare/v2.13.0...v2.14.0) (2024-12-10)
 
 

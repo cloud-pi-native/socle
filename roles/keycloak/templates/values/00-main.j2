@@ -315,9 +315,9 @@ extraEnvVars:
 initContainers:
   - name: realm-ext-provider
 {% if use_private_registry %}
-    image: "{{ dsc.global.registry }}/curlimages/curl:8.8.0"
+    image: "{{ dsc.global.registry }}/curlimages/curl:8.11.1"
 {% else %}
-    image: docker.io/curlimages/curl:8.8.0
+    image: docker.io/curlimages/curl:8.11.1
 {% endif %}
     imagePullPolicy: IfNotPresent
     command:

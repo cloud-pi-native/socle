@@ -87,7 +87,7 @@ spec:
     subDomain: keycloak
     helmRepoUrl: https://charts.bitnami.com/bitnami
     postgresPvcSize: 1Gi
-    pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.0/keycloak-theme-for-kc-26-and-above.jar
+    pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.4/keycloak-theme-for-kc-26-and-above.jar
     cnpg:
       mode: primary
       exposed: false

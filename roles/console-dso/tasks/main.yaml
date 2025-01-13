@@ -130,9 +130,12 @@
   kubernetes.core.k8s:
     template: app.yaml.j2
 
-- name: First console deployment
-  when: pg_db_secret.resources[0].data.uri is undefined
+- name: Check if first console deployment
   block:
+    - name: Set first_console_deployment to "true"
+      ansible.builtin.set_fact:
+        first_console_deployment: true
+
     - name: Get pg-cluster-console-app secret
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.console.namespace }}"
@@ -142,7 +145,10 @@
       until: pg_db_secret.resources[0].data.uri is defined
       retries: 10
       delay: 5
+  when: pg_db_secret.resources[0].data.uri is undefined
 
+- name: First console deployment
+  block:
     - name: Compute Console Helm values
       ansible.builtin.include_role:
         name: combine
@@ -154,6 +160,7 @@
     - name: Apply app (argoCD project)
       kubernetes.core.k8s:
         template: app.yaml.j2
+  when: first_console_deployment is defined
 
 - name: Set alerting rules
   when: dsc.global.alerting.enabled

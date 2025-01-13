@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.1.0](https://github.com/cloud-pi-native/socle/compare/v3.0.0...v3.1.0) (2025-01-13)
+
+
+### Features
+
+* :arrow_up: upgrade keycloak dsfr theme to v2.1.4 ([ace8896](https://github.com/cloud-pi-native/socle/commit/ace88966d2a9960a1ed6fd073358e68420b0147b))
+* :arrow_up: upgrade sonarqube to v10.8.1 ([a4acb05](https://github.com/cloud-pi-native/socle/commit/a4acb050294a78e932b84cdd4983e0764e08761e))
+
+
+### Bug Fixes
+
+* :bug: correctly handle branch protection on catalog ([044ec00](https://github.com/cloud-pi-native/socle/commit/044ec00a6fa5373f7c7fb4c4abe58f8d56117ab9))
+* :bug: correctly handle console installation ([a7c0983](https://github.com/cloud-pi-native/socle/commit/a7c098332ae5b4b86e1c6d75003bc4904c7def26))
+
 ## [3.0.0](https://github.com/cloud-pi-native/socle/compare/v2.14.0...v3.0.0) (2025-01-09)
 
 

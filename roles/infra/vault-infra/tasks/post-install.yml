@@ -1,0 +1,431 @@
+- name: Wait vault pod to be running
+  kubernetes.core.k8s_info:
+    kind: Pod
+    name: "{{ dsc_name }}-vault-infra-0"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+  register: vault_pod_check
+  until: vault_pod_check.resources[0] is defined and
+    vault_pod_check.resources[0].status.phase == 'Running'
+  retries: 15
+  delay: 5
+
+# Find Vault keys
+- name: Find vault keys
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    kind: Secret
+    name: "{{ dsc_name }}-vault-keys"
+  register: vaut_keys
+
+# Check Vault status - node 1
+- name: Check vault status - node 1
+  ansible.builtin.include_tasks: check.yml
+  vars:
+    vault_pod: "{{ dsc_name }}-vault-infra-0"
+
+- name: Check if vaul is coherent
+  ansible.builtin.assert:
+    that:
+      - ((vault_status in ['sealed', 'OK']) and (vaut_keys.resources | length > 0)) or ((vault_status == 'not init') and (vaut_keys.resources | length == 0))
+    fail_msg:
+      - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret {{ dsc_name }}-vault-keys dans {{ dsc.vaultInfra.namespace }}
+      - Veuillez le suppripmer et relancer si vous souhaitez lancer une initialisation
+      - Soit le vault est initialisé mais vous n'avez pas de secret {{ dsc_name }}-vault-keys dans {{ dsc.vaultInfra.namespace }}, et c'est inquiétant !
+
+# Init Vault - node 1
+- name: Init vault node - node 1
+  when: vault_status == 'not init'
+  kubernetes.core.k8s_exec:
+    container: vault
+    pod: "{{ dsc_name }}-vault-infra-0"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    command: vault operator init -key-shares=3 -key-threshold=2 -format=json
+  register: init
+  until: "init is not failed"
+  retries: 3
+  delay: 20
+
+# Store Vault keys and token - node 1
+- name: Set unseal_keys fact
+  when: init.changed
+  no_log: true
+  ansible.builtin.set_fact:
+    unseal_keys: "{{ init.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'unseal_keys_b64')
+      | map(attribute='value') | first }}"
+
+- name: Set root_token fact
+  when: init.changed
+  no_log: true
+  ansible.builtin.set_fact:
+    root_token: "{{ init.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'root_token')
+      | map(attribute='value') | first }}"
+
+- name: Store vault keys and token
+  when: vaut_keys.resources | length == 0
+  kubernetes.core.k8s:
+    definition:
+      kind: Secret
+      metadata:
+        name: "{{ dsc_name }}-vault-keys"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+      data:
+        key1: "{{ unseal_keys[0] | b64encode }}"
+        key2: "{{ unseal_keys[1] | b64encode }}"
+        key3: "{{ unseal_keys[2] | b64encode }}"
+        root_token: "{{ root_token | b64encode }}"
+        init_config: "{{ init.stdout | from_json | b64encode }}"
+
+# Unseal Vault - node 1
+- name: Set seal count - node 1
+  ansible.builtin.set_fact:
+    vault_pod: "{{ dsc_name }}-vault-infra-0"
+    unseal_key_index: "0"
+
+- name: Get vault keys
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    kind: Secret
+    name: "{{ dsc_name }}-vault-keys"
+  register: vault_keys
+
+- name: Unseal vault primary - node 1
+  when: vault_status == 'not init' or vault_status == 'sealed'
+  ansible.builtin.include_tasks: unseal.yml
+  vars:
+    vault_pod: "{{ dsc_name }}-vault-infra-0"
+
+- name: Join and unseal node 2
+  when: vault_values.server.ha.enabled
+  block:
+    # Join node 2 to Vault cluster
+    - name: Check vault-1 status - node 2
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-infra-1"
+
+    - name: Join vault-1 node to cluster - node 2
+      when: vault_status == 'not init'
+      kubernetes.core.k8s_exec:
+        container: vault
+        pod: "{{ dsc_name }}-vault-infra-1"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        command: vault operator raft join http://"{{ dsc_name }}"-vault-infra-0."{{ dsc_name }}"-vault-infra-internal:8200
+      register: node2_join_state
+      retries: 3
+      delay: 20
+
+    # Unseal node 2
+    - name: Check vault-1 status - node 2
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-infra-1"
+
+    - name: Set seal count - node 2
+      ansible.builtin.set_fact:
+        vault_pod: "{{ dsc_name }}-vault-infra-1"
+        unseal_key_index: "0"
+
+    - name: Get vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+        name: "{{ dsc_name }}-vault-keys"
+      register: vault_keys
+
+    - name: Unseal vault node - node 2
+      when: vault_status == 'not init' or vault_status == 'sealed'
+      ansible.builtin.include_tasks: unseal.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-infra-1"
+
+- name: Join and unseal node 3
+  when: vault_values.server.ha.enabled
+  block:
+    # Join node 3 to Vault cluster
+    - name: Check vault-2 status - node 3
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-infra-2"
+
+    - name: Join vault-2 to cluster - node 3
+      when: vault_status == 'not init'
+      kubernetes.core.k8s_exec:
+        container: vault
+        pod: "{{ dsc_name }}-vault-infra-2"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        command: vault operator raft join http://"{{ dsc_name }}"-vault-infra-0."{{ dsc_name }}"-vault-infra-internal:8200
+      register: node3_join_state
+      retries: 3
+      delay: 20
+
+    # Unseal node 3
+    - name: Check vault-2 status - node 3
+      ansible.builtin.include_tasks: check.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-infra-2"
+
+    - name: Set seal count - node 3
+      ansible.builtin.set_fact:
+        vault_pod: "{{ dsc_name }}-vault-infra-2"
+        unseal_key_index: "0"
+
+    - name: Get vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+        name: "{{ dsc_name }}-vault-keys"
+      register: vault_keys
+
+    - name: Unseal vault node - node 3
+      when: vault_status == 'not init' or vault_status == 'sealed'
+      ansible.builtin.include_tasks: unseal.yml
+      vars:
+        vault_pod: "{{ dsc_name }}-vault-infra-2"
+
+# Retrieve Vault token
+- name: Get Vault keys
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    kind: Secret
+    name: "{{ dsc_name }}-vault-keys"
+  register: vault_keys
+
+- name: Get Vault token
+  ansible.builtin.set_fact:
+    vault_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
+
+# Create kv engine
+- name: Get kv engines
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/forge-dso"
+    status_code: [200, 400]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: get_engines
+
+- name: Create default 'forge-dso/' kv engine
+  when: get_engines.status == 400
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/forge-dso"
+    method: POST
+    status_code: [204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      type: kv
+      options:
+        version: 2
+    body_format: json
+
+# Oidc
+- name: Get vault client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: keycloak-client-secret-vaultinfra-client
+  register: vault_secret
+
+- name: Get auth methods
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/auth/oidc"
+    method: GET
+    status_code: [200, 400]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: get_auth_method
+
+- name: Enable oidc auth method
+  when: get_auth_method.status == 400
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/auth/oidc"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "type": "oidc"
+    body_format: json
+
+- name: Get Vault client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: keycloak-client-secret-vaultinfra-client
+  register: vault_secret
+  failed_when: vault_secret.resources | length == 0
+
+- name: Configure oidc auth method
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/auth/oidc/config"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "oidc_discovery_url": "https://{{ keycloakinfra_domain }}/realms/infra"
+      "oidc_discovery_ca_pem": "{{ exposed_ca_pem }}"
+      "oidc_client_id": "{{ vault_secret.resources[0].data.CLIENT_ID | b64decode }}"
+      "oidc_client_secret": "{{ vault_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
+      "default_role": "default"
+      "type": "oidc"
+      "allowed_redirect_uris":
+        - "https://{{ vaultinfra_domain }}/ui/vault/auth/oidc/oidc/callback"
+        - "https://{{ vaultinfra_domain }}/oidc/callback"
+    body_format: json
+
+- name: Create oidc role
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/auth/oidc/role/default"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "oidc_scopes":
+        - "openid"
+        - "generic"
+      "bound_audiences":
+        - "{{ vault_secret.resources[0].data.CLIENT_ID | b64decode }}"
+      "claim_mappings":
+        "prefered_username": "username"
+        "email": "email"
+      "groups_claim": "groups"
+      "allowed_redirect_uris":
+        - "https://{{ vaultinfra_domain }}/ui/vault/auth/oidc/oidc/callback"
+        - "https://{{ vaultinfra_domain }}/oidc/callback"
+      "user_claim": "sub"
+      "token_policies":
+        - "default"
+    body_format: json
+
+- name: Create admin access policy
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/policies/acl/admin"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body: "{{ lookup('ansible.builtin.template', 'superadmin-policy.json.j2') }}"
+    body_format: json
+
+- name: Create admin group
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/identity/group"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "name": "admin"
+      "type": "external"
+      "policies":
+        - "admin"
+    body_format: json
+
+- name: Get oidc accessor
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/auth"
+    method: GET
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: oidc_auth
+
+- name: Get admin group id
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/identity/group/name/admin"
+    method: GET
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: user_group
+
+- name: Create admin group alias
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/identity/group-alias"
+    method: POST
+    status_code: [200, 400]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "name": "/admin"
+      "mount_accessor": "{{ oidc_auth.json['oidc/'].accessor }}"
+      "canonical_id": "{{ user_group.json.data.id }}"
+    body_format: json
+
+# AppRole
+- name: Get auth methods
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/auth/approle"
+    method: GET
+    status_code: [200, 400]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+  register: get_auth_method
+
+- name: Enable approle auth method
+  when: get_auth_method.status == 400
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/auth/approle"
+    method: POST
+    status_code: [200, 204]
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body:
+      "type": "approle"
+    body_format: json
+
+# Service monitor
+- name: Patch ServiceMonitor
+  when: dsc.global.metrics.enabled
+  kubernetes.core.k8s:
+    api_version: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    name: "{{ dsc_name }}-vault"
+    state: patched
+    definition:
+      spec:
+        endpoints:
+          - bearerTokenSecret:
+              key: root_token
+              name: "{{ dsc_name }}-vault-keys"
+            interval: 30s
+            params:
+              format:
+                - prometheus
+            path: /v1/sys/metrics
+            port: http
+            scheme: http
+            scrapeTimeout: 10s
+            tlsConfig:
+              insecureSkipVerify: true
+        namespaceSelector:
+          matchNames:
+            - "{{ dsc.vaultInfra.namespace }}"
+        selector:
+          matchLabels:
+            app.kubernetes.io/instance: "{{ dsc_name }}-vault"
+            app.kubernetes.io/name: vault
+            vault-active: null
+            vault-internal: "true"

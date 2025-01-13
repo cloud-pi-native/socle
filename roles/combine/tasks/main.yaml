@@ -10,8 +10,10 @@
 
 - name: Template and merge all files
   ansible.builtin.set_fact:
-    acc: "{{ acc | combine((lookup('template', item.path) | from_yaml), recursive=True, list_merge='append') }}"
+    acc: "{{ acc | combine((lookup('ansible.builtin.template', template_file.path) | from_yaml), recursive=True, list_merge='append') }}"
   with_items: "{{ templates.files | sort(attribute='path') }}"
+  loop_control:
+    loop_var: template_file
 
 - name: Combine with user supplied values
   ansible.builtin.set_fact:

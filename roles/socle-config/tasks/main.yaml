@@ -127,27 +127,33 @@
 - name: Set tools domains facts
   ansible.builtin.set_fact:
     argocd_domain: "{{ dsc.argocd.subDomain }}{{ root_domain }}"
+    argocdinfra_domain: "{{ dsc.argocdInfra.subDomain }}{{ root_domain }}"
     console_domain: "{{ dsc.console.subDomain }}{{ root_domain }}"
     gitlab_domain: "{{ dsc.gitlab.subDomain }}{{ root_domain }}"
     grafana_domain: "{{ dsc.grafana.subDomain }}{{ root_domain }}"
     harbor_domain: "{{ dsc.harbor.subDomain }}{{ root_domain }}"
     keycloak_domain: "{{ dsc.keycloak.subDomain }}{{ root_domain }}"
+    keycloakinfra_domain: "{{ dsc.keycloakInfra.subDomain }}{{ root_domain }}"
     nexus_domain: "{{ dsc.nexus.subDomain }}{{ root_domain }}"
     sonar_domain: "{{ dsc.sonarqube.subDomain }}{{ root_domain }}"
     vault_domain: "{{ dsc.vault.subDomain }}{{ root_domain }}"
+    vaultinfra_domain: "{{ dsc.vaultInfra.subDomain }}{{ root_domain }}"
 
 - name: Debug domains facts
   ansible.builtin.debug:
     msg:
       - "argocd_domain: {{ argocd_domain }}"
+      - "argocdinfra_domain: {{ argocdinfra_domain }}"
       - "console_domain: {{ console_domain }}"
       - "gitlab_domain: {{ gitlab_domain }}"
       - "grafana_domain: {{ grafana_domain }}"
       - "harbor_domain: {{ harbor_domain }}"
       - "keycloak_domain: {{ keycloak_domain }}"
+      - "keycloakinfra_domain: {{ keycloakinfra_domain }}"
       - "nexus_domain: {{ nexus_domain }}"
       - "sonar_domain: {{ sonar_domain }}"
       - "vault_domain: {{ vault_domain }}"
+      - "vaultinfra_domain: {{ vaultinfra_domain }}"
 
 # - name: End playbook
 #   ansible.builtin.meta: end_play

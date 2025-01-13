@@ -1,0 +1,192 @@
+{% if dsc.global.metrics.enabled %}
+global:
+  serverTelemetry:
+    prometheusOperator: true
+{% endif %}
+injector:
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+{% endif %}
+  image:
+    repository: docker.io/hashicorp/vault-k8s
+  agentImage:
+    repository: docker.io/hashicorp/vault
+server:
+  route:
+    enabled: false
+  ha:
+    enabled: true
+    replicas: 3
+    apiAddr: "https://{{ vaultinfra_domain }}"
+    raft:
+      enabled: true
+{% if dsc.global.metrics.enabled %}
+      config: |
+        ui = true
+        service_registration "kubernetes" {}
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          telemetry {
+            unauthenticated_metrics_access = "false"
+          }
+        }
+        storage "raft" {
+          path = "/vault/data"
+        }
+        telemetry {
+          prometheus_retention_time = "30s"
+          disable_hostname = true
+        }
+{% endif %}
+  standalone:
+    enabled: false
+{% if dsc.global.metrics.enabled %}
+    config: |
+      ui = true
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        telemetry {
+          unauthenticated_metrics_access = "false"
+        }
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
+      telemetry {
+        prometheus_retention_time = "30s"
+        disable_hostname = true
+      }
+{% endif %}
+  auditStorage:
+    enable: true
+  dataStorage:
+    enable: true
+    size: {{ dsc.vaultInfra.pvcSize }}
+  image:
+    repository: docker.io/hashicorp/vault
+csi:
+  image:
+    repository: docker.io/hashicorp/vault-csi-provider
+  agent:
+    image:
+      repository: docker.io/hashicorp/vault
+{% if dsc.global.metrics.enabled %}
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+{% endif %}
+{% if dsc.global.alerting.enabled %}
+serverTelemetry:
+  prometheusRules:
+    enabled: true
+    rules:
+{% if dsc.global.metrics.enabled %}
+      - alert: Vault is sealed
+        annotations:
+          message: Vault instance in namespace {{ dsc.vaultInfra.namespace }} is sealed.
+          summary: Vault instance sealed
+        expr: |
+          max(1 + vault_core_unsealed{namespace="{{ dsc.vaultInfra.namespace }}"}) == 1
+        for: 5m
+        labels:
+          severity: critical
+{% endif %}
+      - alert: Vault infra instance not healthy
+        annotations:
+          message: Vault {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ dsc.vaultInfra.namespace }} is not healthy (sealed?). Check its logs.
+          summary: Vault infra instance is not healthy (sealed?)
+        expr: |
+          up{job="{{ dsc_name }}-vault-internal",pod=~"(.*-)*vault(-.*)*"} == 0
+        for: 5m
+        labels:
+          severity: warning
+      - alert: Vault infra is not available
+        annotations:
+          message: Vault in namespace {{ dsc.vaultInfra.namespace }} has not been available for the last 5 minutes.
+          summary: Vault infra is down (no ready container)
+        expr: |
+          (absent(kube_pod_container_status_ready{
+          pod=~"(.*-)*vault(-.*)*",
+          container="vault",
+          namespace="{{ dsc.vaultInfra.namespace }}"}) == 1)
+          or sum(kube_pod_container_status_ready{
+          pod=~"(.*-)*vault(-.*)*",
+          container="vault",
+          namespace="{{ dsc.vaultInfra.namespace }}"}) == 0
+        for: 5m
+        labels:
+          severity: critical
+      - alert: Vault infra agent injector is not available
+        annotations:
+          message: Vault agent injector in namespace {{ dsc.vaultInfra.namespace }} has not been available for the last 5 minutes.
+          summary: Vault infra agent injector is down (no ready container)
+        expr: |
+          (absent(kube_pod_container_status_ready{
+          pod=~"(.*-)*vault(-.*)*",
+          container="sidecar-injector",
+          namespace="{{ dsc.vaultInfra.namespace }}"}) == 1)
+          or sum(kube_pod_container_status_ready{
+          pod=~"(.*-)*vault(-.*)*",
+          container="sidecar-injector",
+          namespace="{{ dsc.vaultInfra.namespace }}"}) == 0
+        for: 5m
+        labels:
+          severity: critical
+      - alert: Vault infra Pod not healthy
+        annotations:
+          message: Vault {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ dsc.vaultInfra.namespace }} has been unavailable for the last 5 minutes.
+          summary: Vault infra pod not healthy (container is not ready)
+        expr: |
+          kube_pod_container_status_ready{
+          pod!~"backup-utils-vault(-.*)*",
+          namespace="{{ dsc.vaultInfra.namespace }}"} == 0
+        for: 5m
+        labels:
+          severity: warning
+      - alert: Vault infra PVC has low remaining disk space
+        annotations:
+          message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{"{{"}} $labels.namespace {{"}}"}} is running out of disk space (< 20% left). VALUE = {{"{{"}} $value {{"}}"}}%
+          summary: Vault infra PVC is running out of disk space in namespace {{"{{"}} $labels.namespace {{"}}"}}
+        expr: |
+          round(
+          kubelet_volume_stats_available_bytes{
+          persistentvolumeclaim=~"(.*-)*vault(-.*)*",
+          namespace="{{ dsc.vaultInfra.namespace }}"}
+          / kubelet_volume_stats_capacity_bytes{
+          persistentvolumeclaim=~"(.*-)*vault(-.*)*",
+          namespace="{{ dsc.vaultInfra.namespace }}"} * 100, 0.01) < 20 > 10
+        for: 1m
+        labels:
+          severity: warning
+      - alert: Vault infra PVC almost out of disk space
+        annotations:
+          message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ dsc.vaultInfra.namespace }} is almost full (< 10% left). VALUE = {{"{{"}} $value {{"}}"}}%
+          summary: Vault infra PVC almost out of disk space in namespace {{ dsc.vaultInfra.namespace }}
+        expr: |
+          round(
+          kubelet_volume_stats_available_bytes{
+          persistentvolumeclaim=~"(.*-)*vault(-.*)*",
+          namespace="{{ dsc.vaultInfra.namespace }}"}
+          / kubelet_volume_stats_capacity_bytes{
+          persistentvolumeclaim=~"(.*-)*vault(-.*)*",
+          namespace="{{ dsc.vaultInfra.namespace }}"} * 100, 0.01) < 10 > 0
+        for: 1m
+        labels:
+          severity: critical
+      - alert: Vault infra PVC out of disk space
+        annotations:
+          message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ dsc.vaultInfra.namespace }} is full (0% left).
+          summary: Vault infra PVC out of disk space in namespace {{ dsc.vaultInfra.namespace }}
+        expr: |
+          kubelet_volume_stats_available_bytes{
+          persistentvolumeclaim=~"(.*-)*vault(-.*)*",
+          namespace="{{ dsc.vaultInfra.namespace }}"} == 0
+        for: 1m
+        labels:
+          severity: critical
+{% endif %}

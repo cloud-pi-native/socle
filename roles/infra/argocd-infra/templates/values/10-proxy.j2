@@ -1,0 +1,19 @@
+{% if dsc.proxy.enabled %}
+server:
+  env: &extraEnvVars
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+    - name: GIT_HTTP_PROXY_AUTHMETHOD
+      value: basic 
+
+applicationSet:
+  extraEnv: *extraEnvVars
+controller:
+  env: *extraEnvVars
+repoServer:
+  env: *extraEnvVars
+{% endif %}

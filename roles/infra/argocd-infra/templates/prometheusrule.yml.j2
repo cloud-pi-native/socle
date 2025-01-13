@@ -1,0 +1,94 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/name: gitlab
+  name: argocd
+  namespace: {{ dsc.argocdInfra.namespace }}
+spec:
+  groups:
+  - name: ArgoCD
+    rules:
+    - alert: Argo CD Redis HA not available
+      annotations:
+        message: Argo CD Redis HA in namespace {{ dsc.argocdInfra.namespace }} has not been available for the last 5 minutes.
+        summary: Argo CD Redis HA down (no ready pod)"
+      expr: |
+        sum(kube_pod_status_ready{
+        pod=~"argo-redis-ha-server-.*",
+        namespace="{{ dsc.argocdInfra.namespace }}",
+        condition="true"}) == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: Argo CD Redis HA Haproxy not available
+      annotations:
+        message: Argo CD Redis HA Haproxy in namespace {{ dsc.argocdInfra.namespace }} has not been available for the last 5 minutes.
+        summary: Argo CD Redis HA Haproxy down (no ready pod)"
+      expr: |
+        sum(kube_pod_status_ready{
+        pod=~"argo-redis-ha-haproxy-.*",
+        namespace="{{ dsc.argocdInfra.namespace }}",
+        condition="true"}) == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: Argo CD Server not available
+      annotations:
+        message: Argo CD Server in namespace {{ dsc.argocdInfra.namespace }} has not been available for the last 5 minutes.
+        summary: Argo CD Server down (no ready pod)"
+      expr: |
+        sum(kube_pod_status_ready{
+        pod=~"argo-argocd-server-.*",
+        namespace="{{ dsc.argocdInfra.namespace }}",
+        condition="true"}) == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: Argo CD Repo Server not available
+      annotations:
+        message: Argo CD Repo Server in namespace {{ dsc.argocdInfra.namespace }} has not been available for the last 5 minutes.
+        summary: Argo CD Repo Server down (no ready pod)"
+      expr: |
+        sum(kube_pod_status_ready{
+        pod=~"argo-argocd-repo-server-.*",
+        namespace="{{ dsc.argocdInfra.namespace }}",
+        condition="true"}) == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: Argo CD Applicationset Controller not available
+      annotations:
+        message: Argo CD Applicationset Controller in namespace {{ dsc.argocdInfra.namespace }} has not been available for the last 5 minutes.
+        summary: Argo CD Applicationset Controller down (no ready pod)"
+      expr: |
+        sum(kube_pod_status_ready{
+        pod=~"argo-argocd-applicationset-controller-.*",
+        namespace="{{ dsc.argocdInfra.namespace }}",
+        condition="true"}) == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: Argo CD Application Controller not available
+      annotations:
+        message: Argo CD Application Controller in namespace {{ dsc.argocdInfra.namespace }} has not been available for the last 5 minutes.
+        summary: Argo CD Application Controller down (no ready pod)"
+      expr: |
+        sum(kube_pod_status_ready{
+        pod=~"argo-argocd-application-controller-.*",
+        namespace="{{ dsc.argocdInfra.namespace }}",
+        condition="true"}) == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: Argo CD Pod not healthy
+      annotations:
+        message: Argo CD {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ dsc.argocdInfra.namespace }} has been unavailable for the last 5 minutes.
+        summary: Argo CD {{"{{"}} $labels.pod {{"}}"}} pod not healthy (container {{"{{"}} $labels.container {{"}}"}} is not ready)
+      expr: |
+        kube_pod_container_status_ready{
+        pod=~"argo-.*",
+        container!~"secret-init", namespace="{{ dsc.argocdInfra.namespace }}"} == 0
+      for: 5m
+      labels:
+        severity: warning

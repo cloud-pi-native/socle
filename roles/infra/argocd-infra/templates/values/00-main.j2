@@ -1,0 +1,248 @@
+crds:
+  install: true
+  keep: true
+{% if dsc.global.platform == "openshift" %}
+openshift:
+  enabled: true
+{% endif %}
+configs:
+{% if dsc.argocdInfra.admin.enabled %}
+  secret:
+    argocdServerAdminPassword: "{{ dsc.argocdInfra.admin.password }}"
+{% endif %}
+  params:
+    server.insecure: true
+  rbac:
+    policy.csv: |
+      p, role:admin, *, *, */*, allow
+      p, role:nada, applicationsets, *, */*, deny
+      p, role:nada, applications, *, */*, deny
+      p, role:nada, logs, *, */*, deny
+      p, role:nada, exec, *, */*, deny
+      p, role:nada, certificates, *, *, deny
+      p, role:nada, accounts, *, *, deny
+      p, role:nada, gpgkeys, *, *, deny
+      p, role:nada, projects, *, *, deny
+      p, role:nada, clusters, *, *, deny
+      p, role:nada, repositories, get, *, allow
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+      g, /ArgoCDAdmins, role:admin
+      g, ArgoCDAdmins, role:admin
+{% if dsc.global.environment == 'development' %}
+      p, cpin-sa, applications, *, *, allow
+{% endif %}
+    scopes: "[groups]"
+    policy.default: role:nada
+    admin.enabled: "false"
+  cm:
+{% if instance_name != "conf-dso" %}
+    application.instanceLabelKey: argocd.argoproj.io/instance.{{ instance_name }}
+{% endif %}
+    clusterResources: "true"
+    url: "https://{{ argocdinfra_domain }}"
+    oidc.config: |
+      issuer: https://{{ keycloakinfra_domain }}/realms/infra
+      requestedScopes: ["openid", "generic"]
+      name: Keycloak
+      clientID: {{ argocd_secret.resources[0].data.CLIENT_ID | b64decode }}
+      clientSecret: {{ argocd_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+{% if dsc.exposedCA.type != 'none' %}
+      rootCA: |
+        {{ exposed_ca_pem | indent(width=8, first=False) }}
+{% endif %}
+    users.anonymous.enabled: "false"
+    admin.enabled: "{{ dsc.argocdInfra.admin.enabled }}"
+    kustomize.buildOptions: "--enable-helm"
+    resource.exclusions: |
+      - apiGroups:
+        - tekton.dev
+        clusters:
+        - '*'
+        kinds:
+        - TaskRun
+        - PipelineRun
+{% if dsc.global.environment == 'development' %}
+    accounts.cpin-sa: apiKey
+{% endif %}
+redis-ha:
+  enabled: true
+controller:
+  replicas: 3
+dex:
+  enabled: false
+server:
+  replicas: 3
+  ingress:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
+  ingressGrpc:
+    ingressClassName: {{ dsc.ingress.className | default('') }}
+repoServer:
+  replicas: 3
+  initContainers:
+  - name: download-tools
+    image: registry.access.redhat.com/ubi8
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+    - name: AVP_VERSION
+      value: {{ dsc.argocdInfra.vaultPluginVersion }}
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+{% endif %}
+    command: [sh, -c]
+    args:
+    - >-
+      OS="$(uname | tr '[:upper:]' '[:lower:]')" && [ "$(uname -m)" = "aarch64" ] && ARCH="arm64" || ARCH="amd64" &&
+      curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o /custom-tools/argocd-vault-plugin &&
+      chmod +x /custom-tools/argocd-vault-plugin
+    volumeMounts:
+    - mountPath: /custom-tools
+      name: custom-tools
+  extraContainers:
+  - name: avp
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+{% endif %}
+    - name: VAULT_SKIP_VERIFY
+      value: "true"
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  - name: avp-helm
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+{% endif %}
+    - name: VAULT_SKIP_VERIFY
+      value: "true" 
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+#    - mountPath: /app/config/tls
+#      name: tls-certs
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp-helm.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  - name: avp-kustomize
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+{% endif %}
+    - name: VAULT_SKIP_VERIFY
+      value: "true" 
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp-kustomize.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  volumes:
+  - configMap:
+      name: cmp-plugin
+    name: cmp-plugin
+  - name: custom-tools
+    emptyDir: {}
+applicationSet:
+  enabled: false
+  replicas: 2
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className | default('') }}
+notifications:
+  enabled: false
+  webhook:
+    ingress:
+      ingressClassName: {{ dsc.ingress.className | default('') }}

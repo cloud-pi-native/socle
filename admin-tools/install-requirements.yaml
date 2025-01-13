@@ -10,13 +10,15 @@
       - ruby
       - tar
     python_modules:
-      - pyyaml
+      - hvac
+      - jmespath
       - kubernetes
       - python-gitlab
-      - jmespath
+      - pyyaml
     apps:
-      - kubectl
       - helm
+      - k9s
+      - kubectl
       - yq
 
   tasks:
@@ -38,6 +40,11 @@
       community.general.ansible_galaxy_install:
         type: collection
         name: kubernetes.core
+
+    - name: "Install collection community.hashi_vault"
+      community.general.ansible_galaxy_install:
+        type: collection
+        name: community.hashi_vault
 
     - name: "Check if Homebrew is already installed"
       ansible.builtin.stat:

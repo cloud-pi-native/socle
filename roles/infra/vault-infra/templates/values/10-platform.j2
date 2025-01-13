@@ -1,0 +1,30 @@
+{% if dsc.global.platform == "openshift" %}
+global:
+  openshift: true
+{% endif %}
+
+{% if dsc.global.platform == "kubernetes" %}
+injector:
+  securityContext:
+    pod:
+      runAsNonRoot: true
+      runAsGroup: 1000 
+      runAsUser: 100
+      fsGroup: 1000
+    container:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+server:
+  statefulSet:
+    securityContext:
+      pod:
+        runAsNonRoot: true
+        runAsGroup: 1000 
+        runAsUser: 100
+        fsGroup: 1000
+      container:
+        allowPrivilegeEscalation: false
+{% endif %}

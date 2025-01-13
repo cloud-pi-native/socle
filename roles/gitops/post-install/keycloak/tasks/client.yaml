@@ -1,0 +1,61 @@
+---
+- name: Create Keycloak clients
+  community.general.keycloak_client:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: dso
+    clientId: "{{ item.clientId }}"
+    clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
+    standardFlowEnabled: "{{ item.standardFlowEnabled }}"
+    directAccessGrantsEnabled: "{{ item.directAccessGrantsEnabled | default(omit) }}"
+    publicClient: "{{ item.publicClient | default(omit) }}"
+    redirectUris: "{{ item.redirectUris }}"
+    webOrigins: "{{ item.webOrigins }}"
+    defaultClientScopes: "{{ item.defaultClientScopes }}"
+
+- name: Get clients secrets from Keycloak
+  when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'
+  community.general.keycloak_clientsecret_info:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: dso
+    clientId: "{{ item.clientId }}"
+  register: kc_clients_secrets
+
+- name: Set Keycloak clients secrets in Keycloak namespace
+  when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ item.clientId | b64encode }}"
+        CLIENT_SECRET: "{{ kc_clients_secrets.clientsecret_info.value | b64encode }}"
+      metadata:
+        name: keycloak-client-secret-{{ item.clientId }}
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque
+
+- name: Set Keycloak clients secrets in Keycloak namespace
+  when: item.clientAuthenticatorType is not defined or item.clientAuthenticatorType != 'client-secret'
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        CLIENT_ID: "{{ item.clientId | b64encode }}"
+      metadata:
+        name: keycloak-client-secret-{{ item.clientId }}
+        namespace: "{{ dsc.keycloak.namespace }}"
+      type: Opaque

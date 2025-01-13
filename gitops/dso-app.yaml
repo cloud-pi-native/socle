@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dso-install-manager
+  namespace: infra-argocd
+spec:
+  project: default
+  revisionHistoryLimit: 3
+  sources:
+    - repoURL: https://github.com/cloud-pi-native/socle.git
+      targetRevision: main
+      path: ./gitops
+      directory:
+        include: dso-appset.yaml
+  destination:
+    name: in-cluster
+    namespace: infra-argocd
+  syncPolicy:
+    # automated: {}
+    #   selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

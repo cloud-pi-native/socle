@@ -1,0 +1,24 @@
+{% if use_private_registry %}
+injector:
+  image:
+    repository: "{{ dsc.global.registry }}/hashicorp/vault-k8s"
+  agentImage:
+    repository: "{{ dsc.global.registry }}/hashicorp/vault"
+
+server:
+  image:
+    repository: "{{ dsc.global.registry }}/hashicorp/vault"
+
+csi:
+  image:
+    repository: "{{ dsc.global.registry }}/hashicorp/vault-csi-provider"
+  agent:
+    image:
+      repository: "{{ dsc.global.registry }}/hashicorp/vault"
+{% endif %}
+
+{% if use_image_pull_secrets %}
+global:
+  imagePullSecrets: 
+  - name: dso-config-pull-secret
+{% endif %}

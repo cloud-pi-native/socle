@@ -20,6 +20,15 @@
   environment:
     GIT_SSL_NO_VERIFY: "1"
 
+- name: Remove branch protection
+  community.general.gitlab_protected_branch:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+    name: main
+    state: absent
+  ignore_errors: true
+
 - name: Sync Git repository with push mirror
   ansible.builtin.shell: |
     set -e
@@ -38,3 +47,12 @@
     path: catalog
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     visibility: internal
+
+- name: Apply branch protection
+  community.general.gitlab_protected_branch:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+    name: main
+    push_access_level: nobody
+    state: present

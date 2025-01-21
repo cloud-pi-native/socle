@@ -481,6 +481,11 @@ spec:
                 global:
                   description: Global configuration not specific to one service.
                   properties:
+                    componentSuffix:
+                      description: The top level of your component suffix. To expose Argo as "argo-suffix.example.com",
+                        the value should be "-suffix"
+                      type: string
+                      default: ""
                     environment:
                       default: production
                       description: Defines DSO environment type, i.e. development or production.

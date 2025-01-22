@@ -8,6 +8,7 @@ keycloak_clients:
     webOrigins:
       - https://{{ gitlab_domain }}
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false
 
@@ -17,6 +18,7 @@ keycloak_clients:
     redirectUris: "{{ lookup('ansible.builtin.template', 'console-redirectUris.yaml.j2') | from_yaml }}"
     webOrigins: "{{ lookup('ansible.builtin.template', 'console-webOrigins.yaml.j2') | from_yaml }}"
     defaultClientScopes:
+      - basic
       - generic
     publicClient: true
 
@@ -26,6 +28,7 @@ keycloak_clients:
     redirectUris: "{{ lookup('ansible.builtin.template', 'console-redirectUris.yaml.j2') | from_yaml }}"
     webOrigins: "{{ lookup('ansible.builtin.template', 'console-webOrigins.yaml.j2') | from_yaml }}"
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false
 
@@ -39,6 +42,7 @@ keycloak_clients:
     webOrigins:
       - https://{{ argocd_domain }}
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false
 
@@ -50,6 +54,7 @@ keycloak_clients:
     webOrigins:
       - "*"
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false
 
@@ -61,6 +66,7 @@ keycloak_clients:
     webOrigins:
       - https://{{ sonar_domain }}
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false
 
@@ -72,6 +78,7 @@ keycloak_clients:
     webOrigins:
       - https://{{ harbor_domain }}
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false
 
@@ -84,6 +91,7 @@ keycloak_clients:
     webOrigins:
       - https://{{ grafana_domain }}
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false
 
@@ -96,5 +104,6 @@ keycloak_clients:
     webOrigins:
       - https://{{ vault_domain }}
     defaultClientScopes:
+      - basic
       - generic
     publicClient: false

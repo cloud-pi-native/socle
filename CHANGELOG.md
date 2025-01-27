@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.0](https://github.com/cloud-pi-native/socle/compare/v3.1.0...v3.2.0) (2025-01-27)
+
+
+### Features
+
+* :sparkles: Upgrading GitLab to v17.8.1 ([cef49de](https://github.com/cloud-pi-native/socle/commit/cef49de47bfbec88d50f9766b3d75a57c669219f))
+
+
+### Bug Fixes
+
+* :bug: add missing keycloak default client scope ([ae50ee2](https://github.com/cloud-pi-native/socle/commit/ae50ee2c5f5fa5e35788752b6f8d42c0de63d795))
+
 ## [3.1.0](https://github.com/cloud-pi-native/socle/compare/v3.0.0...v3.1.0) (2025-01-13)
 
 

@@ -59,6 +59,31 @@ configs:
         kinds:
         - TaskRun
         - PipelineRun
+      - apiGroups:
+        - wgpolicyk8s.io
+        - aquasecurity.github.io
+        clusters:
+        - '*'
+        kinds:
+        - '*'
+      - apiGroups:
+        - postgresql.cnpg.io
+        clusters:
+        - '*'
+        kinds:
+        - Backup
+      - apiGroups:
+        - reports.kyverno.io
+        clusters:
+        - '*'
+        kinds:
+        - EphemeralReport
+      - apiGroups:
+        - reports.kyverno.io/v1
+        clusters:
+        - '*'
+        kinds:
+        - EphemeralReport
 {% if dsc.global.environment == 'development' %}
     accounts.cpin-sa: apiKey
 {% endif %}

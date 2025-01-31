@@ -118,7 +118,7 @@
 
 - name: Set root_domain fact
   ansible.builtin.set_fact:
-    root_domain: "{{ dsc.global.rootDomain }}"
+    root_domain: "{{ dsc.global.componentSuffix | default('') }}{{ dsc.global.rootDomain }}"
 
 - name: Set tools domains facts
   ansible.builtin.set_fact:

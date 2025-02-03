@@ -28,6 +28,17 @@ containerPorts:
   https: 8443
   infinispan: 7800
 
+podSecurityContext:
+{% if dsc.global.platform == 'kubernetes' %}
+  enabled: true
+  fsGroup: 1001
+{% else %}
+  enabled: false
+{% endif %}
+
+containerSecurityContext:
+  enabled: false
+
 resources:
   limits:
     memory: "2048Mi"

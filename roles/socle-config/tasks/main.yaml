@@ -96,6 +96,10 @@
   ansible.builtin.set_fact:
     dsc: "{{ socle_config.resources[0] }}"
 
+- name: Set some instance name
+  ansible.builtin.set_fact:
+    instance_name: "{{ dsc.metadata.name }}"
+
 - name: Set some facts
   ansible.builtin.set_fact:
     dsc_default_config: "{{ lookup('ansible.builtin.file', 'config.yaml') | from_yaml }}"

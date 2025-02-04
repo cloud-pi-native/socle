@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.1](https://github.com/cloud-pi-native/socle/compare/v3.2.0...v3.2.1) (2025-02-04)
+
+
+### Bug Fixes
+
+* :bug: Fix Harbor ingress values ([d4dc82d](https://github.com/cloud-pi-native/socle/commit/d4dc82de3fecb0be75b61875d0c15b0b03f23fde))
+
+
+### Performance Improvements
+
+* :zap: improve argo-cd resource exclusions ([59010df](https://github.com/cloud-pi-native/socle/commit/59010df7673dc4521a9bd10c6cb3c63d94f78eb1))
+
 ## [3.2.0](https://github.com/cloud-pi-native/socle/compare/v3.1.0...v3.2.0) (2025-01-27)
 
 

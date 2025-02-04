@@ -6,23 +6,9 @@ expose:
     hosts:
       core: {{ harbor_domain }}
       notary: {{ dsc.harbor.subDomain }}-notary{{ root_domain }}
-    notary:
-      annotations:
+    annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
-        {{ key }}: {{ val }}
-{% endfor %}
-      labels:
-{% for key, val in dsc.ingress.labels.items() %}
-        {{ key }}: {{ val }}
-{% endfor %}
-    harbor:
-      annotations:
-{% for key, val in dsc.ingress.annotations.items() %}
-        {{ key }}: {{ val }}
-{% endfor %}
-      labels:
-{% for key, val in dsc.ingress.labels.items() %}
-        {{ key }}: {{ val }}
+      {{ key }}: {{ val }}
 {% endfor %}
 externalURL: https://{{ harbor_domain }}
 persistence:

@@ -27,8 +27,8 @@ configs:
       p, role:nada, repositories, get, *, allow
       g, system:cluster-admins, role:admin
       g, cluster-admins, role:admin
-      g, /ArgoCDAdmins, role:admin
-      g, ArgoCDAdmins, role:admin
+      g, /admin, role:admin
+      g, admin, role:admin
 {% if dsc.global.environment == 'development' %}
       p, cpin-sa, applications, *, *, allow
 {% endif %}

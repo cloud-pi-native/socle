@@ -291,10 +291,7 @@
     auth_password: "{{ keycloak_admin_password }}"
     state: present
     realm: dso
-    name: "{{ item }}"
-  with_items:
-    - admin
-    - ArgoCDAdmins
+    name: admin
 
 - name: Get keycloak dso realm users from API
   ansible.builtin.uri:
@@ -370,8 +367,6 @@
         email_verified: true
         groups:
           - name: admin
-            state: present
-          - name: ArgoCDAdmins
             state: present
 #        force: true # Ne fonctionne pas quand user supprimé via l'interface graphique et tâche relancée.
 

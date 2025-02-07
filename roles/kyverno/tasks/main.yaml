@@ -43,15 +43,15 @@
       kubernetes.core.k8s:
         template: prometheusrule.yml.j2
 
-- name: Wait Kyverno service endpoint to be available
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.kyverno.namespace }}"
-    name: kyverno-svc
-  register: endpoint
-  until: endpoint.resources[0].subsets[0].addresses[0] is defined
-  retries: 45
-  delay: 20
+    - name: Wait Kyverno service endpoint to be available
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        namespace: "{{ dsc.kyverno.namespace }}"
+        name: kyverno-svc
+      register: endpoint
+      until: endpoint.resources[0].subsets[0].addresses[0] is defined
+      retries: 45
+      delay: 20
 
 - name: Get dsc namespaces but not Kyverno's
   ansible.builtin.set_fact:

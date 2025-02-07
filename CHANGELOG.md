@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.2.2](https://github.com/cloud-pi-native/socle/compare/v3.2.1...v3.2.2) (2025-02-07)
+
+
+### Bug Fixes
+
+* :bug: add proxycache into gitlab-ci kaniko args ([a270f68](https://github.com/cloud-pi-native/socle/commit/a270f687196052a92dd2dac2664ceddb08fa606b))
+* :bug: Install Kyverno task ([9deeb17](https://github.com/cloud-pi-native/socle/commit/9deeb17f01521f5e37f00ca96098a5f36cb9a0b1))
+* :bug: update argo-cd default admin group ([716828b](https://github.com/cloud-pi-native/socle/commit/716828b7efca71c1db94ff6fe9d67397fa3bd566))
+* :bug: when two or more argocd installed argocd need labelKey ([c7bd96a](https://github.com/cloud-pi-native/socle/commit/c7bd96ab6aaa24e0ee59146c081b57952e9aae9d))
+
 ## [3.2.1](https://github.com/cloud-pi-native/socle/compare/v3.2.0...v3.2.1) (2025-02-04)
 
 

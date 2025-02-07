@@ -378,6 +378,11 @@
         value: "{{ [additionals_ca_pem, exposed_ca_pem] | join('\n') }}"
         variable_type: file
 
+- name: Append registry mirror arguments to extra_kaniko_args
+  ansible.builtin.set_fact:
+    extra_kaniko_args: "{{ extra_kaniko_args | default('') }} --registry-mirror {{ item.registry.endpointUrl | regex_replace('^https?://', '') }}/{{ item.name }}"
+  loop: "{{ dsc.harbor.proxyCache }}"
+
 - name: Set or update insecure args variables
   community.general.gitlab_group_variable:
     api_url: https://{{ gitlab_domain }}
@@ -388,7 +393,7 @@
     state: "{{ dsc.gitlab.insecureCI | ternary('present', 'absent') }}"
     variables:
       - name: EXTRA_KANIKO_ARGS
-        value: --skip-tls-verify
+        value: --skip-tls-verify {{ extra_kaniko_args }}
       - name: EXTRA_GIT_ARGS
         value: -c http.sslVerify=false
       - name: EXTRA_VAULT_ARGS

@@ -11,11 +11,6 @@ redis-ha:
       serviceMonitor:
         enabled: true
         namespace: "{{ dsc.argocdInfra.namespace }}"
-redis:
-  metrics:
-    enabled: false
-    serviceMonitor:
-      enabled: false
 controller:
   metrics:
     enabled: true

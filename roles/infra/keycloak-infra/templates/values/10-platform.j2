@@ -1,0 +1,7 @@
+{% if dsc.global.platform == "openshift" %}
+podSecurityContext:
+  enabled: false
+
+containerSecurityContext:
+  enabled: false
+{% endif %}

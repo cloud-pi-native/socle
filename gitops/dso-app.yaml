@@ -2,13 +2,13 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: dso-install-manager
-  namespace: infra-argo
+  namespace: infra-argocd
 spec:
   project: default
   revisionHistoryLimit: 3
   sources:
   - repoURL: https://github.com/cloud-pi-native/socle.git
-    targetRevision: refactor/gitops
+    targetRevision: refactor/gitops-falltrades
     path: ./gitops
     directory:
       include: dso-appset.yaml

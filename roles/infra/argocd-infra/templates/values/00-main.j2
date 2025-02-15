@@ -1,10 +1,6 @@
 crds:
   install: true
   keep: true
-{% if dsc.global.platform == "openshift" %}
-openshift:
-  enabled: true
-{% endif %}
 configs:
 {% if dsc.argocdInfra.admin.enabled %}
   secret:
@@ -82,6 +78,11 @@ repoServer:
   initContainers:
   - name: download-tools
     image: registry.access.redhat.com/ubi8
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
     env:
     - name: AVP_VERSION
       value: {{ dsc.argocdInfra.vaultPluginVersion }}
@@ -89,9 +90,12 @@ repoServer:
     args:
     - >-
       OS="$(uname | tr '[:upper:]' '[:lower:]')" && [ "$(uname -m)" = "aarch64" ] && ARCH="arm64" || ARCH="amd64" &&
-      curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o argocd-vault-plugin &&
-      chmod +x argocd-vault-plugin &&
-      mv argocd-vault-plugin /custom-tools/
+{% if dsc.proxy.enabled %}
+      curl -L -x "{{ dsc.proxy.https_proxy }}"  https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o /custom-tools/argocd-vault-plugin &&
+{% else %}
+      curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o /custom-tools/argocd-vault-plugin &&
+{% endif %}
+      chmod +x /custom-tools/argocd-vault-plugin
     volumeMounts:
     - mountPath: /custom-tools
       name: custom-tools
@@ -102,6 +106,8 @@ repoServer:
     securityContext:
       runAsNonRoot: true
       runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
     envFrom:
     - secretRef:
         name: vault-plugin-secret
@@ -126,6 +132,8 @@ repoServer:
     securityContext:
       runAsNonRoot: true
       runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
     envFrom:
     - secretRef:
         name: vault-plugin-secret
@@ -150,6 +158,8 @@ repoServer:
     securityContext:
       runAsNonRoot: true
       runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
     envFrom:
     - secretRef:
         name: vault-plugin-secret

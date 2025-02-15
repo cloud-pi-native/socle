@@ -1,0 +1,33 @@
+{% if dsc.global.platform == "openshift" %}
+openshift:
+  enabled: true
+
+redis-ha:
+  global:
+    compatibility:
+      openshift:
+        adaptSecurityContext: auto
+{% else %}
+global:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+
+#applicationSet:
+#  extraEnv: &extraEnvVars
+#    - name: HELM_CACHE_HOME
+#      value: /helm-working-dir
+#    - name: HELM_CONFIG_HOME
+#      value: /helm-working-dir
+#    - name: HELM_DATA_HOME
+#      value: /helm-working-dir
+
+#server:
+#  env: *extraEnvVars
+#controller:
+#  env: *extraEnvVars
+#repoServer:
+#  env: *extraEnvVars
+{% endif %}

@@ -50,6 +50,7 @@
 - name: Get Argo CD Infra app version
   block:
     - name: Add Argo CD helm repo
+      changed_when: false
       kubernetes.core.helm_repository:
         name: argo
         repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
@@ -104,6 +105,7 @@
 # Argo CD Infra installation
 
 - name: Add helm repo
+  changed_when: false
   kubernetes.core.helm_repository:
     name: argo
     repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"

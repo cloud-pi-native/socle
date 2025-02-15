@@ -6,7 +6,7 @@
   "destination": {
     "clusterName": "in-cluster"
   },
-  "targetRevision": "refactor/gitops",
+  "targetRevision": "refactor/gitops-falltrades",
   "apps": [
     { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
     { "app": "kubeview", "enabled": "false", "namespace": "kubeview", "syncWave": 10 }

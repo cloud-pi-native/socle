@@ -1,10 +1,6 @@
 crds:
   install: true
   keep: true
-{% if dsc.global.platform == "openshift" %}
-openshift:
-  enabled: true
-{% endif %}
 configs:
 {% if dsc.argocdInfra.admin.enabled %}
   secret:
@@ -82,16 +78,26 @@ repoServer:
   initContainers:
   - name: download-tools
     image: registry.access.redhat.com/ubi8
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
     env:
     - name: AVP_VERSION
       value: {{ dsc.argocdInfra.vaultPluginVersion }}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
     command: [sh, -c]
     args:
     - >-
       OS="$(uname | tr '[:upper:]' '[:lower:]')" && [ "$(uname -m)" = "aarch64" ] && ARCH="arm64" || ARCH="amd64" &&
-      curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o argocd-vault-plugin &&
-      chmod +x argocd-vault-plugin &&
-      mv argocd-vault-plugin /custom-tools/
+      curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o /custom-tools/argocd-vault-plugin &&
+      chmod +x /custom-tools/argocd-vault-plugin
     volumeMounts:
     - mountPath: /custom-tools
       name: custom-tools
@@ -102,6 +108,17 @@ repoServer:
     securityContext:
       runAsNonRoot: true
       runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+    env:
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+    - name: VAULT_SKIP_VERIFY
+      value: "true"
     envFrom:
     - secretRef:
         name: vault-plugin-secret
@@ -126,10 +143,23 @@ repoServer:
     securityContext:
       runAsNonRoot: true
       runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+    env:
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+    - name: VAULT_SKIP_VERIFY
+      value: "true" 
     envFrom:
     - secretRef:
         name: vault-plugin-secret
     volumeMounts:
+#    - mountPath: /app/config/tls
+#      name: tls-certs
     - mountPath: /var/run/argocd
       name: var-files
     - mountPath: /home/argocd/cmp-server/plugins
@@ -150,6 +180,17 @@ repoServer:
     securityContext:
       runAsNonRoot: true
       runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+    env:
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+    - name: VAULT_SKIP_VERIFY
+      value: "true" 
     envFrom:
     - secretRef:
         name: vault-plugin-secret

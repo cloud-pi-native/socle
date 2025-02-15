@@ -4,32 +4,55 @@
   gather_facts: false
 
   roles:
-    - name: socle-config
+    - role: socle-config
       tags:
         - always
 
-    - name: ca
+    - role: ca
       tags:
         - always
 
-    - name: console-dso-config
+    - role: console-dso-config
       tags:
         - always
 
-    - name: imagepullsecret
+    - role: imagepullsecret
       tags:
         - always
       when: use_image_pull_secrets
 
-    - name: gitops/vault-secrets
+    - role: cloudnativepg
+      tags:
+        - cloudnativepg
+        - cnpg
+
+    - role: infra/keycloak-infra
+      tags:
+        - keycloak-infra
+        - sso-infra
+      when: dsc.keycloakInfra.installEnabled
+
+    - role: infra/vault-infra
+      tags:
+        - vault-infra
+      when: dsc.vaultInfra.installEnabled
+
+    - role: infra/argocd-infra
+      tags:
+        - gitops-infra
+        - argocd-infra
+        - argo-infra
+      when: dsc.argocdInfra.installEnabled
+
+    - role: gitops/vault-secrets
       tags:
         - vault-secrets
 
-    - name: gitops/dso-app
+    - role: gitops/dso-app
       tags:
         - dso-app
 
-    - name: gitops/post-install/keycloak
+    - role: gitops/post-install/keycloak
       tags:
         - post-install
         - post-install-keycloak

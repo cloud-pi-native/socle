@@ -2,6 +2,12 @@
 envs:
   - name: dso-hp-testcm
     apps:
+      - argocd_app: "common"
+        vault_values:
+          proxy:
+            httpProxy: "{{ dsc.proxy.http_proxy }}"
+            httpsProxy: "{{ dsc.proxy.https_proxy }}"
+            noProxy: "{{ dsc.proxy.no_proxy }}"
       - argocd_app: "keycloak"
         vault_values:
           global:

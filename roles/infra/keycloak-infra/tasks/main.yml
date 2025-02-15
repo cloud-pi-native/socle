@@ -180,6 +180,7 @@
       delay: 5
 
 - name: Add bitnami helm repo
+  changed_when: false
   kubernetes.core.helm_repository:
     name: bitnami
     repo_url: "{{ dsc.keycloakInfra.helmRepoUrl }}"

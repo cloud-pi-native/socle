@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: dso-install-manager
-  namespace: infra-argo
+  namespace: infra-argocd
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
@@ -15,7 +15,7 @@ spec:
         generators:
         - git:
             repoURL: https://github.com/cloud-pi-native/socle.git
-            revision: refactor/gitops
+            revision: refactor/gitops-falltrades
             files:
             - path: './gitops/envs/*'
         - list:

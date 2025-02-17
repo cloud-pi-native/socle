@@ -28,6 +28,16 @@ gitlab:
     registry:
       enabled: false
   gitaly:
+    priorityClassName: gitlab-gitaly
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    securityContext:
+      fsGroupChangePolicy: OnRootMismatch
 {% if dsc.global.metrics.enabled %}
     metrics:
       serviceMonitor:

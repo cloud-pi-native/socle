@@ -1,0 +1,12 @@
+- name: Declare PriorityClass for Gitaly
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ dsc.gitlab.namespace }}"
+    definition:
+      apiVersion: scheduling.k8s.io/v1
+      kind: PriorityClass
+      metadata:
+        name: gitlab-gitaly
+      value: 1000000
+      globalDefault: false
+      description: "GitLab Gitaly priority class"

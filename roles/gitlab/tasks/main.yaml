@@ -386,6 +386,7 @@
   ansible.builtin.set_fact:
     extra_kaniko_args: "{{ extra_kaniko_args | default('') }} --registry-mirror {{ item.registry.endpointUrl | regex_replace('^https?://', '') }}/{{ item.name }}"
   loop: "{{ dsc.harbor.proxyCache }}"
+  when: dsc.harbor.proxyCache is defined
 
 - name: Set or update insecure args variables
   community.general.gitlab_group_variable:
@@ -397,7 +398,7 @@
     state: "{{ dsc.gitlab.insecureCI | ternary('present', 'absent') }}"
     variables:
       - name: EXTRA_KANIKO_ARGS
-        value: --skip-tls-verify {{ extra_kaniko_args }}
+        value: --skip-tls-verify {{ extra_kaniko_args | default('') }}
       - name: EXTRA_GIT_ARGS
         value: -c http.sslVerify=false
       - name: EXTRA_VAULT_ARGS

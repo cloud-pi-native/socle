@@ -6,6 +6,8 @@
     kind: Namespace
     state: present
 
+# Setup CNPG s3 secret
+
 - name: CNPG s3 CA (secret)
   when: >
     dsc.global.backup.cnpg.enabled and
@@ -34,7 +36,10 @@
           data:
             ca.pem: "{{ cnpg_s3_ca_pem }}"
 
+# Setup CNPG backup
+
 - name: Set cnpg backup secret
+  when: dsc.global.backup.cnpg.enabled
   kubernetes.core.k8s:
     name: "{{ dsc.global.backup.s3.credentials.name }}"
     namespace: "{{ dsc.keycloak.namespace }}"
@@ -44,7 +49,6 @@
       data:
         accessKeyId: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
         secretAccessKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
-  when: dsc.global.backup.cnpg.enabled
 
 - name: Remove cnpg scheduled backup
   kubernetes.core.k8s:
@@ -55,7 +59,9 @@
     state: absent
   when: not dsc.global.backup.cnpg.enabled
 
-- name: Create PostgreSQL cluster and keycloak database
+# Create CNPG cluster and Keycloak database
+
+- name: Create PostgreSQL cluster and Keycloak database
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
@@ -95,6 +101,8 @@
   retries: 30
   delay: 5
 
+# Set Keycloak admin password
+
 - name: Get Keycloak admin password secret
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.keycloak.namespace }}"
@@ -115,6 +123,8 @@
         name: keycloak
         namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque
+
+# Deploy Keycloak
 
 - name: Add bitnami helm repo
   kubernetes.core.helm_repository:
@@ -153,6 +163,8 @@
   until: kc_response is not failed
   retries: 30
   delay: 5
+
+# Set admin facts and check access to Keycloak API
 
 - name: Get Keycloak admin password
   kubernetes.core.k8s_info:
@@ -195,6 +207,8 @@
 - name: Set kc_access_token fact
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
+
+# Create permanent Keycloak admin and update DSO Console inventory
 
 - name: Get keycloak master realm users from API
   ansible.builtin.uri:
@@ -279,6 +293,8 @@
         KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password | b64encode }}"
         KEYCLOAK_ADMIN: "{{ 'dsoadmin' | b64encode }}"
 
+# Remove Keycloak temporary admin
+
 - name: Set temporary_admin_present fact
   ansible.builtin.set_fact:
     temporary_admin_present: false
@@ -300,6 +316,8 @@
     state: absent
     realm: master
     username: admin
+
+# Ensure we will use permanent admin for subsequent tasks
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
@@ -330,6 +348,8 @@
 - name: Set kc_access_token fact
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
+
+# Create and setup dso realm
 
 - name: Create dso realm
   community.general.keycloak_realm:
@@ -510,6 +530,8 @@
     auth_password: "{{ keycloak_admin_password }}"
     realm: dso
     otp_policy_algorithm: SHA256
+
+# Patch some metrics resources
 
 - name: Patch serviceMonitors
   when: >

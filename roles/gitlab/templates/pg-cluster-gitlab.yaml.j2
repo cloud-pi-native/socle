@@ -53,6 +53,8 @@ spec:
   - name: pg-cluster-gitlab
 {% if dsc.gitlab.cnpg.mode == "restore" %}
     barmanObjectStore:
+      wal:
+        maxParallel: 8
       destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
       endpointURL: "{{ dsc.global.backup.s3.endpointURL }}"
 {% if dsc.global.backup.s3.endpointCA.key is defined %}

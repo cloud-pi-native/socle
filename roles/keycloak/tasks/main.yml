@@ -189,22 +189,20 @@
   register: kc_token
   ignore_errors: true
 
-- name: Reset Keycloak admin fact and API token
+- name: Reset Keycloak admin fact
   when: kc_token is failed
-  block:
-    - name: Reset Keycloak admin fact
-      ansible.builtin.set_fact:
-        keycloak_admin: dsoadmin
+  ansible.builtin.set_fact:
+    keycloak_admin: dsoadmin
 
-    - name: Get Keycloak API token
-      ansible.builtin.uri:
-        url: https://{{ keycloak_domain }}/realms/master/protocol/openid-connect/token
-        method: POST
-        status_code: [200, 202]
-        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        return_content: true
-        body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
-      register: kc_token
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: https://{{ keycloak_domain }}/realms/master/protocol/openid-connect/token
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
 
 - name: Set kc_access_token fact
   ansible.builtin.set_fact:

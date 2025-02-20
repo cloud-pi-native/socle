@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.3.0](https://github.com/cloud-pi-native/socle/compare/v3.2.2...v3.3.0) (2025-02-20)
+
+
+### Features
+
+* :arrow_up: upgrade console chart to v2 ([d6384c2](https://github.com/cloud-pi-native/socle/commit/d6384c2305fa173306c53823f3bf8e01f6b9a5ce))
+* :sparkles: add wal parallelism when restoring cnpg db ([5c17325](https://github.com/cloud-pi-native/socle/commit/5c17325195f15a7769e32393571a4e0fdd29e0fc))
+* :zap: improve gitaly availability ([f320927](https://github.com/cloud-pi-native/socle/commit/f320927a089d0cfb132b3dd89e9ab4a7318bbbe3))
+
+
+### Bug Fixes
+
+* :bug: ignore proxy in kaniko args if not in dsc ([63b929f](https://github.com/cloud-pi-native/socle/commit/63b929f90d9fcaf167f890ac0ed8df8a4a132879))
+* :bug: Reset Keycloak admin fact and API token ([3137c69](https://github.com/cloud-pi-native/socle/commit/3137c69b0cfc4e2fed1d127be5371fbf7610a2b0))
+* :bug: Set Keycloak permanent admin user ([bddceeb](https://github.com/cloud-pi-native/socle/commit/bddceeb79528e27bf0e7442d237cdd73c6f0d91e))
+* :wrench: platform security context ([5fc5921](https://github.com/cloud-pi-native/socle/commit/5fc592143e77ebe5c66afc7f69fdf39d3edde98b))
+
+
+### Performance Improvements
+
+* :art: Add when condition ([6209903](https://github.com/cloud-pi-native/socle/commit/62099031fe41fd5d71fb4a73e0bf8f289b3fc95d))
+
 ## [3.2.2](https://github.com/cloud-pi-native/socle/compare/v3.2.1...v3.2.2) (2025-02-07)
 
 

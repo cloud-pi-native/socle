@@ -195,6 +195,7 @@
     keycloak_admin: dsoadmin
 
 - name: Get Keycloak API token
+  when: kc_token is failed
   ansible.builtin.uri:
     url: https://{{ keycloak_domain }}/realms/master/protocol/openid-connect/token
     method: POST

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/cloud-pi-native/socle/compare/v3.3.0...v3.3.1) (2025-02-20)
+
+
+### Bug Fixes
+
+* :bug: Keycloak set kc_access_token ([36b0460](https://github.com/cloud-pi-native/socle/commit/36b0460b8ca43b116d64127a1f2937f2a520c1b1))
+
 ## [3.3.0](https://github.com/cloud-pi-native/socle/compare/v3.2.2...v3.3.0) (2025-02-20)
 
 

@@ -599,7 +599,7 @@ spec:
                               description: Vault backup-utils helm chart version (e.g., "1.12.2").
                               type: string
                             pathPrefix:
-                              description: Defines the globally shared s3 destination path for cnpg backups.
+                              description: Defines the s3 destination path for vault backups.
                               type: string
                               default: "vault"
                             mcExtraArgs:
@@ -641,6 +641,28 @@ spec:
                                 - bzip2
                                 - snappy
                               default: "none"
+                          type: object
+                        gitlab:
+                          properties:
+                            enabled:
+                              description: Enable s3 gitlab backups.
+                              default: false
+                              type: boolean
+                            pathPrefix:
+                              description: Defines the s3 destination path for gitlab backups.
+                              type: string
+                              default: "gitlab"
+                            mcExtraArgs:
+                              description: Extra args to pass to minio cli for the backups.
+                              type: string
+                            cron:
+                              description: Defines the cron rule used for gitlab backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for gitlab backups recurrences.
+                              type: string
+                              default: "30d"
                           type: object
                       type: object
                     platform:

@@ -180,6 +180,16 @@
       data:
         tls.crt: "{{ exposed_ca_pem | b64encode }}"
 
+- name: Deploy Gitlab backup s3 secret
+  when: dsc.global.backup.gitlab.enabled
+  kubernetes.core.k8s:
+    template: backup-s3-secret.yaml.j2
+
+- name: Deploy Gitlab backup helper cronjob
+  when: dsc.global.backup.gitlab.enabled
+  kubernetes.core.k8s:
+    template: backup-helper-cronjob.yaml.j2
+
 - name: Declare a PriorityClass for gitaly
   ansible.builtin.include_tasks:
     file: gitaly-priority-class.yaml

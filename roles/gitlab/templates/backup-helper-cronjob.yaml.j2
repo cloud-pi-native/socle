@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gitlab-backup
+  namespace: "{{ dsc.gitlab.namespace }}"
+spec:
+  schedule: "0 1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: gitlab-backup-helper
+            image: docker.io/minio/mc:latest
+            env:
+            - name: S3_ENDPOINT
+              value: "{{ dsc.global.backup.s3.endpointURL }}"
+            - name: S3_BUCKET_NAME
+              value: "{{ dsc.global.backup.s3.bucketName }}"
+            - name: S3_ACCESS_KEY
+              value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
+            - name: S3_SECRET_KEY
+              value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+            - name: S3_PATH_PREFIX
+              value: "{{ dsc.global.backup.gitlab.pathPrefix }}"
+            - name: RETENTION
+              value: "{{ dsc.global.backup.gitlab.retentionPolicy }}"
+            - name: MC_EXTRA_ARGS
+              value: "{{ dsc.global.backup.gitlab.mcExtraArgs }}"
+            args:
+            - /bin/sh
+            - -c
+            - |
+              mc ${MC_EXTRA_ARGS} alias set backup_host "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
+              for BACKUP in $(mc ls --json backup_host/${S3_BUCKET_NAME%/} | jq -c 'select(.key | contains("gitlab_backup"))'); do
+                BACKUP_NAME="$(echo ${BACKUP} | jq -r '.key')"
+                mc ${MC_EXTRA_ARGS} mv --recursive backup_host/${S3_BUCKET_NAME%/}/${BACKUP_NAME} backup_host/${S3_BUCKET_NAME%/}/${S3_PATH_PREFIX}
+              done
+              if [ ! -z "${RETENTION}" ]; then
+                mc ${MC_EXTRA_ARGS} rm --recursive --force --older-than "${RETENTION}" backup_host/${S3_BUCKET_NAME%/}/${S3_PATH_PREFIX}
+              fi
+          restartPolicy: Never

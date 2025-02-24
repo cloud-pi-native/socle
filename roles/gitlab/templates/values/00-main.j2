@@ -58,6 +58,16 @@ gitlab:
       serviceMonitor:
         enabled: true
 {% endif %}
+  toolbox:
+    backups:
+      cron:
+        enabled: {{ dsc.global.backup.gitlab.enabled }}
+        schedule: {{ dsc.global.backup.gitlab.cron }}
+        extraArgs: {{ dsc.global.backup.gitlab.extraArgs }}
+      objectStorage:
+        config:
+          secret: gitlab-backup
+          key: config
 
 global:
   psql:
@@ -112,6 +122,8 @@ global:
       autoLinkUser: ["openid_connect"]
       providers:
         - secret: openid-connect
+    backups:
+      bucket: "{{ dsc.global.backup.s3.bucketName }}"
 
   extraEnv:
     GITLAB_ROOT_EMAIL: "admin@example.com"

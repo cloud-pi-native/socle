@@ -142,8 +142,8 @@
       ansible.builtin.set_fact:
         user_id: "{{ kc_users.json | selectattr('username', 'equalto', user) | map(attribute='id') | first }}"
 
-# Unlocking user using Attack Detection API endpoint
-# See: https://www.keycloak.org/docs-api/latest/rest-api/index.html#_attack_detection
+    # Unlocking user using Attack Detection API endpoint
+    # See: https://www.keycloak.org/docs-api/latest/rest-api/index.html#_attack_detection
 
     - name: Unlock user
       ansible.builtin.uri:

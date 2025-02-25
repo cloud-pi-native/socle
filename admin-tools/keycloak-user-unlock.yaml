@@ -6,19 +6,17 @@
 
     - name: Check user fact and exit if not defined
       when: user is not defined
-      tags:
-        - always
       block:
         - name: Warning message
           ansible.builtin.debug:
             msg:
-              - "Attention ! Vous avez lancé le playbook sans indiquer l'utilisateur à déverrouiller."
+              - "Attention ! Vous avez lancé le playbook sans indiquer l'extra variable 'user'."
               - ""
-              - "Pour préciser l'utilisateur à déverrouiller, veuiller utiliser l'extra variable 'user' comme ceci :"
+              - "Pour préciser l'utilisateur à déverrouiller, veuillez l'exécuter comme ceci :"
               - ""
               - " ansible-playbook admin-tools/keycloak-unlock-user.yaml -e user=utilisateur-souhaité-ici "
               - ""
-              - "Rappel : si vous n'utilisez pas l'extra variable 'dsc_cr', le présent playbook s'appuiera sur la configuration dsc par défaut (conf-dso)."
+              - "Rappel : si vous n'utilisez pas aussi l'extra variable 'dsc_cr', le playbook s'appuiera sur la configuration dsc par défaut (conf-dso)."
               - "Il traitera donc l'instance Keycloak du namespace associé (par défaut 'dso-keycloak')."
               - ""
               - "Si vous voulez traiter une autre instance Keycloak, utilisant donc une autre dsc, veuillez utiliser l'extra variable 'dsc_cr', exemple :"
@@ -56,11 +54,11 @@
               - ""
               - " kubectl get dsc {{ dsc_cr }} "
               - ""
-              - "Si elle n'est pas trouvée (not found), listez simplement les resources dsc actuellement déclarées :"
+              - "Si elle n'est pas trouvée (not found), listez simplement les ressources dsc actuellement déclarées :"
               - ""
               - " kubectl get dsc "
               - ""
-              - "Puis relancez le playbook avec une resource dsc existante."
+              - "Puis relancez le playbook avec une ressource dsc existante."
               - ""
               - "Rappel : le présent playbook lancé seul, sans extra vars, utilisera la configuration dsc par défaut (conf-dso)."
               - "Il réinitialisera donc le mot de passe de l'administrateur Keycloak du namespace associé."

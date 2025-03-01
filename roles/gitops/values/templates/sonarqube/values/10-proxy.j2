@@ -1,0 +1,26 @@
+{% if dsc.proxy.enabled %}
+sonarqube:
+  prometheusExporter:
+    httpProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.httpsProxy}>
+    noProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.noProxy}>
+  
+  plugins:
+    httpProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.httpsProxy}>
+    noProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.noProxy}>
+  
+#  env:
+#    - name: http_proxy
+#      value: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.httpProxy}>
+#    - name: https_proxy
+#      value: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.httpsProxy}>
+#    - name: no_proxy
+#      value: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.noProxy}>
+
+  sonarProperties:
+    http.proxyHost: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.hostProxy}>
+    http.proxyPort: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.portProxy}>
+    https.proxyHost: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.hostProxy}>
+    https.proxyPort: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath {.portProxy}>
+{% endif %}

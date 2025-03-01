@@ -3,3 +3,4 @@
   ansible.builtin.include_tasks: ./template.yml
   loop:
     - vault 
+    - sonarqube 

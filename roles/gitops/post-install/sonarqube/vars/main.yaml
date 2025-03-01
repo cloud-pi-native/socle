@@ -1,0 +1,16 @@
+---
+sonarqube_metrics_ports_names_facts:
+  - fact_name: api_metrics_port_name
+    port: 9000
+  - fact_name: web_metrics_port_name
+    port: 8000
+  - fact_name: ce_metrics_port_name
+    port: 8001
+
+sonarqube_metrics_paths_facts:
+  - fact_name: api_metrics_path
+    path: /api/monitoring/metrics
+  - fact_name: web_metrics_path
+    path: /
+  - fact_name: ce_metrics_path
+    path: /

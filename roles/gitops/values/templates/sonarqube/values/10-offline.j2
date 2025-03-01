@@ -1,0 +1,21 @@
+sonarqube:
+{% if dsc.global.offline %}
+  prometheusExporter:
+    version: {{ dsc.sonarqube.prometheusJavaagentVersion }}
+    noCheckCertificate: true
+    downloadURL: {{ dsc.sonarqube.pluginDownloadUrl }}/jmx_prometheus_javaagent-{{ dsc.sonarqube.prometheusJavaagentVersion }}.jar
+  
+  plugins:
+    install:
+    - {{ dsc.sonarqube.pluginDownloadUrl }}/sonar-auth-oidc-plugin-2.1.1.jar
+    - {{ dsc.sonarqube.pluginDownloadUrl }}/sonarqube-community-branch-plugin-1.23.0.jar
+    - {{ dsc.sonarqube.pluginDownloadUrl }}/sonar-cnes-report-5.0.0.jar
+    noCheckCertificate: true
+  
+{% else %}
+  plugins:
+    install:
+    - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
+    - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.23.0/sonarqube-community-branch-plugin-1.23.0.jar
+    - https://github.com/cnescatlab/sonar-cnes-report/releases/download/5.0.0/sonar-cnes-report-5.0.0.jar
+{% endif %}

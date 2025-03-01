@@ -6,6 +6,7 @@ appVersion: "26.1.2"
 dependencies:
 - name: keycloak
   alias: keycloak
-  version: 24.2.3
+  version: 24.4.10
   #repository: oci://registry-1.docker.io/bitnamicharts/keycloak 
+  #repository: https://charts.bitnami.com/bitnami
   repository: http://helm-charts-e60c21.pages.forge-dc.cloudmi.minint.fr

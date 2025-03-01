@@ -65,6 +65,7 @@
         - post-install
         - post-install-keycloak
         - post-install-vault
+        - post-install-sonarqube
 
     - role: gitops/dso-app
       tags:
@@ -79,3 +80,8 @@
       tags:
         - post-install
         - post-install-vault
+
+    - role: gitops/post-install/sonarqube
+      tags:
+        - post-install
+        - post-install-sonarqube

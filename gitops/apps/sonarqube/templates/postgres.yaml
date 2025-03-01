@@ -1,0 +1,118 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-sonar
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.1
+  postgresql:
+    parameters:
+      max_worker_processes: "60"
+      max_slot_wal_keep_size: 5GB
+    pg_hba:
+      # To access through TCP/IP you will need to get username
+      # and password from the secret pg-cluster-sonar-app
+      - host sonar keycloak all md5
+      - host sonar streaming_replica all md5
+  bootstrap:
+    initdb:
+      database: sonardb
+      owner: dso_admin
+    recovery: null
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 6Gi
+  walStorage:
+    size: 6Gi
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 2Gi
+      cpu: 500m
+  monitoring:
+    enablePodMonitor: false
+{{- if .Values.sonarqube.cnpg.backup.enabled }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: pg-cluster-sonar
+spec:
+  schedule: <path:forge-dso/data/env/dso-hp-testcm/apps/sonarqube/values#cnpg | jsonPath {.backup.cron}>
+  backupOwnerReference: self
+  cluster:
+    name: pg-cluster-sonar
+{{- end }}
+{{- if .Values.sonarqube.cnpg.exposed }}
+---                                                                                                                                             
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    cnpg.io/cluster: pg-cluster-sonar
+  name: pg-cluster-sonar-rw-nodeport
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    nodePort: <path:forge-dso/data/env/dso-hp-testcm/apps/sonarqube/values#cnpg | jsonPath {.nodePort}>
+  selector:
+    cnpg.io/cluster: pg-cluster-sonar
+    role: primary
+  type: NodePort
+{{- end }}
+
+# ---
+# apiVersion: v1
+# kind: Secret
+# type: Opaque
+# metadata:
+#   name: sonar-pg-cluster-backup
+#   annotations:
+#     avp.kubernetes.io/remove-missing: "true"
+# data:
+#   DB_HOST: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.host} | base64encode>
+#   DB_PORT: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.port} | base64encode>
+#   DB_NAME: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.database} | base64encode>
+#   DB_USER: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.app.username} | base64encode>
+#   DB_PASS: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.app.password} | base64encode>
+#   S3_ENDPOINT: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.s3.endpoint} | base64encode>
+#   S3_ACCESS_KEY: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.s3.accessKey} | base64encode>
+#   S3_SECRET_KEY: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.s3.secretKey} | base64encode>
+#   S3_BUCKET_NAME: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.s3.bucketName} | base64encode>
+#   S3_BUCKET_PREFIX: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.s3.bucketPrefix} | base64encode>
+#   RETENTION_DAYS: <path:secret/data/platforms/production/apps/sonar#postgres | jsonPath {.s3.retentionDay} | base64encode>
+
+# ---
+# apiVersion: batch/v1
+# kind: CronJob
+# metadata:
+#   name: sonar-pg-cluster-backup
+#   labels:
+#     jobgroup: sonar-pg-cluster-backup
+# spec:
+#   schedule: "0 1 * * *"
+#   successfulJobsHistoryLimit: 1
+#   failedJobsHistoryLimit: 3
+#   concurrencyPolicy: Forbid
+#   jobTemplate:
+#     metadata:
+#       name: sonar-pg-cluster-backup
+#       labels:
+#         jobgroup: sonar-pg-cluster-backup
+#     spec:
+#       backoffLimit: 0
+#       template:
+#         spec:
+#           containers:
+#           - name: sonar-pg-cluster-backup
+#             image: ghcr.io/this-is-tobi/tools/pg-backup:latest
+#             imagePullPolicy: Always
+#             envFrom:
+#             - secretRef:
+#                 name: sonar-pg-cluster-backup
+#           restartPolicy: Never

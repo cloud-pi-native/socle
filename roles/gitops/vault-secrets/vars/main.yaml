@@ -4,10 +4,19 @@ envs:
     apps:
       - argocd_app: "common"
         vault_values:
+          image:
+            repository:
+              docker: "{{ dsc.global.registry | default('docker.io') }}"
+          domain:
+            keycloak: "{{ keycloak_domain }}"
+            sonarqube: "{{ sonar_domain }}"
+            vault: "{{ vault_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy }}"
             httpsProxy: "{{ dsc.proxy.https_proxy }}"
             noProxy: "{{ dsc.proxy.no_proxy }}"
+            hostProxy: "{{ dsc.proxy.host }}"
+            portProxy: "{{ dsc.proxy.port }}"
       - argocd_app: "keycloak"
         vault_values:
           auth:
@@ -23,14 +32,21 @@ envs:
           podSecurityContext:
             enabled: true
             fsGroup: 1001
-      - argocd_app: "vault"
+      - argocd_app: "sonarqube"
         vault_values:
           global:
-            image:
-              repository: "{{ dsc.global.registry | default('docker.io') }}"
-          server:
-            ha:
-              apiAddr: "https://{{ vault_domain }}" 
+            keycloak:
+              client: "{{ keycloak_client | default('depend de keycloak') }}"
+              secret: "{{ keycloak_secret | default('depend de keycloak') }}"
+          monitoring:
+            password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')}}"
+          cnpg: "{{ (dsc.sonarqube.cnpg.exposed or dsc.global.backup.cnpg.enabled) | ternary({
+            'nodePort': dsc.sonarqube.cnpg.nodePort if dsc.sonarqube.cnpg.exposed else None,
+            'backup': {
+              'cron': dsc.global.backup.cnpg.cron
+            } if dsc.global.backup.cnpg.enabled else None
+          }, None) }}"
+          adminPassword: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')}}"
       - argocd_app: "kubeview"
         vault_values:
           replicaCount: 3

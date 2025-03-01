@@ -1,0 +1,14 @@
+---
+- name: Get Sonar client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloak.namespace }}"
+    name: keycloak-client-secret-sonar-client
+  register: sonar_secret
+  failed_when: sonar_secret.resources | length == 0
+
+- name: Set settings fact
+  ansible.builtin.set_fact:
+    keycloak_secret: "{{ sonar_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
+    keycloak_client: "{{ sonar_secret.resources[0].data.CLIENT_ID | b64decode }}"
+

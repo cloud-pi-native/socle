@@ -1,0 +1,100 @@
+sonarqube:
+  account:
+    adminPasswordSecretName: sonarqube
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    securityContext:
+      runAsUser: 101
+  adminJobAnnotations: {}
+  curlContainerImage: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+    | jsonPath {.repository.docker}>/curlimages/curl:8.11.0
+  image:
+    pullPolicy: IfNotPresent
+    repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image |
+      jsonPath {.repository.docker}>/sonarqube
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    enabled: true
+    hosts:
+    - name: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain | jsonPath
+        {.sonarqube}>
+      path: /
+      pathType: Prefix
+    ingressClassName: traefik
+    labels:
+      app: sonar
+  initFs:
+    enabled: false
+  initSysctl:
+    enabled: false
+  jdbcOverwrite:
+    enable: true
+    jdbcSecretName: pg-cluster-sonar-app
+    jdbcSecretPasswordKey: password
+    jdbcUrl: jdbc:postgresql://pg-cluster-sonar-rw/sonardb?socketTimeout=1500
+    jdbcUsername: dso_admin
+  jvmCeOpts: -javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=ce
+  jvmOpts: -javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=web
+  monitoringPasscodeSecretKey: monitoring-password
+  monitoringPasscodeSecretName: sonar-monitoring-password
+  plugins:
+    httpProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath
+      {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy |
+      jsonPath {.httpsProxy}>
+    install:
+    - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
+    - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.23.0/sonarqube-community-branch-plugin-1.23.0.jar
+    - https://github.com/cnescatlab/sonar-cnes-report/releases/download/5.0.0/sonar-cnes-report-5.0.0.jar
+    noProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath
+      {.noProxy}>
+  postgresql:
+    enabled: false
+  prometheusExporter:
+    enabled: true
+    httpProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath
+      {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy |
+      jsonPath {.httpsProxy}>
+    noProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath
+      {.noProxy}>
+  prometheusMonitoring:
+    podMonitor:
+      enabled: false
+  serviceAccount:
+    create: true
+  sonarProperties:
+    http.proxyHost: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy
+      | jsonPath {.hostProxy}>
+    http.proxyPort: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy
+      | jsonPath {.portProxy}>
+    https.proxyHost: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy
+      | jsonPath {.hostProxy}>
+    https.proxyPort: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy
+      | jsonPath {.portProxy}>
+    sonar.auth.oidc.allowUsersToSignUp: 'true'
+    sonar.auth.oidc.autoLogin: 'false'
+    sonar.auth.oidc.clientId.secured: <path:forge-dso/data/env/dso-hp-testcm/apps/sonarqube/values#global
+      | jsonPath {.keycloak.client}>
+    sonar.auth.oidc.clientSecret.secured: <path:forge-dso/data/env/dso-hp-testcm/apps/sonarqube/values#global
+      | jsonPath {.keycloak.secret}>
+    sonar.auth.oidc.enabled: 'true'
+    sonar.auth.oidc.groupsSync: 'true'
+    sonar.auth.oidc.groupsSync.claimName: groups
+    sonar.auth.oidc.issuerUri: https://<path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain
+      | jsonPath {.keycloak}>/realms/dso
+    sonar.auth.oidc.loginStrategy: Email
+    sonar.auth.oidc.loginStrategy.customClaim.name: upn
+    sonar.auth.oidc.scopes: openid generic
+    sonar.core.serverBaseURL: https://<path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain
+      | jsonPath {.sonarqube}>
+    sonar.plugins.risk.consent: ACCEPTED
+  sonarWebContext: /
+  sonarqubeFolder: /opt/sonarqube
+  terminationGracePeriodSeconds: 60

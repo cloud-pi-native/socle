@@ -2,21 +2,21 @@ vault:
   csi:
     agent:
       image:
-        repository: <path:forge-dso/data/env/dso-hp-testcm/apps/vault/values#global
-          | jsonPath {.image.repository}>/hashicorp/vault
+        repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+          | jsonPath {.repository.docker}>/hashicorp/vault
     image:
-      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/vault/values#global
-        | jsonPath {.image.repository}>/hashicorp/vault-csi-provider
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/hashicorp/vault-csi-provider
   global:
     serverTelemetry:
       prometheusOperator: true
   injector:
     agentImage:
-      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/vault/values#global
-        | jsonPath {.image.repository}>/hashicorp/vault
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/hashicorp/vault
     image:
-      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/vault/values#global
-        | jsonPath {.image.repository}>/hashicorp/vault-k8s
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/hashicorp/vault-k8s
     metrics:
       enabled: true
     securityContext:
@@ -48,8 +48,8 @@ vault:
       NO_PROXY: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy |
         jsonPath {.noProxy}>,.testcm-vault-internal
     ha:
-      apiAddr: <path:forge-dso/data/env/dso-hp-testcm/apps/vault/values#server | jsonPath
-        {.ha.apiAddr}>
+      apiAddr: https://<path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain
+        | jsonPath {.vault}>
       enabled: true
       raft:
         config: "ui = true\nservice_registration \"kubernetes\" {}\nlistener \"tcp\"
@@ -60,8 +60,8 @@ vault:
         enabled: true
       replicas: 3
     image:
-      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/vault/values#global
-        | jsonPath {.image.repository}>/hashicorp/vault
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/hashicorp/vault
     route:
       enabled: false
     standalone:

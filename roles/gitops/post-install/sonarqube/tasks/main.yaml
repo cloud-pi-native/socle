@@ -1,0 +1,255 @@
+---
+- name: Wait pg-cluster-sonar-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    name: pg-cluster-sonar-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-sonar-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    name: pg-cluster-sonar-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and
+    dsc.global.backup.s3.endpointCA.namespace is defined and
+    dsc.global.backup.s3.endpointCA.name is defined and
+    dsc.global.backup.s3.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.s3.endpointCA.name }}"
+        namespace: "{{ dsc.global.backup.s3.endpointCA.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact:
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.s3.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+- name: Get SonarQube monitoring password secret
+  no_log: true
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    name: sonar-monitoring-password
+  register: sonar_monitoring_secret
+
+- name: Set SonarQube monitoring password secret
+  when: sonar_monitoring_secret.resources | length == 0
+  no_log: true
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        monitoring-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
+      metadata:
+        name: sonar-monitoring-password
+        namespace: "{{ dsc.sonarqube.namespace }}"
+      type: Opaque
+
+- name: Set upgrading_chart fact
+  when: sonar_helm_release.status is defined
+  block:
+    - name: Retrieve installed SonarQube chart version
+      ansible.builtin.set_fact:
+        sonar_installed_chart_version: "{{ sonar_helm_release.status.chart | regex_replace('sonarqube-', '') }}"
+
+    - name: Initialize upgrading_chart fact
+      ansible.builtin.set_fact:
+        upgrading_chart: false
+
+    - name: Manage upgrading_chart fact
+      when: sonar_installed_chart_version is defined
+      block:
+        - name: Update upgrading_chart fact
+          when: dsc.sonarqube.chartVersion is version(sonar_installed_chart_version, operator='gt', version_type='loose')
+          ansible.builtin.set_fact:
+            upgrading_chart: true
+
+- name: Manage SonarQube upgrade
+  when: >
+    upgrading_chart is defined and
+    upgrading_chart
+  block:
+    - name: Get Sonarqube admin password secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        kind: Secret
+        name: "sonarqube"
+      register: sonarqube_pwd
+
+    - name: Get SonarQube migration status
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/v2/system/migrations-status
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: GET
+        return_content: true
+        status_code: 200
+      register: sonar_migration_status
+
+    - name: Trigger DB migration
+      when: "'Database migration is required' in sonar_migration_status.json.message"
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/system/migrate_db
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: POST
+        status_code: [200, 204]
+
+    - name: Wait SonarQube status to be UP
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ sonar_domain }}/api/system/status
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: GET
+        return_content: true
+        status_code: 200
+      register: sonar_check
+      until: sonar_check.json.status == "UP"
+      retries: 60
+      delay: 5
+
+- name: Wait sonarqube endpoint to initialize
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    name: "{{ dsc.sonarqube.namespace.split('-')[0] }}-sonarqube-sonarqube" # à améliorer
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0].ip is defined
+  retries: 45
+  delay: 5
+
+- name: Get DSO Console inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: dso-config
+  register: ansible_inventory
+
+- name: Get SonarQube version
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ sonar_domain }}/api/server/version
+    method: GET
+    return_content: true
+  register: sonar_version
+
+- name: Reset Admin Password procedure
+  when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is undefined
+  ansible.builtin.include_tasks:
+    file: reset-admin-password.yaml
+
+- name: Get Sonarqube admin password secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    name: "sonarqube"
+  register: sonarqube_pwd
+
+- name: Remove permissions for sonar-users
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+    force_basic_auth: true
+    method: post
+    status_code: 204
+  with_items:
+    - scan
+    - provisioning
+
+- name: Create metrics resources
+  when: dsc.global.metrics.enabled
+  block:
+    - name: Get SonarQube pod
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        label_selectors:
+          - app=sonarqube
+          - release=sonarqube
+      register: sonarqube_pod
+
+    - name: Set metrics ports names facts
+      loop: "{{ sonarqube_metrics_ports_names_facts }}"
+      ansible.builtin.set_fact:
+        "{{ item.fact_name }}": "{{ sonarqube_pod.resources
+          | map(attribute='spec.containers') | first
+          | selectattr('name', 'contains', 'sonarqube')
+          | map(attribute='ports') | first
+          | selectattr('containerPort', 'equalto', item.port)
+          | map(attribute='name') | first }}"
+
+    - name: Set metrics paths facts
+      loop: "{{ sonarqube_metrics_paths_facts }}"
+      ansible.builtin.set_fact:
+        "{{ item.fact_name }}": "{{ item.path }}"
+
+    - name: Create PodMonitor
+      kubernetes.core.k8s:
+        template: podmonitor.yml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2
+
+- name: Patch podMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get podMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: PodMonitor
+        namespace: "{{ dsc.sonarqube.namespace }}"
+      register: pod_monitors
+
+    - name: Get pod_monitors names
+      ansible.builtin.set_fact:
+        pod_monitors_names: "{{ pod_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch podMonitors
+      kubernetes.core.k8s:
+        kind: PodMonitor
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ pod_monitors_names }}"

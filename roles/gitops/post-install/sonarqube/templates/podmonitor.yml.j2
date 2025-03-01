@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  labels:
+    app: sonarqube
+  name: sonarqube
+  namespace: {{ dsc.sonarqube.namespace }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.sonarqube.namespace }}
+  podMetricsEndpoints:
+  - bearerTokenSecret:
+      key: monitoring-password
+      name: sonar-monitoring-password
+    interval: 30s
+    path: {{ api_metrics_path }}
+    port: {{ api_metrics_port_name }}
+    scheme: http
+  - interval: 30s
+    path: {{ web_metrics_path }}
+    scheme: http
+    targetPort: {{ web_metrics_port_name }}
+  - interval: 30s
+    path: {{ ce_metrics_path }}
+    scheme: http
+    targetPort: {{ ce_metrics_port_name }}
+  selector:
+    matchLabels:
+      app: sonarqube

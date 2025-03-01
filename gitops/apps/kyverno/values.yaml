@@ -1,0 +1,44 @@
+sonarqube:
+  account:
+    adminPasswordSecretName: sonarqube
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+  adminJobAnnotations: {}
+  image:
+    pullPolicy: IfNotPresent
+  initFs:
+    enabled: false
+  initSysctl:
+    enabled: false
+  jvmCeOpts: -javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=ce
+  jvmOpts: -javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=web
+  monitoringPasscodeSecretKey: monitoring-password
+  monitoringPasscodeSecretName: sonar-monitoring-password
+  plugins:
+    install:
+    - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
+    - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.23.0/sonarqube-community-branch-plugin-1.23.0.jar
+    - https://github.com/cnescatlab/sonar-cnes-report/releases/download/5.0.0/sonar-cnes-report-5.0.0.jar
+  postgresql:
+    enabled: false
+  prometheusExporter:
+    enabled: true
+  prometheusMonitoring:
+    podMonitor:
+      enabled: false
+  serviceAccount:
+    create: true
+  sonarProperties:
+    sonar.plugins.risk.consent: ACCEPTED
+  sonarWebContext: /
+  sonarqubeFolder: /opt/sonarqube
+  terminationGracePeriodSeconds: 60
+  cnpg:
+    exposed: false
+    backup:
+      enabled: false

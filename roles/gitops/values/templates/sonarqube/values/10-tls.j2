@@ -1,0 +1,12 @@
+{% if dsc.ingress.tls.type != 'none' %}
+sonarqube:
+  ingress:
+    tls:
+      - hosts:
+          - <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain | jsonPath {.sonarqube}>
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+        secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+        secretName: sonar-tls-secret
+{% endif %}
+{% endif %}

@@ -236,6 +236,7 @@
   block:
     - name: Create admin group
       community.general.keycloak_group:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
         auth_keycloak_url: https://{{ keycloak_domain }}
         auth_realm: master
@@ -247,6 +248,7 @@
 
     - name: Map admin realm role from admin group
       community.general.keycloak_realm_rolemapping:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         realm: master
         auth_client_id: admin-cli
         auth_keycloak_url: https://{{ keycloak_domain }}

@@ -38,7 +38,7 @@ spec:
     chartVersion: 1.16.0
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
-    chartVersion: 24.2.3
+    chartVersion: 24.4.10
   kyverno:
     # https://artifacthub.io/packages/helm/kyverno/kyverno
     chartVersion: 3.1.4

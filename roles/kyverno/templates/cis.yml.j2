@@ -498,6 +498,44 @@ spec:
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
+  name: non-root-security-context-awx-automation-job
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+spec:
+  validationFailureAction: Enforce
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Pod
+        namespaces:
+        - "{{ dsc.awx.namespace }}"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          containers:
+          - (name): "*"
+            +(securityContext):
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              runAsNonRoot: true
+              runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
   name: set-home-env-var
   annotations:
     policies.kyverno.io/title: Set HOME environment variable

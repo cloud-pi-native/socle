@@ -1,0 +1,167 @@
+---
+- name: Unlock Keycloak user
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+    - name: Check user fact and exit if not defined
+      when: user is not defined
+      block:
+        - name: Warning message
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Vous avez lancé le playbook sans indiquer l'extra variable 'user'."
+              - ""
+              - "Pour préciser l'utilisateur à déverrouiller, veuillez l'exécuter comme ceci :"
+              - ""
+              - " ansible-playbook admin-tools/keycloak-unlock-user.yaml -e user=utilisateur-souhaité-ici "
+              - ""
+              - "Rappel : si vous n'utilisez pas aussi l'extra variable 'dsc_cr', le playbook s'appuiera sur la configuration dsc par défaut (conf-dso)."
+              - "Il traitera donc l'instance Keycloak du namespace associé (par défaut 'dso-keycloak')."
+              - ""
+              - "Si vous voulez traiter une autre instance Keycloak, utilisant donc une autre dsc, veuillez utiliser l'extra variable 'dsc_cr', exemple :"
+              - ""
+              - " ansible-playbook admin-tools/keycloak-unlock-user.yaml -e user=utilisateur-souhaité-ici -e dsc_cr=ma-conf-dso"
+
+        - name: Exit playbook
+          ansible.builtin.meta: end_play
+
+    - name: "Get socle config from conf-dso dsc (default)"
+      kubernetes.core.k8s_info:
+        kind: dsc
+        name: conf-dso
+        api_version: cloud-pi-native.fr/v1alpha
+      register: socle_config
+
+    - name: Get socle config from dsc_cr extra var when defined
+      when: dsc_cr is defined
+      kubernetes.core.k8s_info:
+        kind: dsc
+        name: "{{ dsc_cr }}"
+        api_version: cloud-pi-native.fr/v1alpha
+      register: socle_config_custom
+
+    - name: Check socle_config_custom and exit if empty
+      when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
+      block:
+        - name: Warning message
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Vous avez lancé le playbook avec l'option '-e dsc_cr={{ dsc_cr }}'"
+              - "mais la ressource dsc nommée '{{ dsc_cr }}' est vide ou inexistante côté cluster !"
+              - ""
+              - "Vérifiez que vous ne vous êtes pas trompé de nom et que la ressource existe bien, via la commande suivante :"
+              - ""
+              - " kubectl get dsc {{ dsc_cr }} "
+              - ""
+              - "Si elle n'est pas trouvée (not found), listez simplement les ressources dsc actuellement déclarées :"
+              - ""
+              - " kubectl get dsc "
+              - ""
+              - "Puis relancez le playbook avec une ressource dsc existante."
+              - ""
+              - "Rappel : le présent playbook lancé seul, sans extra vars, utilisera la configuration dsc par défaut (conf-dso)."
+              - "Il réinitialisera donc le mot de passe de l'administrateur Keycloak du namespace associé."
+
+        - name: Exit playbook
+          ansible.builtin.meta: end_play
+
+    - name: Set socle_config fact when dsc_cr defined and not empty
+      ansible.builtin.set_fact:
+        socle_config: "{{ socle_config_custom }}"
+      when: (socle_config_custom is not skipped) and (socle_config_custom.resources | length > 0)
+
+    - name: Set DSC facts
+      ansible.builtin.set_fact:
+        dsc_name: "{{ socle_config.resources[0].metadata.name }}"
+        dsc: "{{ socle_config.resources[0] }}"
+        dsc_default_config: "{{ lookup('ansible.builtin.file', '../roles/socle-config/files/config.yaml') | from_yaml }}"
+        dsc_default_releases: "{{ lookup('ansible.builtin.file', '../roles/socle-config/files/releases.yaml') | from_yaml }}"
+
+    - name: Combine DSC with config and releases
+      ansible.builtin.set_fact:
+        dsc: "{{ (dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True)).spec }}"
+
+    - name: Get Keycloak pods
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.keycloak.namespace }}"
+        kind: Pod
+        label_selectors:
+          - app.kubernetes.io/instance=keycloak
+      register: kc_pods
+
+    - name: Set kc_pod fact
+      ansible.builtin.set_fact:
+        kc_pod: "{{ kc_pods.resources[0].metadata.name }}"
+
+    - name: Set temporary admin facts
+      ansible.builtin.set_fact:
+        tmp_admin_pass: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') }}"
+        tmp_admin: tmpadm
+
+    - name: Create temporary admin user
+      kubernetes.core.k8s_exec:
+        pod: "{{ kc_pod }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        command: >
+          bash -c "JAVA_OPTS_APPEND='-Djgroups.dns.query=keycloak-headless.{{ dsc.keycloak.namespace }}.svc.cluster.local -Djgroups.bind.port=7900';
+          export PASS_VAR='{{ tmp_admin_pass }}';
+          kc.sh bootstrap-admin user --username {{ tmp_admin }} --password:env PASS_VAR"
+      register: tmp_adm
+
+    - name: Get Keycloak API token
+      ansible.builtin.uri:
+        url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}/realms/master/protocol/openid-connect/token
+        method: POST
+        status_code: [200, 202]
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        return_content: true
+        body: username={{ tmp_admin }}&password={{ tmp_admin_pass }}&grant_type=password&client_id=admin-cli
+      register: kc_token
+      ignore_errors: true
+
+    - name: Set kc_access_token fact
+      ansible.builtin.set_fact:
+        kc_access_token: "{{ kc_token.json.access_token }}"
+
+    - name: Retrieve users from API
+      ansible.builtin.uri:
+        url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}/admin/realms/master/users
+        method: GET
+        status_code: [200, 204]
+        return_content: true
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        body_format: json
+        headers:
+          Authorization: bearer {{ kc_access_token }}
+      register: kc_users
+
+    - name: Set user_id fact
+      ansible.builtin.set_fact:
+        user_id: "{{ kc_users.json | selectattr('username', 'equalto', user) | map(attribute='id') | first }}"
+
+    # Unlocking user using Attack Detection API endpoint
+    # See: https://www.keycloak.org/docs-api/latest/rest-api/index.html#_attack_detection
+
+    - name: Unlock user
+      ansible.builtin.uri:
+        url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}/admin/realms/master/attack-detection/brute-force/users/{{ user_id }}
+        method: DELETE
+        status_code: [200, 204]
+        return_content: true
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        body_format: json
+        headers:
+          Authorization: bearer {{ kc_access_token }}
+
+    - name: Remove temporary admin from master realm
+      community.general.keycloak_user:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}
+        auth_realm: master
+        auth_username: "{{ tmp_admin }}"
+        auth_password: "{{ tmp_admin_pass }}"
+        state: absent
+        realm: master
+        username: "{{ tmp_admin }}"

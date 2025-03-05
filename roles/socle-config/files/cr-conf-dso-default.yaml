@@ -28,6 +28,9 @@ spec:
         cnpg:
           enabled: false
           pathPrefix: cnpg
+        gitlab:
+          enabled: false
+          pathPrefix: gitlab
         vault:
           enabled: false
           pathPrefix: vault

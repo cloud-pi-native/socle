@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.4.0](https://github.com/cloud-pi-native/socle/compare/v3.3.1...v3.4.0) (2025-03-05)
+
+
+### Features
+
+* :arrow_up: Upgrade Keycloak to version 26.1.2 ([8bfef6d](https://github.com/cloud-pi-native/socle/commit/8bfef6d389fe4b4e38b23c3304e568d29c337791))
+* :sparkles: Add Console server restart tasks and messages ([7ee5b95](https://github.com/cloud-pi-native/socle/commit/7ee5b95b6a6999a9dae5cfe603b57cfdb273182f))
+* :sparkles: Add keycloak admin reset playbook ([da2a596](https://github.com/cloud-pi-native/socle/commit/da2a59663154e6c4cc3a6ea78df78bb4b4794a62))
+* :sparkles: Add keycloak user unlock playbook ([129b34e](https://github.com/cloud-pi-native/socle/commit/129b34e09e052b18ab0f2fd4ac6b661b1c2a18dc))
+* :sparkles: introduce gitlab backup ([6f95582](https://github.com/cloud-pi-native/socle/commit/6f95582f380783bfa66be2979d8a9d52a950eaf7))
+* :sparkles: Upgrade Keycloak to 26.1.3 version ([773adbd](https://github.com/cloud-pi-native/socle/commit/773adbdd9174ecb27f699ddd895fbee7c581a3ef))
+
+
+### Bug Fixes
+
+* :rotating_light: Comments indentation ([58a0263](https://github.com/cloud-pi-native/socle/commit/58a02633eae32d131bea752d4910beaec9fc1f90))
+* :wrench: forgot validate_certs ([74ebc12](https://github.com/cloud-pi-native/socle/commit/74ebc12f559cf64eb3383daf31fd9a43edc329eb))
+
 ## [3.3.1](https://github.com/cloud-pi-native/socle/compare/v3.3.0...v3.3.1) (2025-02-20)
 
 

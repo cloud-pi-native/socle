@@ -1,0 +1,125 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-awx
+  namespace: {{ dsc.awx.namespace }}
+{% if dsc.global.backup.velero.enabled %}
+  annotations:
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  awx > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/container: postgres
+    pre.hook.backup.velero.io/on-error: Fail
+    pre.hook.backup.velero.io/timeout: 90s
+{% endif %}
+spec:
+  instances: 3
+  # Parameters and pg_hba configuration will be append
+  # to the default ones to make the cluster work
+{% if use_private_registry %}
+  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% endif %}
+{% if use_image_pull_secrets %}
+  imagePullSecrets:
+  - name: dso-config-pull-secret
+{% endif %}
+  postgresql:
+    parameters:
+      max_worker_processes: "60"
+{% if dsc.awx.postgresWalMaxSlotKeepSize is defined %}
+      max_slot_wal_keep_size: {{ dsc.awx.postgresWalMaxSlotKeepSize }}
+{% endif %}
+{% if dsc.awx.cnpg.mode == "primary" %}
+    pg_hba:
+      # To access through TCP/IP you will need to get username
+      # and password from the secret pg-cluster-awx-app
+      - host awx awx all md5
+      - host awx streaming_replica all md5
+{% endif %}
+  bootstrap:
+{% if dsc.awx.cnpg.mode == "primary" %}
+    initdb:
+      database: awx
+      owner: awx
+    recovery: null
+{% elif dsc.awx.cnpg.mode == "replica" or dsc.awx.cnpg.mode == "restore" %}
+    recovery:
+      source: pg-cluster-awx
+      database: awx
+      owner: awx
+    initdb: null
+  externalClusters:
+  - name: pg-cluster-awx
+{% if dsc.awx.cnpg.mode == "restore" %}
+    barmanObjectStore:
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointURL }}"
+{% if dsc.global.backup.s3.endpointCA.key is defined %}
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+{% endif %}
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
+{% endif %}
+{% if dsc.awx.cnpg.mode == "replica" %}
+{%- filter indent(width=4) %}
+{{ dsc.awx.cnpg.connectionParameters }}
+{%- endfilter %}
+{% endif %}
+{% endif %}
+
+{% if dsc.awx.cnpg.mode == "replica" %}
+  replica:
+    enabled: true
+    source: pg-cluster-awx
+{% endif %}
+
+  enableSuperuserAccess: true
+  # Example of rolling update strategy:
+  # - unsupervised: automated update of the primary once all
+  #                 replicas have been upgraded (default)
+  # - supervised: requires manual supervision to perform
+  #               the switchover of the primary
+  primaryUpdateStrategy: unsupervised
+  # Require 1Gi of space per instance using default storage class
+  storage:
+    size: {{ dsc.awx.postgresPvcSize }}
+{% if dsc.awx.postgresWalPvcSize is defined %}
+  walStorage:
+    size: {{ dsc.awx.postgresWalPvcSize }}
+{% endif %}
+  monitoring:
+    enablePodMonitor: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled and dsc.awx.cnpg.mode != "restore" %}
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointURL }}"
+{% if dsc.global.backup.s3.endpointCA.key is defined %}
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+{% endif %}
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
+{% if dsc.global.backup.cnpg.compression != 'none' %}
+      data:
+        compression: "{{ dsc.global.backup.cnpg.compression }}"
+      wal:
+        compression: "{{ dsc.global.backup.cnpg.compression }}"
+{% endif %}
+    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+{% else %}
+  backup: null
+{% endif %}

@@ -30,7 +30,7 @@ envs:
               repository: "{{ dsc.global.registry | default('docker.io') }}"
           server:
             ha:
-              apiAddr: "https://{{ vault_domain }}" 
+              apiAddr: "https://{{ vault_domain }}"
       - argocd_app: "kubeview"
         vault_values:
           replicaCount: 3

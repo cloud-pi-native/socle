@@ -1,6 +1,12 @@
 ---
 - name: Loop over services
   ansible.builtin.include_tasks: ./template.yml
-  loop:
-    - keycloak
-    - vault
+  loop: "{{ envs | subelements('apps') }}"
+  loop_control:
+    label: "{{ item.0.name }}"
+  vars:
+    envs:
+      - name: dso-hp-testcm
+        apps:
+          - argocd_app: keycloak
+          - argocd_app: vault

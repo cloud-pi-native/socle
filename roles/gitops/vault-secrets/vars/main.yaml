@@ -11,6 +11,8 @@ envs:
             keycloak: "{{ keycloak_domain }}"
             sonarqube: "{{ sonar_domain }}"
             vault: "{{ vault_domain }}"
+            harbor: "{{ harbor_domain }}"
+            harbor-notary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy }}"
             httpsProxy: "{{ dsc.proxy.https_proxy }}"
@@ -47,6 +49,20 @@ envs:
             } if dsc.global.backup.cnpg.enabled else None
           }, None) }}"
           adminPassword: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')}}"
+      - argocd_app: "harbor"
+        vault_values:
+          global:
+            harborAdminPassword: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits')}}"
+          cnpg: "{{ {
+            'nodePort': dsc.harbor.cnpg.nodePort if dsc.harbor.cnpg.exposed else omit,
+            'backup': {
+              'cron': dsc.global.backup.cnpg.cron
+            } if dsc.global.backup.cnpg.enabled else omit,
+            'app': {
+              'password': lookup('password', '/dev/null length=24 chars=ascii_letters,digits'),
+              'username': 'harbor'
+            }
+          } }}"
       - argocd_app: "kubeview"
         vault_values:
           replicaCount: 3

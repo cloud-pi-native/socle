@@ -12,6 +12,7 @@
     { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
     { "app": "vault", "enabled": "true", "namespace": "vault", "syncWave": 10 },
     { "app": "sonarqube", "enabled": "true", "namespace": "sonarqube", "syncWave": 10 },
+    { "app": "harbor", "enabled": "true", "namespace": "harbor", "syncWave": 10 },
     { "app": "kubeview", "enabled": "false", "namespace": "kubeview", "syncWave": 10 }
   ]
 }

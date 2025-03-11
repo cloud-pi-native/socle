@@ -66,6 +66,7 @@
         - post-install-keycloak
         - post-install-vault
         - post-install-sonarqube
+        - post-install-harbor
 
     - role: gitops/dso-app
       tags:
@@ -85,3 +86,8 @@
       tags:
         - post-install
         - post-install-sonarqube
+
+    - role: gitops/post-install/harbor
+      tags:
+        - post-install
+        - post-install-harbor

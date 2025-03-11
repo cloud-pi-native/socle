@@ -1,0 +1,61 @@
+harbor:
+  core:
+    replicas: 3
+    serviceAccountName: harbor-sa
+  exporter:
+    replicas: 1
+    serviceAccountName: harbor-sa
+  jobservice:
+    jobLoggers:
+    - stdout
+    replicas: 2
+    serviceAccountName: harbor-sa
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+  nginx:
+    replicas: 2
+    serviceAccountName: harbor-sa
+  persistence:
+    enabled: true
+    persistentVolumeClaim:
+      database:
+        size: 5Gi
+      jobservice:
+        jobLog:
+          size: 3Gi
+      redis:
+        size: 3Gi
+      registry:
+        size: 5Gi
+      trivy:
+        size: 3Gi
+    resourcePolicy: keep
+  portal:
+    replicas: 2
+    serviceAccountName: harbor-sa
+  proxy:
+    components:
+    - nginx
+    - portal
+    - core
+    - jobservice
+    - registry
+    - trivy
+    - database
+    - redis
+    - exporter
+  redis:
+    internal:
+      serviceAccountName: harbor-sa
+  registry:
+    replicas: 3
+    serviceAccountName: harbor-sa
+  trivy:
+    replicas: 2
+    serviceAccountName: harbor-sa
+  cnpg:
+    exposed: false
+    backup:
+      enabled: false

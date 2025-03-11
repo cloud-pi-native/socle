@@ -1,0 +1,118 @@
+harbor:
+  core:
+    image:
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/goharbor/harbor-core
+    replicas: 1
+  database:
+    external:
+      coreDatabase: registry
+      host: pg-cluster-harbor-rw
+      password: <path:forge-dso/data/env/dso-hp-testcm/apps/harbor/values#cnpg | jsonPath
+        {.app.password} | base64decode>
+      port: '5432'
+      username: <path:forge-dso/data/env/dso-hp-testcm/apps/harbor/values#cnpg | jsonPath
+        {.app.username} | base64decode>
+    internal:
+      image:
+        repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+          | jsonPath {.repository.docker}>/goharbor/harbor-db
+    type: external
+  exporter:
+    image:
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/goharbor/harbor-exporter
+  expose:
+    imagePullPolicy: IfNotPresent
+    ingress:
+      className: traefik
+      harbor:
+        annotations: null
+        labels: null
+      hosts:
+        core: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain | jsonPath
+          {.harbor}>
+        notary: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain |
+          jsonPath {.harbor-notary}>
+      notary:
+        annotations: null
+        labels: null
+    tls:
+      enabled: false
+    type: ingress
+  externalURL: https://<path:forge-dso/data/env/dso-hp-testcm/apps/common/values#domain
+    | jsonPath {.harbor}>
+  harborAdminPassword: <path:forge-dso/data/env/dso-hp-testcm/apps/harbor/values#global
+    | jsonPath {.harborAdminPassword}>
+  jobservice:
+    image:
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/goharbor/harbor-jobservice
+    replicas: 1
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  nginx:
+    image:
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/goharbor/nginx-photon
+    replicas: 1
+  persistence:
+    enabled: true
+    persistentVolumeClaim:
+      database:
+        size: 5Gi
+      jobservice:
+        jobLog:
+          size: 3Gi
+      redis:
+        size: 3Gi
+      registry:
+        size: 5Gi
+      trivy:
+        size: 3Gi
+    resourcePolicy: keep
+  portal:
+    image:
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/goharbor/harbor-portal
+    replicas: 1
+  proxy:
+    components:
+    - nginx
+    - portal
+    - core
+    - jobservice
+    - registry
+    - trivy
+    - database
+    - redis
+    - exporter
+    httpProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath
+      {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy |
+      jsonPath {.httpsProxy}>
+    noProxy: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#proxy | jsonPath
+      {.noProxy}>,.local,.internal
+  redis:
+    internal:
+      image:
+        repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+          | jsonPath {.repository.docker}>/goharbor/redis-photon
+  registry:
+    controller:
+      image:
+        repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+          | jsonPath {.repository.docker}>/goharbor/harbor-registryctl
+    registry:
+      image:
+        repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+          | jsonPath {.repository.docker}>/goharbor/registry-photon
+    replicas: 1
+  trivy:
+    image:
+      repository: <path:forge-dso/data/env/dso-hp-testcm/apps/common/values#image
+        | jsonPath {.repository.docker}>/goharbor/trivy-adapter-photon
+    replicas: 1
+namespace: testcm-harbor

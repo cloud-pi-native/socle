@@ -65,7 +65,7 @@ gitlab:
         schedule: {{ dsc.global.backup.gitlab.cron }}
         extraArgs: {{ dsc.global.backup.gitlab.extraArgs }}
 {% if dsc.global.backup.gitlab.enabled %}
-        objectStorage:
+      objectStorage:
         config:
           secret: gitlab-backup
           key: config

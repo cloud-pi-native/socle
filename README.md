@@ -971,7 +971,7 @@ Vous en récupérerez le contenu encodé en base64, en une seule fois, via la co
 
 ```bash
 k create secret docker-registry docker-hub-creds \
-    --docker-server="https://index.docker.io/v1" \
+    --docker-server="https://index.docker.io/v1/" \
     --docker-username="email@example.com" \
     --docker-password="mot_de_passe_ici" \
     --docker-email="email@example.com" \

@@ -17,16 +17,16 @@ spec:
     release: "2.*.*"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "8.8.1"
+    chartVersion: "8.9.2"
   gitlabCiPipelinesExporter:
     # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
-    chartVersion: "0.3.4"
+    chartVersion: "0.3.5"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "1.9.1"
+    chartVersion: "1.10.2"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.73.3"
+    chartVersion: "0.74.1"
   grafana:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"

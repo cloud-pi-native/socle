@@ -663,6 +663,9 @@ spec:
                               description: Defines retention policy for gitlab backups recurrences.
                               type: string
                               default: "30d"
+                            extraArgs:
+                              description: String of arguments to pass to the backup utility.
+                              type: string
                           type: object
                       type: object
                     platform:

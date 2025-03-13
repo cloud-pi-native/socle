@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.5.0](https://github.com/cloud-pi-native/socle/compare/v3.4.0...v3.5.0) (2025-03-13)
+
+
+### Features
+
+* :arrow_up: Upgrade GitLab to version 17.9.2 + adapt some values ([434d8a1](https://github.com/cloud-pi-native/socle/commit/434d8a11a34bd36518d7f8b17b7d9f3217ec1e39))
+* :arrow_up: Upgrade GitLab to version 17.9.2 + adapt some values ([21c5647](https://github.com/cloud-pi-native/socle/commit/21c56474aee4f0ebc1c31b760b0a3d40be5cdec5))
+
+
+### Bug Fixes
+
+* :bug: GitLab value indentation ([3698627](https://github.com/cloud-pi-native/socle/commit/3698627aa8d18f0ff9ea1f51ea04d6b7fa325f26))
+* :bug: remove duplicate spec: ([9dddcdc](https://github.com/cloud-pi-native/socle/commit/9dddcdc7493c8c524496f81fd8fafb66782b5691))
+* :bug: remove duplicate spec: ([83c77d2](https://github.com/cloud-pi-native/socle/commit/83c77d286ef0d407d4e499a8bfd4ec184a1b1606))
+
 ## [3.4.0](https://github.com/cloud-pi-native/socle/compare/v3.3.1...v3.4.0) (2025-03-05)
 
 

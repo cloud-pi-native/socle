@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.5.1](https://github.com/cloud-pi-native/socle/compare/v3.5.0...v3.5.1) (2025-03-14)
+
+
+### Bug Fixes
+
+* :bug: Fix dso-config initialization ([b83af65](https://github.com/cloud-pi-native/socle/commit/b83af65dc002c0ada2ce2b6d112a843265764200))
+* :bug: Fix dso-config initialization ([2dfdaf9](https://github.com/cloud-pi-native/socle/commit/2dfdaf9ba1c03555b7122b30070c8fe820a161af))
+
 ## [3.5.0](https://github.com/cloud-pi-native/socle/compare/v3.4.0...v3.5.0) (2025-03-13)
 
 

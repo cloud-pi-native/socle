@@ -1,0 +1,15 @@
+{
+  "env": "dso-hp-testcm2",
+  "provider": "self-hosted",
+  "region": "fr-par",
+  "prefix": "testcm2-",
+  "destination": {
+    "clusterName": "in-cluster"
+  },
+  "targetRevision": "refactor/gitops",
+  "apps": [
+    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 },
+    { "app": "kubeview", "enabled": "false", "namespace": "kubeview", "syncWave": 10 }
+  ]
+}

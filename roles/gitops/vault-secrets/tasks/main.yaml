@@ -3,11 +3,23 @@
 
 - name: Get Vault Infra keys and token
   block:
+    - name: Get Vault Infra secrets
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+      register: vault_infra_secrets
+
+    - name: Set vault_infra_keys_secret_name
+      ansible.builtin.set_fact:
+        vault_infra_keys_secret_name: "{{ vault_infra_secrets.resources
+          | selectattr('metadata.name', 'contains', 'vault-keys')
+          | map(attribute='metadata.name') | first }}"
+
     - name: Get Vault Infra keys
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.vaultInfra.namespace }}"
         kind: Secret
-        name: "{{ dsc_name }}-vault-keys"
+        name: "{{ vault_infra_keys_secret_name }}"
       register: vault_infra_keys
 
     - name: Get Vault Infra token

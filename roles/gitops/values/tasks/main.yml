@@ -6,7 +6,7 @@
     label: "{{ item.0.name }}"
   vars:
     envs:
-      - name: dso-hp-testcm
+      - name: "{{ dsc_name }}"
         apps:
           - argocd_app: keycloak
           - argocd_app: vault

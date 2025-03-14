@@ -1,6 +1,6 @@
 ---
 envs:
-  - name: dso-hp-testcm
+  - name: "{{ dsc_name }}"
     apps:
       - argocd_app: "common"
         vault_values:
@@ -12,6 +12,10 @@ envs:
         vault_values:
           auth:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+          initcontainers:
+            pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
+          ingress:
+            hostname: "{{ keycloak_domain }}"
       - argocd_app: "vault"
         vault_values:
           global:

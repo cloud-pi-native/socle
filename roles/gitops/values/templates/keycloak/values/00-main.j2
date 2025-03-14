@@ -1,4 +1,4 @@
-adminPassword: <path:forge-dso/data/env/dso-hp-testcm/apps/keycloak/values#auth | jsonPath {.adminPassword} | base64encode>
+adminPassword: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#auth | jsonPath {.adminPassword} | base64encode>
 keycloak:
   image:
     registry: docker.io

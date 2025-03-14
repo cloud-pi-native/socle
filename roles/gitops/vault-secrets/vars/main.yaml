@@ -12,17 +12,6 @@ envs:
         vault_values:
           auth:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
-          initcontainers:
-            curlVersion: 8.11.1
-            pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
-          ingress:
-            ingressClassName: "{{ dsc.ingress.className }}"
-            hostname: "{{ keycloak_domain }}"
-            annotations:
-              cluster-issuer: "acme-issuer"
-          podSecurityContext:
-            enabled: true
-            fsGroup: 1001
       - argocd_app: "vault"
         vault_values:
           global:

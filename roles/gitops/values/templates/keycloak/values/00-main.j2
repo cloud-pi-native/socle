@@ -311,16 +311,16 @@ keycloak:
   initContainers:
     - name: realm-ext-provider
 {% if use_private_registry %}
-      image: "{{ dsc.global.registry }}/curlimages/curl:<path:forge-dso/data/env/dso-hp-testcm/apps/keycloak/values#initcontainers | jsonPath {.curlVersion}>"
+      image: "{{ dsc.global.registry }}/curlimages/curl:8.1.11"
 {% else %}
-      image: "docker.io/curlimages/curl:<path:forge-dso/data/env/dso-hp-testcm/apps/keycloak/values#initcontainers | jsonPath {.curlVersion}>"
+      image: "docker.io/curlimages/curl:8.1.11"
 {% endif %}
       imagePullPolicy: IfNotPresent
       command:
         - sh
       args:
         - -c
-        - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:forge-dso/data/env/dso-hp-testcm/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}>
+        - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
       volumeMounts:
         - name: empty-dir
           mountPath: /emptydir

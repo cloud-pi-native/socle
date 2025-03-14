@@ -23,7 +23,7 @@
         VAULT_URL: "{{ ('https://' + vault_domain + '/') | b64encode }}"
         HARBOR_ADMIN: "{{ 'admin' | b64encode }}"
         # HARBOR_ADMIN_PASSWORD: roles/harbor/tasks/main.yaml
-        KEYCLOAK_ADMIN: "{{ 'admin' | b64encode }}"
+        # KEYCLOAK_ADMIN: roles/keycloak/tasks/main.yaml
         # KEYCLOAK_ADMIN_PASSWORD: roles/keycloak/tasks/main.yaml
         # GITLAB_TOKEN: roles/gitlab/tasks/main.yaml
         NEXUS_ADMIN: "{{ 'admin' | b64encode }}"

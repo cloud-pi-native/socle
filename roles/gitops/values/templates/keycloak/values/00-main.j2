@@ -311,9 +311,9 @@ keycloak:
   initContainers:
     - name: realm-ext-provider
 {% if use_private_registry %}
-      image: "{{ dsc.global.registry }}/curlimages/curl:8.1.11"
+      image: "{{ dsc.global.registry }}/curlimages/curl:8.12.1"
 {% else %}
-      image: "docker.io/curlimages/curl:8.1.11"
+      image: "docker.io/curlimages/curl:8.12.1"
 {% endif %}
       imagePullPolicy: IfNotPresent
       command:

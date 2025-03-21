@@ -2,6 +2,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
 metadata:
   name: pooler-pg-cluster-gitlab-rw
+  namespace: {{ dsc.gitlab.namespace }}
 spec:
   cluster:
     name: pg-cluster-gitlab

@@ -62,6 +62,7 @@
     - pg-cluster-gitlab.yaml.j2
     - pg-cluster-gitlab-backup.yaml.j2
     - pg-cluster-gitlab-nodeport.yaml.j2
+    - pooler-pg-cluster-gitlab.yaml.j2
 
 - name: Wait pg-cluster-gitlab-rw endpoint
   kubernetes.core.k8s_info:

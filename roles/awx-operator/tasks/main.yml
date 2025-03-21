@@ -1,0 +1,168 @@
+---
+- name: Create Awx namespace
+  kubernetes.core.k8s:
+    name: "{{ dsc.awx.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and
+    dsc.global.backup.s3.endpointCA.namespace is defined and
+    dsc.global.backup.s3.endpointCA.name is defined and
+    dsc.global.backup.s3.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.s3.endpointCA.name }}"
+        namespace: "{{ dsc.global.backup.s3.endpointCA.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact:
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.s3.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.awx.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+- name: Set cnpg backup secret
+  kubernetes.core.k8s:
+    name: "{{ dsc.global.backup.s3.credentials.name }}"
+    namespace: "{{ dsc.awx.namespace }}"
+    kind: Secret
+    api_version: v1
+    definition:
+      data:
+        accessKeyId: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
+  when: dsc.global.backup.cnpg.enabled
+
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.awx.namespace }}"
+    name: pg-cluster-awx
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
+- name: Create PostgreSQL cluster and awx database
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-awx.yaml.j2
+    - pg-cluster-awx-backup.yaml.j2
+    - pg-cluster-awx-nodeport.yaml.j2
+
+- name: Wait pg-cluster-awx-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.awx.namespace }}"
+    name: pg-cluster-awx-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-awx-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.awx.namespace }}"
+    name: pg-cluster-awx-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Get pg-cluster-awx-app secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.awx.namespace }}"
+    kind: Secret
+    name: pg-cluster-awx-app
+  register: pg_awx_db_secret
+
+- name: Apply project
+  kubernetes.core.k8s:
+    template: project.j2
+
+# Installation des CRDs indépendamment du chart helm.
+# Recommandé en production.
+- name: Download awx-operator awxs CRD
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/ansible/awx-operator/{{ dsc.awx.chartVersion }}/config/crd/bases/awx.ansible.com_awxs.yaml
+    return_content: true
+  register: awxs_crd
+
+- name: Download awx-operator awxbackups CRD
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/ansible/awx-operator/{{ dsc.awx.chartVersion }}/config/crd/bases/awx.ansible.com_awxbackups.yaml
+    return_content: true
+  register: awxbackups_crd
+
+- name: Download awx-operator awxmeshingresses CRD
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/ansible/awx-operator/{{ dsc.awx.chartVersion }}/config/crd/bases/awx.ansible.com_awxmeshingresses.yaml
+    return_content: true
+  register: awxmeshingresses_crd
+
+- name: Download awx-operator awxrestores CRD
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/ansible/awx-operator/{{ dsc.awx.chartVersion }}/config/crd/bases/awx.ansible.com_awxrestores.yaml
+    return_content: true
+  register: awxrestores_crd
+
+- name: Concatenate CRDs content
+  set_fact:
+    concatenated_crds: |
+      {{ awxs_crd.content }}
+      ---
+      {{ awxbackups_crd.content }}
+      ---
+      {{ awxmeshingresses_crd.content }}
+      ---
+      {{ awxrestores_crd.content }}
+
+- name: Apply CRDs
+  kubernetes.core.k8s:
+    state: present
+    definition: |
+      {{ concatenated_crds |
+         regex_replace('- =~', "- '=~'") |
+         regex_replace('- =', "- '='") |
+         from_yaml_all }}
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Compute Console Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.awx['values'] }}"
+    combine_dest_var: "awx_values"
+
+- name: Apply app
+  kubernetes.core.k8s:
+    template: app.yaml.j2
+  register: apply_app_result
+  changed_when: apply_app_result.changed
+
+- name: Wait apply app change
+  ansible.builtin.include_tasks: wait-apply.yml
+  when: apply_app_result.changed
+
+- name: Oidc setup
+  ansible.builtin.include_tasks: oidc-setup.yml
+  when: apply_app_result.changed

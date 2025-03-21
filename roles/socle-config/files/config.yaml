@@ -14,6 +14,14 @@ spec:
     helmRepoUrl: https://charts.jetstack.io
     forcedInstall: false
     values: {}
+  awx:
+    namespace: dso-awx
+    subDomain: awx
+    helmRepoUrl: https://ansible-community.github.io/awx-operator-helm
+    cnpg:
+      mode: primary
+      exposed: false
+    values: {}
   cloudnativepg:
     namespace: dso-cloudnativepg
     helmRepoUrl: https://cloudnative-pg.github.io/charts

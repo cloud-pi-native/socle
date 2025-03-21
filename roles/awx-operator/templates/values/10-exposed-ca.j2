@@ -1,0 +1,7 @@
+{% if dsc.exposedCA.type != 'none' %}
+AWX:
+  spec:
+    extra_settings:
+      - setting: AWX_TASK_ENV['GIT_SSL_NO_VERIFY']
+        value: "True"
+{% endif %}

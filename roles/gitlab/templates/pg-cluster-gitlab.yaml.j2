@@ -26,6 +26,7 @@ spec:
 {% endif %}
   postgresql:
     parameters:
+      max_connections: "300"
       max_worker_processes: "60"
 {% if dsc.gitlab.postgresWalMaxSlotKeepSize is defined %}
       max_slot_wal_keep_size: {{ dsc.gitlab.postgresWalMaxSlotKeepSize }}

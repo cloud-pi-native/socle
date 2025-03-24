@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.6.0](https://github.com/cloud-pi-native/socle/compare/v3.5.1...v3.6.0) (2025-03-24)
+
+
+### Features
+
+* :zap: activation of cnpg Pooler (BgBouncer) for Gitlab database ([ec62b6a](https://github.com/cloud-pi-native/socle/commit/ec62b6a0e2c59244886de4305adfc22199444e10))
+* :zap: activation of cnpg Pooler (PgBouncer) for Gitlab database ([0ebda6e](https://github.com/cloud-pi-native/socle/commit/0ebda6ebf1b865a791da87d4e485b23ab1671b64))
+* :zap: activation of cnpg Pooler (PgBouncer) for Gitlab database ([e4c084c](https://github.com/cloud-pi-native/socle/commit/e4c084c4b97a160055a90baaa18eb0eb2b42ef6a))
+* :zap: activation of cnpg Pooler (PgBouncer) for Gitlab database ([dcb01e0](https://github.com/cloud-pi-native/socle/commit/dcb01e0b245a98aff86762d70dcd044b3a6cc2ef))
+
+
+### Bug Fixes
+
+* :art: securityContext settings + replicaCount ([ebb9163](https://github.com/cloud-pi-native/socle/commit/ebb916332f78802bb6cb2bfd9b5adb5e58b303be))
+* :art: securityContext settings + replicaCount ([7613c59](https://github.com/cloud-pi-native/socle/commit/7613c5988ff556f99234e370379ed2033bdce06b))
+
 ## [3.5.1](https://github.com/cloud-pi-native/socle/compare/v3.5.0...v3.5.1) (2025-03-14)
 
 

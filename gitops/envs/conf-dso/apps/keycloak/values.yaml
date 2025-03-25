@@ -67,6 +67,12 @@ keycloak:
     value: Ministere<br/>de l'interieur
   - name: DSFR_THEME_CONTACT_EMAIL
     value: cloudpinative-relations@interieur.gouv.fr
+  - name: HTTP_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.httpProxy}>
+  - name: HTTPS_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.httpsProxy}>
+  - name: NO_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.noProxy}>
   extraEnvVarsCM: ''
   extraEnvVarsSecret: ''
   extraStartupArgs: ''
@@ -76,7 +82,6 @@ keycloak:
     registry: docker.io
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
       route.openshift.io/termination: edge
     apiVersion: ''
     enabled: true
@@ -85,7 +90,7 @@ keycloak:
     extraRules: []
     hostname: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
       {.keycloak}>
-    ingressClassName: nginx
+    ingressClassName: traefik
     labels:
       app: keycloak
     path: /
@@ -101,6 +106,16 @@ keycloak:
       | jsonPath {.pluginDownloadUrl}>
     command:
     - sh
+    env:
+    - name: HTTP_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.httpProxy}>
+    - name: HTTPS_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.httpsProxy}>
+    - name: NO_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.noProxy}>
     image: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
@@ -121,7 +136,7 @@ keycloak:
     level: INFO
     output: default
   metrics:
-    enabled: false
+    enabled: true
     prometheusRule:
       enabled: false
       groups:

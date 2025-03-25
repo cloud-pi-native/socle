@@ -6,7 +6,7 @@ dependencies:
   version: 2.0.1
 - alias: keycloak
   name: keycloak
-  repository: oci://registry-1.docker.io/bitnamicharts
+  repository: http://helm-charts-e60c21.pages.forge-dc.cloudmi.minint.fr/keycloak
   version: 24.4.11
 name: keycloak
 type: application

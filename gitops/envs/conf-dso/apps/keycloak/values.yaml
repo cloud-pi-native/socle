@@ -26,14 +26,20 @@ keycloak:
     port: 5432
   extraEnvVars:
   - name: DSFR_THEME_HOME_URL
-    value: https://<path:forge-dso/data/env/conf-dso/apps/keycloak/values#extraEnvVars
-      | jsonPath {.consoleDomain}>
+    value: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+      {.console}>
   - name: DSFR_THEME_SERVICE_TITLE
     value: Cloud Pi Native
   - name: DSFR_THEME_BRAND_TOP
     value: Ministere<br/>de l'interieur
   - name: DSFR_THEME_CONTACT_EMAIL
     value: cloudpinative-relations@interieur.gouv.fr
+  - name: HTTP_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.httpProxy}>
+  - name: HTTPS_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.httpsProxy}>
+  - name: NO_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.noProxy}>
   extraEnvVarsCM: ''
   extraEnvVarsSecret: ''
   extraStartupArgs: ''
@@ -43,16 +49,15 @@ keycloak:
     registry: docker.io
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
       route.openshift.io/termination: edge
     apiVersion: ''
     enabled: true
     extraHosts: []
     extraPaths: []
     extraRules: []
-    hostname: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#ingress | jsonPath
-      {.hostname}>
-    ingressClassName: nginx
+    hostname: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+      {.keycloak}>
+    ingressClassName: traefik
     labels:
       app: keycloak
     path: /
@@ -68,7 +73,17 @@ keycloak:
       | jsonPath {.pluginDownloadUrl}>
     command:
     - sh
-    image: docker.io/curlimages/curl:8.12.1
+    env:
+    - name: HTTP_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.httpProxy}>
+    - name: HTTPS_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.httpsProxy}>
+    - name: NO_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.noProxy}>
+    image: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
     volumeMounts:
@@ -88,7 +103,7 @@ keycloak:
     level: INFO
     output: default
   metrics:
-    enabled: false
+    enabled: true
     prometheusRule:
       enabled: false
       groups:

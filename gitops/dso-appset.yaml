@@ -15,7 +15,8 @@ spec:
         generators:
           - git:
               repoURL: https://github.com/cloud-pi-native/socle.git
-              revision: main
+              #revision: main 
+              revision: test/falltrades
               files:
                 - path: "./gitops/envs/*/*.json"
           - list:

@@ -34,6 +34,8 @@ spec:
         vault:
           enabled: false
           pathPrefix: vault
+    gitOps:
+      watchpointEnabled: true
   argocd:
     admin:
       enabled: false

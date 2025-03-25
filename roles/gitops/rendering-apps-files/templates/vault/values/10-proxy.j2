@@ -1,8 +1,0 @@
-{% if dsc.proxy.enabled %}
-vault:
-  server:
-    extraEnvironmentVars:
-      HTTP_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
-      HTTPS_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
-      NO_PROXY: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,.{{ dsc_name }}-vault-internal"
-{% endif %}

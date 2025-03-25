@@ -63,6 +63,12 @@
         - rendering-apps-files
         - apps-files
 
+    - role: gitops/watchpoint
+      tags:
+        - gitops-watchpoint
+        - watchpoint
+      when: dsc.global.gitOps.watchpointEnabled
+
     - role: gitops/dso-app
       tags:
         - dso-app

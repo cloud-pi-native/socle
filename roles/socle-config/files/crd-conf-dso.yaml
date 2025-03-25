@@ -740,6 +740,15 @@ spec:
                     profile:
                       description: Specifies security profile (e.g., cis).
                       type: string
+                    gitOps:
+                      properties:
+                        watchpointEnabled:
+                          default: true
+                          description: |
+                            Specifies whether we should interrupt GitOps installation to review some generated files.
+                            Installation will be interrupted if true, displaying an explanation message.
+                          type: boolean
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
@@ -748,6 +757,7 @@ spec:
                     - alerting
                     - platform
                     - offline
+                    - gitOps
                   type: object
                 grafana:
                   description: Configuration for Grafana instance.

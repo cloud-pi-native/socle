@@ -67,6 +67,8 @@ spec:
       enabled: false
     alerting:
       enabled: false
+    gitOps:
+      watchpointEnabled: true
   grafana:
     namespace: dso-grafana
     subDomain: grafana

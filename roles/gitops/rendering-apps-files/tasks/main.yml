@@ -9,4 +9,3 @@
       - name: "{{ dsc_name }}"
         apps:
           - argocd_app: keycloak
-          - argocd_app: vault

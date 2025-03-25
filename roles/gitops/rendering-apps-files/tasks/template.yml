@@ -1,5 +1,11 @@
 ---
 
+- name: Create chart and values destination dir
+  ansible.builtin.file:
+    path: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
+    state: directory
+    mode: 0775
+
 # Chart file rendering
 
 - name: Set path fact to chart file location
@@ -17,6 +23,12 @@
 - name: Set path fact to templates location
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/' + item.1.argocd_app + '/templates' }}"
+
+- name: Create templates destination dir
+  ansible.builtin.file:
+    path: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates"
+    state: directory
+    mode: 0775
 
 - name: Render "{{ item.1.argocd_app }}" templates and write yaml files to destination
   ansible.builtin.copy:

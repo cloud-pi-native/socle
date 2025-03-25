@@ -740,6 +740,13 @@ spec:
                     profile:
                       description: Specifies security profile (e.g., cis).
                       type: string
+                    gitOps:
+                      properties:
+                        watchpointEnabled:
+                          default: true
+                          description: Specifies whether we should install Argo CD infrastructure instance.
+                          type: boolean
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
@@ -748,6 +755,7 @@ spec:
                     - alerting
                     - platform
                     - offline
+                    - gitOps
                   type: object
                 grafana:
                   description: Configuration for Grafana instance.

@@ -344,6 +344,38 @@
         - argo
         - gitops
 
+    - name: "Suppression de l'instance Argo CD Infra"
+      kubernetes.core.helm:
+        name: "{{ dsc_name }}-argo-infra"
+        release_namespace: "{{ dsc.argocdInfra.namespace }}"
+        release_state: absent
+        wait: true
+      tags:
+        - argocd-infra
+        - argo-infra
+        - gitops-infra
+
+    - name: "Suppression du namespace Argo CD Infra"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.argocdInfra.namespace }}"
+      tags:
+        - argocd-infra
+        - argo-infra
+        - gitops-infra
+
+    - name: "Suppression Argo CD Infra OpenShift scc crb"
+      kubernetes.core.k8s:
+        state: absent
+        kind: ClusterRoleBinding
+        name: "{{ dsc_name }}-argo-infra-argocd-system:openshift:scc:privileged"
+        api_version: rbac.authorization.k8s.io/v1
+      tags:
+        - argocd-infra
+        - argo-infra
+        - gitops-infra
+
     - name: "Suppression du namespace Harbor"
       kubernetes.core.k8s:
         state: absent

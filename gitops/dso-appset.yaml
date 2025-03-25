@@ -1,0 +1,70 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: dso-install-manager
+  namespace: infra-argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  ignoreApplicationDifferences:
+    - jqPathExpressions:
+        - .spec.source.plugin.env[] | select(.name == "HELM_VALUES").value
+  generators:
+    - matrix:
+        generators:
+          - git:
+              repoURL: https://github.com/cloud-pi-native/socle.git
+              revision: main
+              files:
+                - path: "./gitops/envs/*/*.json"
+          - list:
+              elementsYaml: "{{ .apps | toJson }}"
+            selector:
+              matchExpressions:
+                - key: enabled
+                  operator: In
+                  values:
+                    - "true"
+  template:
+    metadata:
+      name: "{{.prefix}}{{.app}}"
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true
+        argocd.argoproj.io/sync-wave: "{{.syncWave}}"
+      labels:
+        platform.env: "{{.env}}"
+        platform.provider: "{{.provider}}"
+        platform.region: "{{.region}}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      revisionHistoryLimit: 3
+      source:
+        repoURL: https://github.com/cloud-pi-native/socle.git
+        path: "./gitops/envs/{{.env}}/apps/{{.app}}"
+        targetRevision: "{{.targetRevision}}"
+        plugin:
+          env:
+            - name: AVP_SECRET
+              value: vault-plugin-secret
+            - name: HELM_ARGS
+              value: -f values.yaml
+            - name: HELM_VALUES
+              value: ""
+      destination:
+        name: "{{.destination.clusterName}}"
+        namespace: "{{.prefix}}{{.namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+        #  selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+          - ServerSideApply=true
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+    # automated:
+    #   selfHeal: true

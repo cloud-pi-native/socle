@@ -1,0 +1,17 @@
+{% if dsc.global.platform == "openshift" %}
+openshift:
+  enabled: true
+
+redis-ha:
+  global:
+    compatibility:
+      openshift:
+        adaptSecurityContext: auto
+{% else %}
+global:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+{% endif %}

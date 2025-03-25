@@ -1,0 +1,41 @@
+---
+envs:
+  - name: "{{ dsc_name }}"
+    apps:
+      - argocd_app: "common"
+        vault_values:
+          proxy:
+            httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
+            httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
+            noProxy: "{{ dsc.proxy.no_proxy | default('') }}"
+          registry: "{{ dsc.global.registry | default('') }}"
+      - argocd_app: "keycloak"
+        vault_values:
+          auth:
+            adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+          externalClusters:
+            pgClusterKeycloak:
+              barmanObjectStore:
+                destinationPath: "s3://{{ dsc.global.backup.s3.bucketName | default('') }}/{{ dsc.global.backup.cnpg.pathPrefix | default('') }}"
+                endpointURL: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
+                s3Credentials:
+                  accessKeyId:
+                    name: "{{ dsc.global.backup.s3.credentials.name | default('') }}"
+                    key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key | default ('') }}"
+                  secretAccessKey:
+                    name: "{{ dsc.global.backup.s3.credentials.name | default('') }}"
+                    key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}"
+          extraEnvVars:
+            consoleDomain: "{{ console_domain }}"
+          initcontainers:
+            pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
+          ingress:
+            hostname: "{{ keycloak_domain }}"
+      - argocd_app: "vault"
+        vault_values:
+          global:
+            image:
+              repository: "{{ dsc.global.registry | default('docker.io') }}"
+          server:
+            ha:
+              apiAddr: "https://{{ vault_domain }}"

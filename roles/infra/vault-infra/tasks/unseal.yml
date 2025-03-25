@@ -1,0 +1,20 @@
+---
+- name: Set seal count
+  ansible.builtin.set_fact:
+    unseal_key_index: "{{ (unseal_key_index | int) + 1 }}"
+
+- name: Unseal Vault - "{{ vault_pod }}"
+  kubernetes.core.k8s_exec:
+    container: vault
+    pod: "{{ vault_pod }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    command: "vault operator unseal {{ vault_keys.resources[0].data['key' + (unseal_key_index | string)] | b64decode }}"
+  register: unseal_res
+  ignore_errors: true
+
+- name: Check vault status - "{{ vault_pod }}"
+  ansible.builtin.include_tasks: check.yml
+
+- name: Rerun unseal if necessary
+  ansible.builtin.include_tasks: unseal.yml
+  when: vault_status == 'sealed'

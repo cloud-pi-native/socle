@@ -1,0 +1,14 @@
+{% if use_private_registry %}
+image:
+  repository: "{{ dsc.global.registry }}"
+
+redis:
+  image:
+    repository: "{{ dsc.global.registry }}"
+{% endif %}
+
+{% if use_image_pull_secrets %}
+global:
+  imagePullSecrets: 
+  - dso-config-pull-secret
+{% endif %}

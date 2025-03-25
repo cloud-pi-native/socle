@@ -10,6 +10,12 @@ spec:
     subDomain: argocd
     helmRepoUrl: https://argoproj.github.io/argo-helm
     values: {}
+  argocdInfra:
+    installEnabled: false
+    namespace: infra-argocd
+    subDomain: infra-argocd
+    helmRepoUrl: https://argoproj.github.io/argo-helm
+    values: {}
   certmanager:
     helmRepoUrl: https://charts.jetstack.io
     forcedInstall: false
@@ -92,6 +98,17 @@ spec:
       mode: primary
       exposed: false
     values: {}
+  keycloakInfra:
+    installEnabled: false
+    namespace: infra-keycloak
+    subDomain: infra-keycloak
+    helmRepoUrl: https://charts.bitnami.com/bitnami
+    postgresPvcSize: 1Gi
+    pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.4/keycloak-theme-for-kc-26-and-above.jar
+    cnpg:
+      mode: primary
+      exposed: false
+    values: {}
   kyverno:
     namespace: dso-kyverno
     helmRepoUrl: https://kyverno.github.io/kyverno
@@ -115,6 +132,13 @@ spec:
   vault:
     namespace: dso-vault
     subDomain: vault
+    helmRepoUrl: https://helm.releases.hashicorp.com
+    pvcSize: 23Gi
+    values: {}
+  vaultInfra:
+    installEnabled: false
+    namespace: infra-vault
+    subDomain: infra-vault
     helmRepoUrl: https://helm.releases.hashicorp.com
     pvcSize: 23Gi
     values: {}

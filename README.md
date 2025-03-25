@@ -124,19 +124,23 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
   - tar
 
 - Modules python requis par certains modules Ansible :
-  - pyyaml
-  - kubernetes
-  - python-gitlab
-  - jmespath
+  - [hvac](https://python-hvac.org/en/stable/overview.html)
+  - [jmespath](https://github.com/jmespath/jmespath.py)
+  - [kubernetes](https://github.com/kubernetes-client/python)
+  - [python-gitlab](https://github.com/python-gitlab/python-gitlab)
+  - [pyyaml](https://github.com/yaml/pyyaml)
 
-- Collection Ansible [kubernetes.core](https://github.com/ansible-collections/kubernetes.core) si elle n'est pas déjà présente.
+- Les collections Ansible suivantes :
+  -  [kubernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/)
+  -  [community.hashi_vault](https://galaxy.ansible.com/ui/repo/published/community/hashi_vault)
 
 - Gestionnaire de paquets [Homebrew](https://brew.sh/) pour une installation simplifiée des prérequis restants sur la plupart des distributions GNU/Linux utilisables en production. Testé sous Debian, Ubuntu, Red Hat Enterprise Linux et Rocky Linux.
 
 - Commandes installées avec Homebrew :
-  - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
   - [helm](https://helm.sh/docs/intro/install/)
-  - [yq](https://github.com/mikefarah/yq/#install) (Facultative, mais utile pour debug)
+  - [k9s](https://k9scli.io/topics/install/) (utile pour debug et administration)
+  - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+  - [yq](https://github.com/mikefarah/yq/#install) (utile pour debug et administration)
 
 ## Configuration
 

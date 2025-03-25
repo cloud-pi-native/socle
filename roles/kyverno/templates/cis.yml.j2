@@ -85,6 +85,7 @@ spec:
         - Job
         namespaces:
         - "{{ dsc.keycloak.namespace }}"
+        - "{{ dsc.keycloakInfra.namespace }}"
     exclude:
       all:
       - resources:
@@ -92,6 +93,7 @@ spec:
           - Job
           namespaces:
           - "{{ dsc.keycloak.namespace }}"
+          - "{{ dsc.keycloakInfra.namespace }}"
           names:
           - "pg-cluster-*"
     mutate:
@@ -114,7 +116,7 @@ spec:
                   +(seccompProfile):
                     type: RuntimeDefault
               initContainers:
-              - name: '*'
+              - name: 'prepare-write-dirs'
                 securityContext:
                   +(allowPrivilegeEscalation): false
                   +(capabilities):
@@ -123,6 +125,16 @@ spec:
                   +(runAsNonRoot): true
                   +(runAsUser): 1001
                   +(seccompProfile):
+                    type: RuntimeDefault
+              - name: 'realm-ext-provider'
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  runAsNonRoot: true
+                  runAsUser: 101
+                  seccompProfile:
                     type: RuntimeDefault
 ---
 apiVersion: kyverno.io/v1

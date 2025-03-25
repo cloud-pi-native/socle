@@ -21,6 +21,11 @@
       tags:
         - always
 
+    - name: imagepullsecret
+      tags:
+        - always
+      when: use_image_pull_secrets
+
     - role: kyverno
       tags:
         - kyverno
@@ -46,6 +51,12 @@
       tags:
         - keycloak
         - sso
+
+    - name: infra/keycloak-infra
+      tags:
+        - keycloak-infra
+        - sso-infra
+      when: dsc.keycloakInfra.installEnabled
 
     - role: nexus
       tags:
@@ -84,11 +95,23 @@
       tags:
         - vault
 
+    - name: infra/vault-infra
+      tags:
+        - vault-infra
+      when: dsc.vaultInfra.installEnabled
+
     - role: argocd
       tags:
         - gitops
         - argocd
         - argo
+
+    - name: infra/argocd-infra
+      tags:
+        - gitops-infra
+        - argocd-infra
+        - argo-infra
+      when: dsc.argocdInfra.installEnabled
 
     - role: harbor
       tags:

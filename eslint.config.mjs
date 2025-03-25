@@ -11,5 +11,5 @@ export default antfu({
       "yml/plain-scalar": "off",
     },
   },
-  ignores: ["./operator", "./gitops"],
+  ignores: ["operator/", "gitops/"],
 })

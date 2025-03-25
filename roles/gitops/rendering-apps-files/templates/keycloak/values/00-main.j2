@@ -326,9 +326,9 @@ keycloak:
 {% if dsc.proxy.enabled %}
       env:
         - name: HTTP_PROXY
-          value: {{ dsc.proxy.http_proxy }}
+          value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
         - name: HTTPS_PROXY
-          value: {{ dsc.proxy.https_proxy }}
+          value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
         - name: NO_PROXY
-          value: {{ dsc.proxy.no_proxy }}
+          value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
 {% endif %}

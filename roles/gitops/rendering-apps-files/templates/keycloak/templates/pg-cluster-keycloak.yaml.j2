@@ -15,10 +15,10 @@ spec:
   instances: 3
   # Parameters and pg_hba configuration will be append
   # to the default ones to make the cluster work
-{% if use_private_registry %}
-  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
-{% elif dsc.keycloak.cnpg.imageName is defined %}
+{% if dsc.keycloak.cnpg.imageName is defined %}
   imageName: "{{ dsc.keycloak.cnpg.imageName }}"
+{% else %}
+  imageName: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/cloudnative-pg/postgresql:16.1"
 {% endif %}
 {% if use_image_pull_secrets %}
   imagePullSecrets:

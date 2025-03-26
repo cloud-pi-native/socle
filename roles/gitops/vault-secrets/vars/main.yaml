@@ -4,11 +4,19 @@ envs:
     apps:
       - argocd_app: "common"
         vault_values:
+          image:
+            repository:
+              docker: "{{ dsc.global.registry | default('docker.io') }}"
+              ghcr: "{{ dsc.global.registry | default('ghcr.io') }}"
+          domain:
+            keycloak: "{{ keycloak_domain }}"
+            console: "{{ console_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
             noProxy: "{{ dsc.proxy.no_proxy | default('') }}"
-          registry: "{{ dsc.global.registry | default('') }}"
+            hostProxy: "{{ dsc.proxy.host }}"
+            portProxy: "{{ dsc.proxy.port }}"
       - argocd_app: "keycloak"
         vault_values:
           auth:
@@ -25,17 +33,5 @@ envs:
                   secretAccessKey:
                     name: "{{ dsc.global.backup.s3.credentials.name | default('') }}"
                     key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}"
-          extraEnvVars:
-            consoleDomain: "{{ console_domain }}"
           initcontainers:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
-          ingress:
-            hostname: "{{ keycloak_domain }}"
-      - argocd_app: "vault"
-        vault_values:
-          global:
-            image:
-              repository: "{{ dsc.global.registry | default('docker.io') }}"
-          server:
-            ha:
-              apiAddr: "https://{{ vault_domain }}"

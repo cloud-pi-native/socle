@@ -1,6 +1,6 @@
 keycloak:
   image:
-    registry: docker.io
+    registry: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>
     pullPolicy: "IfNotPresent"
 
   auth:

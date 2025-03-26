@@ -7,4 +7,4 @@ dependencies:
 - name: keycloak
   alias: keycloak
   version: {{ dsc.keycloak.chartVersion }}
-  repository: {{ dsc.keycloak.helmRepoUrl }}
+  repository: "{{ dsc.keycloak.helmRepoUrl if 'oci://' in dsc.keycloak.helmRepoUrl else dsc.keycloak.helmRepoUrl ~ '/keycloak' }}"

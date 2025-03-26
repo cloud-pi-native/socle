@@ -141,7 +141,7 @@
 - name: Deploy helm
   kubernetes.core.helm:
     name: keycloak
-    chart_ref: "{{ dsc.keycloak.helmRepoUrl }}/keycloak"
+    chart_ref: "{{ dsc.keycloak.helmRepoUrl }}/keycloak/keycloak-{{ dsc.keycloak.chartVersion }}.tgz"
     chart_version: "{{ dsc.keycloak.chartVersion }}"
     release_namespace: "{{ dsc.keycloak.namespace }}"
     release_name: keycloak

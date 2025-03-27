@@ -84,7 +84,7 @@
               RETENTION: "{{ dsc.global.backup.vault.retentionPolicy }}"
               MC_EXTRA_ARGS: "{{ dsc.global.backup.vault.mcExtraArgs }}"
             job:
-              schedule: "{{ dsc.global.backup.vault.cron }}"
+              schedule: '"{{ dsc.global.backup.vault.cron }}"'
         state: "{{ dsc.global.backup.vault.enabled | ternary('present', 'absent') }}"
 
 - name: Patch serviceMonitors

@@ -68,25 +68,25 @@
       kubernetes.core.helm:
         name: "{{ dsc_name }}-vault-backup"
         chart_ref: dso/cpn-backup-utils
-        chart_version: "{{ dsc.global.backup.vault.chartVersion }}"
+        chart_version: "{{ dsc.global.backup.vaultInfra.chartVersion }}"
         release_namespace: "{{ dsc.vaultInfra.namespace }}"
         values:
           vault:
             enabled: true
             secrets:
               S3_BUCKET_NAME: "{{ dsc.global.backup.s3.bucketName }}"
-              S3_BUCKET_PREFIX: "{{ dsc.global.backup.vault.pathPrefix }}"
+              S3_BUCKET_PREFIX: "{{ dsc.global.backup.vaultInfra.pathPrefix }}"
               S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
-              VAULT_ADDR: "http://{{ dsc_name }}-vault-active:8200"
+              VAULT_ADDR: "http://{{ dsc_name }}-vault-infra-active:8200"
               VAULT_TOKEN: "{{ vault_token }}"
               S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
               S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
             env:
-              RETENTION: "{{ dsc.global.backup.vault.retentionPolicy }}"
-              MC_EXTRA_ARGS: "{{ dsc.global.backup.vault.mcExtraArgs }}"
+              RETENTION: "{{ dsc.global.backup.vaultInfra.retentionPolicy }}"
+              MC_EXTRA_ARGS: "{{ dsc.global.backup.vaultInfra.mcExtraArgs }}"
             job:
-              schedule: "{{ dsc.global.backup.vault.cron }}"
-        state: "{{ dsc.global.backup.vault.enabled | ternary('present', 'absent') }}"
+              schedule: '"{{ dsc.global.backup.vaultInfra.cron }}"'
+        state: "{{ dsc.global.backup.vaultInfra.enabled | ternary('present', 'absent') }}"
 
 - name: Patch serviceMonitors
   when: >

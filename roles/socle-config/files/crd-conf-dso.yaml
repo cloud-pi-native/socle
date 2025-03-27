@@ -665,6 +665,34 @@ spec:
                               type: string
                               default: "30d"
                           type: object
+                        vaultInfra:
+                          properties:
+                            enabled:
+                              description: Enable s3 vault infra backups.
+                              default: false
+                              type: boolean
+                            helmRepoUrl:
+                              description: Vault infra backup-utils helm repository url.
+                              type: string
+                            chartVersion:
+                              description: Vault infra backup-utils helm chart version (e.g., "1.12.2").
+                              type: string
+                            pathPrefix:
+                              description: Defines the s3 destination path for vault infra backups.
+                              type: string
+                              default: "vault-infra"
+                            mcExtraArgs:
+                              description: Extra args to pass to minio cli for the backups.
+                              type: string
+                            cron:
+                              description: Defines the cron rule used for vault infra backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for vault infra backups recurrences.
+                              type: string
+                              default: "30d"
+                          type: object
                         cnpg:
                           properties:
                             enabled:

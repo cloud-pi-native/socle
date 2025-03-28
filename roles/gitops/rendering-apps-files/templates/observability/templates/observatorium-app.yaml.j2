@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observatorium
+  namespace: infra-argo
+spec:
+  destination:
+    namespace: {{ dsc.observatorium.namespace }}
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+  - helm:
+      valueFiles:
+      - ./values.yaml
+      - $tenants/helm/values.yaml
+    chart: observatorium
+    repoURL: {{ dsc.observatorium.helmRepoUrl }}
+    targetRevision: {{ dsc.observatorium.chartVersion }}
+  - ref: tenants
+    repoURL: "https://{{ gitlab_domain }}/{{ dsc.global.projectsRootDir | join('/') }}/observability/observability.git"
+    targetRevision: main
+  syncPolicy:
+    automated: {}

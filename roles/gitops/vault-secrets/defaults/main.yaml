@@ -12,6 +12,7 @@ envs:
           domain:
             keycloak: "{{ keycloak_domain }}"
             console: "{{ console_domain }}"
+            observatorium: "{{ observatorium_domain }}"
             sonarqube: "{{ sonar_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
@@ -36,6 +37,21 @@ envs:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           initcontainers:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
+      - argocd_app: "observatorium"
+        vault_values:
+          ingress:
+            ingressClassName: "{{ dsc.ingress.className }}"
+          api:
+            loglevel: info
+            config:
+              id: "prod-infra"
+              name: "prod-infra"
+          logs:
+            enabled: "{{ dsc.global.logs.enabled }}"
+            endpoint: "{{ dsc.global.logs.endpoint }}"
+          metrics:
+            enabled: "{{ dsc.global.metrics.enabled }}"
+            endpoint: "{{ dsc.global.metrics.endpoint }}"
       - argocd_app: "sonarqube"
         vault_values:
           auth:

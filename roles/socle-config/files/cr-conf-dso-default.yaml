@@ -21,6 +21,7 @@ spec:
     projectsRootDir:
       - forge
     rootDomain: .example.com
+    logs: {}
     metrics: {}
     alerting: {}
     backup:
@@ -86,6 +87,8 @@ spec:
       mode: primary
   kyverno: {}
   nexus: {}
+  observatorium:
+    enabled: false
   prometheus:
     crd:
       type: external

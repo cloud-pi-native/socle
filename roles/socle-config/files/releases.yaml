@@ -55,6 +55,9 @@ spec:
   nexus:
     # https://hub.docker.com/r/sonatype/nexus3/
     imageTag: 3.76.0
+  observatorium:
+    # https://github.com/cloud-pi-native/helm-charts/tags
+    chartVersion: 0.5.2
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.8.1

@@ -1,0 +1,9 @@
+apiVersion: v2
+dependencies:
+- alias: observatorium
+  name: observatorium
+  repository: https://cloud-pi-native.github.io/helm-charts
+  version: 0.5.2
+name: observatorium
+type: application
+version: 0.5.2

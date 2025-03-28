@@ -86,6 +86,8 @@ spec:
       mode: primary
   kyverno: {}
   nexus: {}
+  observatorium:
+    enabled: false
   prometheus:
     crd:
       type: external

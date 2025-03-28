@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: observatorium
+type: application
+version: {{ dsc.observatorium.chartVersion }}
+dependencies:
+- name: observatorium
+  alias: observatorium
+  version: {{ dsc.observatorium.chartVersion }}
+  repository: {{ dsc.observatorium.helmRepoUrl }}

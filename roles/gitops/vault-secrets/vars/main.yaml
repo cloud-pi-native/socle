@@ -31,6 +31,24 @@ envs:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
           ingress:
             hostname: "{{ keycloak_domain }}"
+      - argocd_app: "observatorium"
+        vault_values:
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            domain: "{{ observatorium_domain }}"
+          api:
+            loglevel: debug
+            config:
+              id: "prod-infra"
+              name: "prod-infra"
+              issuerURL: "https://{{ keycloak_domain }}/realms/dso"
+          logs:
+            enabled: true
+            endpoint: "https://loki.cpin.numerique-interieur.com"
+          metrics:
+            enabled: true
+            endpoint: "https://mimir.cpin.numerique-interieur.com"
       - argocd_app: "vault"
         vault_values:
           global:

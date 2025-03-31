@@ -1,7 +1,8 @@
 {% if dsc.global.platform == "openshift" %}
-podSecurityContext:
-  enabled: false
-
-containerSecurityContext:
-  enabled: false
+keycloak:
+  podSecurityContext:
+    enabled: false
+  
+  containerSecurityContext:
+    enabled: false
 {% endif %}

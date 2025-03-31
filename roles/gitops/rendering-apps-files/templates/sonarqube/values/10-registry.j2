@@ -1,0 +1,6 @@
+{% if use_image_pull_secrets %}
+sonarqube:
+  image:
+    pullSecrets:
+    - name: dso-config-pull-secret
+{% endif %}

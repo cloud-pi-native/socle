@@ -11,59 +11,6 @@
   retries: 45
   delay: 5
 
-# Setup CNPG s3 secret
-
-- name: CNPG s3 CA (secret)
-  when: >
-    dsc.global.backup.cnpg.enabled and
-    dsc.global.backup.s3.endpointCA.namespace is defined and
-    dsc.global.backup.s3.endpointCA.name is defined and
-    dsc.global.backup.s3.endpointCA.key is defined
-  block:
-    - name: Get secret
-      kubernetes.core.k8s_info:
-        name: "{{ dsc.global.backup.s3.endpointCA.name }}"
-        namespace: "{{ dsc.global.backup.s3.endpointCA.namespace }}"
-        kind: Secret
-      register: cnpg_s3_ca_resource
-
-    - name: Extract key
-      ansible.builtin.set_fact:
-        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.s3.endpointCA.key] }}"
-
-    - name: Set cnpg bundle-ca secret
-      kubernetes.core.k8s:
-        name: "bundle-cnpg-s3"
-        namespace: "{{ dsc.keycloak.namespace }}"
-        kind: Secret
-        api_version: v1
-        definition:
-          data:
-            ca.pem: "{{ cnpg_s3_ca_pem }}"
-
-# Setup CNPG backup
-
-- name: Set cnpg backup secret
-  when: dsc.global.backup.cnpg.enabled
-  kubernetes.core.k8s:
-    name: "{{ dsc.global.backup.s3.credentials.name }}"
-    namespace: "{{ dsc.keycloak.namespace }}"
-    kind: Secret
-    api_version: v1
-    definition:
-      data:
-        accessKeyId: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
-        secretAccessKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
-
-- name: Remove cnpg scheduled backup
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: ScheduledBackup
-    namespace: "{{ dsc.keycloak.namespace }}"
-    name: pg-cluster-keycloak
-    state: absent
-  when: not dsc.global.backup.cnpg.enabled
-
 # Set admin facts and check access to Keycloak API
 
 - name: Get Keycloak admin password

@@ -313,6 +313,23 @@ spec:
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
+                cpnCnpg:
+                  description: Configuration for cpn-cnpg.
+                  properties:
+                    helmRepoUrl:
+                      description: CloudNativePG helm repository url.
+                      type: string
+                    chartVersion:
+                      description: CloudNativePG helm chart version (e.g., "0.18.2").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for CloudNativePG, they will be merged with roles/gitops/rendering-apps-files/
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-cnpg
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-cnpg/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
                 gitlab:
                   description: Configuration for GitLab.
                   properties:

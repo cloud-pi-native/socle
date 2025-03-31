@@ -17,6 +17,7 @@ envs:
             noProxy: "{{ dsc.proxy.no_proxy | default('') }}"
             hostProxy: "{{ dsc.proxy.host }}"
             portProxy: "{{ dsc.proxy.port }}"
+          cnpgS3CaPem: "{{ cnpg_s3_ca_pem | default('') }}"
       - argocd_app: "keycloak"
         vault_values:
           auth:
@@ -28,10 +29,8 @@ envs:
                 endpointURL: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
                 s3Credentials:
                   accessKeyId:
-                    name: "{{ dsc.global.backup.s3.credentials.name | default('') }}"
-                    key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key | default ('') }}"
+                    value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
                   secretAccessKey:
-                    name: "{{ dsc.global.backup.s3.credentials.name | default('') }}"
-                    key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}"
+                    value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
           initcontainers:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"

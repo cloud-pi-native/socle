@@ -1,0 +1,81 @@
+cpn-cnpg:
+  nameOverride: "pg-cluster-keycloak"
+{% if dsc.keycloak.cnpg.imageName is defined %}
+  imageName: "{{ dsc.keycloak.cnpg.imageName }}"
+{% else %}
+  imageName: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/cloudnative-pg/postgresql:16.1"
+{% endif %}
+{% if use_image_pull_secrets %}
+  imagePullSecrets:
+  - name: dso-config-pull-secret
+{% endif %}
+  username: "keycloak"
+  dbName: "keycloak"
+
+  # Require 1Gi of space per instance using default storage class
+  pvcSize:
+    data: {{ dsc.keycloak.postgresPvcSize }}
+{% if dsc.keycloak.postgresWalPvcSize is defined %}
+    wal: {{ dsc.keycloak.postgresWalPvcSize }}
+{% endif %}
+
+  parameters:
+    max_worker_processes: "60"
+{% if dsc.keycloak.postgresWalMaxSlotKeepSize is defined %}
+    max_slot_wal_keep_size: {{ dsc.keycloak.postgresWalMaxSlotKeepSize }}
+{% endif %}
+
+{% if dsc.global.backup.velero.enabled %}
+  annotations:
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d keycloak > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/container: postgres
+    pre.hook.backup.velero.io/on-error: Fail
+    pre.hook.backup.velero.io/timeout: 90s
+{% endif %}
+
+{% if dsc.keycloak.cnpg.exposed %}
+  exposed: true
+  nodePort: {{ dsc.keycloak.cnpg.nodePort }}
+{% endif %}
+
+{% if dsc.keycloak.cnpg.mode == "replica" %}
+{%- filter indent(width=4) %}
+{{ dsc.keycloak.cnpg.connectionParameters }}
+{%- endfilter %}
+{% endif %}
+
+{% if dsc.keycloak.cnpg.mode == "replica" %}
+  mode: "replica"
+{% endif %}
+
+  monitoring:
+    enabled: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled or dsc.keycloak.cnpg.mode == "restore" %}
+  backup:
+    destinationPath: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.destinationPath}>
+    endpointURL: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.endpointURL}>
+{% if dsc.global.backup.cnpg.enabled and dsc.keycloak.cnpg.mode != "restore" %}
+    enabled: true
+{% if dsc.global.backup.s3.endpointCA.key is defined %}
+    endpointCA:
+      create: true
+      name: "bundle-cnpg-s3"
+      key: "ca.pem"
+      value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#cnpgS3CaPem>
+{% endif %}
+{% endif %}
+    s3Credentials:
+      create: true
+      secretName: pg-cluster-backup
+      accessKeyId:
+        key: {{ dsc.global.backup.s3.credentials.accessKeyId.key | default ('') }}
+        value: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.accessKeyId.value}>
+      secretAccessKey:
+        key: {{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}
+        value: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.secretAccessKey.value}>
+{% if dsc.global.backup.cnpg.compression != 'none' %}
+    compression: "{{ dsc.global.backup.cnpg.compression }}"
+{% endif %}
+    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+{% endif %}

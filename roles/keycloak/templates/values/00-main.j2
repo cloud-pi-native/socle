@@ -314,11 +314,24 @@ initContainers:
     image: docker.io/curlimages/curl:8.11.1
 {% endif %}
     imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1001
+      runAsNonRoot: true
+      runAsUser: 1001
+      seLinuxOptions: {}
+      seccompProfile:
+        type: RuntimeDefault
     command:
       - sh
     args:
       - -c
-      - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
+      - mkdir -p /empty-dir/app-providers-dir && curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
     volumeMounts:
       - name: empty-dir
         mountPath: /emptydir

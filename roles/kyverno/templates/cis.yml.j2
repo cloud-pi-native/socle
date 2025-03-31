@@ -515,6 +515,16 @@ spec:
         - Pod
         namespaces:
         - "{{ dsc.awx.namespace }}"
+    exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          - Pod
+          namespaces:
+          - "dso-*"
+          names:
+          - "pg-cluster-*"
     mutate:
       patchStrategicMerge:
         spec:

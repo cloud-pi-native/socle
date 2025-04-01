@@ -2,13 +2,13 @@
   "env": "conf-test",
   "provider": "self-hosted",
   "region": "fr-par",
-  "prefix": "conftest-",
+  "prefix": "dsotest-",
   "destination": {
     "clusterName": "in-cluster"
   },
-  "targetRevision": "main",
+  "targetRevision": "deploy-pax-hp",
   "apps": [
-    { "app": "keycloak", "enabled": "false", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
     { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 }
   ]
 }

@@ -26,8 +26,8 @@ keycloak:
     port: 5432
   extraEnvVars:
   - name: DSFR_THEME_HOME_URL
-    value: https://<path:forge-dso/data/env/conf-test/apps/keycloak/values#extraEnvVars
-      | jsonPath {.consoleDomain}>
+    value: https://<path:forge-dso/data/env/conf-test/apps/common/values#domain |
+      jsonPath {.console}>
   - name: DSFR_THEME_SERVICE_TITLE
     value: Cloud Pi Native
   - name: DSFR_THEME_BRAND_TOP
@@ -50,8 +50,8 @@ keycloak:
     extraHosts: []
     extraPaths: []
     extraRules: []
-    hostname: <path:forge-dso/data/env/conf-test/apps/keycloak/values#ingress | jsonPath
-      {.hostname}>
+    hostname: <path:forge-dso/data/env/conf-test/apps/common/values#domain | jsonPath
+      {.keycloak}>
     ingressClassName: nginx
     labels:
       app: keycloak
@@ -68,7 +68,8 @@ keycloak:
       | jsonPath {.pluginDownloadUrl}>
     command:
     - sh
-    image: docker.io/curlimages/curl:8.12.1
+    image: <path:forge-dso/data/env/conf-test/apps/common/values#image | jsonPath
+      {.repository.docker}>/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
     volumeMounts:
@@ -247,7 +248,7 @@ keycloak:
           labels:
             severity: critical
       labels: {}
-      namespace: conftest-keycloak
+      namespace: dsotest-keycloak
     service:
       annotations:
         prometheus.io/port: '8080'

@@ -2,7 +2,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
   name: pg-cluster-keycloak
-  namespace: conftest-keycloak
+  namespace: dsotest-keycloak
 spec:
   backupOwnerReference: self
   cluster:

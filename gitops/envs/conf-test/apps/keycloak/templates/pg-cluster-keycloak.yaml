@@ -2,7 +2,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: pg-cluster-keycloak
-  namespace: conftest-keycloak
+  namespace: dsotest-keycloak
 spec:
   backup:
     barmanObjectStore:
@@ -32,6 +32,8 @@ spec:
       owner: keycloak
     recovery: null
   enableSuperuserAccess: true
+  imageName: <path:forge-dso/data/env/conf-test/apps/common/values#image | jsonPath
+    {.repository.ghcr}>/cloudnative-pg/postgresql:16.1
   instances: 3
   monitoring:
     enablePodMonitor: false

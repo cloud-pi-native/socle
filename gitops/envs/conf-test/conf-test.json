@@ -8,7 +8,7 @@
   },
   "targetRevision": "deploy-pax-hp",
   "apps": [
-    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "keycloak", "enabled": "false", "namespace": "keycloak", "syncWave": 10 },
     { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 }
   ]
 }

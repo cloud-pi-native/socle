@@ -45,6 +45,10 @@
 - [Platform](#platform)
 - [Profile CIS](#profile-cis)
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
+- [Installation en mode GitOps](#installation-en-mode-gitops)
+  - [Prérequis](#prérequis-1)
+  - [Principe d'installation GitOps](#principe-dinstallation-gitops)
+  - [Exemple de déploiement GitOps](#exemple-de-déploiement-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -55,26 +59,26 @@ L'installation de la plateforme Cloud π Native (aussi appelée `DSO` pour `DevS
 
 Les éléments déployés seront les suivants :
 
-| Outil                                | Site officiel                                                                                                                                               |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Argo CD                              | <https://argo-cd.readthedocs.io>                                                                                                                            |
-| Cert-manager                         | <https://cert-manager.io>                                                                                                                                   |
-| CloudNativePG                        | <https://cloudnative-pg.io>                                                                                                                                 |
-| Console Cloud π Native               | <https://github.com/cloud-pi-native/console>                                                                                                                |
-| GitLab                               | <https://about.gitlab.com>                                                                                                                                  |
-| gitLab-ci-catalog                    | <https://github.com/cloud-pi-native/gitlab-ci-catalog>                                                                                                      |
-| gitLab-ci-pipelines-exporter         | <https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter>                                                                   |
-| GitLab Operator                      | <https://docs.gitlab.com/operator>                                                                                                                          |
-| GitLab Runner                        | <https://docs.gitlab.com/runner>                                                                                                                            |
-| Grafana (optionnel)                  | <https://grafana.com>                                                                                                                                       |
-| Grafana Operator (optionnel)         | <https://grafana.github.io/grafana-operator/>                                                                                                               |
-| Harbor                               | <https://goharbor.io>                                                                                                                                       |
-| HashiCorp Vault                      | <https://www.vaultproject.io>                                                                                                                               |
-| Keycloak                             | <https://www.keycloak.org>                                                                                                                                  |
-| Kyverno                              | <https://kyverno.io>                                                                                                                                        |
-| Prometheus Operator CRDs (optionnel) | <https://github.com/prometheus-operator/prometheus-operator/releases><br>Fichier `stripped-down-crds.yaml`<br>Disponible dans les Assets de chaque version. |
-| SonarQube Community Edition          | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition>                                                                              |
-| Sonatype Nexus Repository            | <https://www.sonatype.com/products/sonatype-nexus-repository>                                                                                               |
+| Outil | Site officiel |
+| -|-|
+| Argo CD | <https://argo-cd.readthedocs.io> |
+| Cert-manager | <https://cert-manager.io> |
+| CloudNativePG | <https://cloudnative-pg.io> |
+| Console Cloud π Native | <https://github.com/cloud-pi-native/console> |
+| GitLab | <https://about.gitlab.com> |
+| gitLab-ci-catalog | <https://github.com/cloud-pi-native/gitlab-ci-catalog> |
+| gitLab-ci-pipelines-exporter | <https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter> |
+| GitLab Operator | <https://docs.gitlab.com/operator> |
+| GitLab Runner | <https://docs.gitlab.com/runner> |
+| Grafana (optionnel) | <https://grafana.com> |
+| Grafana Operator (optionnel) | <https://grafana.github.io/grafana-operator/> |
+| Harbor | <https://goharbor.io> |
+| HashiCorp Vault | <https://www.vaultproject.io> |
+| Keycloak | <https://www.keycloak.org> |
+| Kyverno | <https://kyverno.io> |
+| Prometheus Operator CRDs (optionnel) | <https://github.com/prometheus-operator/prometheus-operator/releases><br>Fichier `stripped-down-crds.yaml` disponible dans les Assets de chaque version. |
+| SonarQube Community Edition | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
+| Sonatype Nexus Repository | <https://www.sonatype.com/products/sonatype-nexus-repository> |
 
 Certains outils peuvent prendre un peu de temps pour s'installer. Ce sera le cas de Keycloak, Nexus, SonarQube et en particulier GitLab.
 
@@ -176,13 +180,13 @@ Les champs utilisables dans cette ressource de type **dsc** peuvent être décri
 kubectl explain dsc.spec.argocd
 ```
 
-Les valeurs des helm charts peuvent être surchargés en ajoutant le paramètre `values` au service concerné. Ces `values` dépendent de la [version du helm chart](versions.md) et peuvent être consultés avec la command `helm show values`. Exemple avec l'opérateur GitLab :
+Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à lancer la commande ci-dessus pour obtenir la description de tout champ sur lequel vous avez un doute.
+
+Par ailleurs, les valeurs des helm charts peuvent être surchargées en ajoutant le paramètre `values` au service concerné. Ces `values` dépendent de la [version du helm chart](versions.md) et peuvent être consultées avec la commande `helm show values`. Exemple avec l'opérateur GitLab :
 
 ```shell
-helm show values gitlab-operator/gitlab-operator --version 1.1.2
+helm show values gitlab-operator/gitlab-operator --version 1.10.2
 ```
-
-Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à lancer la commande ci-dessus pour obtenir la description de tout champ sur lequel vous avez un doute.
 
 ### Utilisation de vos propres values
 
@@ -539,7 +543,7 @@ Les sections suivantes détaillent comment procéder, outil par outil.
 
 **Remarques importantes** :
 
-- Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par la [variable supplémentaire](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée (avec `--extra-vars` ou `-e`).
+- Comme vu dans la section d'installation (sous-section [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster )), si vous utilisez votre propre ressource `dsc` de configuration, distincte de `conf-dso`, alors toutes les commandes `ansible-playbook` indiquées ci-dessous devront être complétées par la [variable supplémentaire](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#defining-variables-at-runtime) `dsc_cr` appropriée (via l'option `--extra-vars` ou `-e`).
 - Pour le gel des versions d'images, il est recommandé, si possible, de positionner un **tag d'image en adéquation avec la version du chart Helm utilisé**, c'est-à-dire d'utiliser le numéro `APP VERSION` retourné par la commande `helm search repo`.
 
 ### Modification des versions de charts
@@ -823,7 +827,7 @@ keycloak:
     image:
       registry: docker.io
       repository: bitnami/keycloak
-      tag: 23.0.7-debian-12-r4
+      tag: 26.1.3-debian-12-r0
 ```
 
 Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml>
@@ -876,7 +880,7 @@ sonarqube:
       registry: docker.io
       repository: sonarqube
       edition: community
-      tag: 10.4.1-{{ .Values.edition }}
+      tag: 10.8.1-{{ .Values.edition }}
 ```
 
 #### Vault
@@ -901,15 +905,15 @@ vault:
     injector:
       image:
         repository: docker.io/hashicorp/vault-k8s
-        tag: 1.2.1
+        tag: 1.5.0
         pullPolicy: IfNotPresent
       agentImage:
         repository: docker.io/hashicorp/vault
-        tag: 1.14.0
+        tag: 1.18.1
     server:
       image:
         repository: docker.io/hashicorp/vault
-        tag: 1.14.0
+        tag: 1.18.1
         pullPolicy: IfNotPresent
       updateStrategyType: RollingUpdate
 ```
@@ -1014,6 +1018,313 @@ kubectl get secrets -A | egrep 'NAME|dso-config-pull-secret'
 ```
 
 Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
+
+## Installation en mode GitOps
+
+Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur un [applicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) Argo CD déployant lui-même les applications du socle, en fonction d'un environnement donné et des paramètres qui le caractérisent.
+
+Pour l'instant **seul le déploiement de Keycloak** est géré en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
+
+Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
+
+### Prérequis
+
+Le mode de déploiement GitOps fait encore appel pour partie à Ansible et nécessite donc les prérequis déjà spécifiés plus haut.
+
+Quatre prérequis supplémentaires sont toutefois à prendre en compte :
+* Disposer de **votre propre dépôt Git** dans lequel vous devez réaliser une **copie du présent dépôt Socle** (et non pas un fork). Ce peut-être initialement dans votre prope espace sur GitHub.
+* Une instance **Vault d'infrastructure**. Elle sert à stocker les secrets des applications du Socle (mots de passe, URLs, etc.).
+* Une instance **Argo CD d'infrastructure**, disposant du [plugin Vault](https://argocd-vault-plugin.readthedocs.io/en/stable/) paramétré pour communiquer avec l'instance Vault d'infrastructure. C'est cette instance d'Argo CD qui utilise l'applicationSet pour déployer les applications du Socle dans le cluster cible.
+* Une instance **Keycloak d'infrastructure**, utilisée pour la connexion aux deux outils précédents. Optionnelle mais recommandée en termes de sécurité et de contrôles d'accès.
+
+Pour faciliter l'installation des trois éléments d'infrastructure évoqués ci-dessus, nous proposons des roles dédiés.
+
+Il faudra préalablement que votre CRD soit à jour pour la ressource de type dsc :
+
+```shell
+kubectl apply -f roles/socle-config/files/crd-conf-dso.yaml
+```
+
+Puis que votre resource de configuration `dsc` soit correctement paramétrée pour installer ces éléments. Exemple (à adapter) :
+
+```yaml
+spec:
+  argocdInfra:
+    admin:
+      enabled: true
+      password: argocd_admin_password
+    installEnabled: true
+    namespace: infra-argocd
+    subDomain: infra-argocd
+    values:
+      applicationSet:
+        enabled: true
+      controller:
+        resourcesPreset: large
+      crds:
+        install: false
+  keycloakInfra:
+    installEnabled: true
+    namespace: infra-keycloak
+    postgresPvcSize: 5Gi
+    subDomain: infra-keycloak
+  vaultInfra:
+    installEnabled: true
+    namespace: infra-vault
+    subDomain: infra-vault
+    values: {}
+```
+
+Notons que chacune des trois applications d'infrastructure ci-dessus dispose d'un paramètre `installEnabled` qui permet d'indiquer si elle doit être installée ou non. Elles ne le sont pas pas défaut (le paramètre `installEnabled` étant positionné à `false`), afin notamment de laisser à nos utilisateurs la liberté de les installer eux-mêmes dans le cluster de leur choix, à l'aide des roles que nous proposons ou non.
+
+Si vous souhaitez les installer une première fois, il faut donc positionner lors de cette première installation le paramètre `installEnabled` sur la valeur `true`.
+
+Autre point important, le mot de passe admin d'Argo CD (`argocd_admin_password` dans notre exemple ci-dessus) doit être un hash salé que vous pouvez générer à l'aide de la commande suivante :
+
+```shell
+htpasswd -nbBC 10 "" votre_mot_de_passe_ici | tr -d ':\n' | sed 's/$2y/$2a/'
+```
+
+Vous pourrez alors installer les trois instances requises de vos outils d'infrastructure à l'aide du playbook `install-gitops.yaml`.
+
+Si vous avez adapté la configuration `dsc` par défaut (nommée `conf-dso`), la commande sera la suivante :
+
+```yaml
+ansible-playbook install-gitops.yaml -t keycloak-infra,vault-infra,argocd-infra
+```
+
+Si vous avez utilisé votre propre resource `dsc`, vous la préciserez via la variable supplémentaire habituelle (exemple à adapter avec le nom de votre `dsc`) :
+
+```yaml
+ansible-playbook install-gitops.yaml -t keycloak-infra,vault-infra,argocd-infra -e dsc_cr=ma-conf-dsc
+```
+
+### Principe d'installation GitOps
+
+L'installation en mode GitOps est à lancer à l'aide du playbook `install-gitops.yaml`.
+
+Ce playbook, après avoir réalisé des tâches de pré-configuration, fait notamment appel aux roles suivants :
+* `vault-secrets` : sert à peupler le Vault d'infrastructure avec les values de secrets pour notre environnement et les applications associées.
+* `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `./gitops/envs/nom_de_notre_environnement`.
+* `watchpoint` : sert à arrêter le playbook suite à la génération des fichiers de charts, afin de permettre un passage en revue par l'utilisateur avant que ce-dernier n'effectue si besoin un `git push` des changements. Affiche un message en ce sens. Il s'agit du comportement par défaut, contôlé par le paramètre `spec.global.gitOps.watchpointEnabled` de la dsc (positionné à `true` par défaut).
+* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `./gitops/dso-app.yaml`, lequel déploie lui-même l'applicationSet défini dans `./gitops/dso-appset.yaml`. Ceci permet notamment de rendre l'applicationSet visible dans la web UI d'Argo CD. C'est ensuite ce même applicationSet qui déploie les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `./gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
+
+Viennent ensuite les roles situés dans le répertoire `./roles/gitops/post-install` et qui vont lancer des tasks de post installation pour les outils concernés.
+
+### Exemple de déploiement GitOps
+
+Nous allons déployer l'instance Keycloak de la chaîne DSO, à l'aide de la dsc `conf-dso` et du code de déploiement GitOps.
+
+Comme vu précédemment, vous devez disposer de votre propre dépot Git, dans lequel vous aurez copié les fichiers de la branche main du présent dépôt.
+
+Pour cela :
+* Créez préalablement votre dépôt à vide dans votre instance GitHub (ou GitLab). Vous pouvez le nommer `socle`, ou tout autre nom à votre convenance.
+* Clonez votre dépôt vide localement.
+* Positionnez-vous dans le répertoire `socle` de votre dépôt (ou tout autre nom que vous avez choisi) et vérifiez l'existence de la branche `main` via la commande `git branch`.
+* Positionnez-vous dans un répertoire distinct de votre dépôt local. Ce peut être par exemple votre répertoire habituel de téléchargement.
+* Lancez la commande `git clone https://github.com/cloud-pi-native/socle.git` afin de cloner le présent dépôt du Socle dans cet autre répertoire.
+* Positionnez-vous dans le répertoire `socle` du présent dépôt que vous venez de cloner, et assurez vous d'être bien positionné sur la branche `main` à l'aide de la commande `git branch`. Listez également les fichiers présents.
+* Positionnez-vous à nouveau dans votre dépôt local, pour l'instant vide, à l'intérieur du répertoire socle (ou tout autre nom que vous avez choisi).
+* Copiez l'intégralité des fichiers du dépôt Socle que vous venez de cloner (contenu du répertoire `socle`) dans votre propre dépôt local, c'est à dire à l'emplacement actuel. Exemple à adapter : `cp -r /chemin-du-dépôt-Socle-cloné/socle/* .`
+* Listez les fichiers que vous venez de copier.
+* Ajoutez l'intégralité des fichiers à l'index de votre dépôt, via la commande suivante : `git add -A`
+* Effecuez votre premier commit sur la branche main de votre dépôt, exemple : `git commit -m "feat/first-commit"`
+* Poussez vos changements sur la branche main distante : `git push`
+
+Vous disposez maintenant de votre propre copie du code du Socle dans votre propre dépôt Git, aussi bien localement qu'à distance.
+
+Vous pouvez vérifier que votre branche main locale est effectivement à jour par rapport à son homologue distante, via la commande  suivante :
+
+`git status`
+
+Vous devriez alors obtenir une sortie similaire à ceci :
+
+```
+Sur la branche main
+Votre branche est à jour avec 'origin/main'.
+
+rien à valider, la copie de travail est propre
+```
+
+Dans votre dépôt, créez une branche de déploiement, exemple :
+
+```shell
+git checkout -b ma-branche
+```
+
+Rappel : Assurez-vous préalablement que votre CRD est à jour pour la définition des ressources de type dsc.
+
+```shell
+kubectl apply -f roles/socle-config/files/crd-conf-dso.yaml
+```
+
+Passez en revue la ressource dsc de configuration `conf-dso` pour paramétrer le déploiement, en particulier la section `spec.keycloak`.
+
+Vérifiez aussi que le paramètre `spec.global.gitOps.watchpointenabled` est bien positionné à `true`. 
+
+Dans le code du Socle en local, toujours dans votre branche, positionnez-vous dans le répertoire `./gitops/envs` puis dans le sous-répertoire correspondant à l'environnement cible, lequel, pour rappel, **doit impérativement correspondre au nom de votre dsc**.
+
+Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. Le sous-répertoire `./gitops/envs/conf-dso` existe donc déjà. Positionnez-vous dans ce sous-répertoire puis éditez le fichier `conf-dso.json` qui par défaut se présente ainsi :
+
+```json
+{
+  "env": "conf-dso",
+  "provider": "self-hosted",
+  "region": "fr-par",
+  "prefix": "dso-",
+  "destination": {
+    "clusterName": "in-cluster"
+  },
+  "targetRevision": "main",
+  "apps": [
+    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 }
+  ]
+}
+```
+
+Passez en revue les paramètres de ce fichier, et notamment :
+* `env` : doit correspondre au nom de l'environnement tel qu'indiqué dans le répertoire `./gitops/envs/conf-dso` et dans lequel se trouve le fichier `conf-dso.json`, qui est-lui même nommé d'après le nom de ce même environnement. Ce nom doit également correspondre au nom de la `dsc` que vous utilisez (spécifié via le paramètre `metadata.name` de cette même dsc). Il y a donc **correspondance rigoureuse** entre le nom de l'environnement utilisé ici par le paramètre `env` et celui de la `dsc`. Ce même nom doit se retrouver impérativement dans le nom du répertoire de l'environnement (soit dans notre exemple `./gitops/envs/conf-dso`) et celui du fichier de configuration JSON associé (`conf-dso.json`). Sans ces correspondances strictes, l'installation échouera.
+* `prefix` : Il s'agit ici du péfixe de vos namespaces. Ce préfixe doit impérativement se retrouver dans tous les paramètres `namespace` des outils spécifiés dans votre `dsc`, à l'exception des outils d'infrastructure vus précédemment et qui ne sont pas installés en mode GitOps.
+* `destination.clustername` : Si votre Argo CD d'infrastructure n'est pas installé dans le même cluster que le cluster de destination vers lequel vous déployez, préciser alors ici le nom du cluster de destination tel qu'il est connu par votre Argo CD d'infrastructure.
+* `targetRevision` : Il s'agit du nom de la branche à partir de laquelle vous déployez et depuis laquelle votre instance Argo CD d'infrastructure va aller tirer les fichiers. Dans notre exemple, vous le modifierez et le remplacerez par "ma-branche". 
+* `apps` : Ce paramètre est un array qui contient lui-même des objets correspondant chacun à l'une des applications du Socle qui seront déployées, ainsi qu'aux paramètres de cette application lus par l'applicationSet Argo CD (`./gitops/dso-appset.yaml`). Nous voyons ici que la ligne correspondant à l'application keycloak comprend le paramètre `enabled` positionné à `true`. Ce paramètre est **très important** puisqu'il détermine si une application est installée (`true`) ou pas (`false`). Veuillez noter que si ce paramètre est positionné à `false` et que l'application en question est déjà installée et gérée par notre applicationSet, alors elle est désinstallée. Notons aussi la présence du paramètre `namespace`, qui indique le nom du namespace hors préfixe. Il en résulte qu'ici l'application keycloak sera finalement déployée dans le namespace "dso-keycloak", le préfixe venant s'ajouter au nom du namespace.
+
+Compte-tenu des éléments que nous venons de vérifier, et si nous nous voulons bien déployer keycloak dans le namespace dso-keycloak, avec un Argo CD d'infrastructure également présent dans le cluster cible, alors notre fichier `./gitops/envs/conf-dso/conf-dso.json`, tenant compte de notre branche de déploiement, se présentera finalement ainsi après édition :
+
+```json
+{
+  "env": "conf-dso",
+  "provider": "self-hosted",
+  "region": "fr-par",
+  "prefix": "dso-",
+  "destination": {
+    "clusterName": "in-cluster"
+  },
+  "targetRevision": "ma-branche",
+  "apps": [
+    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 }
+  ]
+}
+```
+
+Lorsque ce fichier est prêt, il vous reste encore à éditer le fichier `./gitops/dso-app.yaml` dont la section `spec.sources` se présente par défaut ainsi :
+
+```yaml
+  sources:
+    - repoURL: https://github.com/cloud-pi-native/socle.git
+      targetRevision: main
+      path: ./gitops
+      directory:
+        include: dso-appset.yaml
+```
+
+Nous allons devoir corriger cette section du fichier, en précisant l'URL de notre propre dépôt, ainsi que la branche à partir de laquelle nous déployons. Dans notre exemple (à adapter avec votre URL), cela donne donc ceci :
+
+```yaml
+  sources:
+    - repoURL: https://github.com/mon-utilisateur-ici/socle.git
+      targetRevision: ma-branche
+      path: ./gitops
+      directory:
+        include: dso-appset.yaml
+```
+
+Nous faisons ensuite de même avec le fichier `./gitops/dso-appset.yaml`, au niveau de la section `spec.generators`, en adaptant les paramètres `repoURL` et `revision`. Après édition, la section en question doit dans notre exemple ressembler à ceci :
+
+```yaml
+  generators:
+    - matrix:
+        generators:
+          - git:
+              repoURL: https://github.com/mon-utilisateur-ici/socle.git
+              revision: ma-branche
+              files:
+                - path: "./gitops/envs/*/*.json"
+          - list:
+              elementsYaml: "{{ .apps | toJson }}"
+            selector:
+              matchExpressions:
+                - key: enabled
+                  operator: In
+                  values:
+                    - "true"
+```
+
+Puis au niveau de la section `spec.template.spec.source` qui doit ressembler à ceci après adaptation du paramètre `repoURL` :
+
+```yaml
+      source:
+        repoURL: https://github.com/mon-utilisateur-ici/socle.git
+        path: "./gitops/envs/{{.env}}/apps/{{.app}}"
+        targetRevision: "{{.targetRevision}}"
+        plugin:
+          env:
+            - name: AVP_SECRET
+              value: vault-plugin-secret
+            - name: HELM_ARGS
+              value: -f values.yaml
+            - name: HELM_VALUES
+              value: ""
+```
+
+Finalement, nous lançons une première fois notre installation en GitOps de l'application Keycloak s'appuyant sur la dsc `conf-dso` (configuration par défaut) via la commande suivante :
+
+```shell
+ansible-playbook install-gitops.yaml
+```
+
+Ce premier lancement exécutera les tâches passées en revue plus haut et s'arrêtera en affichant le message suivant :
+
+```shell
+ok: [localhost] => {
+    "msg": [
+        "Paramètre global.gitOps.watchpointEnabled positionné à true dans votre resource dsc 'conf-dso'.",
+        "Arrêt de l'installation suite à génération automatique des fichiers d'applications pour l'environnement 'conf-dso'.",
+        "",
+        "Veuillez vous assurer de la cohérence des fichiers générés dans le répertoire './gitops/envs/conf-dso/apps'.",
+        "",
+        "Vous devrez par ailleurs créer le fichier './gitops/envs/conf-dso/conf-dso.json' s'il n'existe pas déjà",
+        "et y ajuster les paramètres souhaités. Se référer à la documentation README à ce sujet.",
+        "",
+        "Une fois ces vérifications et ajustements réalisés, poussez les fichiers modifiés dans votre dépôt Git (via 'git push').",
+        "",
+        "Pour finir vous pouvez soit :",
+        "- Lancer les roles d'installation restants via les tags appropriés.",
+        "- Positionner le paramètre global.gitOps.watchpointEnabled à false dans",
+        "  votre resource dsc 'conf-dso' puis relancer une installation complète."
+    ]
+}
+```
+
+Suivre les indications fournies, notamment les étapes de vérification, puis pousser les changements sur notre branche "ma-branche" :
+
+```shell
+git ls-files --modified | xargs git add
+```
+
+```shell
+git commit -m "chore/adapt gitops conf-dso files"
+```
+
+```shell
+git push --set-upstream origin testcm-deploy
+```
+
+Puis lancer la suite de l'installation gitOps à l'aide du tag `-t dso-app` :
+
+```shell
+ansible-playbook install-gitops.yaml -t dso-app
+```
+
+Nous devrions voir l'application `dso-install-manager` ainsi que notre instance de Keycloak se déployer dans l'interface web de notre instance Argo CD d'infrastructure.
+
+Une fois Keyckloak déployé, nous n'avons plus qu'à lancer sa post-configuration via le role approprié :
+
+```shell
+ansible-playbook install-gitops.yaml -t post-install-keycloak
+```
 
 ## Contributions
 

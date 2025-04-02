@@ -15,7 +15,7 @@ spec:
         generators:
           - git:
               repoURL: https://github.com/cloud-pi-native/socle.git
-              revision: main
+              revision: develop
               files:
                 - path: "./gitops/envs/*/*.json"
           - list:

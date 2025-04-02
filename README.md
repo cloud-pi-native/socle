@@ -1323,7 +1323,7 @@ ansible-playbook install-gitops.yaml -t dso-app
 
 Nous devrions voir l'application `dso-install-manager` ainsi que notre instance de Keycloak se déployer dans l'interface web de notre instance Argo CD d'infrastructure.
 
-Pour rappel, si vous avez utilisé le role que nous proposons pour son installation, vous pourrez retrouver les identifiants de votre instance Argo CD d'infrastructure à l'aide du playbook d'administration lancé comme suit (à adapter avec la variable `-e dsc_cr=votre-dsc` si vous avez utilisé une autre `dsc` que `conf-dso` pour son installation ):
+Pour rappel, si vous avez utilisé le role que nous proposons pour son installation, vous pourrez retrouver les identifiants de votre instance Argo CD d'infrastructure à l'aide du playbook d'administration lancé comme suit (à adapter avec la variable `-e dsc_cr=votre-dsc` si vous avez utilisé une autre `dsc` que `conf-dso` pour son installation) :
 
 ```shell
 ansible-playbook admin-tools/get-credentials.yaml -t argo-infra

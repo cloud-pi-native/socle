@@ -1105,7 +1105,7 @@ L'installation en mode GitOps est à lancer à l'aide du playbook `install-gitop
 
 Ce playbook, après avoir réalisé des tâches de pré-configuration, fait notamment appel aux roles suivants :
 * `vault-secrets` : sert à peupler le Vault d'infrastructure avec les values de secrets pour notre environnement et les applications associées.
-* `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `./gitops/envs/nom_de_notre_environnement`.
+* `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `./gitops/envs/nom_de_notre_environnement`. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
 * `watchpoint` : sert à arrêter le playbook suite à la génération des fichiers de charts, afin de permettre un passage en revue par l'utilisateur avant que ce-dernier n'effectue si besoin un `git push` des changements. Affiche un message en ce sens. Il s'agit du comportement par défaut, contôlé par le paramètre `spec.global.gitOps.watchpointEnabled` de la dsc (positionné à `true` par défaut).
 * `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `./gitops/dso-app.yaml`, lequel déploie lui-même l'applicationSet défini dans `./gitops/dso-appset.yaml`. Ceci permet notamment de rendre l'applicationSet visible dans la web UI d'Argo CD. C'est ensuite ce même applicationSet qui déploie les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `./gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
 
@@ -1288,6 +1288,9 @@ ok: [localhost] => {
         "Vous devrez par ailleurs créer le fichier './gitops/envs/conf-dso/conf-dso.json' s'il n'existe pas déjà",
         "et y ajuster les paramètres souhaités. Se référer à la documentation README à ce sujet.",
         "",
+        "Assurez-vous également de la cohérence des secrets qui ont été générés dans votre instance Vault d'infrastructure,",
+        "au niveau du secret engine 'forge-dso', pour l'environnement 'conf-dso'.",
+        "",
         "Une fois ces vérifications et ajustements réalisés, poussez les fichiers modifiés dans votre dépôt Git (via 'git push').",
         "",
         "Pour finir vous pouvez soit :",
@@ -1319,6 +1322,12 @@ ansible-playbook install-gitops.yaml -t dso-app
 ```
 
 Nous devrions voir l'application `dso-install-manager` ainsi que notre instance de Keycloak se déployer dans l'interface web de notre instance Argo CD d'infrastructure.
+
+Pour rappel, si vous avez utilisé le role que nous proposons pour son installation, vous pourrez retrouver les identifiants de votre instance Argo CD d'infrastructure à l'aide du playbook d'administration lancé comme suit (à adapter avec la variable `-e dsc_cr=votre-dsc` si vous avez utilisé une autre `dsc` que `conf-dso` pour son installation ):
+
+```shell
+ansible-playbook admin-tools/get-credentials.yaml -t argo-infra
+```
 
 Une fois Keyckloak déployé, nous n'avons plus qu'à lancer sa post-configuration via le role approprié :
 

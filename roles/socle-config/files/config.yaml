@@ -33,6 +33,9 @@ spec:
       mode: primary
       exposed: false
     values: {}
+  cpnCnpg:
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    values: {}
   gitlab:
     namespace: dso-gitlab
     subDomain: gitlab

@@ -1,4 +1,14 @@
 ---
+# Get CNPG s3 secret
+
+- name: CNPG s3 CA (secret)
+  ansible.builtin.include_tasks: cnpg-s3-ca.yaml
+  when: >
+    dsc.global.backup.cnpg.enabled and
+    dsc.global.backup.s3.endpointCA.namespace is defined and
+    dsc.global.backup.s3.endpointCA.name is defined and
+    dsc.global.backup.s3.endpointCA.key is defined
+
 # Retrieve Vault Infra token
 
 - name: Get Vault Infra keys and token

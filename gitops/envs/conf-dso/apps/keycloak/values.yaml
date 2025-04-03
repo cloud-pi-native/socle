@@ -1,3 +1,36 @@
+cpn-cnpg:
+  backup:
+    compression: gzip
+    destinationPath: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
+      | jsonPath {.pgClusterKeycloak.barmanObjectStore.destinationPath}>
+    enabled: true
+    endpointURL: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
+      | jsonPath {.pgClusterKeycloak.barmanObjectStore.endpointURL}>
+    retentionPolicy: 14d
+    s3Credentials:
+      accessKeyId:
+        key: accessKeyId
+        value: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
+          | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.accessKeyId.value}>
+      create: true
+      secretAccessKey:
+        key: secretAccessKey
+        value: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
+          | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.secretAccessKey.value}>
+      secretName: pg-cluster-backup
+  dbName: keycloak
+  imageName: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+    {.repository.ghcr}>/cloudnative-pg/postgresql:16.1
+  monitoring:
+    enabled: false
+  nameOverride: pg-cluster-keycloak
+  parameters:
+    max_slot_wal_keep_size: 14GB
+    max_worker_processes: '60'
+  pvcSize:
+    data: 15Gi
+    wal: 15Gi
+  username: keycloak
 keycloak:
   args: []
   auth:

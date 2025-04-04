@@ -15,15 +15,11 @@ envs:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
             noProxy: "{{ dsc.proxy.no_proxy | default('') }}"
-            hostProxy: "{{ dsc.proxy.host }}"
-            portProxy: "{{ dsc.proxy.port }}"
+            hostProxy: "{{ dsc.proxy.host | default('') }}"
+            portProxy: "{{ dsc.proxy.port | default('') }}"
           cnpgS3CaPem: "{{ cnpg_s3_ca_pem | default('') }}"
-      - argocd_app: "keycloak"
-        vault_values:
-          auth:
-            adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           externalClusters:
-            pgClusterKeycloak:
+            pgCluster:
               barmanObjectStore:
                 destinationPath: "s3://{{ dsc.global.backup.s3.bucketName | default('') }}/{{ dsc.global.backup.cnpg.pathPrefix | default('') }}"
                 endpointURL: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
@@ -32,5 +28,9 @@ envs:
                     value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
                   secretAccessKey:
                     value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
+      - argocd_app: "keycloak"
+        vault_values:
+          auth:
+            adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           initcontainers:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"

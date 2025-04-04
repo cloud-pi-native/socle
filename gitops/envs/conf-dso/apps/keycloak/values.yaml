@@ -1,22 +1,22 @@
 cpn-cnpg:
   backup:
     compression: gzip
-    destinationPath: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
-      | jsonPath {.pgClusterKeycloak.barmanObjectStore.destinationPath}>
+    destinationPath: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+      | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
     enabled: true
-    endpointURL: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
-      | jsonPath {.pgClusterKeycloak.barmanObjectStore.endpointURL}>
+    endpointURL: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+      | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
     retentionPolicy: 14d
     s3Credentials:
       accessKeyId:
         key: accessKeyId
-        value: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
-          | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.accessKeyId.value}>
+        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.accessKeyId.value}>
       create: true
       secretAccessKey:
         key: secretAccessKey
-        value: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#externalClusters
-          | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.secretAccessKey.value}>
+        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.secretAccessKey.value}>
       secretName: pg-cluster-backup
   dbName: keycloak
   imageName: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath

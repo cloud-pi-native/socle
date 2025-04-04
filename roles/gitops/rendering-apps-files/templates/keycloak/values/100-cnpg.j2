@@ -53,8 +53,8 @@ cpn-cnpg:
 
 {% if dsc.global.backup.cnpg.enabled or dsc.keycloak.cnpg.mode == "restore" %}
   backup:
-    destinationPath: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.destinationPath}>
-    endpointURL: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.endpointURL}>
+    destinationPath: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
+    endpointURL: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
 {% if dsc.global.backup.cnpg.enabled and dsc.keycloak.cnpg.mode != "restore" %}
     enabled: true
 {% if dsc.global.backup.s3.endpointCA.key is defined %}
@@ -70,10 +70,10 @@ cpn-cnpg:
       secretName: pg-cluster-backup
       accessKeyId:
         key: {{ dsc.global.backup.s3.credentials.accessKeyId.key | default ('') }}
-        value: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.accessKeyId.value}>
+        value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.accessKeyId.value}>
       secretAccessKey:
         key: {{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}
-        value: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#externalClusters | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.secretAccessKey.value}>
+        value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.secretAccessKey.value}>
 {% if dsc.global.backup.cnpg.compression != 'none' %}
     compression: "{{ dsc.global.backup.cnpg.compression }}"
 {% endif %}

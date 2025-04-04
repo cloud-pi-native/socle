@@ -805,6 +805,11 @@ spec:
                             Specifies whether we should interrupt GitOps installation to review some generated files.
                             Installation will be interrupted if true, displaying an explanation message.
                           type: boolean
+                        deploymentEnabled:
+                          default: false
+                          description: |
+                            Specifies whether the Socle deployment is GitOps or not.
+                          type: boolean
                       type: object
                     dockerAccount:
                       properties:

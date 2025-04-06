@@ -77,3 +77,17 @@
       tags:
         - post-install
         - post-install-keycloak
+        - vault-secrets-post-install
+
+  tasks:
+    - name: Load variables for the vault-secrets post-install role
+      ansible.builtin.include_vars:
+        file: roles/gitops/vault-secrets/vars/post-install.yaml
+      tags:
+        - vault-secrets-post-install
+
+    - name: Post-install vault-secrets run
+      ansible.builtin.import_role:
+        name: gitops/vault-secrets
+      tags:
+        - vault-secrets-post-install

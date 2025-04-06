@@ -1,0 +1,34 @@
+---
+vault_secrets_post_install: true
+envs:
+  - name: "{{ dsc_name }}"
+    apps:
+      - argocd_app: "keycloak"
+        vault_values:
+          client:
+            argo:
+              id: "{{ argo_client_id | default('') }}"
+              secret: "{{ argo_client_secret | default('') }}"
+            consoleBackend:
+              id: "{{ console_backend_id | default('') }}"
+              secret: "{{ console_backend_secret | default('') }}"
+            consoleFrontend:
+              id: "{{ console_frontend_id | default('') }}"
+            gitlab:
+              id: "{{ gitlab_client_id | default('') }}"
+              secret: "{{ gitlab_client_secret | default('') }}"
+            grafana:
+              id: "{{ grafana_projects_id | default('') }}"
+              secret: "{{ grafana_projects_secret | default('') }}"
+            harbor:
+              id: "{{ harbor_client_id | default('') }}"
+              secret: "{{ harbor_client_secret | default('') }}"
+            portail:
+              id: "{{ portail_client_id | default('') }}"
+              secret: "{{ portail_client_secret | default('') }}"
+            sonar:
+              id: "{{ sonar_client_id | default('') }}"
+              secret: "{{ sonar_client_secret | default('') }}"
+            vault:
+              id: "{{ vault_client_id | default('') }}"
+              secret: "{{ vault_client_secret | default('') }}"

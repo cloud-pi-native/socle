@@ -43,3 +43,11 @@
   loop: "{{ envs | subelements('apps') }}"
   loop_control:
     label: "{{ item.0.name }}"
+
+# Argo application hard refresh and sync
+
+- name: Argo application hard refresh and sync
+  when: vault_secrets_post_install
+  ansible.builtin.include_tasks: argocd.yml
+  loop:
+    - "{{ dsc.sonarqube.namespace }}"

@@ -1,0 +1,129 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-keycloak
+  namespace: {{ dsc.keycloakInfra.namespace }}
+{% if dsc.global.backup.velero.enabled %}
+  annotations:
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d  keycloak > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/container: postgres
+    pre.hook.backup.velero.io/on-error: Fail
+    pre.hook.backup.velero.io/timeout: 90s
+{% endif %}
+spec:
+  instances: 3
+  # Parameters and pg_hba configuration will be append
+  # to the default ones to make the cluster work
+{% if use_private_registry %}
+  imageName: "{{ dsc.global.registry }}/cloudnative-pg/postgresql:16.1"
+{% elif dsc.keycloakInfra.cnpg.imageName is defined %}
+  imageName: "{{ dsc.keycloakInfra.cnpg.imageName }}"
+{% endif %}
+{% if use_image_pull_secrets %}
+  imagePullSecrets:
+  - name: dso-config-pull-secret
+{% endif %}
+  postgresql:
+    parameters:
+      max_worker_processes: "60"
+{% if dsc.keycloakInfra.postgresWalMaxSlotKeepSize is defined %}
+      max_slot_wal_keep_size: {{ dsc.keycloakInfra.postgresWalMaxSlotKeepSize }}
+{% endif %}
+{% if dsc.keycloakInfra.cnpg.mode == "primary" %}
+    pg_hba:
+      # To access through TCP/IP you will need to get username
+      # and password from the secret pg-cluster-keycloak-app
+      - host keycloak keycloak all md5
+      - host keycloak streaming_replica all md5
+{% endif %}
+  bootstrap:
+{% if dsc.keycloakInfra.cnpg.mode == "primary" %}
+    initdb:
+      database: keycloak
+      owner: keycloak
+    recovery: null
+{% elif dsc.keycloakInfra.cnpg.mode == "replica" or dsc.keycloakInfra.cnpg.mode == "restore" %}
+    recovery:
+      source: pg-cluster-keycloak
+      database: keycloak
+      owner: keycloak
+    initdb: null
+  externalClusters:
+  - name: pg-cluster-keycloak
+{% if dsc.keycloakInfra.cnpg.mode == "restore" %}
+    barmanObjectStore:
+      wal:
+      maxParallel: 8
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointURL }}"
+{% if dsc.global.backup.s3.endpointCA.key is defined %}
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+{% endif %}
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
+{% endif %}
+{% if dsc.keycloakInfra.cnpg.mode == "replica" %}
+{%- filter indent(width=4) %}
+{{ dsc.keycloakInfra.cnpg.connectionParameters }}
+{%- endfilter %}
+{% endif %}
+{% endif %}
+
+{% if dsc.keycloakInfra.cnpg.mode == "replica" %}
+  replica:
+    enabled: true
+    source: pg-cluster-keycloak
+{% endif %}
+
+  enableSuperuserAccess: true
+  # Example of rolling update strategy:
+  # - unsupervised: automated update of the primary once all
+  #                 replicas have been upgraded (default)
+  # - supervised: requires manual supervision to perform
+  #               the switchover of the primary
+  primaryUpdateStrategy: unsupervised
+  # Require 1Gi of space per instance using default storage class
+  storage:
+    size: {{ dsc.keycloakInfra.postgresPvcSize }}
+{% if dsc.keycloakInfra.postgresWalPvcSize is defined %}
+  walStorage:
+    size: {{ dsc.keycloakInfra.postgresWalPvcSize }}
+{% endif %}
+  monitoring:
+    enablePodMonitor: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled and dsc.keycloakInfra.cnpg.mode != "restore" %}
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://{{ dsc.global.backup.s3.bucketName }}/{{ dsc.global.backup.cnpg.pathPrefix }}"
+      endpointURL: "{{ dsc.global.backup.s3.endpointURL }}"
+{% if dsc.global.backup.s3.endpointCA.key is defined %}
+      endpointCA:
+        name: "bundle-cnpg-s3"
+        key: "ca.pem"
+{% endif %}
+      s3Credentials:
+        accessKeyId:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.accessKeyId.key }}"
+        secretAccessKey:
+          name: "{{ dsc.global.backup.s3.credentials.name }}"
+          key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.key }}"
+{% if dsc.global.backup.cnpg.compression != 'none' %}
+      data:
+        compression: "{{ dsc.global.backup.cnpg.compression }}"
+      wal:
+        compression: "{{ dsc.global.backup.cnpg.compression }}"
+{% endif %}
+    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+{% else %}
+  backup: null
+{% endif %}

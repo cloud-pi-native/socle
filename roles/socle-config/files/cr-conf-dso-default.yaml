@@ -34,7 +34,16 @@ spec:
         vault:
           enabled: false
           pathPrefix: vault
+        vaultInfra:
+          enabled: false
+          pathPrefix: vault-infra
+    gitOps:
+      watchpointEnabled: true
   argocd:
+    admin:
+      enabled: false
+  #    password: WeAreThePasswords
+  argocdInfra:
     admin:
       enabled: false
   #    password: WeAreThePasswords
@@ -72,6 +81,9 @@ spec:
   keycloak:
     cnpg:
       mode: primary
+  keycloakInfra:
+    cnpg:
+      mode: primary
   kyverno: {}
   nexus: {}
   prometheus:
@@ -88,3 +100,4 @@ spec:
     cnpg:
       mode: primary
   vault: {}
+  vaultInfra: {}

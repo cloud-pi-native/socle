@@ -1,0 +1,100 @@
+---
+keycloak_clients:
+  - clientId: gitlab-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ gitlab_domain }}/users/auth/openid_connect/callback
+    webOrigins:
+      - https://{{ gitlab_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: console-frontend
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    redirectUris: "{{ lookup('ansible.builtin.template', 'console-redirectUris.yaml.j2') | from_yaml }}"
+    webOrigins: "{{ lookup('ansible.builtin.template', 'console-webOrigins.yaml.j2') | from_yaml }}"
+    defaultClientScopes:
+      - generic
+    publicClient: true
+
+  - clientId: console-backend
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris: "{{ lookup('ansible.builtin.template', 'console-redirectUris.yaml.j2') | from_yaml }}"
+    webOrigins: "{{ lookup('ansible.builtin.template', 'console-webOrigins.yaml.j2') | from_yaml }}"
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: argo-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    redirectUris:
+      - https://{{ argocd_domain }}/auth/callback
+      - "*"
+    webOrigins:
+      - https://{{ argocd_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: portail-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - "*"
+    webOrigins:
+      - "*"
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: sonar-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ sonar_domain }}/*
+    webOrigins:
+      - https://{{ sonar_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: harbor-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ harbor_domain }}/c/oidc/callback
+    webOrigins:
+      - https://{{ harbor_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: grafana-projects
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ grafana_domain }}/*
+      - https://{{ grafana_domain }}/
+    webOrigins:
+      - https://{{ grafana_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false
+
+  - clientId: vault-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ vault_domain }}/ui/vault/auth/oidc/oidc/callback
+      - https://{{ vault_domain }}/oidc/callback
+    webOrigins:
+      - https://{{ vault_domain }}
+    defaultClientScopes:
+      - generic
+    publicClient: false

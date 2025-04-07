@@ -1,0 +1,49 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-keycloak
+  namespace: conftest-keycloak
+spec:
+  backup:
+    barmanObjectStore:
+      data:
+        compression: gzip
+      destinationPath: <path:forge-dso/data/env/conf-test/apps/keycloak/values#externalClusters
+        | jsonPath {.pgClusterKeycloak.barmanObjectStore.destinationPath}>
+      endpointURL: <path:forge-dso/data/env/conf-test/apps/keycloak/values#externalClusters
+        | jsonPath {.pgClusterKeycloak.barmanObjectStore.endpointURL}>
+      s3Credentials:
+        accessKeyId:
+          key: <path:forge-dso/data/env/conf-test/apps/keycloak/values#externalClusters
+            | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.accessKeyId.key}>
+          name: <path:forge-dso/data/env/conf-test/apps/keycloak/values#externalClusters
+            | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.accessKeyId.name}>
+        secretAccessKey:
+          key: <path:forge-dso/data/env/conf-test/apps/keycloak/values#externalClusters
+            | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.secretAccessKey.key}>
+          name: <path:forge-dso/data/env/conf-test/apps/keycloak/values#externalClusters
+            | jsonPath {.pgClusterKeycloak.barmanObjectStore.s3Credentials.secretAccessKey.name}>
+      wal:
+        compression: gzip
+    retentionPolicy: 14d
+  bootstrap:
+    initdb:
+      database: keycloak
+      owner: keycloak
+    recovery: null
+  enableSuperuserAccess: true
+  instances: 3
+  monitoring:
+    enablePodMonitor: false
+  postgresql:
+    parameters:
+      max_slot_wal_keep_size: 14GB
+      max_worker_processes: '60'
+    pg_hba:
+    - host keycloak keycloak all md5
+    - host keycloak streaming_replica all md5
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 15Gi
+  walStorage:
+    size: 15Gi

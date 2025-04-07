@@ -1,0 +1,9 @@
+apiVersion: v2
+dependencies:
+- alias: keycloak
+  name: keycloak
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 24.4.11
+name: keycloak
+type: application
+version: 24.4.11

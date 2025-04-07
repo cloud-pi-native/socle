@@ -1,0 +1,5 @@
+---
+- name: Create dso-install-manager application
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.file', './gitops/dso-app.yaml') | from_yaml }}"

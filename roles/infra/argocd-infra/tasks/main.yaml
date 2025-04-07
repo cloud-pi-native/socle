@@ -1,0 +1,174 @@
+---
+- name: Create Argo CD Infra namespace
+  kubernetes.core.k8s:
+    name: "{{ dsc.argocdInfra.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Get argo client secret
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: keycloak-client-secret-argoinfra-client
+  register: argocd_secret
+  failed_when: argocd_secret.resources | length == 0
+
+# OpenShift CRB
+
+- name: Argo CD OpenShift scc crb
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        creationTimestamp:
+        name: "{{ dsc_name }}-argo-infra-argocd-system:openshift:scc:privileged"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:openshift:scc:privileged
+      subjects:
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-argo-infra-argocd-repo-server"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: argocd-server
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-argo-infra-redis"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-argo-infra-redis-ha"
+        - kind: ServiceAccount
+          namespace: "{{ dsc.argocdInfra.namespace }}"
+          name: "{{ dsc_name }}-argo-infra-redis-ha-haproxy"
+
+# Vault plugin setup
+
+- name: Get Argo CD Infra app version
+  block:
+    - name: Add Argo CD helm repo
+      changed_when: false
+      kubernetes.core.helm_repository:
+        name: argo
+        repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
+        force_update: true
+
+    - name: Retrieve Argo CD Helm infos
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          helm search repo -l argo --version "{{ dsc.argocdInfra.chartVersion }}" | tail -n 1
+        executable: /bin/bash
+      register: argo_infos
+
+    - name: Set argo_app_version fact
+      ansible.builtin.set_fact:
+        argo_app_version: "{{ argo_infos.stdout | regex_search('v([0-9]*\\.)+([0-9]+)') }}"
+
+- name: Retrieve Vault infra token
+  block:
+    - name: Get Vault infra secrets
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+      register: vault_infra_secrets
+
+    - name: Get Vault infra keys secret name
+      ansible.builtin.set_fact:
+        vault_infra_keys_secret: "{{ vault_infra_secrets.resources
+          | map(attribute='metadata.name')
+          | select('contains', 'vault-keys') | first }}"
+
+    - name: Find Vault infra keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+        name: "{{ vault_infra_keys_secret }}"
+      register: vault_infra_keys
+
+    - name: Set fact for Vault infra secrets
+      ansible.builtin.set_fact:
+        vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
+
+- name: Deploy Argo CD Infra Vault plugin config
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+    state: present
+  with_items:
+    - vault-plugin-cm.yml.j2
+    - vault-plugin-secret.yml.j2
+
+# Argo CD Infra installation
+
+- name: Add helm repo
+  changed_when: false
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
+    force_update: true
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Compute ArgoCD Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.argocdInfra['values'] }}"
+    combine_dest_var: "argo_values"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: "{{ dsc_name }}-argo-infra"
+    chart_ref: argo/argo-cd
+    chart_version: "{{ dsc.argocdInfra.chartVersion }}"
+    release_namespace: "{{ dsc.argocdInfra.namespace }}"
+    create_namespace: true
+    values: "{{ argo_values }}"
+
+- name: Install routes
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - ingress.yaml.j2
+
+# Alerting and monitoring setup
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2
+
+- name: Patch serviceMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get serviceMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+      register: service_monitors
+
+    - name: Get service_monitors names
+      ansible.builtin.set_fact:
+        service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch serviceMonitors
+      kubernetes.core.k8s:
+        kind: ServiceMonitor
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ service_monitors_names }}"

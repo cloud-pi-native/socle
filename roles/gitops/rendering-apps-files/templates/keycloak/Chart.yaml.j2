@@ -1,0 +1,14 @@
+---
+apiVersion: v2
+name: keycloak
+type: application
+version: {{ dsc.keycloak.chartVersion }}
+dependencies:
+- name: cpn-cnpg
+  alias: cpn-cnpg
+  version: {{ dsc.cpnCnpg.chartVersion }}
+  repository: {{ dsc.cpnCnpg.helmRepoUrl }}
+- name: keycloak
+  alias: keycloak
+  version: {{ dsc.keycloak.chartVersion }}
+  repository: "{{ dsc.keycloak.helmRepoUrl if 'oci://' in dsc.keycloak.helmRepoUrl else dsc.keycloak.helmRepoUrl ~ '/keycloak' }}"

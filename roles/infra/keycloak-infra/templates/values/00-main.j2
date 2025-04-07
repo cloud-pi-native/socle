@@ -1,0 +1,333 @@
+image:
+  registry: docker.io
+  pullPolicy: "IfNotPresent"
+
+auth:
+  adminUser: "admin"
+  existingSecret: "keycloak"
+  passwordSecretKey: "admin-password"
+
+tls:
+  enabled: false
+
+production: true
+proxy: "edge"
+httpRelativePath: "/"
+configuration: ""
+existingConfigmap: ""
+extraStartupArgs: ""
+initdbScriptsConfigMap: ""
+command: []
+args: []
+extraEnvVarsCM: ""
+extraEnvVarsSecret: ""
+replicaCount: 3
+
+containerPorts:
+  http: 8080
+  https: 8443
+  infinispan: 7800
+
+resources:
+  limits:
+    memory: "2048Mi"
+  requests:
+    memory: "1024Mi"
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 300
+  periodSeconds: 1
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 3
+  successThreshold: 1
+
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 1
+  failureThreshold: 60
+  successThreshold: 1
+
+service:
+  type: "ClusterIP"
+  http:
+    enabled: true
+  ports:
+    http: 80
+    https: 443
+  nodePorts:
+    http: ""
+    https: ""
+  sessionAffinity: "None"
+  sessionAffinityConfig: 
+  clusterIP: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  externalTrafficPolicy: "Cluster"
+  annotations: 
+  extraPorts: []
+  extraHeadlessPorts: []
+  headless:
+    annotations: 
+    extraPorts: []
+
+ingress:
+  enabled: true
+  ingressClassName: {{ dsc.ingress.className | default('') }}
+  pathType: "Prefix"
+  apiVersion: ""
+  hostname: "{{ keycloakinfra_domain }}"
+  path: /
+  servicePort: "http"
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: "{{ val }}"
+{% endfor %}
+    route.openshift.io/termination: "edge"
+  labels: 
+    app: "keycloak"
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: "{{ val }}"
+{% endfor %}
+  tls: true
+  selfSigned: false
+  extraHosts: []
+  extraPaths: []
+  secrets: []
+  extraRules: []
+
+networkPolicy:
+  enabled: false
+  allowExternal: true
+  additionalRules: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: true
+  annotations:
+  extraLabels:
+
+rbac:
+  create: false
+  rules: []
+
+pdb:
+  create: false
+
+autoscaling:
+  enabled: false
+
+metrics:
+  enabled: {{ dsc.global.metrics.enabled }}
+  service:
+    ports:
+      http: 8080
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8080"
+    extraPorts: []
+  serviceMonitor:
+    enabled: true
+    port: http
+    endpoints:
+      - path: '/metrics'
+      - path: '/realms/master/metrics'
+      - path: '/realms/infra/metrics'
+  prometheusRule:
+    enabled: {{ dsc.global.alerting.enabled }}
+    namespace: {{ dsc.keycloakInfra.namespace }}
+    labels: {}
+    groups:
+{% raw %}
+      - name: Keycloak
+        rules:
+          - alert: Keycloak infra instance not available
+            annotations:
+              message: Keycloak infra instance in namespace {{ include "common.names.namespace" . }} has not been available for the last 5 minutes.
+              summary: Keycloak infra instance down (no ready container)
+            expr: |
+              (absent(kube_pod_container_status_ready{
+              pod=~"{{ include "common.names.fullname" . }}-\\d+",
+              container="{{ include "common.names.fullname" . }}",
+              namespace="{{ include "common.names.namespace" . }}"}) == 1)
+              or sum(kube_pod_container_status_ready{
+              pod=~"{{ include "common.names.fullname" . }}-\\d+",
+              container="{{ include "common.names.fullname" . }}",
+              namespace="{{ include "common.names.namespace" . }}"}) == 0
+            for: 5m
+            labels:
+              severity: critical
+          - alert: Keycloak infra Pod not healthy
+            annotations:
+              message: Keycloak {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ include "common.names.namespace" . }} has been unavailable for the last 5 minutes.
+              summary: Keycloak pod not healthy (container is not ready)
+            expr: |
+              kube_pod_container_status_ready{
+              pod=~"{{ include "common.names.fullname" . }}-\\d+",
+              container="{{ include "common.names.fullname" . }}",
+              namespace="{{ include "common.names.namespace" . }}"} == 0
+            for: 5m
+            labels:
+              severity: warning
+          - alert: Keycloak infra DB not available
+            annotations:
+              message: All Keycloak CNPG pods in namespace {{ include "common.names.namespace" . }} have been unavailable for the last 5 minutes.
+              summary: Keycloak infra database down (containers not ready)
+            expr: |
+              (absent(kube_pod_container_status_ready{
+              pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 1)
+              or sum(kube_pod_container_status_ready{
+              pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              container="postgres", namespace="{{ include "common.names.namespace" . }}"}) == 0
+            for: 5m
+            labels:
+              severity: critical
+          - alert: Keycloak infra DB Pod not healthy
+            annotations:
+              message: Keycloak {{"{{"}} $labels.pod {{"}}"}} pod in namespace {{ include "common.names.namespace" . }} has been unavailable for the last 5 minutes.
+              summary: Keycloak infra database pod not healthy (container is not ready)
+            expr: |
+              kube_pod_container_status_ready{
+              pod=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              container="postgres", namespace="{{ include "common.names.namespace" . }}"} == 0
+            for: 5m
+            labels:
+              severity: warning
+          - alert: Keycloak infra DB PVC has low remaining disk space
+            annotations:
+              message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{"{{"}} $labels.namespace {{"}}"}} is running out of disk space (< 20% left). VALUE = {{"{{"}} $value {{"}}"}}%
+              summary: Keycloak infra CNPG PVC is running out of disk space in namespace {{"{{"}} $labels.namespace {{"}}"}}
+            expr: |
+              round(
+              kubelet_volume_stats_available_bytes{
+              persistentvolumeclaim=~"pg-cluster-keycloak-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"}
+              / kubelet_volume_stats_capacity_bytes{
+              persistentvolumeclaim=~"pg-cluster-keycloak-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"} * 100, 0.01) < 20 > 10
+            for: 1m
+            labels:
+              severity: warning
+          - alert: Keycloak infra DB PVC almost out of disk space
+            annotations:
+              message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is almost full (< 10% left). VALUE = {{"{{"}} $value {{"}}"}}%
+              summary: Keycloak infra CNPG PVC almost out of disk space in namespace {{ include "common.names.namespace" . }}
+            expr: |
+              round(
+              kubelet_volume_stats_available_bytes{
+              persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"}
+              / kubelet_volume_stats_capacity_bytes{
+              persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"} * 100, 0.01) < 10 > 0
+            for: 1m
+            labels:
+              severity: critical
+          - alert: Keycloak infra DB PVC out of disk space
+            annotations:
+              message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ include "common.names.namespace" . }} is full (0% left).
+              summary: Keycloak infra CNPG PVC out of disk space in namespace {{ include "common.names.namespace" . }}
+            expr: |
+              kubelet_volume_stats_available_bytes{
+              persistentvolumeclaim=~"pg-cluster-{{ include "common.names.fullname" . }}-\\d+",
+              namespace="{{ include "common.names.namespace" . }}"} == 0
+            for: 1m
+            labels:
+              severity: critical
+{% endraw %}
+
+keycloakConfigCli:
+  enabled: false
+
+postgresql:
+  enabled: false
+#  auth:
+#    postgresPassword: ""
+#    username: bn_keycloak
+#    password: ""
+#    database: bitnami_keycloak
+#    existingSecret: ""
+#  architecture: standalone
+
+## External PostgreSQL configuration
+## All of these values are only used when postgresql.enabled is set to false
+## @param externalDatabase.host Database host
+## @param externalDatabase.port Database port number
+## @param externalDatabase.user Non-root username for Keycloak
+## @param externalDatabase.password Password for the non-root username for Keycloak
+## @param externalDatabase.database Keycloak database name
+## @param externalDatabase.existingSecret Name of an existing secret resource containing the database credentials
+## @param externalDatabase.existingSecretHostKey Name of an existing secret key containing the database host name
+## @param externalDatabase.existingSecretPortKey Name of an existing secret key containing the database port
+## @param externalDatabase.existingSecretUserKey Name of an existing secret key containing the database user
+## @param externalDatabase.existingSecretDatabaseKey Name of an existing secret key containing the database name
+## @param externalDatabase.existingSecretPasswordKey Name of an existing secret key containing the database credentials
+##
+externalDatabase:
+  host: pg-cluster-keycloak-rw
+  port: 5432
+#  user: ""
+  database: keycloak
+#  password: ""
+  existingSecret: pg-cluster-keycloak-app
+#  existingSecretHostKey: host
+#  existingSecretPortKey: port
+  existingSecretUserKey: username
+#  existingSecretDatabaseKey: database
+  existingSecretPasswordKey: password
+
+cache:
+  enabled: true
+  stackName: "kubernetes"
+  stackFile: ""
+
+logging:
+  output: "default"
+  level: "INFO"
+
+extraEnvVars:
+  - name: DSFR_THEME_HOME_URL
+    value: https://{{ console_domain }}
+  - name: DSFR_THEME_SERVICE_TITLE
+    value: Cloud Pi Native
+  - name: DSFR_THEME_BRAND_TOP
+    value: "Ministere<br/>de l'interieur"
+  - name: DSFR_THEME_CONTACT_EMAIL
+    value: cloudpinative-relations@interieur.gouv.fr
+initContainers:
+  - name: realm-ext-provider
+{% if use_private_registry %}
+    image: "{{ dsc.global.registry }}/curlimages/curl:8.11.1"
+{% else %}
+    image: docker.io/curlimages/curl:8.11.1
+{% endif %}
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+    args:
+      - -c
+      - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
+    volumeMounts:
+      - name: empty-dir
+        mountPath: /emptydir
+{% if dsc.proxy.enabled %}
+    env:
+      - name: HTTP_PROXY
+        value: {{ dsc.proxy.http_proxy }}
+      - name: HTTPS_PROXY
+        value: {{ dsc.proxy.https_proxy }}
+      - name: NO_PROXY
+        value: {{ dsc.proxy.no_proxy }}
+{% endif %}

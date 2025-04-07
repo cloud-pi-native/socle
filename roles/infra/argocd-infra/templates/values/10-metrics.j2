@@ -1,0 +1,44 @@
+{% if dsc.global.metrics.enabled %}
+redis-ha:
+  exporter:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocdInfra.namespace }}"
+  haproxy:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocdInfra.namespace }}"
+server:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocdInfra.namespace }}"
+repoServer:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocdInfra.namespace }}"
+applicationSet:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocdInfra.namespace }}"
+notifications:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: "{{ dsc.argocdInfra.namespace }}"
+{% endif %}

@@ -126,12 +126,6 @@
 
 # Deploy Keycloak
 
-- name: Add bitnami helm repo
-  kubernetes.core.helm_repository:
-    name: bitnami
-    repo_url: "{{ dsc.keycloak.helmRepoUrl }}"
-    force_update: true
-
 - name: Set path fact
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
@@ -147,10 +141,12 @@
 - name: Deploy helm
   kubernetes.core.helm:
     name: keycloak
-    chart_ref: bitnami/keycloak
+    chart_ref: "{{ dsc.keycloak.helmRepoUrl }}/keycloak/keycloak-{{ dsc.keycloak.chartVersion }}.tgz"
     chart_version: "{{ dsc.keycloak.chartVersion }}"
     release_namespace: "{{ dsc.keycloak.namespace }}"
+    release_name: keycloak
     values: "{{ kc_values }}"
+    release_state: present
 
 - name: Wait Keycloak URL
   ansible.builtin.uri:

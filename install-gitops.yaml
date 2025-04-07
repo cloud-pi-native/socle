@@ -1,0 +1,79 @@
+---
+- name: Installation du socle DSO en mode GitOps
+  hosts: localhost
+  gather_facts: false
+
+  roles:
+    - role: socle-config
+      tags:
+        - always
+
+    - role: ca
+      tags:
+        - always
+
+    - role: console-dso-config
+      tags:
+        - always
+
+    - role: imagepullsecret
+      tags:
+        - always
+      when: use_image_pull_secrets
+
+    - role: prometheus
+      tags:
+        - prometheus
+        - prom
+      when: dsc.prometheus.crd.type == 'managed'
+
+    - role: kyverno
+      tags:
+        - kyverno
+
+    - role: cloudnativepg
+      tags:
+        - cloudnativepg
+        - cnpg
+
+    - role: infra/keycloak-infra
+      tags:
+        - keycloak-infra
+        - sso-infra
+      when: dsc.keycloakInfra.installEnabled
+
+    - role: infra/vault-infra
+      tags:
+        - vault-infra
+      when: dsc.vaultInfra.installEnabled
+
+    - role: infra/argocd-infra
+      tags:
+        - gitops-infra
+        - argocd-infra
+        - argo-infra
+      when: dsc.argocdInfra.installEnabled
+
+    - role: gitops/vault-secrets
+      tags:
+        - vault-secrets
+
+    - role: gitops/rendering-apps-files
+      tags:
+        - rendering-apps-files
+        - apps-files
+
+    - role: gitops/watchpoint
+      tags:
+        - gitops-watchpoint
+        - watchpoint
+      when: dsc.global.gitOps.watchpointEnabled
+
+    - role: gitops/dso-app
+      tags:
+        - dso-app
+
+    - role: gitops/post-install/keycloak
+      tags:
+        - post-install
+        - post-install-keycloak

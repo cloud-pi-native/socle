@@ -1,0 +1,15 @@
+{% if use_private_registry %}
+keycloak:
+  global:                                                                                                                                       
+    security:
+      allowInsecureImages: true
+  image:
+    registry: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>
+{% endif %}
+
+{% if use_image_pull_secrets %}
+keycloak:
+  global:
+    imagePullSecrets:
+    - dso-config-pull-secret
+{% endif %}

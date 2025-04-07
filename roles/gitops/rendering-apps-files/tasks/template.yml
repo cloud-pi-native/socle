@@ -1,0 +1,60 @@
+---
+
+- name: Create chart and values destination dir
+  ansible.builtin.file:
+    path: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
+    state: directory
+    mode: 0775
+
+# Chart file rendering
+
+- name: Set path fact to chart file location
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/' + item.1.argocd_app + '/Chart.yaml.j2' }}"
+
+- name: Render "{{ item.1.argocd_app }}" chart template and write to destination
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.template', path) | from_yaml | to_nice_yaml(indent=2) }}"
+    dest: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/{{ path | basename | regex_replace('\\.j2', '') }}"
+    mode: "0644"
+
+# Templates rendering
+
+- name: Set path fact to templates location
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/' + item.1.argocd_app + '/templates' }}"
+
+- name: Create templates destination dir
+  ansible.builtin.file:
+    path: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates"
+    state: directory
+    mode: 0775
+
+- name: Render "{{ item.1.argocd_app }}" templates and write yaml files to destination
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.template', my_template) | from_yaml | to_nice_yaml(indent=2) }}"
+    dest: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates/{{ my_template | basename | regex_replace('\\.j2', '') }}"
+    mode: "0644"
+  with_fileglob: "{{ path }}/*"
+  loop_control:
+    loop_var: my_template
+
+# Values rendering
+
+- name: Set path fact to values location
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/' + item.1.argocd_app + '/values' }}"
+
+- name: Compute "{{ item.1.argocd_app }}" Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ {} | combine({item.1.argocd_app: dsc[item.1.argocd_app]['values']}) }}"
+    combine_dest_var: "{{ item.1.argocd_app }}_values"
+
+- name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination
+  ansible.builtin.copy:
+    content: "{{ lookup('vars', item.1.argocd_app ~ '_values') | to_nice_yaml(indent=2) }}"
+    dest: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    mode: "0644"

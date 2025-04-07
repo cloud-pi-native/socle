@@ -1,0 +1,8 @@
+{% if dsc.ingress.tls.type == "tlsSecret" %}
+keycloak:
+  ingress:
+    extraTls:
+      - hosts:
+        - <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>
+        secretName: "{{ dsc.ingress.tls.tlsSecret.name }}"
+{% endif %}

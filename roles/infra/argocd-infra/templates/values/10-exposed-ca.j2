@@ -1,0 +1,9 @@
+{% if dsc.exposedCA.type != 'none' %}
+configs:
+  tls:
+    certificates:
+      {{ gitlab_domain }}: |
+        {{ exposed_ca_pem | indent(width=8, first=False) }}
+      {{ vaultinfra_domain }}: |
+        {{ exposed_ca_pem | indent(width=8, first=False) }}
+{% endif %}

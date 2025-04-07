@@ -1,0 +1,117 @@
+---
+- name: Create Vault namespace
+  kubernetes.core.k8s:
+    state: present
+    kind: Namespace
+    name: "{{ dsc.vaultInfra.namespace }}"
+    api_version: v1
+
+- name: Add helm repo
+  changed_when: false
+  kubernetes.core.helm_repository:
+    name: hashicorp
+    repo_url: "{{ dsc.vaultInfra.helmRepoUrl }}"
+    force_update: true
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Compute Vault Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.vaultInfra['values'] }}"
+    combine_dest_var: "vault_values"
+
+- name: Create exposed_ca Secret
+  kubernetes.core.k8s:
+    kind: Secret
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    name: exposed-ca
+    definition:
+      data:
+        tls.crt: "{{ exposed_ca_pem | b64encode }}"
+  when: dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: "{{ dsc_name }}-vault-infra"
+    chart_ref: hashicorp/vault
+    chart_version: "{{ dsc.vaultInfra.chartVersion }}"
+    release_namespace: "{{ dsc.vaultInfra.namespace }}"
+    create_namespace: true
+    values: "{{ vault_values }}"
+
+- name: Create route and certs
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - role.yaml.j2
+    - ingress.yaml.j2
+
+# Post install
+- name: Post install
+  ansible.builtin.include_tasks: post-install.yml
+
+- name: Add backup utils Helm repo and deploy
+  when: dsc.global.backup.vault.enabled
+  block:
+    - name: Add Helm repo
+      kubernetes.core.helm_repository:
+        name: dso
+        repo_url: "{{ dsc.global.backup.vault.helmRepoUrl }}"
+        force_update: true
+
+    - name: Deploy Helm chart
+      kubernetes.core.helm:
+        name: "{{ dsc_name }}-vault-backup"
+        chart_ref: dso/cpn-backup-utils
+        chart_version: "{{ dsc.global.backup.vaultInfra.chartVersion }}"
+        release_namespace: "{{ dsc.vaultInfra.namespace }}"
+        values:
+          vault:
+            enabled: true
+            secrets:
+              S3_BUCKET_NAME: "{{ dsc.global.backup.s3.bucketName }}"
+              S3_BUCKET_PREFIX: "{{ dsc.global.backup.vaultInfra.pathPrefix }}"
+              S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
+              VAULT_ADDR: "http://{{ dsc_name }}-vault-infra-active:8200"
+              VAULT_TOKEN: "{{ vault_token }}"
+              S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
+              S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+            env:
+              RETENTION: "{{ dsc.global.backup.vaultInfra.retentionPolicy }}"
+              MC_EXTRA_ARGS: "{{ dsc.global.backup.vaultInfra.mcExtraArgs }}"
+            job:
+              schedule: '"{{ dsc.global.backup.vaultInfra.cron }}"'
+        state: "{{ dsc.global.backup.vaultInfra.enabled | ternary('present', 'absent') }}"
+
+- name: Patch serviceMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get serviceMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+      register: service_monitors
+
+    - name: Get service_monitors names
+      ansible.builtin.set_fact:
+        service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch serviceMonitors
+      kubernetes.core.k8s:
+        kind: ServiceMonitor
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ service_monitors_names }}"

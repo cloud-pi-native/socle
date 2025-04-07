@@ -1,0 +1,43 @@
+---
+- name: Reset current vault values
+  ansible.builtin.set_fact:
+    current_vault_values:
+
+- name: Retrieve current vault secret
+  community.hashi_vault.vault_kv2_get:
+    url: "https://{{ vaultinfra_domain }}"
+    auth_method: token
+    token: "{{ vault_infra_token }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    engine_mount_point: "forge-dso"
+    path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+  register: current_vault_values
+  ignore_errors: true
+
+- name: Get current non null values
+  ansible.builtin.shell:
+    cmd: |
+      echo '{
+        "old": {{ current_vault_values.secret | default({}) | to_json }},
+        "new": {{ item.1.vault_values | default({}) | to_json }}
+      }' | yq -p=json -o=json -I=0 '.old *n .new'
+  register: current_vault_values_combined
+
+- name: Compare vault values
+  ansible.utils.fact_diff:
+    before: "{{ current_vault_values.secret | default({}) | to_nice_json }}"
+    after: "{{ current_vault_values_combined.stdout | from_json | to_nice_json }}"
+  register: json_comparison_result
+
+- name: Update vault secret
+  when: json_comparison_result.changed
+  community.hashi_vault.vault_kv2_write:
+    url: "https://{{ vaultinfra_domain }}"
+    auth_method: token
+    token: "{{ vault_infra_token }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    engine_mount_point: "forge-dso"
+    path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
+    data: "{{ current_vault_values_combined.stdout | from_json }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"

@@ -1,0 +1,580 @@
+---
+- name: Create Keycloak namespace
+  kubernetes.core.k8s:
+    name: "{{ dsc.keycloakInfra.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+# Setup CNPG s3 secret
+
+- name: CNPG s3 CA (secret)
+  when: >
+    dsc.global.backup.cnpg.enabled and
+    dsc.global.backup.s3.endpointCA.namespace is defined and
+    dsc.global.backup.s3.endpointCA.name is defined and
+    dsc.global.backup.s3.endpointCA.key is defined
+  block:
+    - name: Get secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.s3.endpointCA.name }}"
+        namespace: "{{ dsc.global.backup.s3.endpointCA.namespace }}"
+        kind: Secret
+      register: cnpg_s3_ca_resource
+
+    - name: Extract key
+      ansible.builtin.set_fact:
+        cnpg_s3_ca_pem: "{{ cnpg_s3_ca_resource.resources[0].data[dsc.global.backup.s3.endpointCA.key] }}"
+
+    - name: Set cnpg bundle-ca secret
+      kubernetes.core.k8s:
+        name: "bundle-cnpg-s3"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+        kind: Secret
+        api_version: v1
+        definition:
+          data:
+            ca.pem: "{{ cnpg_s3_ca_pem }}"
+
+# Setup CNPG backup
+
+- name: Set cnpg backup secret
+  when: dsc.global.backup.cnpg.enabled
+  kubernetes.core.k8s:
+    name: "{{ dsc.global.backup.s3.credentials.name }}"
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    kind: Secret
+    api_version: v1
+    definition:
+      data:
+        accessKeyId: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
+        secretAccessKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
+
+- name: Remove cnpg scheduled backup
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: ScheduledBackup
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: pg-cluster-keycloak
+    state: absent
+  when: not dsc.global.backup.cnpg.enabled
+
+# Create CNPG cluster and Keycloak database
+
+- name: Create PostgreSQL cluster and keycloak database
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - pg-cluster-keycloak.yaml.j2
+    - pg-cluster-keycloak-backup.yaml.j2
+    - pg-cluster-keycloak-nodeport.yaml.j2
+
+- name: Wait pg-cluster-keycloak-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: pg-cluster-keycloak-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-keycloak-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: pg-cluster-keycloak-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-keycloak-2-join to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    name: pg-cluster-keycloak-2-join
+  register: job2
+  until: job2.resources | length == 0
+  retries: 30
+  delay: 5
+
+# Set Keycloak admin password
+
+- name: Get Keycloak admin password secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    kind: Secret
+    name: keycloak
+  register: kc_adm_pass_secret
+
+- name: Set Keycloak admin password secret
+  when: kc_adm_pass_secret.resources | length == 0
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      data:
+        admin-password: "{{ lookup('password', '/dev/null length=24 chars=ascii_letters,digits') | b64encode }}"
+      metadata:
+        name: keycloak
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+      type: Opaque
+
+# Deploy Keycloak
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Compute Keycloak Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.keycloakInfra['values'] }}"
+    combine_dest_var: "kc_values"
+
+- name: Deploy helm
+  kubernetes.core.helm:
+    name: keycloak
+    chart_ref: "{{ dsc.keycloakInfra.helmRepoUrl }}/keycloak/keycloak-{{ dsc.keycloakInfra.chartVersion }}.tgz"
+    chart_version: "{{ dsc.keycloakInfra.chartVersion }}"
+    release_namespace: "{{ dsc.keycloakInfra.namespace }}"
+    release_name: keycloak
+    values: "{{ kc_values }}"
+    release_state: present
+
+- name: Wait Keycloak URL
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    status_code: [200, 202]
+    return_content: false
+  register: kc_response
+  until: kc_response is not failed
+  retries: 30
+  delay: 5
+
+# Set admin facts and check access to Keycloak API
+
+- name: Get Keycloak admin password
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    kind: Secret
+    name: keycloak
+  register: kc_adm_pass
+
+- name: Set Keycloak admin facts
+  ansible.builtin.set_fact:
+    keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password'] | b64decode }}"
+    keycloak_admin: admin
+
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/realms/master/protocol/openid-connect/token
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
+  ignore_errors: true
+
+- name: Reset Keycloak admin fact
+  when: kc_token is failed
+  ansible.builtin.set_fact:
+    keycloak_admin: admininfra
+
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/realms/master/protocol/openid-connect/token
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
+
+- name: Set kc_access_token fact
+  ansible.builtin.set_fact:
+    kc_access_token: "{{ kc_token.json.access_token }}"
+
+# Create permanent Keycloak admin
+
+- name: Get keycloak master realm users from API
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/admin/realms/master/users
+    method: GET
+    status_code: [200, 202]
+    return_content: true
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    body_format: json
+    headers:
+      Authorization: bearer {{ kc_access_token }}
+  register: kc_master_users
+
+- name: Set permanent_admin_present fact
+  ansible.builtin.set_fact:
+    permanent_admin_present: false
+
+- name: Update admin_present fact
+  when: kc_master_users.json | selectattr('username', 'equalto', 'admininfra')
+  ansible.builtin.set_fact:
+    permanent_admin_present: true
+
+- name: Create permanent admin group and user into master realm
+  when: not permanent_admin_present
+  block:
+    - name: Create admin group
+      community.general.keycloak_group:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ keycloakinfra_domain }}
+        auth_realm: master
+        auth_username: "{{ keycloak_admin }}"
+        auth_password: "{{ keycloak_admin_password }}"
+        name: admin
+        realm: master
+        state: present
+
+    - name: Map admin realm role from admin group
+      community.general.keycloak_realm_rolemapping:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        realm: master
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ keycloakinfra_domain }}
+        auth_realm: master
+        auth_username: "{{ keycloak_admin }}"
+        auth_password: "{{ keycloak_admin_password }}"
+        state: present
+        group_name: admin
+        roles:
+          - name: admin
+
+    - name: Create master realm permanent admin user
+      community.general.keycloak_user:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ keycloakinfra_domain }}
+        auth_realm: master
+        auth_username: "{{ keycloak_admin }}"
+        auth_password: "{{ keycloak_admin_password }}"
+        state: present
+        realm: master
+        credentials:
+          - temporary: false
+            type: password
+            value: "{{ keycloak_admin_password }}"
+        username: admininfra
+        first_name: Admin
+        last_name: Admin
+        email: admin@example.com
+        enabled: true
+        email_verified: true
+        groups:
+          - name: admin
+            state: present
+
+# Remove Keycloak temporary admin
+
+- name: Set temporary_admin_present fact
+  ansible.builtin.set_fact:
+    temporary_admin_present: false
+
+- name: Update temporary_admin_present fact
+  when: kc_master_users.json | selectattr('username', 'equalto', 'admin')
+  ansible.builtin.set_fact:
+    temporary_admin_present: true
+
+- name: Remove temporary admin from master realm
+  when: temporary_admin_present
+  community.general.keycloak_user:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: absent
+    realm: master
+    username: admin
+
+# Ensure we will use permanent admin for subsequent tasks
+
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/realms/master/protocol/openid-connect/token
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
+  ignore_errors: true
+
+- name: Reset Keycloak admin fact
+  when: kc_token is failed
+  ansible.builtin.set_fact:
+    keycloak_admin: admininfra
+
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/realms/master/protocol/openid-connect/token
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
+
+- name: Set kc_access_token fact
+  ansible.builtin.set_fact:
+    kc_access_token: "{{ kc_token.json.access_token }}"
+
+# Create and setup infra realm
+
+- name: Create infra realm
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    id: infra
+    realm: infra
+    display_name: Infra Realm
+    loginWithEmailAllowed: true
+    registration_email_as_username: false
+    loginTheme: dsfr
+    accountTheme: dsfr
+    adminTheme: dsfr
+    emailTheme: dsfr
+    internationalizationEnabled: true
+    supportedLocales:
+      - en
+      - fr
+    defaultLocale: fr
+    password_policy: >
+      length(15) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
+      passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)
+    enabled: true
+
+- name: Create base admins groups
+  community.general.keycloak_group:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    realm: infra
+    name: "{{ item }}"
+  with_items:
+    - admin
+    - ArgoCDAdmins
+
+- name: Get keycloak infra realm users from API
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/admin/realms/infra/users
+    method: GET
+    status_code: [200, 202]
+    return_content: true
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    body_format: json
+    headers:
+      Authorization: bearer {{ kc_access_token }}
+  register: kc_infra_users
+
+- name: Find infra admin secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.keycloakInfra.namespace }}"
+    kind: Secret
+    name: infra-admin-user-secret
+  register: infra_admin_secret
+
+- name: Create infra admin secret and user
+  when: >
+    (infra_admin_secret.resources | length == 0) or
+    (kc_infra_users.json | selectattr('username', 'equalto', infra_admin_secret.resources[0].data.ADMIN_USER|b64decode) | length == 0)
+  block:
+    - name: Generate admin user password
+      ansible.builtin.set_fact:
+        admin_user_password: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+
+    - name: Create infra secret
+      kubernetes.core.k8s:
+        definition:
+          kind: Secret
+          metadata:
+            namespace: "{{ dsc.keycloakInfra.namespace }}"
+            name: infra-admin-user-secret
+          data:
+            ADMIN_USER: "{{ 'admin@example.com' | b64encode }}"
+            ADMIN_USER_PASSWORD: "{{ admin_user_password | b64encode }}"
+          type: Opaque
+
+    - name: Remove infra admin user
+      community.general.keycloak_user:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ keycloakinfra_domain }}
+        auth_realm: master
+        auth_username: "{{ keycloak_admin }}"
+        auth_password: "{{ keycloak_admin_password }}"
+        state: absent
+        realm: infra
+        username: admin@example.com
+
+    - name: Create infra admin user
+      community.general.keycloak_user:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://{{ keycloakinfra_domain }}
+        auth_realm: master
+        auth_username: "{{ keycloak_admin }}"
+        auth_password: "{{ keycloak_admin_password }}"
+        state: present
+        realm: infra
+        credentials:
+          - temporary: false
+            type: password
+            value: "{{ admin_user_password }}"
+        username: admin@example.com
+        first_name: Admin
+        last_name: Admin
+        email: admin@example.com
+        enabled: true
+        email_verified: true
+        groups:
+          - name: admin
+            state: present
+          - name: ArgoCDAdmins
+            state: present
+#        force: true  ## Ne fontionne pas quand user supprimé via la GUI et tâche relancée.
+
+- name: Get infra keycloak client scopes from API
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/admin/realms/infra/client-scopes
+    method: GET
+    status_code: [200, 202]
+    return_content: true
+    body_format: json
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    headers:
+      Authorization: bearer {{ kc_access_token }}
+  register: kc_client_scopes
+
+- name: Create generic keycloak client scope
+  when: kc_client_scopes.json | selectattr('name', 'equalto', 'generic') | length == 0
+  community.general.keycloak_clientscope:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    name: generic
+    realm: infra
+    description: Generic client scope
+    protocol: openid-connect
+    attributes:
+      include.in.token.scope: true
+      display.on.consent.screen: true
+      gui.order: ""
+      consent.screen.text: ""
+    protocolMappers: "{{ lookup('ansible.builtin.file', 'generic-client-scope-protocolMappers.yaml') | from_yaml }}"
+
+- name: Create clients
+  ansible.builtin.include_tasks:
+    file: client.yaml
+  with_items: "{{ keycloak_clients }}"
+
+- name: Enable brute force detection
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: "{{ item }}"
+    brute_force_protected: true
+    failure_factor: 10
+  with_items:
+    - master
+    - infra
+
+- name: Set OTP policy algorithm in dso realm
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    realm: infra
+    otp_policy_algorithm: SHA256
+
+- name: Patch serviceMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get serviceMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+      register: service_monitors
+
+    - name: Get service_monitors names
+      ansible.builtin.set_fact:
+        service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch serviceMonitors
+      kubernetes.core.k8s:
+        kind: ServiceMonitor
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ service_monitors_names }}"
+
+- name: Patch podMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get podMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: PodMonitor
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+      register: pod_monitors
+
+    - name: Get pod_monitors names
+      ansible.builtin.set_fact:
+        pod_monitors_names: "{{ pod_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch podMonitors
+      kubernetes.core.k8s:
+        kind: PodMonitor
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ pod_monitors_names }}"

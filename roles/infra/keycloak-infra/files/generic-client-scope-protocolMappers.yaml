@@ -1,0 +1,143 @@
+- id: e0491f43-3e4c-4649-b16e-3c0e47bbc2c0
+  name: family name
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-property-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: lastName
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: family_name
+    jsonType.label: String
+- id: 000f3a6c-bec3-40dd-8397-0c45019df7e0
+  name: given name
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-property-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: firstName
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: given_name
+    jsonType.label: String
+- id: 2acd698c-03d2-4d0b-99a4-db00ed08f25d
+  name: name
+  protocol: openid-connect
+  protocolMapper: oidc-full-name-mapper
+  config:
+    id.token.claim: true
+    access.token.claim: true
+    userinfo.token.claim: true
+- id: 13e8d53a-415f-4f98-a133-8795e0173efd
+  name: phone number
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-attribute-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: phoneNumber
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: phone_number
+    jsonType.label: String
+- id: 5a8652b6-9a42-48e5-819f-59259c349883
+  name: acr loa level
+  protocol: openid-connect
+  protocolMapper: oidc-acr-mapper
+  config:
+    id.token.claim: true
+    access.token.claim: true
+- id: 9d090281-1d17-4283-8fb7-183e1b536328
+  name: nickname
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-attribute-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: nickname
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: nickname
+    jsonType.label: String
+- id: 79bccac1-d0f1-4c28-a040-e0e640889e52
+  name: username
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-property-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: username
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: preferred_username
+    jsonType.label: String
+- id: 7d976f67-441d-4491-a1fe-f17343a03120
+  name: full name
+  protocol: openid-connect
+  protocolMapper: oidc-full-name-mapper
+  config:
+    id.token.claim: true
+    access.token.claim: true
+    userinfo.token.claim: true
+- id: 5ca2ebe3-ef32-4f62-bcad-e764c70d20e6
+  name: locale
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-attribute-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: locale
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: locale
+    jsonType.label: String
+- id: 84629e2c-c129-4d49-bb04-a03a5124ed47
+  name: email verified
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-property-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: emailVerified
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: email_verified
+    jsonType.label: boolean
+- id: bb8a7b6e-2f1a-46b2-91e1-8d027dabe93d
+  name: updated at
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-attribute-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: updatedAt
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: updated_at
+    jsonType.label: long
+- id: f5c4b940-47ad-4734-8712-4f53357cff1c
+  name: middle name
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-attribute-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: middleName
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: middle_name
+    jsonType.label: String
+- id: e1e82435-1b52-4b41-aa0e-14a3e9779670
+  name: groups
+  protocol: openid-connect
+  protocolMapper: oidc-group-membership-mapper
+  config:
+    full.path: true
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: groups
+    userinfo.token.claim: true
+- id: c3803e56-b542-45e3-a780-0fb70841dd5c
+  name: email
+  protocol: openid-connect
+  protocolMapper: oidc-usermodel-property-mapper
+  config:
+    userinfo.token.claim: true
+    user.attribute: email
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: email
+    jsonType.label: String

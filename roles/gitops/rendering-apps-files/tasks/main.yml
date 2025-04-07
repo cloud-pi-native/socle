@@ -1,0 +1,11 @@
+---
+- name: Loop over services to render templates
+  ansible.builtin.include_tasks: ./template.yml
+  loop: "{{ envs | subelements('apps') }}"
+  loop_control:
+    label: "{{ item.0.name }}"
+  vars:
+    envs:
+      - name: "{{ dsc_name }}"
+        apps:
+          - argocd_app: keycloak

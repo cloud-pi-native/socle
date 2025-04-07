@@ -146,6 +146,57 @@ spec:
                   required:
                     - admin
                   type: object
+                argocdInfra:
+                  description: Configuration for Argo CD infrastructure instance that will be used to deploy everything else.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Argo CD infrastructure instance.
+                      type: boolean
+                    admin:
+                      description: Configuration for the Argo CD infrastructure instance admin user.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether the Argo CD infrastructure instance admin user is enabled.
+                          type: boolean
+                        password:
+                          description: The password for the Argo CD infrastructure instance admin user.
+                          type: string
+                      required:
+                        - enabled
+                      type: object
+                    namespace:
+                      description: The namespace for Argo CD infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Argo CD infrastructure instance .
+                      type: string
+                    helmRepoUrl:
+                      description: Argo CD community maintained helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Argo CD community maintained helm chart version (e.g., "7.3.11").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for argocdInfra, they will be merged with roles/infra/argocd-infra/templates/values/
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    privateGitlabDomain:
+                      description: Private Gitlab repository for argocd to access.
+                      type: string
+                    vaultPluginVersion:
+                      description: |
+                        Argo CD Vault plugin version (e.g., "1.18.1").
+                        See https://github.com/argoproj-labs/argocd-vault-plugin/releases
+                      type: string
+                  required:
+                    - admin
+                    - installEnabled
+                  type: object
                 certmanager:
                   description: Configuration for Cert Manager.
                   properties:
@@ -261,6 +312,23 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
+                  type: object
+                cpnCnpg:
+                  description: Configuration for cpn-cnpg.
+                  properties:
+                    helmRepoUrl:
+                      description: CloudNativePG helm repository url.
+                      type: string
+                    chartVersion:
+                      description: CloudNativePG helm chart version (e.g., "0.18.2").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for CloudNativePG, they will be merged with roles/gitops/rendering-apps-files/
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-cnpg
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-cnpg/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 gitlab:
                   description: Configuration for GitLab.
@@ -614,6 +682,34 @@ spec:
                               type: string
                               default: "30d"
                           type: object
+                        vaultInfra:
+                          properties:
+                            enabled:
+                              description: Enable s3 vault infra backups.
+                              default: false
+                              type: boolean
+                            helmRepoUrl:
+                              description: Vault infra backup-utils helm repository url.
+                              type: string
+                            chartVersion:
+                              description: Vault infra backup-utils helm chart version (e.g., "1.12.2").
+                              type: string
+                            pathPrefix:
+                              description: Defines the s3 destination path for vault infra backups.
+                              type: string
+                              default: "vault-infra"
+                            mcExtraArgs:
+                              description: Extra args to pass to minio cli for the backups.
+                              type: string
+                            cron:
+                              description: Defines the cron rule used for vault infra backups. By default it runs every 6 hours.
+                              type: string
+                              default: "0 */6 * * *"
+                            retentionPolicy:
+                              description: Defines retention policy for vault infra backups recurrences.
+                              type: string
+                              default: "30d"
+                          type: object
                         cnpg:
                           properties:
                             enabled:
@@ -689,6 +785,15 @@ spec:
                     profile:
                       description: Specifies security profile (e.g., cis).
                       type: string
+                    gitOps:
+                      properties:
+                        watchpointEnabled:
+                          default: true
+                          description: |
+                            Specifies whether we should interrupt GitOps installation to review some generated files.
+                            Installation will be interrupted if true, displaying an explanation message.
+                          type: boolean
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
@@ -697,6 +802,7 @@ spec:
                     - alerting
                     - platform
                     - offline
+                    - gitOps
                   type: object
                 grafana:
                   description: Configuration for Grafana instance.
@@ -1035,6 +1141,80 @@ spec:
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   type: object
+                keycloakInfra:
+                  description: Configuration for Keycloak infrastructure instance.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Keycloak infrastructure instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Keycloak infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Keycloak infrastructure instance.
+                      type: string
+                    helmRepoUrl:
+                      description: Keycloak Bitnami helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Keycloak Bitnami chart version (e.g., "19.3.4").
+                      type: string
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    pluginDownloadUrl:
+                      description: Plugins download Url.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for keycloakInfra, they will be merged with roles/infra/keycloak-infra/templates/values/
+                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak
+                        https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        mode:
+                          description: Determines whether cnpg clusters should be deployed as a primary cluster
+                            (initdb from scratch) or replica cluster (initdb from external source).
+                          default: primary
+                          type: string
+                          enum:
+                            - primary
+                            - replica
+                            - restore
+                        exposed:
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
+                          type: boolean
+                          default: false
+                        nodePort:
+                          description: NodePort used to expose the cnpg cluster instance.
+                          type: string
+                        connectionParameters:
+                          description: |
+                            Connection parameters used for replication, it should contain
+                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
+                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                          type: string
+                  required:
+                    - installEnabled
+                  type: object
                 kyverno:
                   description: Configuration for Kyverno.
                   properties:
@@ -1232,9 +1412,40 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
+                vaultInfra:
+                  description: Configuration for Vault infrastructure instance.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Vault infrastructure instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Vault infrastructure instance.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Vault infrastructure instance.
+                      type: string
+                    helmRepoUrl:
+                      description: Hashicorp Vault helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                      type: string
+                    pvcSize:
+                      description: Size for Vault infrastructure instance persistent volume.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/
+                        https://developer.hashicorp.com/vault/docs/platform/k8s/helm
+                        https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
               required:
                 - additionalsCA
                 - argocd
+                - argocdInfra
                 - certmanager
                 - cloudnativepg
                 - console
@@ -1250,11 +1461,13 @@ spec:
                 - harbor
                 - ingress
                 - keycloak
+                - keycloakInfra
                 - kyverno
                 - nexus
                 - proxy
                 - sonarqube
                 - vault
+                - vaultInfra
               type: object
           required:
             - spec

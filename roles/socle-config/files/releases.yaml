@@ -6,6 +6,10 @@ spec:
   argocd:
     # https://artifacthub.io/packages/helm/argo/argo-cd
     chartVersion: 7.7.8
+  argocdInfra:
+    # https://artifacthub.io/packages/helm/argo/argo-cd
+    chartVersion: 7.7.8
+    vaultPluginVersion: 1.18.1
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
     chartVersion: v1.14.3
@@ -15,18 +19,21 @@ spec:
   console:
     # https://github.com/cloud-pi-native/console/releases
     release: "2.*.*"
+  cpnCnpg:
+    # https://github.com/cloud-pi-native/helm-charts/releases
+    chartVersion: 2.0.1
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "8.9.2"
+    chartVersion: "8.10.3"
   gitlabCiPipelinesExporter:
     # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
     chartVersion: "0.3.5"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "1.10.2"
+    chartVersion: "1.11.2"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.74.1"
+    chartVersion: "0.75.1"
   grafana:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"
@@ -39,6 +46,9 @@ spec:
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11
+  keycloakInfra:
+    # https://artifacthub.io/packages/helm/bitnami/keycloak
+    chartVersion: 24.4.11
   kyverno:
     # https://artifacthub.io/packages/helm/kyverno/kyverno
     chartVersion: 3.1.4
@@ -49,5 +59,8 @@ spec:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.8.1
   vault:
+    # https://artifacthub.io/packages/helm/hashicorp/vault
+    chartVersion: 0.29.1
+  vaultInfra:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.29.1

@@ -1,0 +1,10 @@
+{% if dsc.proxy.enabled %}
+keycloak:
+  extraEnvVars:
+    - name: HTTP_PROXY
+      value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+    - name: HTTPS_PROXY
+      value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+    - name: NO_PROXY
+      value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
+{% endif %}

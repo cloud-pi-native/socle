@@ -1,5 +1,44 @@
 # Changelog
 
+## [3.7.0](https://github.com/cloud-pi-native/socle/compare/v3.6.0...v3.7.0) (2025-04-07)
+
+
+### Features
+
+* :arrow_up: Upgrade GitLab ([dd9999f](https://github.com/cloud-pi-native/socle/commit/dd9999f947459fd55f0225a43eb491e36b7ead55))
+* :arrow_up: Upgrade GitLab ([39d4335](https://github.com/cloud-pi-native/socle/commit/39d4335f555f43c74d0ad25f86713c3186305866))
+* :memo: Update README with GitOps part ([092aebe](https://github.com/cloud-pi-native/socle/commit/092aebeb32fc51a4677e87b2453a279294ec5cd9))
+* :memo: Update README with GitOps part ([db4e3f9](https://github.com/cloud-pi-native/socle/commit/db4e3f9d8a05b54399d0c20af0f0e2b30500468a))
+* :sparkles: Add GitOps watchpoint and adapt apps files rendering ([6b28d11](https://github.com/cloud-pi-native/socle/commit/6b28d1180d65c7b8bd02d59bb5545f514bbca6ec))
+* :sparkles: enable registry choice ([72bdb97](https://github.com/cloud-pi-native/socle/commit/72bdb9705f6384d35ee5dbc57ecc13a48dcc0ecd))
+* :sparkles: enable registry choice ([1bf8278](https://github.com/cloud-pi-native/socle/commit/1bf82780d78ebe0be88f2c1c5535753b973926fd))
+* :sparkles: Introducing GitOps install (base + keycloak) ([c535f70](https://github.com/cloud-pi-native/socle/commit/c535f70ed6478f93e2f93e462796296229e93944))
+* :sparkles: Introducing GitOps install (base + keycloak) ([0da06a0](https://github.com/cloud-pi-native/socle/commit/0da06a0bfc8e25db078e99d4ca50aeac9422718a))
+
+
+### Bug Fixes
+
+* :adhesive_bandage: Adapt some README parts + add content ([984e5b4](https://github.com/cloud-pi-native/socle/commit/984e5b4ade70cb06f341540b876b5fb52bef6fd5))
+* :adhesive_bandage: GitOps message ([24fac87](https://github.com/cloud-pi-native/socle/commit/24fac8729605489c26ff787dee7530bdda661abf))
+* :adhesive_bandage: GitOps message ([a9c11a0](https://github.com/cloud-pi-native/socle/commit/a9c11a0aa4aa4c5040f1ff7b18b0af4403f98eb0))
+* :art: Set targetRevision to develop ([d87a1e0](https://github.com/cloud-pi-native/socle/commit/d87a1e0bfbd07bf9b6fbfcb694e07eef2c652320))
+* :bug: eslint "ignores" pattern ([fe2f69b](https://github.com/cloud-pi-native/socle/commit/fe2f69bef230b9d2371c5e1d4405c0bd191a37c0))
+* :bug: GitOps watchpoint message ([590d711](https://github.com/cloud-pi-native/socle/commit/590d711c790b49375cd34bdad3c13135c180c04c))
+* :bug: GitOps watchpoint message ([b55de26](https://github.com/cloud-pi-native/socle/commit/b55de26451d5c177563f7976c73bc7dc2e96b050))
+* :bug: Vault backups (DSO + infra) ([b28089a](https://github.com/cloud-pi-native/socle/commit/b28089a5a0a919e171369329c55e33ad1455a222))
+* :bug: Vault backups (DSO + infra) ([3f9601d](https://github.com/cloud-pi-native/socle/commit/3f9601d8736c81d99638f6aa852e60cafa00e598))
+* :rotating_light: Exclude README from linter ([d372165](https://github.com/cloud-pi-native/socle/commit/d372165f3b09d0b8a679ad983e9447e869edb541))
+* :wrench: gitops proxies rendering ([11a9d49](https://github.com/cloud-pi-native/socle/commit/11a9d494111d4a562d2d706aaf35340fdf2ae7c9))
+* :wrench: gitops proxies rendering ([c7d8ee4](https://github.com/cloud-pi-native/socle/commit/c7d8ee462125d13faef1b66e88744dabccd3c057))
+* :wrench: keycloak infra validate_certs ([40c9092](https://github.com/cloud-pi-native/socle/commit/40c909208af9ec283e0290f965af5cbbd6a62d17))
+* :wrench: keycloak pod label ([9559ea3](https://github.com/cloud-pi-native/socle/commit/9559ea391374b3de9922232b3692a987ad73e419))
+* :wrench: keycloak pod label ([4f602bd](https://github.com/cloud-pi-native/socle/commit/4f602bd8e2aaae8ea8ac0457775d0cf0f0f67f4c))
+* :wrench: keycloak pod label ([318b0fa](https://github.com/cloud-pi-native/socle/commit/318b0fac2a284542fb16a96ed47dc30f368e939c))
+* :wrench: keycloak pod label ([c7e7efd](https://github.com/cloud-pi-native/socle/commit/c7e7efd2f9a3f6358c8a2c3341fbb016ff475d88))
+* :wrench: keycloak validate_certs ([25b1d54](https://github.com/cloud-pi-native/socle/commit/25b1d548c6ed68f8ca2ecfbee01e39608e5d53d9))
+* :wrench: keycloak validate_certs and CRD parameter ([8dde28f](https://github.com/cloud-pi-native/socle/commit/8dde28f1d31f04545609bac2b7f7e54cc6c24788))
+* :wrench: update helm registry and fix install tasks ([9bd9ff4](https://github.com/cloud-pi-native/socle/commit/9bd9ff44bc255a85a658932e96608585d280b17a))
+
 ## [3.6.0](https://github.com/cloud-pi-native/socle/compare/v3.5.1...v3.6.0) (2025-03-24)
 
 

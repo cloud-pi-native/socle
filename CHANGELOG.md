@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.7.1](https://github.com/cloud-pi-native/socle/compare/v3.7.0...v3.7.1) (2025-04-07)
+
+
+### Bug Fixes
+
+* :bug: Gitlab Runner resources overwrite condition ([d5905f1](https://github.com/cloud-pi-native/socle/commit/d5905f1ae50ecb7b8af02051062dfe5ddc16577e))
+* :bug: Gitlab Runner resources overwrite condition ([45a4dfe](https://github.com/cloud-pi-native/socle/commit/45a4dfee8cf3ecceb10ca7fa95e44e9e57acbcfc))
+
 ## [3.7.0](https://github.com/cloud-pi-native/socle/compare/v3.6.0...v3.7.0) (2025-04-07)
 
 

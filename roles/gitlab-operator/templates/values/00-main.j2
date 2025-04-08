@@ -1,4 +1,4 @@
-watchCluster: true
+watchCluster: false
 
 image:
 {% if use_private_registry %}
@@ -14,7 +14,7 @@ image:
   # pullSecrets: []
   prepend: "false"
 
-nameOverride: "gitlab"
+nameOverride: "{{ dsc_name }}-gitlab-operator"
 fullnameOverride: ""
 
 extraEnvs: []
@@ -48,7 +48,7 @@ manager:
     annotations: {}
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the name template
-    # name:
+    # name: gitlab-operator-manager
   webhook:
     selfSignedCert:
       # Specifies whether CertManager Issuer and Certificate should be created
@@ -63,12 +63,23 @@ app:
     annotations: {}
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the name template
-    # name:
+    # name: gitlab-operator-app
 
 nginx-ingress:
   serviceAccount:
     # Specifies whether a service account should be created
     create: false
+
+prometheus:
+  serviceAccount:
+    server:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the name template
+      # name: gitlab-operator-prometheus-server
 
 scc: {}
 #  apiVersion: ""

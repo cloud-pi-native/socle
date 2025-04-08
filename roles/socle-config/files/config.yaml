@@ -51,9 +51,8 @@ spec:
     helmRepoUrl: https://charts.visonneau.fr
     values: {}
   gitlabOperator:
-    namespace: dso-gitlab-operator
+    namespace: dso-gitlab
     helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
-    forcedInstall: false
     values: {}
   gitlabRunner:
     helmRepoUrl: https://charts.gitlab.io

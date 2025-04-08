@@ -103,12 +103,6 @@
       - "control-plane=controller-manager"
   register: cp_deployments
 
-- name: Set gitlab_operator_ns fact
-  ansible.builtin.set_fact:
-    gitlab_operator_ns: "{{ cp_deployments.resources
-      | selectattr('metadata.name', 'equalto', 'gitlab-controller-manager')
-      | map(attribute='metadata.namespace') | first }}"
-
 - name: Get existing GitLab sidekiq deployments
   kubernetes.core.k8s_info:
     kind: Deployment
@@ -116,11 +110,6 @@
       - "app.kubernetes.io/instance=gitlab-sidekiq"
       - "app.kubernetes.io/managed-by=gitlab-operator"
   register: gs_deployments
-
-- name: Set other_gitlabs_ns fact
-  ansible.builtin.set_fact:
-    other_gitlabs_ns: "{{ gs_deployments.resources | map(attribute='metadata.namespace')
-      | reject('search', dsc.gitlab.namespace) | list }}"
 
 - name: Create RBAC resources
   kubernetes.core.k8s:

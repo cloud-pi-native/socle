@@ -3,7 +3,7 @@ dependencies:
 - alias: cpn-cnpg
   name: cpn-cnpg
   repository: https://cloud-pi-native.github.io/helm-charts
-  version: 2.0.1
+  version: 2.3.0
 - alias: sonarqube
   name: sonarqube
   repository: https://sonarsource.github.io/helm-chart-sonarqube

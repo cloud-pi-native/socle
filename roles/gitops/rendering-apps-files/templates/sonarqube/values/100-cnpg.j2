@@ -50,6 +50,12 @@ cpn-cnpg:
 
   monitoring:
     enabled: {{ dsc.global.metrics.enabled }}
+{% if dsc.global.metrics.additionalLabels is defined %}
+    podMonitorAdditionalLabels:
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+      {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
 
 {% if dsc.global.backup.cnpg.enabled or dsc.sonarqube.cnpg.mode == "restore" %}
   backup:

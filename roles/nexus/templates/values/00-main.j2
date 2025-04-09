@@ -1,0 +1,172 @@
+---
+fullnameOverride: "nexus"
+
+{% if dsc.global.platform == "kubernetes" %}
+podSecurityContext:
+  fsGroup: 200
+  runAsNonRoot: true  # Force l'exécution en non-root
+
+securityContext:
+  runAsNonRoot: true
+  runAsGroup: 200
+  runAsUser: 200
+{% endif %}
+
+config:
+  enabled: true
+  cleanup:
+    - name: DSOdockerCleanupPolicy
+      notes: ""
+      format: docker
+      mode: delete
+      criteria:
+        lastDownloaded: "1209600"
+  tasks:
+    - name: "Clean Docker unused stuff"
+      typeId: "repository.docker.gc"
+      crontab: "0 30 0 * * ?"
+      attributes:
+        repositoryName: "dso-dockerhub-proxy"
+        deployOffset: "24"
+    - name: "Clean Docker uploads"
+      typeId: "repository.docker.upload-purge"
+      crontab: "0 20 0 * * ?"
+      attributes:
+        age: "24"
+    - name: "Compact DSO Blob Store"
+      typeId: "blobstore.compact"
+      crontab: "0 10 1 * * ?"
+      attributes:
+        blobstoreName: "dso"
+  blobStores:
+    - name: dso
+      type: file
+      path: /nexus-data-docker/dso
+      softQuota:
+        type: spaceRemainingQuota
+        limit: 1073741824
+  repos:
+{% if dsc.nexus.proxyEnabled | default(false) %}
+    - name: dso-dockerhub-proxy
+      format: docker
+      type: proxy
+      online: true
+      storage:
+        blobStoreName: dso
+        strictContentTypeValidation: true
+        writePolicy: ALLOW
+      cleanup:
+        policyNames:
+          - DSOdockerCleanupPolicy
+      docker:
+        forceBasicAuth: false
+        httpPort: 5000
+        httpsPort: null
+        subdomain: null
+        v1Enabled: true
+      dockerProxy:
+        cacheForeignLayers: false
+        foreignLayerUrlWhitelist: []
+        indexType: "HUB"
+        indexUrl: null
+      httpClient:
+        authentication: null
+        autoBlock: true
+        blocked: false
+        connection:
+          enableCircularRedirects: false
+          enableCookies: false
+          retries: null
+          timeout: null
+          useTrustStore: false
+          userAgentSuffix: null
+      negativeCache:
+        enabled: true
+        timeToLive: 1440
+      proxy:
+        contentMaxAge: 1440
+        metadataMaxAge: 1440
+        remoteUrl: "https://registry-1.docker.io"
+      routingRuleName: null
+{% endif %}
+
+  realms:
+    enabled: true
+    values:
+      - NexusAuthenticatingRealm
+      - DockerToken
+  anonymous:
+    enabled: true
+    roles:
+      - new-anon
+  roles:
+    - id: new-anon
+      name: new-anon
+      description: new-anon
+      privileges:
+        - nx-repository-view-docker-*-browse
+        - nx-repository-view-docker-*-read
+      roles: [] 
+  users:
+    - userId: anonymous
+      firstName: Anonymous
+      lastName: User
+      emailAddress: anonymous@example.org
+      source: default
+      status: active
+      readOnly: true
+      roles:
+        - new-anon
+  job:
+    image:
+      repository: docker.io/alpine/k8s
+      tag: 1.31.2
+      pullPolicy: IfNotPresent
+    ttlSecondsAfterFinished: 600
+
+rootPassword:
+  secret: admin-creds
+  key: password
+
+extraVolumes:
+  - name: nexus-data-proxy-cache
+    persistentVolumeClaim:
+      claimName: nexus-data-proxy-cache
+extraVolumeMounts:
+  - name: nexus-data-proxy-cache
+    mountPath: /nexus-data-docker
+
+persistence:
+  enabled: true
+  annotations: {}
+  accessMode: ReadWriteOnce
+  size: 250Gi
+  retainDeleted: true
+  retainScaled: true
+
+service:
+  type: ClusterIP
+  port: 8081
+  additionalPorts: 
+    - port: 5000
+      name: dockerproxy
+      containerPort: 5000
+      hosts:
+        - "{{ dsc.nexus.subDomain }}-docker-proxy{{ root_domain }}"  
+env:
+{% if dsc.proxy.enabled %}
+  - name: http_proxy
+    value: "{{ dsc.proxy.http_proxy }}"
+  - name: https_proxy
+    value: "{{ dsc.proxy.https_proxy }}"
+  - name: no_proxy
+    value: "{{ dsc.proxy.no_proxy }}"
+{% endif %}
+
+# Désactivation des métriques Nexus (sans ServiceMonitor interne)
+metrics:
+  enabled: "{{ dsc.global.metrics.enabled | default(false) }}"
+  serviceMonitor:
+    enabled: false
+
+

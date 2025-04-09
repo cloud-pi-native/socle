@@ -132,11 +132,19 @@ spec:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
   nexus:
+    chartVersion: 5.8.3
+    helmRepoName: stevehipwell
+    helmRepoUrl: https://stevehipwell.github.io/helm-charts/
+    chartReference: stevehipwell/nexus3
+    release: nexus
+    imageTag: 3.78.2
     namespace: dso-nexus
     subDomain: nexus
     storageSize: 25Gi
     proxyEnabled: false
     proxyCacheSize: 25Gi
+    values:
+      replicaCount: 1
   sonarqube:
     namespace: dso-sonarqube
     subDomain: sonar

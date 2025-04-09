@@ -5,7 +5,7 @@ metadata:
   name: nexus-alternative
   namespace: {{ dsc.nexus.namespace }}
   annotations:
-{% for key, val in (dsc.ingress.annotations | combine(dsc.nexus.ingressAnnotations | default([]))).items() %}
+{% for key, val in (dsc.ingress.annotations | combine(dsc.nexus.ingressAnnotations | default({}))).items() %}
     {{ key }}: {{ val }}
 {% endfor %}
   labels:
@@ -33,7 +33,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nexus
+                name: {{ dsc.nexus.release }}
                 port:
                   name: http
 ---
@@ -71,6 +71,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nexus-docker-proxy
+                name: {{ dsc.nexus.release }}
                 port:
                   name: dockerproxy

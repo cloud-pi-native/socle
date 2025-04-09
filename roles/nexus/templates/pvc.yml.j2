@@ -2,23 +2,15 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: nexus-data-proxy-cache
   namespace: {{ dsc.nexus.namespace }}
-  name: nexus-data-claim
+  labels:
+    app.kubernetes.io/component: repository
+    app.kubernetes.io/instance: nexus
+    app.kubernetes.io/name: nexus3
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: {{ dsc.nexus.storageSize }}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  namespace: {{ dsc.nexus.namespace }}
-  name: nexus-data-proxy-cache
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: {{ dsc.nexus.proxyCacheSize }}

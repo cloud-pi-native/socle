@@ -1291,6 +1291,21 @@ spec:
                 nexus:
                   description: Configuration for Nexus.
                   properties:
+                    helmRepoName:
+                      description: Nexus helm repository name (e.g., "stevehipwell").
+                      type: string
+                    helmRepoUrl:
+                      description: Nexus helm repository url (e.g., "https://stevehipwell.github.io/helm-charts/").
+                      type: string
+                    chartVersion:
+                      description: Nexus Helm chart version (e.g., "5.8.3").
+                      type: string
+                    chartReference:
+                      description: Helm chart reference (e.g., "stevehipwell/nexus3").
+                      type: string
+                    release:
+                      description: Nexus Helm release Name (e.g., "nexus").
+                      type: string
                     namespace:
                       description: The namespace for Nexus.
                       type: string
@@ -1312,6 +1327,13 @@ spec:
                     ingressAnnotations:
                       description: Custom annotations for nexus ingress, they will be pushed into the nexus
                         ingress rule combined to `dsc.ingress.annotations`.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    values:
+                      description: |
+                        You can add custom values for nexus, they will be merged with roles/nexus/templates/values/
+                        https://github.com/stevehipwell/helm-charts/
+                        https://github.com/stevehipwell/helm-charts/blob/main/charts/nexus3/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object

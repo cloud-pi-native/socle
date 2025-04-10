@@ -59,3 +59,15 @@
         name: keycloak-client-secret-{{ item.clientId }}
         namespace: "{{ dsc.keycloak.namespace }}"
       type: Opaque
+
+- name: Set facts for vault-secret update
+  when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'
+    and kc_clients_secrets.clientsecret_info.value is defined
+  ansible.builtin.set_fact:
+    "{{ item.clientId | replace('-', '_') }}_id": "{{ item.clientId }}"
+    "{{ item.clientId | replace('-', '_') }}_secret": "{{ kc_clients_secrets.clientsecret_info.value }}"
+
+- name: Set facts for vault-secret update
+  when: item.clientAuthenticatorType is not defined or item.clientAuthenticatorType != 'client-secret'
+  ansible.builtin.set_fact:
+    "{{ item.clientId | replace('-', '_') }}_id": "{{ item.clientId }}"

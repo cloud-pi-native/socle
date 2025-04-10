@@ -352,7 +352,7 @@
 - name: Create clients
   ansible.builtin.include_tasks:
     file: client.yaml
-  with_items: "{{ keycloak_clients }}"
+  loop: "{{ keycloak_clients }}"
 
 - name: Enable brute force detection
   community.general.keycloak_realm:

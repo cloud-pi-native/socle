@@ -1,0 +1,109 @@
+---
+- name: Wait pg-cluster-sonar-rw endpoint
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    name: pg-cluster-sonar-rw
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 30
+  delay: 5
+
+- name: Wait job.batch/pg-cluster-sonar-1-initdb to be terminated
+  kubernetes.core.k8s_info:
+    kind: Job
+    api_version: batch/v1
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    name: pg-cluster-sonar-1-initdb
+  register: job1
+  until: job1.resources | length == 0
+  retries: 30
+  delay: 5
+
+- name: Get Sonarqube admin password secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    name: "sonarqube"
+  register: sonarqube_pwd
+
+- name: Get SonarQube migration status
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ sonar_domain }}/api/v2/system/migrations-status
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+    force_basic_auth: true
+    method: GET
+    return_content: true
+    status_code: 200
+  register: sonar_migration_status
+
+- name: Trigger DB migration
+  when: "'Database migration is required' in sonar_migration_status.json.message"
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ sonar_domain }}/api/system/migrate_db
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+    force_basic_auth: true
+    method: POST
+    status_code: [200, 204]
+
+- name: Wait SonarQube status to be UP
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ sonar_domain }}/api/system/status
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+    force_basic_auth: true
+    method: GET
+    return_content: true
+    status_code: 200
+  register: sonar_check
+  until: sonar_check.json.status == "UP"
+  retries: 60
+  delay: 5
+
+- name: Wait sonarqube endpoint to initialize
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    label_selectors:
+      - "release={{ dsc.sonarqube.namespace }}"
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0].ip is defined
+  retries: 45
+  delay: 5
+
+- name: Get DSO Console inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: dso-config
+  register: ansible_inventory
+
+- name: Reset Admin Password procedure
+  when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is undefined
+  ansible.builtin.include_tasks:
+    file: reset-admin-password.yaml
+
+- name: Get Sonarqube admin password secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    name: "sonarqube"
+  register: sonarqube_pwd
+
+- name: Remove permissions for sonar-users
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+    force_basic_auth: true
+    method: post
+    status_code: 204
+  with_items:
+    - scan
+    - provisioning

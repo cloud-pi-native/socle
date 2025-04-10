@@ -12,6 +12,7 @@ envs:
           domain:
             keycloak: "{{ keycloak_domain }}"
             console: "{{ console_domain }}"
+            sonarqube: "{{ sonar_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"

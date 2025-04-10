@@ -91,3 +91,10 @@
         name: gitops/vault-secrets
       tags:
         - vault-secrets-post-install
+
+    - name: Sonarqube post-install
+      ansible.builtin.import_role:
+        name: gitops/post-install/sonarqube
+      tags:
+        - post-install
+        - post-install-sonarqube

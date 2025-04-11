@@ -32,6 +32,7 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+      initPassword: false
     values: {}
   cpnCnpg:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
@@ -44,6 +45,7 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+      initPassword: false
     values: {}
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
@@ -90,9 +92,12 @@ spec:
     pvcDatabaseSize: 10Gi
     pvcRedisSize: 5Gi
     pvcTrivySize: 10Gi
+    s3ImageChartStorage:
+      enabled: false
     cnpg:
       mode: primary
       exposed: false
+      initPassword: false # switch to true when only GitOps deployment remain
     values: {}
   keycloak:
     namespace: dso-keycloak
@@ -103,6 +108,7 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+      initPassword: false
     values: {}
   keycloakInfra:
     installEnabled: false
@@ -139,6 +145,7 @@ spec:
     cnpg:
       mode: primary
       exposed: false
+      initPassword: false
     values: {}
   vault:
     namespace: dso-vault

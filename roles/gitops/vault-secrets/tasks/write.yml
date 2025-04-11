@@ -24,6 +24,7 @@
         "new": {{ item.1.vault_values | default({}) | to_json }}
       }' | yq -p=json -o=json -I=0 '.old *n .new'
   register: current_vault_values_combined_pre
+  changed_when: false
 
 - name: Get current and post install non null values
   when: vault_secrets_post_install

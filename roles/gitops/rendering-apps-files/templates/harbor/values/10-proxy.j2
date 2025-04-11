@@ -1,0 +1,17 @@
+{% if dsc.proxy.enabled %}
+harbor:
+  proxy:
+    httpProxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+    noProxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,.local,.internal
+    components:
+      - nginx
+      - portal
+      - core
+      - jobservice
+      - registry
+      - trivy
+      - database
+      - redis
+      - exporter
+{% endif %}

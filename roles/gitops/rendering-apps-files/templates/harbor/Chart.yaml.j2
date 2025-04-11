@@ -1,0 +1,14 @@
+---
+apiVersion: v2
+name: harbor
+type: application
+version: {{ dsc.harbor.chartVersion }}
+dependencies:
+- name: cpn-cnpg
+  alias: cpn-cnpg
+  version: {{ dsc.cpnCnpg.chartVersion }}
+  repository: {{ dsc.cpnCnpg.helmRepoUrl }}
+- name: harbor
+  alias: harbor
+  version: {{ dsc.harbor.chartVersion }}
+  repository: {{ dsc.harbor.helmRepoUrl }}

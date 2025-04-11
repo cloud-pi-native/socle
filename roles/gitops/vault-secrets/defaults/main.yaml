@@ -14,6 +14,8 @@ envs:
             console: "{{ console_domain }}"
             observatorium: "{{ observatorium_domain }}"
             sonarqube: "{{ sonar_domain }}"
+            harbor: "{{ harbor_domain }}"
+            harborNotary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
@@ -40,20 +42,33 @@ envs:
       - argocd_app: "observatorium"
         vault_values:
           ingress:
-            ingressClassName: "{{ dsc.ingress.className }}"
+            ingressClassName: "{{ dsc.ingress.className | default('') }}"
           api:
             loglevel: info
             config:
               id: "prod-infra"
               name: "prod-infra"
           logs:
-            enabled: "{{ dsc.global.logs.enabled }}"
-            endpoint: "{{ dsc.global.logs.endpoint }}"
+            enabled: "{{ dsc.global.logs.enabled | default('') }}"
+            endpoint: "{{ dsc.global.logs.endpoint | default('') }}"
           metrics:
-            enabled: "{{ dsc.global.metrics.enabled }}"
-            endpoint: "{{ dsc.global.metrics.endpoint }}"
+            enabled: "{{ dsc.global.metrics.enabled | default('') }}"
+            endpoint: "{{ dsc.global.metrics.endpoint | default('') }}"
       - argocd_app: "sonarqube"
         vault_values:
           auth:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
             monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+      - argocd_app: "harbor"
+        vault_values:
+          global:
+            harborAdminPassword: "{{ dsc.harbor.adminPassword | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+            s3ImageChartStorage:
+              bucket: "{{ dsc.harbor.s3ImageChartStorage.bucket | default('') }}"
+              region: "{{ dsc.harbor.s3ImageChartStorage.region | default('') }}"
+              regionendpoint: "{{ dsc.harbor.s3ImageChartStorage.regionendpoint | default('') }}"
+              accesskey: "{{ dsc.harbor.s3ImageChartStorage.accesskey | default('') }}"
+              secretkey: "{{ dsc.harbor.s3ImageChartStorage.secretkey | default('') }}"
+          cnpg:
+            username: "{{ 'harbor' if dsc.harbor.cnpg.initPassword else (pg_harbor_db_secret.resources[0].data.username | b64decode) }}"
+            password: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) if dsc.harbor.cnpg.initPassword else (pg_harbor_db_secret.resources[0].data.password | b64decode) }}"

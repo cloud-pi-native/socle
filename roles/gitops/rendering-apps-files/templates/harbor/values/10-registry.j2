@@ -1,0 +1,47 @@
+harbor:
+  nginx:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/nginx-photon"
+  
+  portal:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/harbor-portal"
+  
+  core:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/harbor-core"
+  
+  jobservice:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/harbor-jobservice"
+  
+  registry:
+    registry:
+      image:
+        repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/registry-photon"
+    controller:
+      image:
+        repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/harbor-registryctl"
+  
+  trivy:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/trivy-adapter-photon"
+  
+  database:
+    internal:
+      image:
+        repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/harbor-db"
+  
+  redis:
+    internal:
+      image:
+        repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/redis-photon"
+  
+  exporter:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/goharbor/harbor-exporter"
+
+{% if use_image_pull_secrets %}
+  imagePullSecrets:
+    - name: dso-config-pull-secret
+{% endif %}

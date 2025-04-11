@@ -1,4 +1,15 @@
 ---
+- name: Create Nexus namespace
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: "{{ dsc.nexus.namespace }}"
+
+- name: Add Nexus helm repo
+  kubernetes.core.helm_repository:
+    name: "{{ dsc.nexus.helmRepoName }}"
+    repo_url: "{{ dsc.nexus.helmRepoUrl }}"
+    force_update: true
+
 - name: Check if first install
   block:
     - name: Check Nexus Pod
@@ -9,16 +20,7 @@
 
     - name: Set first_install fact
       ansible.builtin.set_fact:
-        first_install: "{{ check_nx_pod.resources | ternary('false', 'true') }}"
-
-- name: Create nexus Namespace
-  kubernetes.core.k8s:
-    definition:
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        creationTimestamp:
-        name: "{{ dsc.nexus.namespace }}"
+        first_install: "{{ check_nx_pod.resources | length == 0 }}"
 
 - name: Create nexus Service Account
   kubernetes.core.k8s:
@@ -33,12 +35,85 @@
   ansible.builtin.include_tasks:
     file: manage-pvc.yaml
 
-- name: Deploy nexus
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+
+- name: Define default admin password if not set
+  ansible.builtin.set_fact:
+    nexus_admin_password: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters') }}"
+
+- name: Create admin-creds secret
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: admin-creds
+        namespace: "{{ dsc.nexus.namespace }}"
+      data:
+        password: "{{ nexus_admin_password | b64encode }}"
+
+- name: Compute Nexus Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.nexus['values'] }}"
+    combine_dest_var: "nexus_values"
+
+- name: Check Nexus helm release
+  kubernetes.core.helm_info:
+    name: "{{ dsc.nexus.release }}"
+    namespace: "{{ dsc.nexus.namespace }}"
+  register: nexus_helm_release
+
+- name: Set upgrading_chart fact
+  when: nexus_helm_release.status is defined
+  block:
+    - name: Retrieve installed Nexus chart version
+      ansible.builtin.set_fact:
+        nexus_installed_chart_version: "{{ nexus_helm_release.status.chart | regex_replace('nexus3-', '') }}"
+
+    - name: Initialize upgrading_chart fact
+      ansible.builtin.set_fact:
+        upgrading_chart: false
+
+- name: Manage upgrading_chart fact
+  when: nexus_installed_chart_version is defined
+  become: false
+  block:
+    - name: Update upgrading_chart fact
+      when: dsc.nexus.chartVersion is version(nexus_installed_chart_version, operator='gt', version_type='loose')
+      ansible.builtin.set_fact:
+        upgrading_chart: true
+
+- name: Deploy Nexus helm
+  kubernetes.core.helm:
+    name: "{{ dsc.nexus.release }}"
+    chart_ref: "{{ dsc.nexus.chartReference }}"
+    chart_version: "{{ dsc.nexus.chartVersion }}"
+    release_namespace: "{{ dsc.nexus.namespace }}"
+    create_namespace: true
+    values: "{{ nexus_values }}"
+  ignore_errors: true
+  register: nexus_deploy
+
+- name: Deploy Nexus Ingress
   kubernetes.core.k8s:
     template: "{{ item }}"
   with_items:
-    - nexus.yml.j2
     - ingress.yml.j2
+
+- name: Wait Nexus endpoint to initialize
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.nexus.namespace }}"
+    name: "{{ dsc.nexus.release }}"
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0].ip is defined
+  retries: 45
+  delay: 5
 
 - name: Wait Nexus URL
   ansible.builtin.uri:
@@ -52,62 +127,23 @@
   retries: 25
   delay: 5
 
-- name: Retrieve initial admin password on first install
+- name: Update inventory
   when: first_install
   block:
-    - name: Get nexus pod's name
-      kubernetes.core.k8s_info:
-        kind: Endpoints
-        namespace: "{{ dsc.nexus.namespace }}"
-        name: nexus
-      register: nx_ep
-
-    - name: Set nx_pod
-      ansible.builtin.set_fact:
-        nx_pod: "{{ nx_ep.resources[0].subsets[0].addresses[0].targetRef.name }}"
-
-    - name: Get initial admin password
-      kubernetes.core.k8s_exec:
-        pod: "{{ nx_pod }}"
-        namespace: "{{ dsc.nexus.namespace }}"
-        command: cat /nexus-data/admin.password
-      register: initial_admin_password
-      ignore_errors: true
-
-- name: Change Nexus password on first install
-  when: first_install
-  block:
-    - name: Generate random password
-      ansible.builtin.set_fact:
-        new_pass: "{{ lookup('password', '/dev/null length=16 chars=ascii_letters') }}"
-
-    - name: Change nexus password
-      ansible.builtin.uri:
-        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        force_basic_auth: true
-        url: https://{{ nexus_domain }}/service/rest/v1/security/users/admin/change-password
-        method: PUT
-        user: admin
-        password: "{{ initial_admin_password.stdout }}"
-        body: "{{ new_pass }}"
-        body_format: raw
-        headers:
-          Content-Type: text/plain
-        status_code: [204, 503]
-      until: update_nexus_pass.status == 204
-      register: update_nexus_pass
-      retries: 10
-      delay: 12
-
-    - name: Update inventory
+    - name: Update or create inventory secret (dso-config)
       kubernetes.core.k8s:
         kind: Secret
         name: dso-config
         namespace: "{{ dsc.console.namespace }}"
         state: patched
         definition:
+          apiVersion: v1
+          metadata:
+            name: dso-config
+            namespace: "{{ dsc.console.namespace }}"
           data:
-            NEXUS_ADMIN_PASSWORD: "{{ new_pass | b64encode }}"
+            NEXUS_ADMIN_PASSWORD: "{{ nexus_admin_password | b64encode }}"
+      register: update_inventory_result
 
     - name: Get admin-creds secret
       kubernetes.core.k8s_info:
@@ -125,7 +161,7 @@
         state: patched
         definition:
           data:
-            password: "{{ new_pass | b64encode }}"
+            password: "{{ nexus_admin_password | b64encode }}"
 
 - name: Get inventory
   kubernetes.core.k8s_info:
@@ -134,237 +170,18 @@
     name: dso-config
   register: ansible_inventory
 
+- name: Debug inventory retrieval
+  ansible.builtin.debug:
+    var: ansible_inventory
+  when: ansible_inventory.resources is not defined or ansible_inventory.resources | length == 0
+
 - name: Retrieve admin password from inventory
   ansible.builtin.set_fact:
-    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode }}"
-  register: get_nx_pass
-
-- name: Enable Anonymous access
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/security/anonymous
-    method: PUT
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body:
-      enabled: true
-      userId: anonymous
-      realmName: NexusAuthorizingRealm
-    body_format: json
-    status_code: [200]
-
-- name: Check if new-anon role already exists
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/security/roles/new-anon
-    method: GET
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    status_code: [200, 404]
-  register: new_anon_role
-
-- name: Create new-anon role
-  when: new_anon_role.status == 404
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/security/roles
-    method: POST
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body:
-      id: new-anon
-      name: new-anon
-      description: new-anon
-      privileges:
-        - nx-repository-view-docker-*-browse
-        - nx-repository-view-docker-*-read
-      roles: []
-    body_format: json
-    status_code: [200]
-  register: create_role
-
-- name: Get anonymous user
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/security/users?userId=anonymous&source=default
-    method: GET
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    status_code: [200]
-  register: anon_user
-
-- name: Update anonymous user with new-anon role
-  when: (create_role is not failed) and not (anon_user.json[0].roles | regex_search('new-anon', multiline=True))
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/security/users/anonymous
-    method: PUT
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body:
-      userId: anonymous
-      firstName: Anonymous
-      lastName: User
-      emailAddress: anonymous@example.org
-      source: default
-      status: active
-      readOnly: true
-      roles:
-        - new-anon
-    body_format: json
-    status_code: [204]
-
-- name: Get Blob Stores
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/blobstores
-    method: GET
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    status_code: [200]
-  register: blobstores
-
-- name: Set dso_blobstore fact
-  ansible.builtin.set_fact:
-    dso_blobstore: "{{ blobstores.json
-      | selectattr('name', 'contains', 'dso')
-      | map(attribute='name') | first | default('') }}"
-
-- name: Create dso Blob Store
-  when: dso_blobstore != "dso"
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    force_basic_auth: true
-    url: https://{{ nexus_domain }}/service/rest/v1/blobstores/file
-    method: POST
-    user: admin
-    password: "{{ nexus_admin_password }}"
-    body:
-      softQuota:
-        type: spaceRemainingQuota
-        limit: 1073741824
-      path: /nexus-data-docker/dso
-      name: dso
-    body_format: json
-    status_code: [204]
-
-- name: Check cleanup policy placeholder file
-  ansible.builtin.include_tasks:
-    file: check-cleanup-policy.yaml
-
-- name: Check Nexus tasks
-  ansible.builtin.include_tasks:
-    file: check-nexus-tasks.yaml
-
-- name: Manage cleanup policy and Nexus tasks
-  when: (cp_placeholder_file.stderr_lines | length > 0) or (nexus_tasks_check == 'missing')
-  block:
-    - name: Allow scripts
-      ansible.builtin.include_tasks:
-        file: allow-scripts.yaml
-
-    - name: Create cleanup policy
-      when: cp_placeholder_file.stderr_lines | length > 0
-      ansible.builtin.include_tasks:
-        file: manage-cleanup-policy.yaml
-
-    - name: Create Nexus tasks
-      when: nexus_tasks_check == 'missing'
-      ansible.builtin.include_tasks:
-        file: manage-nexus-tasks.yaml
-  always:
-    - name: Disallow scripts
-      ansible.builtin.include_tasks:
-        file: disallow-scripts.yaml
-
-# Create Docker Hub Proxy
-- name: Docker proxy configuration
-  when: dsc.nexus.proxyEnabled
-  block:
-    - name: Get dso-dockerhub-proxy
-      ansible.builtin.uri:
-        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        force_basic_auth: true
-        url: https://{{ nexus_domain }}/service/rest/v1/repositories/docker/proxy/dso-dockerhub-proxy
-        method: GET
-        user: admin
-        password: "{{ nexus_admin_password }}"
-        status_code: [200]
-      register: dso_dockerhub_proxy
-      ignore_errors: true
-
-    - name: Create Docker Proxy Repository
-      when: dso_dockerhub_proxy.status == 404
-      ansible.builtin.uri:
-        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        force_basic_auth: true
-        url: https://{{ nexus_domain }}/service/rest/v1/repositories/docker/proxy
-        method: POST
-        user: admin
-        password: "{{ nexus_admin_password }}"
-        body:
-          cleanup:
-            policyNames:
-              - DSOdockerCleanupPolicy
-          docker:
-            forceBasicAuth: false
-            httpPort: 5000
-            httpsPort: null
-            subdomain: null
-            v1Enabled: true
-          dockerProxy:
-            cacheForeignLayers: false
-            foreignLayerUrlWhitelist: []
-            indexType: "HUB"
-            indexUrl: null
-          format: docker
-          httpClient:
-            authentication: null
-            autoBlock: true
-            blocked: false
-            connection:
-              enableCircularRedirects: false
-              enableCookies: false
-              retries: null
-              timeout: null
-              useTrustStore: false
-              userAgentSuffix: null
-          name: dso-dockerhub-proxy
-          negativeCache:
-            enabled: true
-            timeToLive: 1440
-          online: true
-          proxy:
-            contentMaxAge: 1440
-            metadataMaxAge: 1440
-            remoteUrl: "https://registry-1.docker.io"
-          routingRuleName: null
-          storage:
-            blobStoreName: dso
-            strictContentTypeValidation: true
-            writePolicy: ALLOW
-          type: proxy
-          url: "https://{{ nexus_domain }}/repository/dso-dockerhub-proxy"
-        body_format: json
-        status_code: [201]
-
-    - name: Set DockerToken as an active realm
-      ansible.builtin.uri:
-        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        force_basic_auth: true
-        url: https://{{ nexus_domain }}/service/rest/v1/security/realms/active
-        method: PUT
-        user: admin
-        password: "{{ nexus_admin_password }}"
-        body: [NexusAuthenticatingRealm, DockerToken]
-        body_format: json
-        status_code: [204]
+    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode | default(nexus_admin_password) }}"
+  when: >
+    ansible_inventory.resources is defined and
+    ansible_inventory.resources | length > 0 and
+    ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined
 
 - name: Activate Nexus metrics scraping
   when: dsc.global.metrics.enabled
@@ -389,7 +206,7 @@
         template: servicemonitor.yml.j2
 
 - name: Set alerting rules
-  when: dsc.global.alerting.enabled
+  when: dsc.global.alerting.enabled and dsc.global.metrics.enabled
   kubernetes.core.k8s:
     template: prometheusrule.yml.j2
 

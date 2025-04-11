@@ -1,44 +1,4 @@
 ---
-- name: Get storage PVC info
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.nexus.namespace }}"
-    name: nexus-data-claim
-    kind: PersistentVolumeClaim
-  register: nexus_pvc
-
-- name: Manage incorrect storage pvc size
-  when: (nexus_pvc.resources | length) and (nexus_pvc.resources[0].status.capacity.storage != dsc.nexus.storageSize)
-  block:
-    - name: Disclaimer Storage downsize
-      when: nexus_pvc.resources[0].status.capacity.storage[:-2] > dsc.nexus.storageSize[:-2]
-      ansible.builtin.fail:
-        msg:
-          - Operation Cancelled.
-          - You want to downsize dsc.nexus.storageSize, and we can't do it.
-          - Please change value and try again or operate pvc manually.
-
-    - name: Disclaimer Bad storage unit size
-      when: nexus_pvc.resources[0].status.capacity.storage[-2:] != dsc.nexus.storageSize[-2:]
-      ansible.builtin.fail:
-        msg:
-          - Operation Cancelled.
-          - You are trying to use another storage unit, and we can't ensure it works.
-          - Please change value and try again or operate pvc manually.
-
-    - name: Delete deployment
-      kubernetes.core.k8s:
-        template: nexus.yml.j2
-        state: absent
-
-    - name: Wait end of deletion
-      kubernetes.core.k8s_info:
-        api_version: v1
-        kind: pod
-        namespace: "{{ dsc.nexus.namespace }}"
-      register: nexus_pod
-      until: nexus_pod.resources | length == 0
-      retries: 5
-
 - name: Get proxy cache PVC info
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.nexus.namespace }}"
@@ -65,9 +25,10 @@
           - You are trying to use another storage unit, and we can't ensure it works.
           - Please change value and try again or operate pvc manually.
 
-    - name: Delete deployment
-      kubernetes.core.k8s:
-        template: nexus.yml.j2
+    - name: Delete Nexus deployment
+      kubernetes.core.helm:
+        name: "{{ dsc.nexus.release }}"
+        release_namespace: "{{ dsc.nexus.namespace }}"
         state: absent
 
     - name: Wait end of deletion

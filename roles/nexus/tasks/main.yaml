@@ -3,14 +3,12 @@
   kubernetes.core.k8s:
     kind: Namespace
     name: "{{ dsc.nexus.namespace }}"
-  become: false
 
 - name: Add Nexus helm repo
   kubernetes.core.helm_repository:
     name: "{{ dsc.nexus.helmRepoName }}"
     repo_url: "{{ dsc.nexus.helmRepoUrl }}"
     force_update: true
-  become: false
 
 - name: Check if first install
   block:
@@ -19,12 +17,10 @@
         kind: Pod
         namespace: "{{ dsc.nexus.namespace }}"
       register: check_nx_pod
-      become: false
 
     - name: Set first_install fact
       ansible.builtin.set_fact:
         first_install: "{{ check_nx_pod.resources | length == 0 }}"
-      become: false
 
 - name: Create nexus Service Account
   kubernetes.core.k8s:

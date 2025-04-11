@@ -38,6 +38,15 @@ cpn-cnpg:
   nodePort: {{ dsc.sonarqube.cnpg.nodePort }}
 {% endif %}
 
+{% if dsc.sonarqube.cnpg.initPassword %}
+  initSecret:
+    enabled: true 
+    username: <path:forge-dso/data/env/{{ dsc_name }}/apps/sonarqube/values#cnpg | jsonPath  
+      {.username} | base64encode>
+    password: <path:forge-dso/data/env/{{ dsc_name }}/apps/sonarqube/values#cnpg | jsonPath
+      {.password} | base64encode>
+{% endif %}
+
 {% if dsc.sonarqube.cnpg.mode == "replica" %}
 {%- filter indent(width=4) %}
 {{ dsc.sonarqube.cnpg.connectionParameters }}

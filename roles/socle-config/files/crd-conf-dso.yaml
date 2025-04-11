@@ -312,6 +312,10 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
+                        initPassword:
+                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
+                          type: boolean
+                          default: false
                   type: object
                 cpnCnpg:
                   description: Configuration for cpn-cnpg.
@@ -427,6 +431,10 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
+                        initPassword:
+                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
+                          type: boolean
+                          default: false
                   type: object
                 gitlabCiPipelinesExporter:
                   description: Configuration for GitLab CI Pipelines Exporter.
@@ -929,6 +937,29 @@ spec:
                         required:
                           - name
                           - registry
+                    s3ImageChartStorage:
+                      description: Define s3 storage backend used for registry to store images and charts.
+                      type: object
+                      properties:
+                        enabled:
+                          description: Specifies whether the s3ImageChartStorage is enabled.
+                          default: false
+                          type: boolean
+                        bucket:
+                          description: Defines the bucket.
+                          type: string
+                        region:
+                          description: Defines the region.
+                          type: string
+                        regionendpoint:
+                          description: Defines the region s3 endpoint for.
+                          type: string
+                        accesskey:
+                          description: Defines the access key.
+                          type: string
+                        secretkey:
+                          description: Defines the secret key.
+                          type: string
                     values:
                       description: |
                         You can add custom values for harbor, they will be merged with roles/harbor/templates/values/
@@ -981,8 +1012,11 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
+                        initPassword:
+                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
+                          type: boolean
+                          default: false
                   required:
-                    - adminPassword
                     - pvcRegistrySize
                   type: object
                 ingress:
@@ -1144,6 +1178,10 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
+                        initPassword:
+                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
+                          type: boolean
+                          default: false
                   type: object
                 keycloakInfra:
                   description: Configuration for Keycloak infrastructure instance.
@@ -1216,6 +1254,10 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
+                        initPassword:
+                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
+                          type: boolean
+                          default: false
                   required:
                     - installEnabled
                   type: object
@@ -1409,6 +1451,10 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
+                        initPassword:
+                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
+                          type: boolean
+                          default: false
                   type: object
                 vault:
                   description: Configuration for Vault.

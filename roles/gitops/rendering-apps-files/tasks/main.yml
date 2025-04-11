@@ -11,3 +11,4 @@
           - argocd_app: keycloak
           - argocd_app: sonarqube
           - argocd_app: observability
+          - argocd_app: harbor

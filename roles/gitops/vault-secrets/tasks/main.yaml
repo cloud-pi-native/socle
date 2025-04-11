@@ -36,6 +36,16 @@
       ansible.builtin.set_fact:
         vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
 
+# Get existing values for migration
+
+- name: Get pg-cluster-harbor-app secret
+  when: not dsc.harbor.cnpg.initPassword
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.harbor.namespace }}"
+    kind: Secret
+    name: pg-cluster-harbor-app
+  register: pg_harbor_db_secret
+
 # Write Vault Infra secrets
 
 - name: Write secrets

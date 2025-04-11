@@ -1,0 +1,162 @@
+cpn-cnpg:
+  backup:
+    compression: gzip
+    destinationPath: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+      | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
+    enabled: true
+    endpointURL: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+      | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
+    retentionPolicy: 14d
+    s3Credentials:
+      accessKeyId:
+        key: accessKeyId
+        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.accessKeyId.value}>
+      create: true
+      secretAccessKey:
+        key: secretAccessKey
+        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.secretAccessKey.value}>
+      secretName: pg-cluster-backup
+  dbName: registry
+  imageName: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+    {.repository.ghcr}>/cloudnative-pg/postgresql:16.1
+  monitoring:
+    enabled: false
+  nameOverride: pg-cluster-harbor
+  parameters:
+    max_slot_wal_keep_size: 54GB
+    max_worker_processes: '60'
+  pvcSize:
+    data: 55Gi
+    wal: 55Gi
+  username: harbor
+harbor:
+  core:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-core
+    replicas: 3
+    serviceAccountName: harbor-sa
+  database:
+    external:
+      coreDatabase: registry
+      host: pg-cluster-harbor-rw
+      password: <path:forge-dso/data/env/conf-dso/apps/harbor/values#cnpg | jsonPath
+        {.password}>
+      port: '5432'
+      username: <path:forge-dso/data/env/conf-dso/apps/harbor/values#cnpg | jsonPath
+        {.username}>
+    internal:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/harbor-db
+    type: external
+  exporter:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-exporter
+  expose:
+    imagePullPolicy: IfNotPresent
+    ingress:
+      className: nginx
+      harbor:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        labels: null
+      hosts:
+        core: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+          {.harbor}>
+        notary: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+          {.harborNotary}>
+      notary:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        labels: null
+    tls:
+      certSource: secret
+      enabled: true
+      secret:
+        notarySecretName: harbor-ingress-notary
+        secretName: harbor-ingress
+    type: ingress
+  externalURL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain
+    | jsonPath {.harbor}>
+  fullnameOverride: harbor
+  harborAdminPassword: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global
+    | jsonPath {.harborAdminPassword}>
+  jobservice:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-jobservice
+    jobLoggers:
+    - stdout
+    replicas: 2
+    serviceAccountName: harbor-sa
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+  nginx:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/nginx-photon
+    replicas: 2
+    serviceAccountName: harbor-sa
+  persistence:
+    enabled: true
+    imageChartStorage:
+      s3:
+        accesskey: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global | jsonPath
+          {.s3ImageChartStorage.accesskey}>
+        bucket: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global | jsonPath
+          {.s3ImageChartStorage.bucket}>
+        region: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global | jsonPath
+          {.s3ImageChartStorage.region}>
+        regionendpoint: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global
+          | jsonPath {.s3ImageChartStorage.regionendpoint}>
+        secretkey: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global | jsonPath
+          {.s3ImageChartStorage.secretkey}>
+      type: s3
+    persistentVolumeClaim:
+      database:
+        size: 10Gi
+      jobservice:
+        jobLog:
+          size: 5Gi
+      redis:
+        size: 5Gi
+      registry:
+        size: 400Gi
+      trivy:
+        size: 5Gi
+    resourcePolicy: keep
+  portal:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-portal
+    replicas: 2
+    serviceAccountName: harbor-sa
+  redis:
+    internal:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/redis-photon
+      serviceAccountName: harbor-sa
+  registry:
+    controller:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/harbor-registryctl
+    registry:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/registry-photon
+    replicas: 3
+    serviceAccountName: harbor-sa
+  trivy:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/trivy-adapter-photon
+    replicas: 2
+    serviceAccountName: harbor-sa

@@ -1,0 +1,95 @@
+harbor:
+  fullnameOverride: harbor
+  expose:
+    imagePullPolicy: IfNotPresent
+    type: ingress
+    ingress:
+      className: {{ dsc.ingress.className | default('') }}
+      hosts:
+        core: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
+        notary: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harborNotary}>
+      notary:
+        annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+          {{ key }}: {{ val }}
+{% endfor %}
+        labels:
+{% for key, val in dsc.ingress.labels.items() %}
+          {{ key }}: {{ val }}
+{% endfor %}
+      harbor:
+        annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+          {{ key }}: {{ val }}
+{% endfor %}
+        labels:
+{% for key, val in dsc.ingress.labels.items() %}
+          {{ key }}: {{ val }}
+{% endfor %}
+  externalURL: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
+  persistence:
+    enabled: true
+    resourcePolicy: keep
+{% if dsc.harbor.s3ImageChartStorage.enabled %}
+    imageChartStorage:
+      s3:
+        bucket: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.bucket}>
+        region: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.region}>
+        regionendpoint: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.regionendpoint}>
+        accesskey: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.accesskey}> 
+        secretkey: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.secretkey}>
+      type: s3
+{% endif %}
+    persistentVolumeClaim:
+      registry:
+        size: "{{ dsc.harbor.pvcRegistrySize }}"
+      jobservice:
+        jobLog:
+          size: "{{ dsc.harbor.pvcJobLogSize }}"
+      database:
+        size: "{{ dsc.harbor.pvcDatabaseSize }}"
+      redis:
+        size: "{{ dsc.harbor.pvcRedisSize }}"
+      trivy:
+        size: "{{ dsc.harbor.pvcTrivySize }}"
+  harborAdminPassword: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.harborAdminPassword}>
+  nginx:
+    replicas: 2
+    serviceAccountName: harbor-sa
+  portal:
+    replicas: 2
+    serviceAccountName: harbor-sa
+  core:
+    replicas: 3
+    serviceAccountName: harbor-sa
+  jobservice:
+    replicas: 2
+    serviceAccountName: harbor-sa
+    image:
+      repository: docker.io/goharbor/harbor-jobservice
+    jobLoggers:
+    - stdout
+  registry:
+    replicas: 3
+    serviceAccountName: harbor-sa
+  trivy:
+    replicas: 2
+    serviceAccountName: harbor-sa
+  redis:
+    internal:
+      serviceAccountName: harbor-sa
+  database:
+    type: external
+    external:
+      host: "pg-cluster-harbor-rw"
+      port: "5432"
+      username: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.username}>
+      password: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.password}>
+      coreDatabase: "registry"
+  metrics:
+    enabled: {{ dsc.global.metrics.enabled }}
+    serviceMonitor:
+      enabled: {{ dsc.global.metrics.enabled }}
+{% if dsc.global.metrics.additionalLabels is defined %}
+      labels: {{ dsc.global.metrics.additionalLabels }} 
+{% endif %}

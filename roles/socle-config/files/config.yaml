@@ -129,10 +129,10 @@ spec:
     release: nexus
     imageTag: 3.78.2
     namespace: dso-nexus
+    subDomain: nexus
     storageSize: 25Gi
     proxyEnabled: false
     proxyCacheSize: 25Gi
-    subDomain: nexus
     values:
       replicaCount: 1
   sonarqube:

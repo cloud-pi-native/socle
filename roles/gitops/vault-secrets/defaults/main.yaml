@@ -13,6 +13,8 @@ envs:
             keycloak: "{{ keycloak_domain }}"
             console: "{{ console_domain }}"
             sonarqube: "{{ sonar_domain }}"
+            harbor: "{{ harbor_domain }}"
+            harborNotary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
@@ -41,3 +43,16 @@ envs:
           auth:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
             monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+      - argocd_app: "harbor"
+        vault_values:
+          global:
+            harborAdminPassword: "{{ dsc.harbor.adminPassword | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+            s3ImageChartStorage:
+              bucket: "{{ dsc.harbor.s3ImageChartStorage.bucket }}"
+              region: "{{ dsc.harbor.s3ImageChartStorage.region }}"
+              regionendpoint: "{{ dsc.harbor.s3ImageChartStorage.regionendpoint }}"
+              accesskey: "{{ dsc.harbor.s3ImageChartStorage.accesskey }}"
+              secretkey: "{{ dsc.harbor.s3ImageChartStorage.secretkey }}"
+          cnpg:
+            username: "harbor"
+            password: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"

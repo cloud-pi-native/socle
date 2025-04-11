@@ -1284,6 +1284,26 @@ spec:
                           type: string
                       type: object
                   type: object
+                observatorium:
+                  description: Configuration for Observatorium.
+                  properties:
+                    enabled:
+                      default: false
+                      description: Enable or disable Observatorium.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Observatorium.
+                      type: string
+                    subDomain:
+                      description: The subdomain for Observatorium.
+                      type: string
+                    helmRepoUrl:
+                      description: Observatorium helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Observatorium helm chart version (e.g., "0.25.0").
+                      type: string
+                  type: object
                 proxy:
                   description: Proxy configuration for tools.
                   properties:

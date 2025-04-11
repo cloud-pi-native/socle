@@ -10,3 +10,4 @@
         apps:
           - argocd_app: keycloak
           - argocd_app: sonarqube
+          - argocd_app: observability

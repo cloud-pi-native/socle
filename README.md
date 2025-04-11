@@ -49,6 +49,8 @@
   - [Prérequis](#prérequis-1)
   - [Principe d'installation GitOps](#principe-dinstallation-gitops)
   - [Exemple de déploiement GitOps](#exemple-de-déploiement-gitops)
+  - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
+    - [Harbor GitOps](#harbor-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1023,9 +1025,9 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur un [applicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) Argo CD déployant lui-même les applications du socle, en fonction d'un environnement donné et des paramètres qui le caractérisent.
 
-Pour l'instant **seul le déploiement de Keycloak et de Sonarqube** est géré en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
+Pour l'instant **seuls les déploiements de Keycloak, Sonarqube et Harbor** sont gérés en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
 
-Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak et Sonarqube en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
+Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak, Sonarqube et Harbor en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
 
 ### Prérequis
 
@@ -1333,6 +1335,66 @@ Une fois Keyckloak déployé, nous n'avons plus qu'à lancer sa post-configurati
 
 ```shell
 ansible-playbook install-gitops.yaml -t post-install-keycloak
+```
+
+## Migration vers le déploiement GitOps
+
+### Harbor GitOps
+
+En cas d'utilisation de `imageChartStorage` dans la `dsc` comme suit.
+```yaml
+harbor:
+  values:
+    persistence:
+      imageChartStorage:
+        s3:
+          accesskey: <accesskey>
+          bucket: <bucket>
+          region: <region>
+          regionendpoint: <regionendpoint>
+          secretkey: <secretkey>
+        type: s3
+```
+Il faut supprimer et remplacer par ce qui suit.
+```yaml
+harbor:
+  s3ImageChartStorage:
+    enabled: true 
+    accesskey: <accesskey>
+    bucket: <bucket>
+    region: <region>
+    regionendpoint: <regionendpoint>
+    secretkey: <secretkey>
+```
+
+Conserver `dsc.harbor.cnpg.initPassword` à `false`.
+
+Il y aura potentiellement des erreurs de ce type pour les statefulsets `harbor-redis` et `harbor-trivy` et pour les deployments `harbor-core`, `harbor-jobservice`, `harbor-portal` et `harbor-registry`.
+
+```
+# deployments.apps "harbor-portal" was not valid:
+# * spec.template.metadata.labels: Invalid value: map[string]string{"app":"harbor", "app.kubernetes.io/component":"portal", "app.kubernetes.io/instance":"harbor", "app.kubernetes.io/managed-by":"Helm", "app.kubernetes.io/name":"harbor", "app.kubernetes.io/part-of":"harbor", "app.kubernetes.io/version":"2.12.0", "chart":"harbor", "component":"portal", "heritage":"Helm", "release":"harbor"}: selector does not match template labels
+# * spec.selector: Invalid value: v1.LabelSelector{MatchLabels:map[string]string{"app":"harbor", "component":"portal", "release":"dso-harbor"}, MatchExpressions:[]v1.LabelSelectorRequirement(nil)}: field is immutable
+```
+
+Ceci étant du à un changement du champ immutable
+```yaml
+spec:
+  selector:
+    matchLabels:
+      release: harbor
+```
+en
+```yaml
+spec:
+  selector:
+    matchLabels:
+      release: dso-harbor
+```
+Pour résoudre, il suffit de supprimer les deployments et statefulsets
+```
+kubectl delete deploy harbor-core harbor-jobservice harbor-portal harbor-registry
+kubectl delete sts harbor-redis harbor-trivy
 ```
 
 ## Contributions

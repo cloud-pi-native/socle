@@ -71,6 +71,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nexus
+                name: {{ dsc.nexus.release }}
                 port:
                   name: dockerproxy

@@ -1,11 +1,10 @@
 ---
 fullnameOverride: "nexus"
 
+{% if dsc.global.platform == "kubernetes" %}
 podSecurityContext:
   fsGroup: 200
-  runAsNonRoot: true  # Force l'exécution en non-root
-
-{% if dsc.global.platform == "kubernetes" %}
+  runAsNonRoot: true
 securityContext:
   runAsNonRoot: true
   runAsGroup: 200
@@ -174,4 +173,42 @@ metrics:
   enabled: "{{ dsc.global.metrics.enabled | default(false) }}"
   serviceMonitor:
     enabled: false
+
+ingress:
+  enabled: true
+  className: nginx # Ajuste selon ton Ingress Controller
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  labels: {}
+  tls:
+    type: none # Change à tlsSecret si tu utilises TLS
+    tlsSecret:
+      name: ""
+
+  nexusAlternative:
+    enabled: true
+    name: nexus-alternative
+    annotations: {}
+    labels:
+      app: nexus
+    host: "{{ nexus_domain }}"
+    tls:
+      secretName: nexus-tls-secret
+    service:
+      name: "{{ fullnameOverride }}"
+      port: http
+
+  dockerProxy:
+    enabled: true
+    name: docker-proxy
+    annotations: {}
+    labels:
+      app: nexus
+    host: "{{ dsc.nexus.subDomain }}-docker-proxy{{ root_domain }}"
+    tls:
+      secretName: nexus-docker-proxy-tls-secret
+    service:
+      name: "{{ fullnameOverride }}"
+      port: dockerproxy
 

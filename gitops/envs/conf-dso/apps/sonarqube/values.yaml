@@ -1,35 +1,14 @@
 cpn-cnpg:
-  backup:
-    compression: gzip
-    destinationPath: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-      | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
-    enabled: true
-    endpointURL: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-      | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
-    retentionPolicy: 14d
-    s3Credentials:
-      accessKeyId:
-        key: accessKeyId
-        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.accessKeyId.value}>
-      create: true
-      secretAccessKey:
-        key: secretAccessKey
-        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.secretAccessKey.value}>
-      secretName: pg-cluster-backup
   dbName: sonardb
   imageName: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
     {.repository.ghcr}>/cloudnative-pg/postgresql:16.1
   monitoring:
-    enabled: false
+    enabled: true
   nameOverride: pg-cluster-sonar
   parameters:
-    max_slot_wal_keep_size: 49GB
     max_worker_processes: '60'
   pvcSize:
-    data: 50Gi
-    wal: 50Gi
+    data: 5Gi
   username: dsoadmin
 sonarqube:
   account:
@@ -52,7 +31,6 @@ sonarqube:
       {.repository.docker}>/sonarqube
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
       nginx.ingress.kubernetes.io/proxy-body-size: 64m
     enabled: true
     hosts:
@@ -60,17 +38,13 @@ sonarqube:
         {.sonarqube}>
       path: /
       pathType: Prefix
-    ingressClassName: nginx
+    ingressClassName: traefik
     labels:
       app: sonar
-    tls:
-    - hosts:
-      - <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.sonarqube}>
-      secretName: sonar-tls-secret
   initFs:
-    enabled: true
+    enabled: false
   initSysctl:
-    enabled: true
+    enabled: false
   jdbcOverwrite:
     enable: true
     jdbcSecretName: pg-cluster-sonar-app
@@ -83,21 +57,42 @@ sonarqube:
   monitoringPasscodeSecretName: sonar-monitoring-password
   nameOverride: sonar
   plugins:
+    httpProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.httpsProxy}>
     install:
     - https://github.com/vaulttec/sonar-auth-oidc/releases/download/v2.1.1/sonar-auth-oidc-plugin-2.1.1.jar
     - https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/1.23.0/sonarqube-community-branch-plugin-1.23.0.jar
     - https://github.com/cnescatlab/sonar-cnes-report/releases/download/5.0.0/sonar-cnes-report-5.0.0.jar
+    noProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.noProxy}>
   postgresql:
     enabled: false
   prometheusExporter:
-    enabled: false
+    enabled: true
+    httpProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.httpsProxy}>
+    noProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.noProxy}>
   prometheusMonitoring:
     podMonitor:
-      enabled: false
-  replicaCount: 1
+      enabled: true
+      labels:
+        test: test
   serviceAccount:
     create: true
   sonarProperties:
+    http.proxyHost: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.hostProxy}>
+    http.proxyPort: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.portProxy}>
+    https.proxyHost: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy |
+      jsonPath {.hostProxy}>
+    https.proxyPort: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy |
+      jsonPath {.portProxy}>
     sonar.auth.oidc.allowUsersToSignUp: 'true'
     sonar.auth.oidc.autoLogin: 'false'
     sonar.auth.oidc.clientId.secured: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#client

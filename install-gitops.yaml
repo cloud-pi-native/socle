@@ -57,6 +57,8 @@
     - role: gitops/vault-secrets
       tags:
         - vault-secrets
+        - post-install
+        - post-install-harbor
 
     - role: gitops/rendering-apps-files
       tags:
@@ -78,6 +80,11 @@
         - post-install
         - post-install-keycloak
         - vault-secrets-post-install
+
+    - role: gitops/post-install/harbor
+      tags:
+        - post-install
+        - post-install-harbor
 
   tasks:
     - name: Load variables for the vault-secrets post-install role

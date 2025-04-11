@@ -1,0 +1,103 @@
+---
+- name: Display proxy cache name
+  ansible.builtin.debug:
+    msg: "Proxy cache: {{ proxy_cache.name }}"
+
+- name: Check if registry exists
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: result_registry
+
+- name: Create or Update registry
+  vars:
+    x_total_count_test: "{{ (result_registry.x_total_count | int) == 0 }}"
+    method: "{{ x_total_count_test | ternary('POST', 'PUT') }}"
+    url_id_param: "{{ x_total_count_test | ternary('', result_registry.json[0].id) }}"
+
+    # Harbor n'attend pas la même structure de paramètre pour une création ou une modification
+    body_post:
+      credential:
+        type: "{{ proxy_cache.registry.credential.type | default('basic') }}"
+        access_key: "{{ proxy_cache.registry.credential.accessKey | default('') }}"
+        access_secret: "{{ proxy_cache.registry.credential.accessSecret | default('') }}"
+      insecure: "{{ proxy_cache.registry.insecure }}"
+      name: "{{ proxy_cache.name }}"
+      type: "{{ proxy_cache.registry.provider }}"
+      url: "{{ proxy_cache.registry.endpointUrl }}"
+    body_put:
+      credential_type: "{{ proxy_cache.registry.credential.type | default('basic') }}"
+      access_key: "{{ proxy_cache.registry.credential.accessKey | default('') }}"
+      access_secret: "{{ proxy_cache.registry.credential.accessSecret | default('') }}"
+      insecure: "{{ proxy_cache.registry.insecure }}"
+      name: "{{ proxy_cache.name }}"
+      type: "{{ proxy_cache.registry.provider }}"
+      url: "{{ proxy_cache.registry.endpointUrl }}"
+    body: "{{ x_total_count_test | ternary(body_post, body_put) }}"
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: "{{ method }}"
+    url: https://{{ harbor_domain }}/api/v2.0/registries/{{ url_id_param }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200, 201]
+    body: "{{ body }}"
+
+- name: Retrieve info from registry name
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: result_registry
+
+- name: Check if registry exists
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: GET
+    url: https://{{ harbor_domain }}/api/v2.0/projects?q=name={{ proxy_cache.name }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200]
+  register: result_project
+
+- name: Debug result_project
+  ansible.builtin.debug:
+    var: result_project
+    verbosity: 1
+
+- name: Debug result_registry
+  ansible.builtin.debug:
+    var: result_registry
+    verbosity: 1
+
+- name: Create or Update Project registry cache
+  vars:
+    x_total_count_test: "{{ (result_project.x_total_count | int) == 0 }}"
+    project_id: "{{ result_project.json[0].project_id | default('-1') }}"
+    method: "{{ x_total_count_test | ternary('POST', 'PUT') }}"
+    url_id_param: "{{ x_total_count_test | ternary('', project_id) }}"
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: "{{ method }}"
+    url: https://{{ harbor_domain }}/api/v2.0/projects/{{ url_id_param }}
+    password: "{{ dsc.harbor.adminPassword }}"
+    user: admin
+    force_basic_auth: true
+    body_format: json
+    status_code: [200, 201]
+    body: "{{ {'project_name': proxy_cache.name, 'metadata': {'public': 'true'}, 'storage_limit': -1, 'registry_id': (result_registry.json[0].id | int)} }}"

@@ -1,0 +1,145 @@
+cpn-cnpg:
+  dbName: registry
+  imageName: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+    {.repository.ghcr}>/cloudnative-pg/postgresql:16.1
+  initSecret:
+    enabled: true
+    password: <path:forge-dso/data/env/conf-dso/apps/harbor/values#cnpg | jsonPath
+      {.password} | base64encode>
+    username: <path:forge-dso/data/env/conf-dso/apps/harbor/values#cnpg | jsonPath
+      {.username} | base64encode>
+  monitoring:
+    enabled: true
+  nameOverride: pg-cluster-harbor
+  parameters:
+    max_worker_processes: '60'
+  pvcSize:
+    data: 5Gi
+  username: harbor
+harbor:
+  core:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-core
+  database:
+    external:
+      coreDatabase: registry
+      host: pg-cluster-harbor-rw
+      password: <path:forge-dso/data/env/conf-dso/apps/harbor/values#cnpg | jsonPath
+        {.password}>
+      port: '5432'
+      username: <path:forge-dso/data/env/conf-dso/apps/harbor/values#cnpg | jsonPath
+        {.username}>
+    internal:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/harbor-db
+    type: external
+  exporter:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-exporter
+  expose:
+    imagePullPolicy: IfNotPresent
+    ingress:
+      className: traefik
+      harbor:
+        annotations: null
+        labels: null
+      hosts:
+        core: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+          {.harbor}>
+        notary: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+          {.harborNotary}>
+      notary:
+        annotations: null
+        labels: null
+    tls:
+      enabled: false
+    type: ingress
+  externalURL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain
+    | jsonPath {.harbor}>
+  harbor:
+    core:
+      replicas: 1
+    jobservice:
+      replicas: 1
+    nginx:
+      replicas: 1
+    portal:
+      replicas: 1
+    registry:
+      replicas: 1
+    trivy:
+      replicas: 1
+  harborAdminPassword: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global
+    | jsonPath {.harborAdminPassword}>
+  jobservice:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-jobservice
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      labels:
+        test: test
+  nginx:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/nginx-photon
+  persistence:
+    enabled: true
+    persistentVolumeClaim:
+      database:
+        size: 5Gi
+      jobservice:
+        jobLog:
+          size: 3Gi
+      redis:
+        size: 3Gi
+      registry:
+        size: 5Gi
+      trivy:
+        size: 3Gi
+    resourcePolicy: keep
+  portal:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/harbor-portal
+  proxy:
+    components:
+    - nginx
+    - portal
+    - core
+    - jobservice
+    - registry
+    - trivy
+    - database
+    - redis
+    - exporter
+    httpProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.httpProxy}>
+    httpsProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.httpsProxy}>
+    noProxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+      {.noProxy}>,.local,.internal
+  redis:
+    internal:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/redis-photon
+  registry:
+    controller:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/harbor-registryctl
+    registry:
+      image:
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/goharbor/registry-photon
+  trivy:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/goharbor/trivy-adapter-photon
+namespace: dso-harbor

@@ -806,6 +806,19 @@ spec:
                             Installation will be interrupted if true, displaying an explanation message.
                           type: boolean
                       type: object
+                    dockerAccount:
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether we should enabled the use of a Docker account for Argocd.
+                          type: boolean
+                        username:
+                          description: The Docker account username.
+                          type: string
+                        password:
+                          description: The Docker account password.
+                          type: string
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
@@ -815,6 +828,7 @@ spec:
                     - platform
                     - offline
                     - gitOps
+                    - dockerAccount
                   type: object
                 grafana:
                   description: Configuration for Grafana instance.

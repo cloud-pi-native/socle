@@ -824,6 +824,19 @@ spec:
                           description: The Docker account password.
                           type: string
                       type: object
+                    dockerAccount:
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether we should enabled the use of a Docker account for Argocd.
+                          type: boolean
+                        username:
+                          description: The Docker account username.
+                          type: string
+                        password:
+                          description: The Docker account password.
+                          type: string
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain

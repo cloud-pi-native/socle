@@ -67,6 +67,8 @@ configs:
 {% endif %}
 redis-ha:
   enabled: true
+  image:
+    tag: 7.4.1-alpine
 controller:
   replicas: 3
 dex:
@@ -79,7 +81,82 @@ server:
     ingressClassName: {{ dsc.ingress.className | default('') }}
 repoServer:
   replicas: 3
+{% if dsc.global.dockerAccount.enabled %}
+  env:
+  - name: HELM_USER
+    valueFrom:
+      secretKeyRef:
+        name: helm-docker-registry-secret
+        key: username
+  - name: HELM_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: helm-docker-registry-secret
+        key: password
+{% endif %}
   initContainers:
+{% if dsc.global.dockerAccount.enabled %}
+  - name: helm-login
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+    command: ["sh", "-c"]
+    args:
+      - |
+        cp /usr/local/bin/helm /helm-custom-binary/helm.bin;
+        cat <<'EOF' > /helm-custom-binary/helm
+        #!/usr/bin/env bash
+        args=($@)
+        if [ "$#" -gt 2 ] && [ $1 == "registry" ] && { [ "$2" = "login" ] || [ "$2" = "logout" ]; } && [ $3 == "registry-1.docker.io/bitnamicharts" ]; then
+          args[2]="registry-1.docker.io"
+        fi
+        helm.bin ${args[@]}
+        EOF
+        chmod +x /helm-custom-binary/helm;
+        echo $HELM_PASSWORD | helm registry login -u $HELM_USER registry-1.docker.io --password-stdin;
+    volumeMounts:
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
+    - mountPath: /helm-custom-binary
+      name: helm-custom-binary
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      runAsUser: 999 
+      seccompProfile:
+        type: RuntimeDefault
+{% endif %}
+{% if dsc.global.dockerAccount.enabled %}
+    env:
+    - name: HELM_USER
+      valueFrom:
+        secretKeyRef:
+          name: helm-docker-registry-secret
+          key: username
+    - name: HELM_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: helm-docker-registry-secret
+          key: password
+{% endif %}
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argo-infra-argocd-repo-server"
+{% endif %}
+{% endif %}
   - name: download-tools
     image: registry.access.redhat.com/ubi8
 {% if dsc.global.platform != "openshift" %}
@@ -121,6 +198,12 @@ repoServer:
       fsGroup: 999
 {% endif %}
     env:
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
 {% if dsc.proxy.enabled %}
     - name: HTTP_PROXY
       value: "{{ dsc.proxy.http_proxy }}"
@@ -135,6 +218,8 @@ repoServer:
     - secretRef:
         name: vault-plugin-secret
     volumeMounts:
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
     - mountPath: /var/run/argocd
       name: var-files
     - mountPath: /home/argocd/cmp-server/plugins
@@ -160,6 +245,12 @@ repoServer:
       fsGroup: 999
 {% endif %}
     env:
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
 {% if dsc.proxy.enabled %}
     - name: HTTP_PROXY
       value: "{{ dsc.proxy.http_proxy }}"
@@ -174,8 +265,8 @@ repoServer:
     - secretRef:
         name: vault-plugin-secret
     volumeMounts:
-#    - mountPath: /app/config/tls
-#      name: tls-certs
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
     - mountPath: /var/run/argocd
       name: var-files
     - mountPath: /home/argocd/cmp-server/plugins
@@ -201,6 +292,12 @@ repoServer:
       fsGroup: 999
 {% endif %}
     env:
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
 {% if dsc.proxy.enabled %}
     - name: HTTP_PROXY
       value: "{{ dsc.proxy.http_proxy }}"
@@ -215,6 +312,8 @@ repoServer:
     - secretRef:
         name: vault-plugin-secret
     volumeMounts:
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
     - mountPath: /var/run/argocd
       name: var-files
     - mountPath: /home/argocd/cmp-server/plugins
@@ -235,6 +334,15 @@ repoServer:
     name: cmp-plugin
   - name: custom-tools
     emptyDir: {}
+  - name: helm-custom-binary
+    emptyDir: {}
+  volumeMounts:
+  - name: helm-custom-binary
+    mountPath: /usr/local/bin/helm
+    subPath: helm
+  - name: helm-custom-binary
+    mountPath: /usr/local/bin/helm.bin
+    subPath: helm.bin
 applicationSet:
   enabled: false
   replicas: 2

@@ -75,6 +75,8 @@ spec:
       enabled: false
     gitOps:
       watchpointEnabled: true
+    dockerAccount:
+      enabled: false
   grafana:
     namespace: dso-grafana
     subDomain: grafana

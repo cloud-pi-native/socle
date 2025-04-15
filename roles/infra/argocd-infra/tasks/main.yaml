@@ -102,6 +102,14 @@
     - vault-plugin-cm.yml.j2
     - vault-plugin-secret.yml.j2
 
+- name: Deploy registry secret
+  when: "{{ dsc.global.dockerAccount.enabled }}"
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+    state: present
+  with_items:
+    - helm-docker-registry-secret.yml.j2
+
 # Argo CD Infra installation
 
 - name: Add helm repo

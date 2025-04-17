@@ -104,6 +104,232 @@ server:
     ingressClassName: {{ dsc.ingress.className | default('') }}
 repoServer:
   replicas: 3
+  initContainers:
+{% if dsc.global.dockerAccount.enabled %}
+  - name: helm-login
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+    command: ["sh", "-c"]
+    args:
+      - |
+        echo $HELM_PASSWORD | helm registry login -u $HELM_USER registry-1.docker.io --password-stdin
+    volumeMounts:
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      runAsUser: 999 
+      seccompProfile:
+        type: RuntimeDefault
+{% endif %}
+    env:
+    - name: HELM_USER
+      valueFrom:
+        secretKeyRef:
+          name: helm-docker-registry-secret
+          key: username
+    - name: HELM_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: helm-docker-registry-secret
+          key: password
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argocd-repo-server"
+{% endif %}
+{% endif %}
+  - name: download-tools
+    image: registry.access.redhat.com/ubi8
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+    - name: AVP_VERSION
+      value: {{ dsc.argocd.vaultPluginVersion }}
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argocd-repo-server"
+{% endif %}
+    command: [sh, -c]
+    args:
+    - >-
+      OS="$(uname | tr '[:upper:]' '[:lower:]')" && [ "$(uname -m)" = "aarch64" ] && ARCH="arm64" || ARCH="amd64" &&
+      curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_${OS}_${ARCH} -o /custom-tools/argocd-vault-plugin &&
+      chmod +x /custom-tools/argocd-vault-plugin
+    volumeMounts:
+    - mountPath: /custom-tools
+      name: custom-tools
+  extraContainers:
+  - name: avp
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argocd-repo-server"
+{% endif %}
+    - name: VAULT_SKIP_VERIFY
+      value: "true"
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  - name: avp-helm
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argocd-repo-server"
+{% endif %}
+    - name: VAULT_SKIP_VERIFY
+      value: "true" 
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp-helm.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  - name: avp-kustomize
+    command: [/var/run/argocd/argocd-cmp-server]
+    image: quay.io/argoproj/argocd:{{ argo_app_version }}
+{% if dsc.global.platform != "openshift" %}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      fsGroup: 999
+{% endif %}
+    env:
+    - name: HELM_CACHE_HOME
+      value: /helm-working-dir
+    - name: HELM_CONFIG_HOME
+      value: /helm-working-dir
+    - name: HELM_DATA_HOME
+      value: /helm-working-dir
+{% if dsc.proxy.enabled %}
+    - name: HTTP_PROXY
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: HTTPS_PROXY
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: NO_PROXY
+      value: "{{ dsc.proxy.no_proxy }},{{ dsc_name }}-argocd-repo-server"
+{% endif %}
+    - name: VAULT_SKIP_VERIFY
+      value: "true" 
+    envFrom:
+    - secretRef:
+        name: vault-plugin-secret
+    volumeMounts:
+    - mountPath: /helm-working-dir
+      name: helm-working-dir
+    - mountPath: /var/run/argocd
+      name: var-files
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+    - mountPath: /tmp
+      name: tmp
+    # Register plugins into sidecar
+    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+      subPath: avp-kustomize.yaml
+      name: cmp-plugin
+    # Important: Mount tools into $PATH
+    - name: custom-tools
+      subPath: argocd-vault-plugin
+      mountPath: /usr/local/bin/argocd-vault-plugin
+  volumes:
+  - configMap:
+      name: cmp-plugin
+    name: cmp-plugin
+  - name: custom-tools
+    emptyDir: {}
 applicationSet:
   enabled: false
   replicas: 2
@@ -115,4 +341,3 @@ notifications:
   webhook:
     ingress:
       ingressClassName: {{ dsc.ingress.className | default('') }}
-

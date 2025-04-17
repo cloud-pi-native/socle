@@ -36,6 +36,77 @@
           namespace: "{{ dsc.argocd.namespace }}"
           name: "{{ dsc_name }}-redis-ha-haproxy"
 
+# Vault plugin setup
+
+- name: Get Argo CD app version
+  block:
+    - name: Add Argo CD helm repo
+      changed_when: false
+      kubernetes.core.helm_repository:
+        name: argo
+        repo_url: "{{ dsc.argocd.helmRepoUrl }}"
+        force_update: true
+
+    - name: Retrieve Argo CD Helm infos
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          helm search repo -l argo --version "{{ dsc.argocd.chartVersion }}" | tail -n 1
+        executable: /bin/bash
+      register: argo_infos
+
+    - name: Set argo_app_version fact
+      ansible.builtin.set_fact:
+        argo_app_version: "{{ argo_infos.stdout | regex_search('v([0-9]*\\.)+([0-9]+)') }}"
+
+- name: Retrieve Vault token
+  block:
+    - name: Get Vault secrets
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vault.namespace }}"
+        kind: Secret
+      register: vault_secrets
+
+    - name: Get Vault keys secret name
+      ansible.builtin.set_fact:
+        vault_keys_secret: "{{ vault_secrets.resources
+          | map(attribute='metadata.name')
+          | select('contains', 'vault-keys') | first }}"
+
+    - name: Find Vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vault.namespace }}"
+        kind: Secret
+        name: "{{ vault_keys_secret }}"
+      register: vault_keys
+
+    - name: Set fact for Vault secrets
+      ansible.builtin.set_fact:
+        vault_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
+
+- name: Create Argo CD namespace
+  when: "{{ dsc.global.dockerAccount.enabled }}"
+  kubernetes.core.k8s:
+    name: "{{ dsc.argocd.namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Deploy Argo CD Vault plugin config
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+    state: present
+  with_items:
+    - vault-plugin-cm.yml.j2
+    - vault-plugin-secret.yml.j2
+
+- name: Deploy registry secret
+  when: "{{ dsc.global.dockerAccount.enabled }}"
+  kubernetes.core.k8s:
+    template: helm-docker-registry-secret.yml.j2
+    state: present
+
 - name: Add helm repo
   kubernetes.core.helm_repository:
     name: argo

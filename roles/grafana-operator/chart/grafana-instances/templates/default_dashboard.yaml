@@ -1,0 +1,14 @@
+{{ if .Values.dashboard.default }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: k8s-namespace
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  configMapRef:
+      name: grafana-dashboard-k8s-resources-namespace
+      key: k8s-resources-namespace.json
+{{ end }}

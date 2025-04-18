@@ -1,0 +1,54 @@
+{{- range $project := default .Values.projects .Values.global.projects }}
+{{- range $env, $val := $project.envs }}
+{{- range $tenant, $val := $val.tenants }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ $tenant }}-mimir-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    isDefault: false
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+      prometheusType: "Mimir"
+      prometheusVersion: "2.6.0"
+    name: "prom-{{ $tenant }}"
+    type: prometheus
+    uid: "prom-{{ $tenant }}"
+    url: "{{ $.Values.grafana.observatorium_url }}/api/metrics/v1/{{ $tenant }}/prometheus"
+  instanceSelector:
+    matchLabels:
+      app: {{ printf "%s-%s" $env $project.projectName }}
+  resyncPeriod: 5m
+---
+{{- end }}
+{{- end }}
+{{- end }}
+---
+{{- with .Values.default }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ .name }}-mimir-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    isDefault: true
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+      prometheusType: "Mimir"
+      prometheusVersion: "2.6.0"
+    name: prometheus
+    type: prometheus
+    uid: prometheus
+    url: "{{ $.Values.grafana.observatorium_url }}/api/metrics/v1/{{ .name }}/prometheus"
+  instanceSelector:
+    matchLabels:
+      app: {{ .name }}
+  resyncPeriod: 5m
+{{- end }}

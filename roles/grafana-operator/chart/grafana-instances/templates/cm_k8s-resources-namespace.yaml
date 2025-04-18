@@ -1,0 +1,8 @@
+﻿kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: grafana-dashboard-k8s-resources-namespace
+  namespace: {{ $.Values.grafanaNamespace }}
+data:
+  k8s-resources-namespace.json: |-
+{{ .Files.Get "dashboards/k8s-resources-namespace.json" | indent 4 }}

@@ -1,0 +1,174 @@
+{{- range $project := default .Values.projects .Values.global.projects }}
+{{- range $env, $val := $project.envs }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  labels:
+    app: {{ printf "%s-%s" $env $project.projectName }}
+    dashboards: grafana
+  name: "{{ $env }}-{{ $project.projectName }}-grafana"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  client:
+    preferIngress: false
+  config:
+    security:
+      admin_user: {{ $.Values.grafana.adminUser | default "admin" | quote }}
+      admin_password: {{ $.Values.grafana.adminPassword | default "admin" | quote }}
+    {{- if $.Values.oauth.enabled }}
+    auth:
+      oauth_allow_insecure_email_lookup: "true"
+    auth.generic_oauth:
+      api_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/userinfo"
+      auth_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/auth"
+      client_id: "{{ $.Values.oauth.id }}"
+      client_secret: "{{ $.Values.oauth.secret }}"
+      email_attribute_path: email
+      enabled: "true"
+      name: "{{ $.Values.oauth.id }}"
+      role_attribute_strict: "true"
+      role_attribute_path: contains(groups[*], '/admin') && 'Admin' || contains(groups[*], '{{ index $val.groups 0 }}') && 'Editor'|| contains(groups[*], '{{ index $val.groups 1 }}') && 'Viewer'
+      scopes: profile, email, openid, generic
+      tls_skip_verify_insecure: "true"
+      token_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/token"
+      use_refresh_token: "true"
+    {{- end }}
+    log:
+      mode: console
+    server:
+      root_url: {{ printf "https://%s/%s/" $.Values.server.url (printf "%s-%s" $env $project.projectName ) }}
+      serve_from_sub_path: "true"
+  {{- if not $.Values.grafana.isOpenShift }}
+  ingress:
+    {{- if $.Values.server.certManager.enabled }}
+    metadata:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    spec:
+      ingressClassName: "{{ $.Values.server.ingressClassName }}"
+      rules:
+      - host: "{{ $.Values.server.url }}"
+        http:
+          paths:
+          - path: "/{{ printf "%s-%s" $env $project.projectName }}"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: "{{ printf "%s-%s" $env $project.projectName }}-grafana-service"
+                port:
+                  number: 3000
+      tls:
+        - hosts:
+          - {{ $.Values.server.url }}
+          secretName: "{{ $.Values.server.url }}-tls"
+  {{- end }}
+  {{- if $.Values.grafana.isOpenShift }}
+  route:
+    {{- if $.Values.server.certManager.enabled }}
+    metadata:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    spec:
+      host: "{{ $.Values.server.url }}"
+      path: "/{{ printf "%s-%s" $env $project.projectName }}"
+      port:
+        targetPort: 3000
+      tls:
+        termination: edge
+      to:
+        kind: Service
+        name: "{{ printf "%s-%s" $env $project.projectName }}-grafana-service"
+        weight: 100
+      wildcardPolicy: None
+  {{- end }}
+---
+{{- end }}
+{{- end }}
+---
+{{- with .Values.default }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  labels:
+    app: {{ .name }}
+    dashboards: grafana
+  name: "{{ .name }}-grafana"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  client:
+    preferIngress: false
+  config:
+    security:
+      admin_user: {{ $.Values.grafana.adminUser | default "admin" | quote }}
+      admin_password: {{ $.Values.grafana.adminPassword | default "admin" | quote }}
+    {{- if $.Values.oauth.enabled }}
+    auth:
+      oauth_allow_insecure_email_lookup: "true"
+    auth.generic_oauth:
+      api_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/userinfo"
+      auth_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/auth"
+      client_id: "{{ $.Values.oauth.id }}"
+      client_secret: "{{ $.Values.oauth.secret }}"
+      email_attribute_path: email
+      enabled: "true"
+      name: "{{ $.Values.oauth.id }}"
+      role_attribute_strict: "true"
+      role_attribute_path: contains(groups[*], '/admin') && 'Admin'
+      scopes: profile, email, openid, generic
+      tls_skip_verify_insecure: "true"
+      token_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/token"
+      use_refresh_token: "true"
+    {{- end }}
+    log:
+      mode: console
+    server:
+      root_url: {{ printf "https://%s/%s/" $.Values.server.url .name }}
+      serve_from_sub_path: "true"
+  {{- if not $.Values.grafana.isOpenShift }}
+  ingress:
+    {{- if $.Values.server.certManager.enabled }}
+    metadata:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    spec:
+      ingressClassName: "{{ $.Values.server.ingressClassName }}"
+      rules:
+      - host: "{{ $.Values.server.url }}"
+        http:
+          paths:
+          - path: "/{{ .name }}"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: "{{ .name }}-grafana-service"
+                port:
+                  number: 3000
+      tls:
+        - hosts:
+          - {{ $.Values.server.url }}
+          secretName: "{{ $.Values.server.url }}-tls"
+  {{- end }}
+  {{- if $.Values.grafana.isOpenShift }}
+  route:
+    {{- if $.Values.server.certManager.enabled }}
+    metadata:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    {{- end }}
+    spec:
+      host: "{{ $.Values.server.url }}"
+      path: "/{{ .name }}"
+      port:
+        targetPort: 3000
+      tls:
+        termination: edge
+      to:
+        kind: Service
+        name: "{{ .name }}-grafana-service"
+        weight: 100
+      wildcardPolicy: None
+  {{- end }}
+{{- end }}

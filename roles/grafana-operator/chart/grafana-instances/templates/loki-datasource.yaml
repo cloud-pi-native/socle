@@ -1,0 +1,50 @@
+{{- range $project := default .Values.projects .Values.global.projects }}
+{{- range $env, $val := $project.envs }}
+{{- range $tenant, $val := $val.tenants }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ $tenant }}-loki-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    isDefault: false
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+    name: "loki-{{ $tenant }}"
+    type: loki
+    uid: "loki-{{ $tenant }}"
+    url: "{{ $.Values.grafana.observatorium_url }}/api/logs/v1/{{ $tenant }}/"
+  instanceSelector:
+    matchLabels:
+      app: {{ printf "%s-%s" $env $project.projectName }}
+  resyncPeriod: 5m
+---
+{{- end }}
+{{- end }}
+{{- end }}
+---
+{{- with .Values.default }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ .name }}-loki-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    isDefault: false
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+    name: loki
+    type: loki
+    uid: loki
+    url: "{{ $.Values.grafana.observatorium_url }}/api/logs/v1/{{ .name }}/"
+  instanceSelector:
+    matchLabels:
+      app: {{ .name }}
+  resyncPeriod: 5m
+{{- end }}

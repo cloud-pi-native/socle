@@ -1,0 +1,58 @@
+{{- range $project := default .Values.projects .Values.global.projects }}
+{{- range $env, $val := $project.envs }}
+{{- range $tenant, $val := $val.tenants }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ $tenant }}-cardinality-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+    name: "cardinality-{{ $tenant }}"
+    type: marcusolsson-json-datasource
+    uid: "cardinality-{{ $tenant }}"
+    url: "{{ $.Values.grafana.observatorium_url }}/api/metrics/v1/{{ $tenant }}/prometheus/api/v1/cardinality/"
+  instanceSelector:
+    matchLabels:
+      app: {{ printf "%s-%s" $env $project.projectName }}
+  resyncPeriod: 5m
+  plugins:
+    - name: marcusolsson-json-datasource
+      version: 1.3.17
+    - name: marcusolsson-treemap-panel
+      version: 2.0.1
+---
+{{- end }}
+{{- end }}
+{{- end }}
+---
+{{- with .Values.default }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ .name }}-cardinality-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    isDefault: false
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+    name: cardinality
+    type: marcusolsson-json-datasource
+    uid: cardinality
+    url: "{{ $.Values.grafana.observatorium_url }}/api/metrics/v1/{{ .name }}/prometheus/api/v1/cardinality/"
+  instanceSelector:
+    matchLabels:
+      app: {{ .name }}
+  plugins:
+    - name: marcusolsson-json-datasource
+      version: 1.3.17
+    - name: marcusolsson-treemap-panel
+      version: 2.0.1
+{{- end }}

@@ -1,0 +1,38 @@
+{{ if .Values.dashboard.cardinality }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: cardinality-overview
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  url: https://raw.githubusercontent.com/Ronan-WeScale/grafana-mimir-cardinality-dashboards/refs/heads/main/dashboards/cardinality-management-1-overview.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: cardinality-metrics
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  url: https://raw.githubusercontent.com/Ronan-WeScale/grafana-mimir-cardinality-dashboards/refs/heads/main/dashboards/cardinality-management-2-metrics.json
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: cardinality-labels
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  url: https://raw.githubusercontent.com/Ronan-WeScale/grafana-mimir-cardinality-dashboards/refs/heads/main/dashboards/cardinality-management-3-labels.json
+{{ end }}

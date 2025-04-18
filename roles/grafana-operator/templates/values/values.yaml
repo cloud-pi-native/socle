@@ -1,0 +1,49 @@
+grafanaNamespace: "{{ dsc.grafana.namespace }}"
+tenant_id: console
+
+default:
+  name: console
+
+projects:
+  - projectName: console
+    envs:
+      hprod:
+        groups:
+          - Editors
+          - Viewers
+      prod:
+        groups:
+          - Editors
+          - Viewers
+
+global:
+  projects: []
+
+oauth:
+  enabled: true
+  url: "https://fabrice-sdid-hp-keycloak.cpin.numerique-interieur.com/realms/dso"
+  id: grafana
+  secret: ""
+  aud: grafana
+  scopes: profile, email, openid, offline_access
+  allow_assign_grafana_admin: true
+
+server:
+  certManager:
+    enabled: true
+  ingressClassName: nginx
+  url: "fabrice-sdid-hp-grafana.sdid-hp.cpin.numerique-interieur.com"
+
+grafana:
+  isOpenShift: false
+  observatorium_url: http://observatorium-api.infra-loki.svc:8080
+  subDomain: fabrice-sdid-hp-grafana
+  adminUser: admin
+  adminPassword: admin
+
+dashboard:
+  default: true
+  mimir: false
+  loki: false
+  minio: false
+  cardinality: true

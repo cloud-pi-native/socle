@@ -1,0 +1,52 @@
+{{- range $project := default .Values.projects .Values.global.projects }}
+{{- range $env, $val := $project.envs }}
+{{- range $tenant, $val := $val.tenants }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ $tenant }}-alertmanager-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    isDefault: false
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+      implementation: "mimir"
+    name: "am-{{ $tenant }}"
+    type: alertmanager
+    uid: "am-{{ $tenant }}"
+    url: "{{ $.Values.grafana.observatorium_url }}/api/metrics/v1/{{ $tenant }}"
+  instanceSelector:
+    matchLabels:
+      app: {{ printf "%s-%s" $env $project.projectName }}
+  resyncPeriod: 5m
+---
+{{- end }}
+{{- end }}
+{{- end }}
+---
+{{- with .Values.default }}
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: "{{ .name }}-alertmanager-ds"
+  namespace: {{ $.Values.grafanaNamespace }}
+spec:
+  datasource:
+    access: proxy
+    isDefault: false
+    jsonData:
+      oauthPassThru: true
+      tlsSkipVerify: true
+      implementation: "mimir"
+    name: alertmanager
+    type: alertmanager
+    uid: alertmanager
+    url: "{{ $.Values.grafana.observatorium_url }}/api/metrics/v1/{{ .name }}"
+  instanceSelector:
+    matchLabels:
+      app: {{ .name }}
+  resyncPeriod: 5m
+{{- end }}

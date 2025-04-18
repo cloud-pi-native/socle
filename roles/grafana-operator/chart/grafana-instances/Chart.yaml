@@ -1,0 +1,4 @@
+apiVersion: v2
+name: grafana-instances
+description: A Helm chart for deploying Grafana instances with Grafana Operator
+version: 0.1.0

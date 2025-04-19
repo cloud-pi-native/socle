@@ -4,10 +4,10 @@ dependencies:
   name: cpn-cnpg
   repository: https://cloud-pi-native.github.io/helm-charts
   version: 2.1.0
-- alias: keycloak
-  name: keycloak
-  repository: oci://registry-1.docker.io/bitnamicharts
-  version: 24.4.11
-name: keycloak
+- alias: harbor
+  name: harbor
+  repository: https://helm.goharbor.io
+  version: 1.16.0
+name: harbor
 type: application
-version: 24.4.11
+version: 1.16.0

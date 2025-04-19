@@ -1,7 +1,7 @@
 cpn-cnpg:
-  nameOverride: "pg-cluster-sonar"
-{% if dsc.sonarqube.cnpg.imageName is defined %}
-  imageName: "{{ dsc.sonarqube.cnpg.imageName }}"
+  nameOverride: "pg-cluster-harbor"
+{% if dsc.harbor.cnpg.imageName is defined %}
+  imageName: "{{ dsc.harbor.cnpg.imageName }}"
 {% else %}
   imageName: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/cloudnative-pg/postgresql:16.1"
 {% endif %}
@@ -9,62 +9,62 @@ cpn-cnpg:
   imagePullSecrets:
   - name: dso-config-pull-secret
 {% endif %}
-  username: "dsoadmin"
-  dbName: "sonardb"
+  username: "harbor"
+  dbName: "registry"
 
   # Require 1Gi of space per instance using default storage class
   pvcSize:
-    data: {{ dsc.sonarqube.postgresPvcSize }}
-{% if dsc.sonarqube.postgresWalPvcSize is defined %}
-    wal: {{ dsc.sonarqube.postgresWalPvcSize }}
+    data: {{ dsc.harbor.postgresPvcSize }}
+{% if dsc.harbor.postgresWalPvcSize is defined %}
+    wal: {{ dsc.harbor.postgresWalPvcSize }}
 {% endif %}
 
   parameters:
     max_worker_processes: "60"
-{% if dsc.sonarqube.postgresWalMaxSlotKeepSize is defined %}
-    max_slot_wal_keep_size: {{ dsc.sonarqube.postgresWalMaxSlotKeepSize }}
+{% if dsc.harbor.postgresWalMaxSlotKeepSize is defined %}
+    max_slot_wal_keep_size: {{ dsc.harbor.postgresWalMaxSlotKeepSize }}
 {% endif %}
 
 {% if dsc.global.backup.velero.enabled %}
   annotations:
-    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d sonarqube > /var/lib/postgresql/data/app.dump-${index}"]'
+    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d harbor > /var/lib/postgresql/data/app.dump-${index}"]'
     pre.hook.backup.velero.io/container: postgres
     pre.hook.backup.velero.io/on-error: Fail
     pre.hook.backup.velero.io/timeout: 90s
 {% endif %}
 
-{% if dsc.sonarqube.cnpg.exposed %}
+{% if dsc.harbor.cnpg.exposed %}
   exposed: true
-  nodePort: {{ dsc.sonarqube.cnpg.nodePort }}
+  nodePort: {{ dsc.harbor.cnpg.nodePort }}
 {% endif %}
 
-{% if dsc.sonarqube.cnpg.initPassword %}
+{% if dsc.harbor.cnpg.initPassword %}
   initSecret:
     enabled: true 
-    username: <path:forge-dso/data/env/{{ dsc_name }}/apps/sonarqube/values#cnpg | jsonPath  
+    username: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath  
       {.username} | base64encode>
-    password: <path:forge-dso/data/env/{{ dsc_name }}/apps/sonarqube/values#cnpg | jsonPath
+    password: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath
       {.password} | base64encode>
 {% endif %}
 
-{% if dsc.sonarqube.cnpg.mode == "replica" %}
+{% if dsc.harbor.cnpg.mode == "replica" %}
 {%- filter indent(width=4) %}
-{{ dsc.sonarqube.cnpg.connectionParameters }}
+{{ dsc.harbor.cnpg.connectionParameters }}
 {%- endfilter %}
 {% endif %}
 
-{% if dsc.sonarqube.cnpg.mode == "replica" %}
+{% if dsc.harbor.cnpg.mode == "replica" %}
   mode: "replica"
 {% endif %}
 
   monitoring:
     enabled: {{ dsc.global.metrics.enabled }}
 
-{% if dsc.global.backup.cnpg.enabled or dsc.sonarqube.cnpg.mode == "restore" %}
+{% if dsc.global.backup.cnpg.enabled or dsc.harbor.cnpg.mode == "restore" %}
   backup:
     destinationPath: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
     endpointURL: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
-{% if dsc.global.backup.cnpg.enabled and dsc.sonarqube.cnpg.mode != "restore" %}
+{% if dsc.global.backup.cnpg.enabled and dsc.harbor.cnpg.mode != "restore" %}
     enabled: true
 {% if dsc.global.backup.s3.endpointCA.key is defined %}
     endpointCA:

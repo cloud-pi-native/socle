@@ -49,6 +49,8 @@
   - [Prérequis](#prérequis-1)
   - [Principe d'installation GitOps](#principe-dinstallation-gitops)
   - [Exemple de déploiement GitOps](#exemple-de-déploiement-gitops)
+  - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
+    - [Harbor GitOps](#harbor-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1023,9 +1025,9 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur un [applicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) Argo CD déployant lui-même les applications du socle, en fonction d'un environnement donné et des paramètres qui le caractérisent.
 
-Pour l'instant **seul le déploiement de Keycloak et de Sonarqube** est géré en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
+Pour l'instant **seul les déploiements de Keycloak, Sonarqube et Harbor** est géré en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
 
-Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak et Sonarqube en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
+Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak, Sonarqube et Harbor en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
 
 ### Prérequis
 
@@ -1170,10 +1172,10 @@ Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. 
 {
   "env": "conf-dso",
   "provider": "self-hosted",
-  "region": "fr-par",
+  "region": "fr-par",gitops/envs/conf-dso/apps/harbor/values.yaml
   "prefix": "dso-",
   "destination": {
-    "clusterName": "in-cluster"
+    "clusterName": "in-cluster"gitops/envs/conf-dso/apps/harbor/values.yaml
   },
   "targetRevision": "main",
   "apps": [
@@ -1334,6 +1336,39 @@ Une fois Keyckloak déployé, nous n'avons plus qu'à lancer sa post-configurati
 ```shell
 ansible-playbook install-gitops.yaml -t post-install-keycloak
 ```
+
+## Migration vers le déploiement GitOps
+
+### Harbor GitOps
+
+En cas d'utilisation de `imageChartStorage` dans la `dsc` comme suit.
+```yaml
+harbor:
+  values:
+    persistence:
+      imageChartStorage:
+        s3:
+          accesskey: <accesskey>
+          bucket: <bucket>
+          region: <region>
+          regionendpoint: <regionendpoint>
+          secretkey: <secretkey>
+        type: s3
+```
+Il faut supprimer et remplacer par ce qui suit.
+```yaml
+harbor:
+  s3ImageChartStorage:
+    enabled: true 
+    accesskey: <accesskey>
+    bucket: <bucket>
+    region: <region>
+    regionendpoint: <regionendpoint>
+    secretkey: <secretkey>
+```
+
+VERIFIER ET COMPLETER POUR CE QUI CONCERNE `dsc.harbor.cnpg.initPassword`.
+
 
 ## Contributions
 

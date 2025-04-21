@@ -18,14 +18,10 @@ envs:
             keycloak: "{{ keycloak_domain }}"
             observatorium: "{{ observatorium_domain }}"
             sonarqube: "{{ sonar_domain }}"
-<<<<<<< HEAD
-            vault: "{{ vault_domain }}"
-=======
             harbor: "{{ harbor_domain }}"
             harborNotary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"
->>>>>>> feat: :sparkles: Harbor GitOps install
           proxy:
-            httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
+            httpProxy: "{{ dsc.proxxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
             noProxy: "{{ dsc.proxy.no_proxy | default('') }}"
             hostProxy: "{{ dsc.proxy.host | default('') }}"
@@ -51,11 +47,8 @@ envs:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
       - argocd_app: "observatorium"
         vault_values:
-<<<<<<< HEAD
-=======
           ingress:
             ingressClassName: "{{ dsc.ingress.className | default('') }}"
->>>>>>> feat: :sparkles: Harbor GitOps install
           api:
             loglevel: info
             config:
@@ -67,7 +60,6 @@ envs:
           metrics:
             enabled: "{{ dsc.global.metrics.enabled | default('') }}"
             endpoint: "{{ dsc.global.metrics.endpoint | default('') }}"
-<<<<<<< HEAD
       - argocd_app: "vault"
         vault_values:
           backupSecrets:
@@ -76,8 +68,6 @@ envs:
             s3Endpoint: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
             s3AccessKey: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default('') }}"
             s3SecretKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
-=======
->>>>>>> feat: :sparkles: Harbor GitOps install
       - argocd_app: "sonarqube"
         vault_values:
           auth:

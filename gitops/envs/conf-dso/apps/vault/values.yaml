@@ -1,0 +1,63 @@
+cpn-backup-utils:
+  fullnameOverride: conf-dso-vault-backup-cpn-backup-utils
+  vault:
+    enabled: true
+    env:
+      MC_EXTRA_ARGS: ''
+      RETENTION: 14d
+    job:
+      schedule: '"0 0 * * *"'
+    secrets:
+      S3_ACCESS_KEY: <path:forge-dso/data/env/conf-dso/apps/vault/values#backupSecrets
+        | jsonPath {.s3AccessKey}>
+      S3_BUCKET_NAME: <path:forge-dso/data/env/conf-dso/apps/vault/values#backupSecrets
+        | jsonPath {.s3BucketName}>
+      S3_BUCKET_PREFIX: <path:forge-dso/data/env/conf-dso/apps/vault/values#backupSecrets
+        | jsonPath {.s3BucketPrefix}>
+      S3_ENDPOINT: <path:forge-dso/data/env/conf-dso/apps/vault/values#backupSecrets
+        | jsonPath {.s3Endpoint}>
+      S3_SECRET_KEY: <path:forge-dso/data/env/conf-dso/apps/vault/values#backupSecrets
+        | jsonPath {.s3SecretKey}>
+      VAULT_ADDR: http://dso-vault-active:8200
+      VAULT_TOKEN: <path:forge-dso/data/env/conf-dso/apps/vault/values#backupSecrets
+        | jsonPath {.vaultToken}>
+vault:
+  fullnameOverride: conf-dso-vault
+  injector:
+    securityContext:
+      container:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      pod:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 100
+  server:
+    auditStorage:
+      enable: true
+    dataStorage:
+      enable: true
+      size: 23Gi
+    ha:
+      apiAddr: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain
+        | jsonPath {.vault}>
+      enabled: true
+      raft:
+        enabled: true
+      replicas: 3
+    route:
+      enabled: false
+    standalone:
+      enabled: false
+    statefulSet:
+      securityContext:
+        container:
+          allowPrivilegeEscalation: false
+        pod:
+          fsGroup: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 100

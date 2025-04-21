@@ -1,0 +1,26 @@
+{% if use_private_registry %}
+vault:
+  injector:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/hashicorp/vault-k8s"
+    agentImage:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
+  
+  server:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
+  
+  csi:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/hashicorp/vault-csi-provider"
+    agent:
+      image:
+        repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
+{% endif %}
+
+{% if use_image_pull_secrets %}
+vault:
+  global:
+    imagePullSecrets:
+    - name: dso-config-pull-secret
+{% endif %}

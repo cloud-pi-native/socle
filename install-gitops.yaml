@@ -64,6 +64,8 @@
       tags:
         - rendering-apps-files
         - apps-files
+        - post-install-vault
+        - vault-secrets-post-install
 
     - role: gitops/watchpoint
       tags:
@@ -85,6 +87,12 @@
       tags:
         - post-install
         - post-install-harbor
+
+    - role: gitops/post-install/vault
+      tags:
+        - post-install
+        - post-install-vault
+        - vault-secrets-post-install
 
   tasks:
     - name: Load variables for the vault-secrets post-install role

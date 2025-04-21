@@ -1,0 +1,41 @@
+---
+- name: Get vault status
+  kubernetes.core.k8s_exec:
+    container: vault
+    pod: "{{ vault_pod }}"
+    namespace: "{{ dsc.vault.namespace }}"
+    command: vault status -format=json
+  register: vault_status
+  ignore_errors: true
+  changed_when: false
+
+- name: Set vault_initialized fact
+  ansible.builtin.set_fact:
+    vault_initialized: "{{ vault_status.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'initialized')
+      | map(attribute='value') | first | default('false') }}"
+
+- name: Set vault_sealed fact
+  ansible.builtin.set_fact:
+    vault_sealed: "{{ vault_status.stdout
+      | from_json
+      | dict2items
+      | selectattr('key', 'eq', 'sealed')
+      | map(attribute='value') | first | default('true') }}"
+
+- name: Set vault_status to "not init"
+  when: not vault_initialized
+  ansible.builtin.set_fact:
+    vault_status: "not init"
+
+- name: Set vault_status to sealed
+  when: (vault_initialized) and (vault_sealed)
+  ansible.builtin.set_fact:
+    vault_status: "sealed"
+
+- name: Set vault_status to OK
+  when: (vault_initialized) and (not vault_sealed)
+  ansible.builtin.set_fact:
+    vault_status: "OK"

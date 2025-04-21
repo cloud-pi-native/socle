@@ -32,3 +32,7 @@ envs:
             vault:
               id: "{{ vault_client_id | default('') }}"
               secret: "{{ vault_client_secret | default('') }}"
+      - argocd_app: "vault"
+        vault_values:
+          backupSecrets:
+            vaultToken: "{{ vault_token | default('') }}"

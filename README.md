@@ -1339,6 +1339,43 @@ ansible-playbook install-gitops.yaml -t post-install-keycloak
 
 ## Migration vers le déploiement GitOps
 
+### Vault GitOps
+
+Lancer le playbook d'installation avec le tag suivant pour récupérer le `vaultToken`.
+```
+ansible-playbook install-gitops.yaml -t vault-secrets-post-install
+```
+
+Il y aura potentiellement des erreurs de ce type pour les statefulsets `harbor-redis` et `harbor-trivy` et pour les deployments `harbor-core`, `harbor-jobservice`, `harbor-portal` et `harbor-registry`.
+
+```
+Failed to compare desired state to live state: failed to calculate diff: error calculating server side diff: serverSideDiff error: error running server side apply in dryrun mode for resource StatefulSet/conf-dso-vault: StatefulSet.apps "conf-dso-vault" is invalid: spec: Forbidden: updates to statefulset spec for fields other than 'replicas', 'ordinals', 'template', 'updateStrategy', 'persistentVolumeClaimRetentionPolicy' and 'minReadySeconds' are forbidden
+```
+
+Ceci étant du à un changement du champ immutable
+```
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: conf-dso-vault
+```
+en
+```
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: dso-vault
+```
+Pour résoudre, il suffit de supprimer les deployments et statefulsets avant de synchroniser sur Argocd.
+```
+kubectl delete deploy conf-dso-vault-agent-injector 
+kubectl delete sts conf-dso-vault 
+```
+Puis lancer le playbook de post-installation.
+```
+ansible-playbook install-gitops.yaml -t post-install-vault
+```
+
 ### Harbor GitOps
 
 En cas d'utilisation de `imageChartStorage` dans la `dsc` comme suit.

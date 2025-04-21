@@ -63,7 +63,7 @@ spec:
     chartVersion: 10.8.1
   vault:
     # https://artifacthub.io/packages/helm/hashicorp/vault
-    chartVersion: 0.29.1
+    chartVersion: 0.30.0
   vaultInfra:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.29.1

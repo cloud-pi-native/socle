@@ -1,0 +1,12 @@
+---
+{% if dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret" %}
+kind: Secret
+apiVersion: v1
+type: Opaque
+metadata:
+  name: exposed-ca 
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+data:
+  tsl.crt: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#exposedCa | base64encode>
+{% endif %}

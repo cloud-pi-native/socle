@@ -21,7 +21,7 @@ global:
 
 oauth:
   enabled: true
-  url: "https://fabrice-sdid-hp-keycloak.cpin.numerique-interieur.com/realms/dso"
+  url: "https://fabrice-sdid-hp-keycloak.sdid-hp.cpin.numerique-interieur.com/realms/dso"
   id: grafana
   secret: ""
   aud: grafana

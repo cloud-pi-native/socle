@@ -51,29 +51,6 @@
   retries: 15
   delay: 5
 
-- name: Ensure Grafana Keycloak Secret exists
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: grafana-keycloak
-        namespace: "{{ dsc.grafana.namespace }}"
-      type: Opaque
-      data:
-        client_id: "{{ 'grafana' | b64encode }}"
-        client_secret: "{{ 'grafana' | b64encode }}"
-  when: not lookup('k8s', kind='Secret', name='grafana-keycloak', namespace=(dsc.grafana.namespace)) | bool
-
-- name: Get Grafana Keycloak Secret
-  kubernetes.core.k8s_info:
-    kind: Secret
-    name: grafana-keycloak
-    namespace: "{{ dsc.grafana.namespace }}"
-  register: keycloak_secret
-  failed_when: keycloak_secret.resources | length == 0
-
 - name: Deploy Grafana instances Helm chart
   kubernetes.core.helm:
     name: grafana-instances

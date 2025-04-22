@@ -28,7 +28,7 @@ spec:
       name: "{{ $.Values.oauth.id }}"
       role_attribute_strict: "true"
       role_attribute_path: contains(groups[*], '/admin') && 'Admin' || contains(groups[*], '{{ index $val.groups 0 }}') && 'Editor'|| contains(groups[*], '{{ index $val.groups 1 }}') && 'Viewer'
-      scopes: profile, email, openid, generic
+      scopes: {{ $.Values.oauth.scopes | join ", " }}
       tls_skip_verify_insecure: "true"
       token_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/token"
       use_refresh_token: "true"
@@ -116,7 +116,7 @@ spec:
       name: "{{ $.Values.oauth.id }}"
       role_attribute_strict: "true"
       role_attribute_path: contains(groups[*], '/admin') && 'Admin'
-      scopes: profile, email, openid, generic
+      scopes: {{ $.Values.oauth.scopes | join ", " }}
       tls_skip_verify_insecure: "true"
       token_url: "{{ $.Values.oauth.url }}/protocol/openid-connect/token"
       use_refresh_token: "true"

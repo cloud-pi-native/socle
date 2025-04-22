@@ -1,0 +1,139 @@
+---
+- name: Deploy Nexus Ingress
+  kubernetes.core.k8s:
+    template: "{{ item }}"
+  with_items:
+    - ingress.yml.j2
+
+- name: Wait Nexus endpoint to initialize
+  kubernetes.core.k8s_info:
+    kind: Endpoints
+    namespace: "{{ dsc.nexus.namespace }}"
+    name: "{{ dsc.nexus.release }}"
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0].ip is defined
+  retries: 45
+  delay: 5
+
+- name: Wait Nexus URL
+  ansible.builtin.uri:
+    url: https://{{ nexus_domain }}
+    method: GET
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    status_code: [200, 202]
+    return_content: false
+  register: nexus_response
+  until: nexus_response is not failed
+  retries: 25
+  delay: 5
+
+- name: Update inventory
+  when: first_install
+  block:
+    - name: Update or create inventory secret (dso-config)
+      kubernetes.core.k8s:
+        kind: Secret
+        name: dso-config
+        namespace: "{{ dsc.console.namespace }}"
+        state: patched
+        definition:
+          apiVersion: v1
+          metadata:
+            name: dso-config
+            namespace: "{{ dsc.console.namespace }}"
+          data:
+            NEXUS_ADMIN_PASSWORD: "{{ nexus_admin_password | b64encode }}"
+      register: update_inventory_result
+
+    - name: Get admin-creds secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.nexus.namespace }}"
+        kind: Secret
+        name: admin-creds
+      register: admin_creds_secret
+
+    - name: Update admin-creds secret
+      when: admin_creds_secret.resources[0] is defined
+      kubernetes.core.k8s:
+        kind: Secret
+        name: admin-creds
+        namespace: "{{ dsc.nexus.namespace }}"
+        state: patched
+        definition:
+          data:
+            password: "{{ nexus_admin_password | b64encode }}"
+
+- name: Get inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: dso-config
+  register: ansible_inventory
+
+- name: Debug inventory retrieval
+  ansible.builtin.debug:
+    var: ansible_inventory
+  when: ansible_inventory.resources is not defined or ansible_inventory.resources | length == 0
+
+- name: Retrieve admin password from inventory
+  ansible.builtin.set_fact:
+    nexus_admin_password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD | b64decode | default(nexus_admin_password) }}"
+  when: >
+    ansible_inventory.resources is defined and
+    ansible_inventory.resources | length > 0 and
+    ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD is defined
+
+- name: Activate Nexus metrics scraping
+  when: dsc.global.metrics.enabled
+  block:
+    - name: Create admin-creds secret
+      kubernetes.core.k8s:
+        definition:
+          kind: Secret
+          apiVersion: v1
+          data:
+            username: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN }}"
+            password: "{{ ansible_inventory.resources[0].data.NEXUS_ADMIN_PASSWORD }}"
+          metadata:
+            labels:
+              app: nexus
+            name: admin-creds
+            namespace: "{{ dsc.nexus.namespace }}"
+          type: Opaque
+
+    - name: Create nexus ServiceMonitor
+      kubernetes.core.k8s:
+        template: servicemonitor.yml.j2
+
+- name: Set alerting rules
+  when: dsc.global.alerting.enabled and dsc.global.metrics.enabled
+  kubernetes.core.k8s:
+    template: prometheusrule.yml.j2
+
+- name: Patch serviceMonitors
+  when: >
+    dsc.global.metrics.enabled and
+    dsc.global.metrics.additionalLabels is defined
+  block:
+    - name: Get serviceMonitors
+      kubernetes.core.k8s_info:
+        api_version: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        namespace: "{{ dsc.nexus.namespace }}"
+      register: service_monitors
+
+    - name: Get service_monitors names
+      ansible.builtin.set_fact:
+        service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
+
+    - name: Patch serviceMonitors
+      kubernetes.core.k8s:
+        kind: ServiceMonitor
+        namespace: "{{ dsc.nexus.namespace }}"
+        state: patched
+        name: "{{ item }}"
+        definition:
+          metadata:
+            labels:
+              "{{ dsc.global.metrics.additionalLabels }}"
+      loop: "{{ service_monitors_names }}"

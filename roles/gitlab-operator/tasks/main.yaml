@@ -34,7 +34,7 @@
         release_namespace: "{{ dsc.gitlab.namespace }}"
         values: "{{ operator_values }}"
 
-    - name: Wait gitlab-webhook-service endpoint
+    - name: Wait gitlab-operator-webhook-service endpoint
       kubernetes.core.k8s_info:
         kind: Endpoints
         namespace: "{{ dsc.gitlab.namespace }}"

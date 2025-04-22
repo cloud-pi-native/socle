@@ -42,47 +42,28 @@ manager:
       registry: "{{ dsc.global.registry }}"
 {% endif %}
   serviceAccount:
-    # Specifies whether a service account should be created
     create: true
-    # Annotations to add to the service account
     annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the name template
-    # name: gitlab-operator-manager
   webhook:
     selfSignedCert:
-      # Specifies whether CertManager Issuer and Certificate should be created
-      # to generate a self-signed certificate for the Manager's webhook.
       create: true
 
 app:
   serviceAccount:
-    # Specifies whether a service account should be created
     create: true
-    # Annotations to add to the service account
     annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the name template
-    # name: gitlab-operator-app
 
 nginx-ingress:
   serviceAccount:
-    # Specifies whether a service account should be created
     create: false
 
 prometheus:
   serviceAccount:
     server:
-      # Specifies whether a service account should be created
       create: true
-      # Annotations to add to the service account
       annotations: {}
-      # The name of the service account to use.
-      # If not set and create is true, a name is generated using the name template
-      # name: gitlab-operator-prometheus-server
 
 scc: {}
-#  apiVersion: ""
 
 cert-manager:
   install: false

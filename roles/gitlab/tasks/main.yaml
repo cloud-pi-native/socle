@@ -111,10 +111,6 @@
       - "app.kubernetes.io/managed-by=gitlab-operator"
   register: gs_deployments
 
-- name: Create RBAC resources
-  kubernetes.core.k8s:
-    template: rbac.yaml.j2
-
 - name: Set some facts
   ansible.builtin.set_fact:
     vault_auth_path: jwt

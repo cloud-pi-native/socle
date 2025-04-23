@@ -279,18 +279,9 @@
     - name: "Suppression de l'opérateur GitLab"
       kubernetes.core.helm:
         name: gitlab-operator
-        release_namespace: "{{ dsc.gitlabOperator.namespace }}"
+        release_namespace: "{{ dsc.gitlab.namespace }}"
         release_state: absent
         wait: true
-      tags:
-        - never
-        - gitlab-operator
-
-    - name: "Suppression du namespace GitLab Operator"
-      kubernetes.core.k8s:
-        state: absent
-        kind: Namespace
-        name: "{{ dsc.gitlabOperator.namespace }}"
       tags:
         - never
         - gitlab-operator

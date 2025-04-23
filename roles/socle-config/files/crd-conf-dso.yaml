@@ -455,16 +455,6 @@ spec:
                     chartVersion:
                       description: GitLab Operator release version (e.g., "0.24.1").
                       type: string
-                    namespace:
-                      description: The namespace for GitLab Operator.
-                      type: string
-                    forcedInstall:
-                      description: |
-                        If set to true, GitLab Operator will be installed (or reinstalled) in the
-                        desired namespace regardless of its existing state.
-                        The default value is false, which means no forced installation will occur.
-                      default: false
-                      type: boolean
                     values:
                       description: |
                         You can add custom values for GitLab Operator, they will be merged with roles/gitlab-operator/templates/values/

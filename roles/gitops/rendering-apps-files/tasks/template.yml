@@ -31,8 +31,11 @@
     mode: 0775
 
 - name: Render "{{ item.1.argocd_app }}" templates and write yaml files to destination
+  vars:
+    rendered_content: "{{ lookup('ansible.builtin.template', my_template) | from_yaml | to_nice_yaml(indent=2) }}"
+  when: rendered_content | trim != 'null'
   ansible.builtin.copy:
-    content: "{{ lookup('ansible.builtin.template', my_template) | from_yaml | to_nice_yaml(indent=2) }}"
+    content: "{{ rendered_content }}"
     dest: "gitops/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates/{{ my_template | basename | regex_replace('\\.j2', '') }}"
     mode: "0644"
   with_fileglob: "{{ path }}/*"

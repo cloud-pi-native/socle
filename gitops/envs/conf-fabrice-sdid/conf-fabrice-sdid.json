@@ -1,0 +1,15 @@
+{
+  "env": "conf-fabrice-sdid",
+  "provider": "self-hosted",
+  "region": "fr-par",
+  "prefix": "fabrice-",
+  "destination": {
+    "clusterName": "in-cluster"
+  },
+  "targetRevision": "feat/gitops-nexus-deployment",
+  "apps": [
+    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
+    { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 },
+    { "app": "nexus", "enabled": "true", "namespace": "nexus", "syncWave": 10 }
+  ]
+}

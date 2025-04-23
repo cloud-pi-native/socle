@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: repository
+    app.kubernetes.io/instance: nexus
+    app.kubernetes.io/name: nexus3
+  name: nexus-data-proxy-cache
+  namespace: fabrice-nexus
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 250Gi

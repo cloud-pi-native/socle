@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  generation: 1
+  labels:
+    app: nexus
+  name: nexus
+  namespace: fabrice-nexus
+spec:
+  endpoints:
+  - basicAuth:
+      password:
+        key: password
+        name: admin-creds
+      username:
+        key: username
+        name: admin-creds
+    interval: 15s
+    path: /service/metrics/prometheus
+    port: http
+  namespaceSelector:
+    matchNames:
+    - fabrice-nexus
+  selector:
+    matchLabels:
+      app: nexus

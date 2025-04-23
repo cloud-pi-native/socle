@@ -1,0 +1,13 @@
+apiVersion: v2
+dependencies:
+- alias: cpn-cnpg
+  name: cpn-cnpg
+  repository: https://cloud-pi-native.github.io/helm-charts
+  version: 2.0.1
+- alias: sonarqube
+  name: sonarqube
+  repository: https://sonarsource.github.io/helm-chart-sonarqube
+  version: 10.8.1
+name: sonarqube
+type: application
+version: 10.8.1

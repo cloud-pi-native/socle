@@ -29,6 +29,12 @@ rbac:
   podSecurityPolicy:
     enabled: true
 
+resources:
+  requests:
+    ephemeral-storage: "500Mi"
+  limits:
+    ephemeral-storage: "2Gi"
+
 {% if dsc.global.metrics.enabled %}
 metrics:
   enabled: true

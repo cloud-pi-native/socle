@@ -4,9 +4,9 @@ dependencies:
   name: cpn-cnpg
   repository: https://cloud-pi-native.github.io/helm-charts
   version: 2.0.1
-- alias: nexus
-  name: nexus
-  repository: oci://ghcr.io/stevehipwell/helm-charts/nexus3
+- alias: nexus3
+  name: nexus3
+  repository: oci://ghcr.io/stevehipwell/helm-charts
   version: 5.8.3
 name: nexus
 type: application

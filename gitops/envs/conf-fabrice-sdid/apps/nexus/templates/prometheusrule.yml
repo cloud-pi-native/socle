@@ -36,8 +36,8 @@ spec:
         severity: critical
     - alert: Nexus PVC has low remaining disk space
       annotations:
-        message: PVC {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is running out of disk space (< 20% left). VALUE = {{ $value }}%
-        summary: Nexus PVC is running out of disk space in namespace {{ $labels.namespace }}
+        message: PVC {{ $$labels.persistentvolumeclaim }} in namespace {{ $$labels.namespace }} is running out of disk space (< 20% left). VALUE = {{ $value }}%
+        summary: Nexus PVC is running out of disk space in namespace {{ $$labels.namespace }}
       expr: 'round(
 
         kubelet_volume_stats_available_bytes{
@@ -58,7 +58,7 @@ spec:
         severity: warning
     - alert: Nexus PVC almost out of disk space
       annotations:
-        message: PVC {{ $labels.persistentvolumeclaim }} in namespace fabrice-nexus
+        message: PVC {{ $$labels.persistentvolumeclaim }} in namespace fabrice-nexus
           is almost full (< 10% left). VALUE = {{ $value }}%
         summary: Nexus PVC almost out of disk space in namespace fabrice-nexus
       expr: 'round(
@@ -81,7 +81,7 @@ spec:
         severity: critical
     - alert: Nexus PVC out of disk space
       annotations:
-        message: PVC {{ $labels.persistentvolumeclaim }} in namespace fabrice-nexus
+        message: PVC {{ $$labels.persistentvolumeclaim }} in namespace fabrice-nexus
           is full (0% left).
         summary: Nexus PVC out of disk space in namespace fabrice-nexus
       expr: 'kubelet_volume_stats_available_bytes{

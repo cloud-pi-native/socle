@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.8.0](https://github.com/cloud-pi-native/socle/compare/v3.7.1...v3.8.0) (2025-04-24)
+
+
+### Features
+
+* :recycle: Adapt GitLab Operator install to non cluster scoped ([6f49175](https://github.com/cloud-pi-native/socle/commit/6f491757d894538969c65a0d197f2538e3c7f15b))
+* :sparkles: add post-install vault-secrets ([a94f9b2](https://github.com/cloud-pi-native/socle/commit/a94f9b2e4fcadbaaf71eef597c0bfde41399c5b9))
+* :sparkles: add post-install vault-secrets ([48a98d6](https://github.com/cloud-pi-native/socle/commit/48a98d6eafdec3e8e3664140d1c2f49f9cd688fe))
+* :sparkles: Sonarqube GitOps install ([48f6a73](https://github.com/cloud-pi-native/socle/commit/48f6a73a7294bbc55de10feecaab40e5e2b47308))
+
+
+### Bug Fixes
+
+* :arrow_up: Upgrade GitLab Operator and GitLab ([3039561](https://github.com/cloud-pi-native/socle/commit/3039561f7f2e516e301a03c82e425ef177eb58a7))
+* :arrow_up: Upgrade GitLab Operator and GitLab ([ebfbc99](https://github.com/cloud-pi-native/socle/commit/ebfbc9979f03efac2eb734805621c83befba1552))
+
 ## [3.7.1](https://github.com/cloud-pi-native/socle/compare/v3.7.0...v3.7.1) (2025-04-07)
 
 

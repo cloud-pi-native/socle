@@ -75,7 +75,7 @@ extraVolumes:
     claimName: nexus-data-proxy-cache
 fullnameOverride: nexus
 metrics:
-  enabled: false
+  enabled: 'False'
   serviceMonitor:
     enabled: false
 nexus:
@@ -106,4 +106,3 @@ service:
     port: 5000
   port: 8081
   type: ClusterIP
-

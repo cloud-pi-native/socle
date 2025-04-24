@@ -8,6 +8,6 @@ dependencies:
   name: nexus3
   repository: oci://ghcr.io/stevehipwell/helm-charts
   version: 5.8.3
-name: nexus
+name: nexus3
 type: application
 version: 5.8.3

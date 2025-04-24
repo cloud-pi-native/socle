@@ -1,4 +1,5 @@
 ---
+vault_secrets_post_install: false
 envs:
   - name: "{{ dsc_name }}"
     apps:
@@ -11,6 +12,7 @@ envs:
           domain:
             keycloak: "{{ keycloak_domain }}"
             console: "{{ console_domain }}"
+            sonarqube: "{{ sonar_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
@@ -34,3 +36,8 @@ envs:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           initcontainers:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
+      - argocd_app: "sonarqube"
+        vault_values:
+          auth:
+            adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+            monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"

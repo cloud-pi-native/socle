@@ -1023,9 +1023,9 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur un [applicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) Argo CD déployant lui-même les applications du socle, en fonction d'un environnement donné et des paramètres qui le caractérisent.
 
-Pour l'instant **seul le déploiement de Keycloak** est géré en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
+Pour l'instant **seul le déploiement de Keycloak et de Sonarqube** est géré en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
 
-Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
+Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak et Sonarqube en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
 
 ### Prérequis
 

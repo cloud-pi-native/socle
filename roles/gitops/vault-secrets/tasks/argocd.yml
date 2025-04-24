@@ -1,0 +1,27 @@
+---
+- name: Hard refresh argocd applications
+  kubernetes.core.k8s:
+    kind: Application
+    api_version: argoproj.io/v1alpha1
+    name: "{{ item }}"
+    namespace: "{{ dsc.argocdInfra.namespace }}"
+    definition:
+      metadata:
+        annotations:
+          argocd.argoproj.io/refresh: "hard"
+    state: patched
+
+- name: Sync argocd applications
+  kubernetes.core.k8s:
+    kind: Application
+    api_version: argoproj.io/v1alpha1
+    name: "{{ item }}"
+    namespace: "{{ dsc.argocdInfra.namespace }}"
+    definition:
+      operation:
+        initiatedBy:
+          username: GitOpsAnsible
+        sync:
+          syncStrategy:
+            hook: {}
+    state: patched

@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     app.kubernetes.io/component: repository
-    app.kubernetes.io/instance: nexus
+    app.kubernetes.io/instance: nexus3
     app.kubernetes.io/name: nexus3
   name: nexus-data-proxy-cache
   namespace: fabrice-nexus

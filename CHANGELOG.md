@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.9.1](https://github.com/cloud-pi-native/socle/compare/v3.9.0...v3.9.1) (2025-04-25)
+
+
+### Bug Fixes
+
+* :bug: Missing CRD property type ([#540](https://github.com/cloud-pi-native/socle/issues/540)) ([83a7c2c](https://github.com/cloud-pi-native/socle/commit/83a7c2c62d4c88f64c23ca472a56aa28d4e97089))
+* :wrench: duplicate changelog entries ([#539](https://github.com/cloud-pi-native/socle/issues/539)) ([83a7c2c](https://github.com/cloud-pi-native/socle/commit/83a7c2c62d4c88f64c23ca472a56aa28d4e97089))
+
 ## [3.9.0](https://github.com/cloud-pi-native/socle/compare/v3.8.0...v3.9.0) (2025-04-25)
 
 

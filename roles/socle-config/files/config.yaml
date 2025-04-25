@@ -120,6 +120,11 @@ spec:
     helmRepoUrl: https://kyverno.github.io/kyverno
     forcedInstall: false
     values: {}
+  observatorium:
+    namespace: dso-observatorium
+    subDomain: observatorium
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    values: {}
   nexus:
     namespace: dso-nexus
     subDomain: nexus

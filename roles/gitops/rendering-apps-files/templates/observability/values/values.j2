@@ -1,0 +1,47 @@
+observatorium:
+  ingress:
+    enabled: true
+    ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#ingress | jsonPath {.ingressClassName}>
+    hosts:
+      - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#ingress | jsonPath {.domain}>
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+        secretName: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#ingress | jsonPath {.domain}>-tls
+
+  api:
+    loglevel: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.loglevel}>
+    config:
+      # Default tenant config
+      id: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.id}>
+      name: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.name}>
+      groups: [/admin]
+      # Default oidc config
+      clientID: "account"
+      issuerURL: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#domain | jsonPath {.keycloak}>/realms/dso
+      usernameClaim: "preferred_username"
+      groupClaim: "groups"
+  logs:
+    enabled: true
+    read:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+    tail:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+    write:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+    rules:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+  metrics:
+    enabled: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.enabled}>
+    tenantHeader: 'X-Scope-OrgId'
+    read:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+    alertmanager:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+    write:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+    rules:
+      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"

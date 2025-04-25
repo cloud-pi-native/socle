@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  labels:
+    app: nexus
+  name: nexus-alternative
+  namespace: fabrice-nexus
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: fabrice-sdid-hp-nexus.sdid-hp.cpin.numerique-interieur.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: fabrice-nexus-nexus3
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - fabrice-sdid-hp-nexus.sdid-hp.cpin.numerique-interieur.com
+    secretName: nexus-tls-secret

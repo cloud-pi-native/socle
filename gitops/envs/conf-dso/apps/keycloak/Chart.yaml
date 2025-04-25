@@ -3,7 +3,7 @@ dependencies:
 - alias: cpn-cnpg
   name: cpn-cnpg
   repository: https://cloud-pi-native.github.io/helm-charts
-  version: 2.0.1
+  version: 2.3.0
 - alias: keycloak
   name: keycloak
   repository: oci://registry-1.docker.io/bitnamicharts

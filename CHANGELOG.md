@@ -14,14 +14,12 @@
 ### Features
 
 * :recycle: Adapt GitLab Operator install to non cluster scoped ([6f49175](https://github.com/cloud-pi-native/socle/commit/6f491757d894538969c65a0d197f2538e3c7f15b))
-* :sparkles: add post-install vault-secrets ([a94f9b2](https://github.com/cloud-pi-native/socle/commit/a94f9b2e4fcadbaaf71eef597c0bfde41399c5b9))
 * :sparkles: add post-install vault-secrets ([48a98d6](https://github.com/cloud-pi-native/socle/commit/48a98d6eafdec3e8e3664140d1c2f49f9cd688fe))
 * :sparkles: Sonarqube GitOps install ([48f6a73](https://github.com/cloud-pi-native/socle/commit/48f6a73a7294bbc55de10feecaab40e5e2b47308))
 
 
 ### Bug Fixes
 
-* :arrow_up: Upgrade GitLab Operator and GitLab ([3039561](https://github.com/cloud-pi-native/socle/commit/3039561f7f2e516e301a03c82e425ef177eb58a7))
 * :arrow_up: Upgrade GitLab Operator and GitLab ([ebfbc99](https://github.com/cloud-pi-native/socle/commit/ebfbc9979f03efac2eb734805621c83befba1552))
 
 ## [3.7.1](https://github.com/cloud-pi-native/socle/compare/v3.7.0...v3.7.1) (2025-04-07)
@@ -29,7 +27,6 @@
 
 ### Bug Fixes
 
-* :bug: Gitlab Runner resources overwrite condition ([d5905f1](https://github.com/cloud-pi-native/socle/commit/d5905f1ae50ecb7b8af02051062dfe5ddc16577e))
 * :bug: Gitlab Runner resources overwrite condition ([45a4dfe](https://github.com/cloud-pi-native/socle/commit/45a4dfee8cf3ecceb10ca7fa95e44e9e57acbcfc))
 
 ## [3.7.0](https://github.com/cloud-pi-native/socle/compare/v3.6.0...v3.7.0) (2025-04-07)
@@ -37,35 +34,25 @@
 
 ### Features
 
-* :arrow_up: Upgrade GitLab ([dd9999f](https://github.com/cloud-pi-native/socle/commit/dd9999f947459fd55f0225a43eb491e36b7ead55))
 * :arrow_up: Upgrade GitLab ([39d4335](https://github.com/cloud-pi-native/socle/commit/39d4335f555f43c74d0ad25f86713c3186305866))
-* :memo: Update README with GitOps part ([092aebe](https://github.com/cloud-pi-native/socle/commit/092aebeb32fc51a4677e87b2453a279294ec5cd9))
 * :memo: Update README with GitOps part ([db4e3f9](https://github.com/cloud-pi-native/socle/commit/db4e3f9d8a05b54399d0c20af0f0e2b30500468a))
 * :sparkles: Add GitOps watchpoint and adapt apps files rendering ([6b28d11](https://github.com/cloud-pi-native/socle/commit/6b28d1180d65c7b8bd02d59bb5545f514bbca6ec))
-* :sparkles: enable registry choice ([72bdb97](https://github.com/cloud-pi-native/socle/commit/72bdb9705f6384d35ee5dbc57ecc13a48dcc0ecd))
 * :sparkles: enable registry choice ([1bf8278](https://github.com/cloud-pi-native/socle/commit/1bf82780d78ebe0be88f2c1c5535753b973926fd))
-* :sparkles: Introducing GitOps install (base + keycloak) ([c535f70](https://github.com/cloud-pi-native/socle/commit/c535f70ed6478f93e2f93e462796296229e93944))
 * :sparkles: Introducing GitOps install (base + keycloak) ([0da06a0](https://github.com/cloud-pi-native/socle/commit/0da06a0bfc8e25db078e99d4ca50aeac9422718a))
 
 
 ### Bug Fixes
 
 * :adhesive_bandage: Adapt some README parts + add content ([984e5b4](https://github.com/cloud-pi-native/socle/commit/984e5b4ade70cb06f341540b876b5fb52bef6fd5))
-* :adhesive_bandage: GitOps message ([24fac87](https://github.com/cloud-pi-native/socle/commit/24fac8729605489c26ff787dee7530bdda661abf))
 * :adhesive_bandage: GitOps message ([a9c11a0](https://github.com/cloud-pi-native/socle/commit/a9c11a0aa4aa4c5040f1ff7b18b0af4403f98eb0))
 * :art: Set targetRevision to develop ([d87a1e0](https://github.com/cloud-pi-native/socle/commit/d87a1e0bfbd07bf9b6fbfcb694e07eef2c652320))
 * :bug: eslint "ignores" pattern ([fe2f69b](https://github.com/cloud-pi-native/socle/commit/fe2f69bef230b9d2371c5e1d4405c0bd191a37c0))
-* :bug: GitOps watchpoint message ([590d711](https://github.com/cloud-pi-native/socle/commit/590d711c790b49375cd34bdad3c13135c180c04c))
 * :bug: GitOps watchpoint message ([b55de26](https://github.com/cloud-pi-native/socle/commit/b55de26451d5c177563f7976c73bc7dc2e96b050))
-* :bug: Vault backups (DSO + infra) ([b28089a](https://github.com/cloud-pi-native/socle/commit/b28089a5a0a919e171369329c55e33ad1455a222))
 * :bug: Vault backups (DSO + infra) ([3f9601d](https://github.com/cloud-pi-native/socle/commit/3f9601d8736c81d99638f6aa852e60cafa00e598))
 * :rotating_light: Exclude README from linter ([d372165](https://github.com/cloud-pi-native/socle/commit/d372165f3b09d0b8a679ad983e9447e869edb541))
-* :wrench: gitops proxies rendering ([11a9d49](https://github.com/cloud-pi-native/socle/commit/11a9d494111d4a562d2d706aaf35340fdf2ae7c9))
 * :wrench: gitops proxies rendering ([c7d8ee4](https://github.com/cloud-pi-native/socle/commit/c7d8ee462125d13faef1b66e88744dabccd3c057))
 * :wrench: keycloak infra validate_certs ([40c9092](https://github.com/cloud-pi-native/socle/commit/40c909208af9ec283e0290f965af5cbbd6a62d17))
-* :wrench: keycloak pod label ([9559ea3](https://github.com/cloud-pi-native/socle/commit/9559ea391374b3de9922232b3692a987ad73e419))
 * :wrench: keycloak pod label ([4f602bd](https://github.com/cloud-pi-native/socle/commit/4f602bd8e2aaae8ea8ac0457775d0cf0f0f67f4c))
-* :wrench: keycloak pod label ([318b0fa](https://github.com/cloud-pi-native/socle/commit/318b0fac2a284542fb16a96ed47dc30f368e939c))
 * :wrench: keycloak pod label ([c7e7efd](https://github.com/cloud-pi-native/socle/commit/c7e7efd2f9a3f6358c8a2c3341fbb016ff475d88))
 * :wrench: keycloak validate_certs ([25b1d54](https://github.com/cloud-pi-native/socle/commit/25b1d548c6ed68f8ca2ecfbee01e39608e5d53d9))
 * :wrench: keycloak validate_certs and CRD parameter ([8dde28f](https://github.com/cloud-pi-native/socle/commit/8dde28f1d31f04545609bac2b7f7e54cc6c24788))
@@ -77,14 +64,11 @@
 ### Features
 
 * :zap: activation of cnpg Pooler (BgBouncer) for Gitlab database ([ec62b6a](https://github.com/cloud-pi-native/socle/commit/ec62b6a0e2c59244886de4305adfc22199444e10))
-* :zap: activation of cnpg Pooler (PgBouncer) for Gitlab database ([0ebda6e](https://github.com/cloud-pi-native/socle/commit/0ebda6ebf1b865a791da87d4e485b23ab1671b64))
 * :zap: activation of cnpg Pooler (PgBouncer) for Gitlab database ([e4c084c](https://github.com/cloud-pi-native/socle/commit/e4c084c4b97a160055a90baaa18eb0eb2b42ef6a))
-* :zap: activation of cnpg Pooler (PgBouncer) for Gitlab database ([dcb01e0](https://github.com/cloud-pi-native/socle/commit/dcb01e0b245a98aff86762d70dcd044b3a6cc2ef))
 
 
 ### Bug Fixes
 
-* :art: securityContext settings + replicaCount ([ebb9163](https://github.com/cloud-pi-native/socle/commit/ebb916332f78802bb6cb2bfd9b5adb5e58b303be))
 * :art: securityContext settings + replicaCount ([7613c59](https://github.com/cloud-pi-native/socle/commit/7613c5988ff556f99234e370379ed2033bdce06b))
 
 ## [3.5.1](https://github.com/cloud-pi-native/socle/compare/v3.5.0...v3.5.1) (2025-03-14)
@@ -92,7 +76,6 @@
 
 ### Bug Fixes
 
-* :bug: Fix dso-config initialization ([b83af65](https://github.com/cloud-pi-native/socle/commit/b83af65dc002c0ada2ce2b6d112a843265764200))
 * :bug: Fix dso-config initialization ([2dfdaf9](https://github.com/cloud-pi-native/socle/commit/2dfdaf9ba1c03555b7122b30070c8fe820a161af))
 
 ## [3.5.0](https://github.com/cloud-pi-native/socle/compare/v3.4.0...v3.5.0) (2025-03-13)
@@ -100,14 +83,12 @@
 
 ### Features
 
-* :arrow_up: Upgrade GitLab to version 17.9.2 + adapt some values ([434d8a1](https://github.com/cloud-pi-native/socle/commit/434d8a11a34bd36518d7f8b17b7d9f3217ec1e39))
 * :arrow_up: Upgrade GitLab to version 17.9.2 + adapt some values ([21c5647](https://github.com/cloud-pi-native/socle/commit/21c56474aee4f0ebc1c31b760b0a3d40be5cdec5))
 
 
 ### Bug Fixes
 
 * :bug: GitLab value indentation ([3698627](https://github.com/cloud-pi-native/socle/commit/3698627aa8d18f0ff9ea1f51ea04d6b7fa325f26))
-* :bug: remove duplicate spec: ([9dddcdc](https://github.com/cloud-pi-native/socle/commit/9dddcdc7493c8c524496f81fd8fafb66782b5691))
 * :bug: remove duplicate spec: ([83c77d2](https://github.com/cloud-pi-native/socle/commit/83c77d286ef0d407d4e499a8bfd4ec184a1b1606))
 
 ## [3.4.0](https://github.com/cloud-pi-native/socle/compare/v3.3.1...v3.4.0) (2025-03-05)

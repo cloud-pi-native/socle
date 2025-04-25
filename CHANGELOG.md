@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.9.0](https://github.com/cloud-pi-native/socle/compare/v3.8.0...v3.9.0) (2025-04-25)
+
+
+### Features
+
+* :sparkles: add observatorium deployment ([#485](https://github.com/cloud-pi-native/socle/issues/485)) ([32ea268](https://github.com/cloud-pi-native/socle/commit/32ea26876b9653e6df02eb6216efe8ca51133c7b))
+* :sparkles: use helm values for service and pod monitor label ([5e720b1](https://github.com/cloud-pi-native/socle/commit/5e720b1ee3fc704dbb671939ec7ec6e91e72990c))
+
 ## [3.8.0](https://github.com/cloud-pi-native/socle/compare/v3.7.1...v3.8.0) (2025-04-24)
 
 

@@ -572,6 +572,7 @@ spec:
                         endpoint:
                           description: Endpoint where logs are aggregated for this environment.
                           type: string
+                      type: object
                     metrics:
                       description: Configuration for metrics feature.
                       properties:

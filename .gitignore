@@ -10,3 +10,6 @@ node_modules
 .venv/
 .vscode/
 pyvenv.cfg
+
+**/Chart.lock
+**/charts/*

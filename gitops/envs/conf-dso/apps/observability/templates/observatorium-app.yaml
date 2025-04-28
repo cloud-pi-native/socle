@@ -5,22 +5,21 @@ metadata:
   namespace: infra-argocd
 spec:
   destination:
-    namespace: {{ dsc.observatorium.namespace }}
+    namespace: dso-observability
     server: https://kubernetes.default.svc
   project: default
   sources:
   - chart: observatorium
-    repoURL: {{ dsc.observatorium.helmRepoUrl }}
-    targetRevision: {{ dsc.observatorium.chartVersion }}
+    repoURL: https://cloud-pi-native.github.io/helm-charts
+    targetRevision: 0.5.2
     helm:  
-      values: {% raw %}|
+      values: |
         {{ .Values.observatorium | toYaml | nindent 8 }}
-{% endraw %}
       valueFiles:
       - ./values.yaml
       - $tenants/helm/values.yaml
   - ref: tenants
-    repoURL: "https://{{ gitlab_domain }}/observability/observability.git"
+    repoURL: "https://gitlab.sdid-hp.cpin.numerique-interieur.com/observability/observability.git"
     targetRevision: main
   syncPolicy:
     automated: {}

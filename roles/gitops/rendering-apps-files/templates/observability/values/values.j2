@@ -3,14 +3,14 @@ observatorium:
     enabled: true
     ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#ingress | jsonPath {.ingressClassName}>
     hosts:
-      - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#ingress | jsonPath {.domain}>
+      - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
         paths:
           - path: /
             pathType: ImplementationSpecific
     tls:
       - hosts:
           - <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
-        secretName: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#ingress | jsonPath {.domain}>-tls
+        secretName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>-tls
 
   api:
     loglevel: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.loglevel}>
@@ -21,11 +21,11 @@ observatorium:
       groups: [/admin]
       # Default oidc config
       clientID: "account"
-      issuerURL: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#domain | jsonPath {.keycloak}>/realms/dso
+      issuerURL: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
       usernameClaim: "preferred_username"
       groupClaim: "groups"
   logs:
-    enabled: true
+    enabled: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.enabled}>
     read:
       endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
     tail:

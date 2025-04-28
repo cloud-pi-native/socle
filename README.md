@@ -52,6 +52,7 @@
   - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
     - [Harbor GitOps](#harbor-gitops)
     - [Vault GitOps](#vault-gitops)
+    - [Nexus GitOps](#nexus-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1433,6 +1434,20 @@ kubectl delete sts conf-dso-vault
 Puis lancer le playbook de post-installation.
 ```
 ansible-playbook install-gitops.yaml -t post-install-vault
+```
+
+### Nexus GitOps
+
+Lors de la migration, afin de résoudre les conflits survenant lors du déploiement initial Helm sur la ressource Nexus existante, il est nécessaire d'exécuter les commandes suivantes :
+
+```
+KIND=service
+NAME=nexus
+RELEASE=nexus
+NAMESPACE=dso-nexus
+kubectl annotate $KIND $NAME meta.helm.sh/release-name=$RELEASE --namespace=$NAMESPACE
+kubectl annotate $KIND $NAME meta.helm.sh/release-namespace=$NAMESPACE --namespace=$NAMESPACE
+kubectl label $KIND $NAME app.kubernetes.io/managed-by=Helm --namespace=$NAMESPACE
 ```
 
 ## Contributions

@@ -1,0 +1,27 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docker-proxy
+  namespace: dso-nexus
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  labels:
+    app: nexus
+spec:
+  tls:
+  - hosts:
+    - <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.nexusDockerProxy}>
+    secretName: nexus-docker-proxy-tls-secret
+  ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
+  rules:
+    - host: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.nexusDockerProxy}>
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nexus
+                port:
+                  name: dockerproxy

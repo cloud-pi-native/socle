@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  generation: 1
+  labels:
+    app: nexus
+  name: nexus
+  namespace: {{ dsc.nexus.namespace }}
+spec:
+  endpoints:
+  - basicAuth:
+      username:
+        name: admin-creds
+        key: username
+      password:
+        name: admin-creds
+        key: password
+    interval: 15s
+    path: /service/metrics/prometheus
+    port: http
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.nexus.namespace }}
+  selector:
+    matchLabels:
+      app: nexus

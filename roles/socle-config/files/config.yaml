@@ -81,9 +81,10 @@ spec:
     namespace: dso-grafana
     subDomain: grafana
     grafanaPvcSize: 5Gi
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
   grafanaOperator:
     namespace: dso-grafana-operator
-    ociChartUrl: oci://ghcr.io/grafana/helm-charts/grafana-operator
+    ociChartUrl: oci://ghcr.io/grafana/helm-charts
     values: {}
   harbor:
     namespace: dso-harbor
@@ -129,7 +130,7 @@ spec:
     forcedInstall: false
     values: {}
   observatorium:
-    namespace: dso-observability
+    namespace: dso-observatorium
     subDomain: observatorium
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}

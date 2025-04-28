@@ -13,6 +13,7 @@ envs:
             keycloak: "{{ keycloak_domain }}"
             vault: "{{ vault_domain }}"
             console: "{{ console_domain }}"
+            grafana: "{{ grafana_domain }}"
             observatorium: "{{ observatorium_domain }}"
             sonarqube: "{{ sonar_domain }}"
             harbor: "{{ harbor_domain }}"

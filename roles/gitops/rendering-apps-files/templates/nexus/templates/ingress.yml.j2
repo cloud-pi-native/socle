@@ -1,0 +1,38 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nexus-alternative
+  namespace: {{ dsc.nexus.namespace }}
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+    app: nexus
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+spec:
+{% if not dsc.ingress.tls.type == 'none' %}
+  tls:
+  - hosts:
+    - <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexus}>
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: nexus-tls-secret
+{% endif %}
+{% endif %}
+  ingressClassName: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>"
+  rules:
+    - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexus}>
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ dsc.nexus.release }}
+                port:
+                  name: http

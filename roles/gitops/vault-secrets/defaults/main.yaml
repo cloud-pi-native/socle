@@ -16,6 +16,8 @@ envs:
             harbor: "{{ harbor_domain }}"
             harborNotary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"
             keycloak: "{{ keycloak_domain }}"
+            nexus: "{{ nexus_domain }}"
+            nexusDockerProxy: "{{ dsc.nexus.subDomain }}-docker-proxy{{ root_domain }}"
             observatorium: "{{ observatorium_domain }}"
             sonarqube: "{{ sonar_domain }}"
             vault: "{{ vault_domain }}"
@@ -70,6 +72,10 @@ envs:
           auth:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
             monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+      - argocd_app: "nexus"
+        vault_values:
+          auth:
+            adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
       - argocd_app: "harbor"
         vault_values:
           global:

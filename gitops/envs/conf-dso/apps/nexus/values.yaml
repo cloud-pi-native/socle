@@ -1,0 +1,121 @@
+nexus:
+  replicaCount: 1
+nexus3:
+  config:
+    anonymous:
+      enabled: true
+      roles:
+      - new-anon
+    blobStores:
+    - name: dso
+      path: /nexus-data-docker/dso
+      softQuota:
+        limit: 1073741824
+        type: spaceRemainingQuota
+      type: file
+    - name: data-claim
+      path: /nexus-data-claim/blobs/default
+      softQuota:
+        limit: 1073741824
+        type: spaceRemainingQuota
+      type: file
+    cleanup:
+    - criteria:
+        lastDownloaded: '1209600'
+      format: docker
+      mode: delete
+      name: DSOdockerCleanupPolicy
+      notes: ''
+    enabled: true
+    job:
+      image:
+        pullPolicy: IfNotPresent
+        repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+          {.repository.docker}>/alpine/k8s
+        tag: 1.31.2
+      ttlSecondsAfterFinished: 600
+    realms:
+      enabled: true
+      values:
+      - NexusAuthenticatingRealm
+      - DockerToken
+    repos: null
+    roles:
+    - description: new-anon
+      id: new-anon
+      name: new-anon
+      privileges:
+      - nx-repository-view-docker-*-browse
+      - nx-repository-view-docker-*-read
+      roles: []
+    tasks:
+    - attributes:
+        deployOffset: '24'
+        repositoryName: dso-dockerhub-proxy
+      crontab: 0 30 0 * * ?
+      name: Clean Docker unused stuff
+      typeId: repository.docker.gc
+    - attributes:
+        age: '24'
+      crontab: 0 20 0 * * ?
+      name: Clean Docker uploads
+      typeId: repository.docker.upload-purge
+    - attributes:
+        blobstoreName: dso
+      crontab: 0 10 1 * * ?
+      name: Compact DSO Blob Store
+      typeId: blobstore.compact
+    users:
+    - emailAddress: anonymous@example.org
+      firstName: Anonymous
+      lastName: User
+      readOnly: true
+      roles:
+      - new-anon
+      source: default
+      status: active
+      userId: anonymous
+  env: null
+  extraVolumeMounts:
+  - mountPath: /nexus-data-docker
+    name: nexus-data-proxy-cache
+  - mountPath: /nexus-data-claim
+    name: nexus-data-claim
+  extraVolumes:
+  - name: nexus-data-proxy-cache
+    persistentVolumeClaim:
+      claimName: nexus-data-proxy-cache
+  - name: nexus-data-claim
+    persistentVolumeClaim:
+      claimName: nexus-data-claim
+  fullnameOverride: nexus
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  persistence:
+    accessMode: ReadWriteOnce
+    annotations: {}
+    enabled: true
+    retainDeleted: true
+    retainScaled: true
+    size: 250Gi
+  podSecurityContext:
+    fsGroup: 200
+    runAsNonRoot: true
+  rootPassword:
+    key: password
+    secret: admin-creds
+  securityContext:
+    runAsGroup: 200
+    runAsNonRoot: true
+    runAsUser: 200
+  service:
+    additionalPorts:
+    - containerPort: 5000
+      hosts:
+      - <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.nexusDockerProxy}>
+      name: dockerproxy
+      port: 5000
+    port: 8081
+    type: ClusterIP

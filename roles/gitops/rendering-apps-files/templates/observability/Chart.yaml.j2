@@ -3,4 +3,7 @@ apiVersion: v2
 name: observability
 type: application
 version: 1.0.0
-
+dependencies:
+- name: grafana-operator    
+  repository: "{{ dsc.grafanaOperator.ociChartUrl }}"
+  version: "{{ dsc.grafanaOperator.chartVersion }}"

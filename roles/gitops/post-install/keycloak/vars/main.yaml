@@ -85,6 +85,9 @@ keycloak_clients:
       - https://{{ grafana_domain }}
     defaultClientScopes:
       - generic
+      - email
+      - offline_access
+      - profile
     publicClient: false
 
   - clientId: vault-client

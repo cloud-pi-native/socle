@@ -1,25 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observatorium
+  name: grafana
   namespace: infra-argocd
 spec:
   destination:
-    namespace: dso-observatorium
+    namespace: {{ dsc.grafana.namespace }}
     server: https://kubernetes.default.svc
   project: default
   sources:
-  - chart: observatorium
-    repoURL: https://cloud-pi-native.github.io/helm-charts
-    targetRevision: 0.5.2
+  - chart: dso-grafana
+    repoURL: {{ dsc.grafana.helmRepoUrl }}
+    targetRevision: {{ dsc.grafana.chartVersion }}
     helm:  
-      values: |
-        {{ .Values.observatorium | toYaml | nindent 8 }}
+      values: {% raw %}|
+        {{ .Values.grafana | toYaml | nindent 8 }}
+{% endraw %}
       valueFiles:
       - ./values.yaml
       - $tenants/helm/values.yaml
   - ref: tenants
-    repoURL: "https://gitlab.sdid-hp.cpin.numerique-interieur.com/observability/observability.git"
+    repoURL: "https://{{ gitlab_domain }}/observability/observability.git"
     targetRevision: main
   syncPolicy:
     automated:

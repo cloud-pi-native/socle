@@ -845,6 +845,12 @@ spec:
                     imageVersion:
                       description: Grafana release version (e.g., "9.5.5").
                       type: string
+                    helmRepoUrl:
+                      description: DSO Grafana instances helm repository url.
+                      type: string
+                    chartVersion:
+                      description: DSO Grafana instances release version (e.g., "9.5.5").
+                      type: string
                   type: object
                 grafanaDatasource:
                   description: Configuration for Grafana default Datasource.

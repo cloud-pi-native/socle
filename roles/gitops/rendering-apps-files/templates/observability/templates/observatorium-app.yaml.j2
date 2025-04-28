@@ -23,4 +23,10 @@ spec:
     repoURL: "https://{{ gitlab_domain }}/observability/observability.git"
     targetRevision: main
   syncPolicy:
-    automated: {}
+    automated:
+      prune: true
+    #  selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true

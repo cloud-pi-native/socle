@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  tsl.crt: <path:forge-dso/data/env/conf-dso/apps/common/values#exposedCa | base64encode>
+kind: Secret
+metadata:
+  annotations:
+    avp.kubernetes.io/remove-missing: 'true'
+  name: exposed-ca
+type: Opaque

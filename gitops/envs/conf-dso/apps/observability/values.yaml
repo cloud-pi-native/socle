@@ -1,0 +1,62 @@
+observatorium:
+  api:
+    config:
+      clientID: account
+      groupClaim: groups
+      groups:
+      - /admin
+      id: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#api | jsonPath
+        {.config.id}>
+      issuerURL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain
+        | jsonPath {.keycloak}>/realms/dso
+      name: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#api | jsonPath
+        {.config.name}>
+      usernameClaim: preferred_username
+    loglevel: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#api | jsonPath
+      {.loglevel}>
+  ingress:
+    enabled: true
+    hosts:
+    - host: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+        {.observatorium}>
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+    ingressClassName: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#ingress
+      | jsonPath {.ingressClassName}>
+    tls:
+    - hosts:
+      - <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.observatorium}>
+      secretName: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+        {.observatorium}>-tls
+  logs:
+    enabled: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#logs | jsonPath
+      {.enabled}>
+    read:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#logs |
+        jsonPath {.endpoint}>
+    rules:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#logs |
+        jsonPath {.endpoint}>
+    tail:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#logs |
+        jsonPath {.endpoint}>
+    write:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#logs |
+        jsonPath {.endpoint}>
+  metrics:
+    alertmanager:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#metrics
+        | jsonPath {.endpoint}>
+    enabled: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#metrics |
+      jsonPath {.enabled}>
+    read:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#metrics
+        | jsonPath {.endpoint}>
+    rules:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#metrics
+        | jsonPath {.endpoint}>
+    tenantHeader: X-Scope-OrgId
+    write:
+      endpoint: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#metrics
+        | jsonPath {.endpoint}>

@@ -130,7 +130,7 @@ spec:
     forcedInstall: false
     values: {}
   observatorium:
-    namespace: dso-observability
+    namespace: dso-observatorium
     subDomain: observatorium
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}

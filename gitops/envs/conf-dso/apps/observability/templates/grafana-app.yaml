@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observatorium
+  name: grafana
   namespace: infra-argocd
 spec:
   destination:
-    namespace: dso-observatorium
+    namespace: dso-grafana
     server: https://kubernetes.default.svc
   project: default
   sources:
-  - chart: observatorium
+  - chart: dso-grafana
     repoURL: https://cloud-pi-native.github.io/helm-charts
-    targetRevision: 0.5.2
+    targetRevision: 1.0.0
     helm:  
       values: |
-        {{ .Values.observatorium | toYaml | nindent 8 }}
+        {{ .Values.grafana | toYaml | nindent 8 }}
       valueFiles:
       - ./values.yaml
       - $tenants/helm/values.yaml

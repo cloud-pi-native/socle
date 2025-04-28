@@ -46,6 +46,7 @@ sonarqube:
   adminJobAnnotations: {}
   curlContainerImage: <path:forge-dso/data/env/conf-dso/apps/common/values#image |
     jsonPath {.repository.docker}>/curlimages/curl:8.11.0
+  fullnameOverride: sonarqube-sonarqube
   image:
     pullPolicy: IfNotPresent
     repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
@@ -76,7 +77,7 @@ sonarqube:
     jdbcSecretName: pg-cluster-sonar-app
     jdbcSecretPasswordKey: password
     jdbcUrl: jdbc:postgresql://pg-cluster-sonar-rw/sonardb?socketTimeout=1500
-    jdbcUsername: dso_admin
+    jdbcUsername: dsoadmin
   jvmCeOpts: -javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=ce
   jvmOpts: -javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=web
   monitoringPasscodeSecretKey: monitoring-password

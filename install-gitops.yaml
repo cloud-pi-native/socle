@@ -64,6 +64,7 @@
       tags:
         - rendering-apps-files
         - apps-files
+        - post-install
         - post-install-vault
         - vault-secrets-post-install
 

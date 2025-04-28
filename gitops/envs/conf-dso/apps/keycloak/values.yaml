@@ -70,6 +70,7 @@ keycloak:
   extraEnvVarsCM: ''
   extraEnvVarsSecret: ''
   extraStartupArgs: ''
+  fullnameOverride: keycloak
   httpRelativePath: /
   image:
     pullPolicy: IfNotPresent

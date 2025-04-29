@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.10.0](https://github.com/cloud-pi-native/socle/compare/v3.9.1...v3.10.0) (2025-04-29)
+
+
+### Features
+
+* :sparkles: enable registry-1.docker.io argo login ([f62a90c](https://github.com/cloud-pi-native/socle/commit/f62a90c20a61ecc544d57604d5a387114311f6c3))
+* :sparkles: Harbor GitOps install ([7d78602](https://github.com/cloud-pi-native/socle/commit/7d78602fa66090169cbc44629890675d6af88734))
+* :sparkles: Vault Gitops deployment ([14c4a0e](https://github.com/cloud-pi-native/socle/commit/14c4a0e3bedbbc9dfd1e49e3b2da1ea245e2df44))
+
+
+### Bug Fixes
+
+* :bug: fixing generated yaml for observatorium ([b48cd44](https://github.com/cloud-pi-native/socle/commit/b48cd448688278d35a4465321fafc1b453393fc4))
+* :wrench: fullnameOverride ([4ca8dba](https://github.com/cloud-pi-native/socle/commit/4ca8dbae831d2117291f5d75e90a0247dba81138))
+* **1580:** Fix Ephemeral storage issue ([f0e9efa](https://github.com/cloud-pi-native/socle/commit/f0e9efa73a8f454d22344ba905e563f9a611586c))
+
 ## [3.9.1](https://github.com/cloud-pi-native/socle/compare/v3.9.0...v3.9.1) (2025-04-25)
 
 

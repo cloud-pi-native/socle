@@ -1,0 +1,21 @@
+{% if use_private_registry %}
+certmanager:
+  image:
+    repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/cert-manager-controller"
+
+  webhook:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/cert-manager-webhook"
+
+  cainjector:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/cert-manager-cainjector"
+
+  acmesolver:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/cert-manager-acmesolver"
+
+  startupapicheck:
+    image:
+      repository: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/cert-manager-startupapicheck"
+{% endif %}

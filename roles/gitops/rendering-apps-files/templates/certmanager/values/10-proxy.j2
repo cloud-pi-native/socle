@@ -1,0 +1,6 @@
+{% if dsc.proxy.enabled %}
+certmanager:
+    http_proxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+    https_proxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+    no_proxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,.{{ dsc.vault.namespace }}-internal"
+{% endif %}

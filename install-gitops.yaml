@@ -8,6 +8,10 @@
       tags:
         - always
 
+    - role: check-prerequisite
+      tags:
+        - check-prerequisite
+
     - role: ca
       tags:
         - always

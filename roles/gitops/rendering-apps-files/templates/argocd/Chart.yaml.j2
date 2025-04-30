@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: argocd
+type: application
+version: {{ dsc.argocd.chartVersion }}
+dependencies:
+- name: argo-cd
+  alias: argocd
+  version: {{ dsc.argocd.chartVersion }}
+  repository: {{ dsc.argocd.helmRepoUrl }}

@@ -1,0 +1,20 @@
+{% if dsc.proxy.enabled %}
+argocd:
+  server:
+    env: &extraEnvVars
+      - name: HTTP_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+      - name: HTTPS_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+      - name: NO_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,{{ dsc_name }}-argocd-repo-server
+      - name: GIT_HTTP_PROXY_AUTHMETHOD
+        value: basic 
+  
+  applicationSet:
+    extraEnv: *extraEnvVars
+  controller:
+    env: *extraEnvVars
+  repoServer:
+    env: *extraEnvVars
+{% endif %}

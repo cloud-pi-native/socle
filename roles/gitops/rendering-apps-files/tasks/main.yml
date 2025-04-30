@@ -1,4 +1,7 @@
 ---
+- name: Preliminary tasks
+  ansible.builtin.include_tasks: ./preliminary.yml
+
 - name: Loop over services to render templates
   ansible.builtin.include_tasks: ./template.yml
   loop: "{{ envs | subelements('apps') }}"
@@ -14,3 +17,4 @@
           - argocd_app: sonarqube
           - argocd_app: observability
           - argocd_app: harbor
+          - argocd_app: argocd

@@ -1,0 +1,36 @@
+---
+- name: Get Argo CD app version
+  block:
+    - name: Add Argo CD helm repo
+      changed_when: false
+      kubernetes.core.helm_repository:
+        name: argo
+        repo_url: "{{ dsc.argocd.helmRepoUrl }}"
+        force_update: true
+
+    - name: Retrieve Argo CD Helm infos
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          helm search repo -l argo --version "{{ dsc.argocd.chartVersion }}" | tail -n 1
+        executable: /bin/bash
+      register: argo_infos
+
+    - name: Set argo_app_version fact
+      ansible.builtin.set_fact:
+        argo_app_version: "{{ argo_infos.stdout | regex_search('v([0-9]*\\.)+([0-9]+)') }}"
+
+- name: Find argo crd existence
+  kubernetes.core.k8s_info:
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: applications.argoproj.io
+  register: argocd_crd
+
+- name: Set argo_infra_ownership fact
+  ansible.builtin.set_fact:
+    argo_infra_ownership: >-
+      {{ (argocd_crd.resources | length > 0 and
+          'meta.helm.sh/release-namespace' in argocd_crd.resources[0].metadata.annotations and
+          argocd_crd.resources[0].metadata.annotations['meta.helm.sh/release-namespace'] == "{{ dsc.argocdInfra.namespace }}") | bool }}

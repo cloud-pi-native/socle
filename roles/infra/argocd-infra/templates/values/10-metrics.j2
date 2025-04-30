@@ -4,10 +4,12 @@ redis-ha:
     enabled: true
     serviceMonitor:
       enabled: true
+      image: ghcr.io/oliver006/redis_exporter
       namespace: "{{ dsc.argocdInfra.namespace }}"
   haproxy:
     metrics:
       enabled: true
+      image: docker.io/library/haproxy
       serviceMonitor:
         enabled: true
         namespace: "{{ dsc.argocdInfra.namespace }}"

@@ -1,35 +1,17 @@
 cpn-cnpg:
-  backup:
-    compression: gzip
-    destinationPath: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-      | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
-    enabled: true
-    endpointURL: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-      | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
-    retentionPolicy: 14d
-    s3Credentials:
-      accessKeyId:
-        key: accessKeyId
-        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.accessKeyId.value}>
-      create: true
-      secretAccessKey:
-        key: secretAccessKey
-        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
-          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.secretAccessKey.value}>
-      secretName: pg-cluster-backup
   dbName: keycloak
   imageName: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
     {.repository.ghcr}>/cloudnative-pg/postgresql:16.1
   monitoring:
-    enabled: false
+    enabled: true
+    podMonitorAdditionalLabels:
+      test: test
+      testttttt: tttttt
   nameOverride: pg-cluster-keycloak
   parameters:
-    max_slot_wal_keep_size: 14GB
     max_worker_processes: '60'
   pvcSize:
-    data: 15Gi
-    wal: 15Gi
+    data: 5Gi
   username: keycloak
 keycloak:
   args: []
@@ -67,6 +49,12 @@ keycloak:
     value: Ministere<br/>de l'interieur
   - name: DSFR_THEME_CONTACT_EMAIL
     value: cloudpinative-relations@interieur.gouv.fr
+  - name: HTTP_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.httpProxy}>
+  - name: HTTPS_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.httpsProxy}>
+  - name: NO_PROXY
+    value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.noProxy}>
   extraEnvVarsCM: ''
   extraEnvVarsSecret: ''
   extraStartupArgs: ''
@@ -77,7 +65,6 @@ keycloak:
     registry: docker.io
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
       route.openshift.io/termination: edge
     apiVersion: ''
     enabled: true
@@ -102,6 +89,16 @@ keycloak:
       | jsonPath {.pluginDownloadUrl}>
     command:
     - sh
+    env:
+    - name: HTTP_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.httpProxy}>
+    - name: HTTPS_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.httpsProxy}>
+    - name: NO_PROXY
+      value: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath
+        {.noProxy}>
     image: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1
     imagePullPolicy: IfNotPresent
     name: realm-ext-provider
@@ -122,7 +119,7 @@ keycloak:
     level: INFO
     output: default
   metrics:
-    enabled: false
+    enabled: true
     prometheusRule:
       enabled: false
       groups:
@@ -295,6 +292,9 @@ keycloak:
       - path: /metrics
       - path: /realms/master/metrics
       - path: /realms/dso/metrics
+      labels:
+        test: test
+        testttttt: tttttt
       port: http
   networkPolicy:
     additionalRules: {}

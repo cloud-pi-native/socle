@@ -89,11 +89,17 @@
         - post-install
         - post-install-harbor
 
+    - role: gitops/post-install/gitlab
+      tags:
+        - post-install
+        - post-install-gitlab
+        - vault-secrets-post-install
+
     - role: gitops/post-install/vault
       tags:
         - post-install
         - post-install-vault
-        - vault-secrets-post-install
+#        - vault-secrets-post-install
 
   tasks:
     - name: Gitlab post-install

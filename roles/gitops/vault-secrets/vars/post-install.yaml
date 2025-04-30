@@ -35,6 +35,9 @@ envs:
             vault:
               id: "{{ vault_client_id | default('') }}"
               secret: "{{ vault_client_secret | default('') }}"
+      - argocd_app: "gitlab"
+        vault_values:
+          gitlabToken: "{{ gitlab_token | default('') }}"
       - argocd_app: "vault"
         vault_values:
           backupSecrets:

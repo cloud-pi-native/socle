@@ -12,6 +12,7 @@
     { "app": "vault", "enabled": "true", "namespace": "vault", "syncWave": 10 },
     { "app": "sonarqube", "enabled": "true", "namespace": "sonarqube", "syncWave": 10 },
     { "app": "harbor", "enabled": "true", "namespace": "harbor", "syncWave": 10 },
-    { "app": "observability", "enabled": "true", "namespace": "observability", "syncWave": 10 }
+    { "app": "observability", "enabled": "true", "namespace": "observability", "syncWave": 10 },
+    { "app": "cert-manager", "enabled": "true", "namespace": "cert-manager", "syncWave": 10 }
   ]
 }

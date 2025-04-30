@@ -9,7 +9,9 @@ envs:
             repository:
               docker: "{{ dsc.global.registry | default('docker.io') }}"
               ghcr: "{{ dsc.global.registry | default('ghcr.io') }}"
+              quay: "{{ dsc.global.registry | default('quay.io') }}"
           domain:
+            argocd: "{{ argocd_domain }}"
             console: "{{ console_domain }}"
             gitlab: "{{ gitlab_domain }}"
             grafana: "{{ grafana_domain }}"
@@ -38,6 +40,9 @@ envs:
                     value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
                   secretAccessKey:
                     value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
+          dockerAccount:
+            username: "{{ dsc.global.dockerAccount.username | default('') }}"
+            password: "{{ dsc.global.dockerAccount.password | default('') }}"
       - argocd_app: "keycloak"
         vault_values:
           auth:
@@ -83,3 +88,7 @@ envs:
           cnpg:
             username: "{{ 'harbor' if dsc.harbor.cnpg.initPassword else (pg_harbor_db_secret.resources[0].data.username | b64decode) }}"
             password: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) if dsc.harbor.cnpg.initPassword else (pg_harbor_db_secret.resources[0].data.password | b64decode) }}"
+      - argocd_app: "argocd"
+        vault_values:
+          auth:
+            argocdServerAdminPassword: "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"

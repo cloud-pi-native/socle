@@ -1,0 +1,7 @@
+{% if dsc.exposedCA.type != 'none' %}
+argocd:
+  configs:
+    tls:
+      certificates:
+        {{ gitlab_domain }}: <path:{{ vaultinfra_kv_name }}/data/env/conf-dso/apps/common/values#exposedCa>
+{% endif %}

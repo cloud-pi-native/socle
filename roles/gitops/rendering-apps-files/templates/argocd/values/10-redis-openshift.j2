@@ -1,0 +1,8 @@
+{% if dsc.global.platform == "openshift" %}
+argocd:
+  redis-ha:
+    global:
+      compatibility:
+        openshift:
+          adaptSecurityContext: auto
+{% endif %}

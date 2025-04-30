@@ -52,6 +52,7 @@
 - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
   - [Harbor GitOps](#harbor-gitops)
   - [Vault GitOps](#vault-gitops)
+  - [Argocd GitOps](#argocd-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1026,9 +1027,9 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur un [applicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) Argo CD déployant lui-même les applications du socle, en fonction d'un environnement donné et des paramètres qui le caractérisent.
 
-Pour l'instant **seuls les déploiements de Keycloak, Sonarqube, Harbor, Vault, Gitlab-runner et Glexporter** sont gérés en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
+Pour l'instant **seuls les déploiements de Keycloak, Sonarqube, Harbor, Vault, Gitlab-runner, Glexporter et Argocd** sont gérés en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
 
-Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak, Sonarqube, Harbor, Vault (nécessite Gitlab pour la post-configuration), Gitlab-runner et Glexporter en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
+Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak, Sonarqube, Harbor, Vault (nécessite Gitlab pour la post-configuration), Gitlab-runner, Glexporter et Argocd en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
 
 ### Prérequis
 
@@ -1330,7 +1331,7 @@ en
 spec:
   selector:
     matchLabels:
-      release: dso-harbor
+      release: {{ dsc.global.gitOps.envName }}-dso-harbor
 ```
 Pour résoudre, il suffit de supprimer les deployments et statefulsets
 ```
@@ -1363,7 +1364,7 @@ en
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/instance: dso-vault
+      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-dso-vault
 ```
 Pour résoudre, il suffit de supprimer les deployments et statefulsets avant de synchroniser sur Argocd.
 ```
@@ -1373,6 +1374,34 @@ kubectl delete sts conf-dso-vault
 Puis lancer le playbook de post-installation.
 ```
 ansible-playbook install-gitops.yaml -t post-install-vault
+```
+
+### Argocd GitOps
+
+Il y aura potentiellement des erreurs de ce type pour les statefulsets `conf-dso-redis-ha-server` et `conf-dso-argocd-application-controller` et pour les deployments `conf-dso-argocd-applicationset-controller`, `conf-dso-argocd-repo-server`, `conf-dso-argocd-server` et `conf-dso-redis-ha-haproxy`.
+
+```
+Failed to compare desired state to live state: failed to calculate diff: error calculating server side diff: serverSideDiff error: error running server side apply in dryrun mode for resource Deployment/conf-dso-redis-ha-haproxy: Deployment.apps "conf-dso-redis-ha-haproxy" is invalid: spec.selector: Invalid value: v1.LabelSelector{MatchLabels:v1.LabelSelectorRequirement(nil)}: field is immutable
+```
+
+Ceci étant du à un changement du champ immutable
+```
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: conf-dso-argocd
+```
+en
+```
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-dso-argocd
+```
+Pour résoudre, il suffit de supprimer les deployments et statefulsets avant de synchroniser sur Argocd.
+```
+kubectl delete deploy conf-dso-argocd-applicationset-controller conf-dso-argocd-repo-server conf-dso-argocd-server conf-dso-redis-ha-haproxy
+kubectl delete sts conf-dso-redis-ha-server conf-dso-argocd-application-controller
 ```
 
 ## Contributions

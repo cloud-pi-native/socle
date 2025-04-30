@@ -12,6 +12,7 @@ envs:
               gitlab: "{{ dsc.global.registry | default('registry.gitlab.com') }}"
               quay: "{{ dsc.global.registry | default('quay.io') }}"
           domain:
+            argocd: "{{ argocd_domain }}"
             console: "{{ console_domain }}"
             gitlab: "{{ gitlab_domain }}"
             grafana: "{{ grafana_domain }}"
@@ -42,6 +43,9 @@ envs:
                     value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
                   secretAccessKey:
                     value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
+          dockerAccount:
+            username: "{{ dsc.global.dockerAccount.username | default('') }}"
+            password: "{{ dsc.global.dockerAccount.password | default('') }}"
       - argocd_app: "keycloak"
         vault_values:
           auth:
@@ -105,3 +109,6 @@ envs:
                 and pg_harbor_db_secret.resources | length > 0
                 else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
               }}
+      - argocd_app: "argocd"
+        vault_values:
+          argocdServerAdminPassword: "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"

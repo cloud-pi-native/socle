@@ -1,0 +1,19 @@
+argocd:
+  image:
+    repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>
+  
+  redis:
+    image:
+      repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>
+
+  redis-ha:
+    image:
+      repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/library/redis
+      tag: 7.4.1-alpine
+
+{% if use_image_pull_secrets %}
+argocd:
+  global:
+    imagePullSecrets:
+    - dso-config-pull-secret
+{% endif %}

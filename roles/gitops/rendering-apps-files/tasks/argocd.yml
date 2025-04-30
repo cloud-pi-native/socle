@@ -1,0 +1,38 @@
+---
+- name: Add development-only RBAC line
+  when: dsc.global.environment == 'development'
+  ansible.builtin.set_fact:
+    values: >-
+      {{
+        values | combine({
+          'argocd': values.argocd | combine({
+            'configs': values.argocd.configs + 'p, cpin-sa, applications, *, *, allow' | indent(4, true)
+          })
+        }, recursive=True)
+      }}
+
+- name: Add rootCA
+  when: dsc.exposedCA.type != 'none'
+  ansible.builtin.set_fact:
+    values: >-
+      {{
+        values | combine({
+          'argocd': values.argocd | combine({
+            'cm': values.argocd.cm + values.argocd.rootCA_block | indent(2, true)
+          })
+        }, recursive=True)
+      }}
+
+- name: Inject rbac block under configs
+  ansible.builtin.blockinfile:
+    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    insertafter: '^  configs:\s*$'
+    block: "{{ values.argocd.configs | indent(4, true) }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: rbac"
+
+- name: Inject resource.exclusions and oidc.config block under cm
+  ansible.builtin.blockinfile:
+    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    insertafter: '^    cm:\s*$'
+    block: "{{ values.argocd.cm | indent(6, true) }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: resource.exclusions and oidc.config"

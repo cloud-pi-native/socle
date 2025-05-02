@@ -18,6 +18,7 @@ envs:
             keycloak: "{{ keycloak_domain }}"
             observatorium: "{{ observatorium_domain }}"
             sonarqube: "{{ sonar_domain }}"
+            vault: "{{ vault_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
@@ -45,8 +46,6 @@ envs:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
       - argocd_app: "observatorium"
         vault_values:
-          ingress:
-            ingressClassName: "{{ dsc.ingress.className | default('') }}"
           api:
             loglevel: info
             config:

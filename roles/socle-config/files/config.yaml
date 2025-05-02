@@ -18,7 +18,7 @@ spec:
     values: {}
   certmanager:
     helmRepoUrl: https://charts.jetstack.io
-    namespace: dso-certmanager
+    namespace: cert-manager
     forcedInstall: false
     values: {}
   cloudnativepg:

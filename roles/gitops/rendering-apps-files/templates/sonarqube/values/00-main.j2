@@ -20,7 +20,7 @@ sonarqube:
 {% endfor %}
     # This property allows for reports up to a certain size to be uploaded to SonarQube
       nginx.ingress.kubernetes.io/proxy-body-size: "64m"
-    ingressClassName: {{ dsc.ingress.className | default('') }}
+    ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
     labels:
       app: "sonar"
   

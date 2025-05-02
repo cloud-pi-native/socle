@@ -24,7 +24,7 @@ spec:
       secretName: vault-tls-secret
 {% endif %}
 {% endif %}
-  ingressClassName: {{ dsc.ingress.className | default('') }}
+  ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
   rules:
     - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.vault}>
       http:

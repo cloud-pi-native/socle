@@ -85,7 +85,7 @@ keycloak:
 
   ingress:
     enabled: true
-    ingressClassName: {{ dsc.ingress.className | default('') }}
+    ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
     pathType: "Prefix"
     apiVersion: ""
     hostname: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>

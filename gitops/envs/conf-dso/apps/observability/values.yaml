@@ -46,8 +46,7 @@ observatorium:
       paths:
       - path: /
         pathType: ImplementationSpecific
-    ingressClassName: <path:forge-dso/data/env/conf-dso/apps/observatorium/values#ingress
-      | jsonPath {.ingressClassName}>
+    ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
     tls:
     - hosts:
       - <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.observatorium}>

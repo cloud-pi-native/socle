@@ -4,7 +4,7 @@ harbor:
     imagePullPolicy: IfNotPresent
     type: ingress
     ingress:
-      className: {{ dsc.ingress.className | default('') }}
+      className: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
       hosts:
         core: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
         notary: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harborNotary}>

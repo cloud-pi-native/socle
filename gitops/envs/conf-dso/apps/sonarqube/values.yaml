@@ -61,7 +61,7 @@ sonarqube:
         {.sonarqube}>
       path: /
       pathType: Prefix
-    ingressClassName: nginx
+    ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
     labels:
       app: sonar
     tls:

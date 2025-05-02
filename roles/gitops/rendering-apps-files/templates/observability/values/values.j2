@@ -1,7 +1,7 @@
 observatorium:
   ingress:
     enabled: true
-    ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#ingress | jsonPath {.ingressClassName}>
+    ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
     hosts:
       - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
         paths:

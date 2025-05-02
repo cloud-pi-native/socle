@@ -13,7 +13,7 @@ spec:
     - hosts:
         - <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.vault}>
       secretName: vault-tls-secret
-  ingressClassName: nginx
+  ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
   rules:
     - host: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.vault}>
       http:

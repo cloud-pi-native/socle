@@ -10,14 +10,14 @@ envs:
               docker: "{{ dsc.global.registry | default('docker.io') }}"
               ghcr: "{{ dsc.global.registry | default('ghcr.io') }}"
           domain:
-            keycloak: "{{ keycloak_domain }}"
-            vault: "{{ vault_domain }}"
             console: "{{ console_domain }}"
             grafana: "{{ grafana_domain }}"
-            observatorium: "{{ observatorium_domain }}"
-            sonarqube: "{{ sonar_domain }}"
             harbor: "{{ harbor_domain }}"
             harborNotary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"
+            keycloak: "{{ keycloak_domain }}"
+            observatorium: "{{ observatorium_domain }}"
+            sonarqube: "{{ sonar_domain }}"
+            vault: "{{ vault_domain }}"
           proxy:
             httpProxy: "{{ dsc.proxy.http_proxy | default('') }}"
             httpsProxy: "{{ dsc.proxy.https_proxy | default('') }}"
@@ -26,6 +26,7 @@ envs:
             portProxy: "{{ dsc.proxy.port | default('') }}"
           exposedCa: "{{ exposed_ca_pem | default('') }}"
           cnpgS3CaPem: "{{ cnpg_s3_ca_pem | default('') }}"
+          ingressClassName: "{{ dsc.ingress.className | default('') }}"
           externalClusters:
             pgCluster:
               barmanObjectStore:
@@ -44,8 +45,6 @@ envs:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
       - argocd_app: "observatorium"
         vault_values:
-          ingress:
-            ingressClassName: "{{ dsc.ingress.className | default('') }}"
           api:
             loglevel: info
             config:

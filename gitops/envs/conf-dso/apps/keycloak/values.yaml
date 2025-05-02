@@ -86,7 +86,7 @@ keycloak:
     extraRules: []
     hostname: <path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
       {.keycloak}>
-    ingressClassName: nginx
+    ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
     labels:
       app: keycloak
     path: /

@@ -59,7 +59,7 @@ harbor:
   expose:
     imagePullPolicy: IfNotPresent
     ingress:
-      className: nginx
+      className: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
       harbor:
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-prod

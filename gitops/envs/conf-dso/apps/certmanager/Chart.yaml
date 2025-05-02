@@ -1,7 +1,7 @@
 apiVersion: v2
 dependencies:
 - alias: certmanager
-  name: certmanager
+  name: cert-manager
   repository: https://charts.jetstack.io
   version: v1.17.2
 name: certmanager

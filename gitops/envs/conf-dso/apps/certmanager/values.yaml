@@ -1,2 +1,21 @@
 certmanager:
-  namespace: dso-certmanager
+  acmesolver:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/cert-manager-acmesolver
+  cainjector:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/cert-manager-cainjector
+  image:
+    repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+      {.repository.docker}>/cert-manager-controller
+  namespace: cert-manager
+  startupapicheck:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/cert-manager-startupapicheck
+  webhook:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/cert-manager-webhook

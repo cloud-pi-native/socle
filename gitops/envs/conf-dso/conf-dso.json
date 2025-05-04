@@ -6,12 +6,13 @@
   "destination": {
     "clusterName": "in-cluster"
   },
-  "targetRevision": "develop",
+  "targetRevision": "test/falltrades",
   "apps": [
     { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
-    { "app": "vault", "enabled": "true", "namespace": "vault", "syncWave": 10 },
-    { "app": "sonarqube", "enabled": "true", "namespace": "sonarqube", "syncWave": 10 },
-    { "app": "harbor", "enabled": "true", "namespace": "harbor", "syncWave": 10 },
-    { "app": "observability", "enabled": "true", "namespace": "observability", "syncWave": 10 }
+    { "app": "observability", "enabled": "false", "namespace": "observability", "syncWave": 10 },
+    { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 },
+    { "app": "sonarqube", "enabled": "false", "namespace": "sonarqube", "syncWave": 10 },
+    { "app": "harbor", "enabled": "false", "namespace": "harbor", "syncWave": 10 },
+    { "app": "argocd", "enabled": "true", "namespace": "argocd", "syncWave": 10 }
   ]
 }

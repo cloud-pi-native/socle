@@ -20,7 +20,7 @@ spec:
       - ./values.yaml
       - $tenants/helm/values.yaml
   - ref: tenants
-    repoURL: "https://{{ gitlab_domain }}/observability/observability.git"
+    repoURL: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/observability/observability.git"
     targetRevision: main
   syncPolicy:
     automated:

@@ -11,6 +11,7 @@ envs:
               ghcr: "{{ dsc.global.registry | default('ghcr.io') }}"
           domain:
             console: "{{ console_domain }}"
+            gitlab: "{{ gitlab_domain }}"
             grafana: "{{ grafana_domain }}"
             harbor: "{{ harbor_domain }}"
             harborNotary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"

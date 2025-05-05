@@ -19,7 +19,7 @@ spec:
       - ./values.yaml
       - $tenants/helm/values.yaml
   - ref: tenants
-    repoURL: "https://gitlab.sdid-hp.cpin.numerique-interieur.com/observability/observability.git"
+    repoURL: "https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.gitlab}>/observability/observability.git"
     targetRevision: main
   syncPolicy:
     automated:

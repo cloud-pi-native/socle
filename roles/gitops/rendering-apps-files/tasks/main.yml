@@ -13,3 +13,4 @@
           - argocd_app: sonarqube
           - argocd_app: observability
           - argocd_app: harbor
+          - argocd_app: certmanager

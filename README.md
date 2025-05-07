@@ -52,6 +52,7 @@
   - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
     - [Harbor GitOps](#harbor-gitops)
     - [Vault GitOps](#vault-gitops)
+    - [Nexus GitOps](#nexus-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1434,6 +1435,39 @@ Puis lancer le playbook de post-installation.
 ```
 ansible-playbook install-gitops.yaml -t post-install-vault
 ```
+
+### Nexus GitOps
+
+Lors de la migration, afin de résoudre les conflits survenant lors du déploiement initial Helm sur la ressource Nexus existante, il est nécessaire d'exécuter les commandes suivantes :
+
+```
+KIND=service
+NAME=nexus
+RELEASE=nexus
+NAMESPACE=dso-nexus
+kubectl annotate $KIND $NAME meta.helm.sh/release-name=$RELEASE --namespace=$NAMESPACE
+kubectl annotate $KIND $NAME meta.helm.sh/release-namespace=$NAMESPACE --namespace=$NAMESPACE
+kubectl label $KIND $NAME app.kubernetes.io/managed-by=Helm --namespace=$NAMESPACE
+```
+
+Puis supprimer les éléments du déploiement précédent afin de libérer le point de montage du PVC nexus-data-proxy-cache.
+
+```
+k delete deployment nexus -n dso-nexus
+k delete ingress nexus-alternative -n dso-nexus
+k delete ingress docker-proxy -n dso-nexus
+k delete service  nexus  -n dso-nexus
+k delete service  nexus-docker-proxy  -n dso-nexus
+k delete service  nexus-hl  -n dso-nexus
+```
+Assurez-vous que le PVC nexus-data-proxy-cache est toujours présent et en état Bound
+
+```
+nexus-data-proxy-cache   Bound    pvc-d9a9584a-c6c8-401f-92bd-3f5305aea4ee   250Gi      RWO            sbs-default    <unset>                 65m
+```
+Lancer l'installation via helm. Le PVC sera automatiquement remonté sur /nexus-data-docker au sein du nouveau pod Nexus.
+
+Il convient de lancer une tache d'administration au travers de l'interface web afin de recalculer la taille du blobstore (Recalculate Blobstore storage)
 
 ## Contributions
 

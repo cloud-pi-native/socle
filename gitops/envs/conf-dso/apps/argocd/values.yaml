@@ -1,0 +1,174 @@
+argocd:
+  applicationSet:
+    enabled: false
+    replicas: 2
+    webhook:
+      ingress:
+        ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
+  configs:
+# BEGIN ANSIBLE MANAGED BLOCK: rbac
+    rbac:
+      scopes: "[groups]"
+      policy.default: role:nada
+      admin.enabled: "false"
+      policy.csv: |
+        p, role:admin, *, *, */*, allow
+        p, role:nada, applicationsets, *, */*, deny
+        p, role:nada, applications, *, */*, deny
+        p, role:nada, logs, *, */*, deny
+        p, role:nada, exec, *, */*, deny
+        p, role:nada, certificates, *, *, deny
+        p, role:nada, accounts, *, *, deny
+        p, role:nada, gpgkeys, *, *, deny
+        p, role:nada, projects, *, *, deny
+        p, role:nada, clusters, *, *, deny
+        p, role:nada, repositories, get, *, allow
+        g, system:cluster-admins, role:admin
+        g, cluster-admins, role:admin
+        g, /admin, role:admin
+        g, admin, role:admin
+        p, cpin-sa, applications, *, *, allow
+# END ANSIBLE MANAGED BLOCK: rbac
+    cm:
+# BEGIN ANSIBLE MANAGED BLOCK: resource.exclusions and oidc.config
+      resource.exclusions: |
+        - apiGroups:
+          - tekton.dev
+          clusters:
+          - '*'
+          kinds:
+          - TaskRun
+          - PipelineRun
+        - apiGroups:
+          - wgpolicyk8s.io
+          - aquasecurity.github.io
+          clusters:
+          - '*'
+          kinds:
+          - '*'
+        - apiGroups:
+          - postgresql.cnpg.io
+          clusters:
+          - '*'
+          kinds:
+          - Backup
+        - apiGroups:
+          - reports.kyverno.io
+          clusters:
+          - '*'
+          kinds:
+          - EphemeralReport
+        - apiGroups:
+          - reports.kyverno.io/v1
+          clusters:
+          - '*'
+          kinds:
+          - EphemeralReport
+      oidc.config: |
+        issuer: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
+        requestedScopes: ["openid", "generic"]
+        name: Keycloak
+        clientID: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#client | jsonPath {.argo.id}>
+        clientSecret: <path:forge-dso/data/env/conf-dso/apps/keycloak/values#client | jsonPath {.argo.secret}>
+# END ANSIBLE MANAGED BLOCK: resource.exclusions and oidc.config
+      accounts.cpin-sa: apiKey
+      admin.enabled: 'True'
+      clusterResources: 'true'
+      kustomize.buildOptions: --enable-helm
+      url: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath
+        {.argocd}>
+      users.anonymous.enabled: 'false'
+    params:
+      server.insecure: true
+    secret:
+      argocdServerAdminPassword: <path:forge-dso/data/env/conf-dso/apps/argocd/values#argocdServerAdminPassword>
+  controller:
+    replicas: 3
+  crds:
+    install: true
+    keep: true
+  dex:
+    enabled: false
+  fullnameOverride: conf-dso-argocd
+  image:
+    repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+      {.repository.quay}>
+  notifications:
+    enabled: false
+    webhook:
+      ingress:
+        ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
+  redis:
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>
+  redis-ha:
+    enabled: true
+    fullnameOverride: conf-dso-redis-ha
+    image:
+      repository: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+        {.repository.docker}>/library/redis
+      tag: 7.4.1-alpine
+  repoServer:
+    initContainers:
+    - args:
+      - "cp /usr/local/bin/helm /helm-custom-binary/helm.bin;\ncat <<'EOF' > /helm-custom-binary/helm\n#!/usr/bin/env
+        bash\nargs=($@)\nif [ \"$#\" -gt 2 ] && [ $1 == \"registry\" ] && { [ \"$2\"
+        = \"login\" ] || [ \"$2\" = \"logout\" ]; } && [ $3 == \"registry-1.docker.io/bitnamicharts\"
+        ]; then\n  args[2]=\"registry-1.docker.io\"\nfi\nhelm.bin ${args[@]}\nEOF\nchmod
+        +x /helm-custom-binary/helm;\necho $HELM_PASSWORD | helm registry login -u
+        $HELM_USER registry-1.docker.io --password-stdin;\n"
+      command:
+      - sh
+      - -c
+      env:
+      - name: HELM_USER
+        valueFrom:
+          secretKeyRef:
+            key: username
+            name: helm-docker-registry-secret
+      - name: HELM_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: password
+            name: helm-docker-registry-secret
+      - name: HELM_CACHE_HOME
+        value: /helm-working-dir
+      - name: HELM_CONFIG_HOME
+        value: /helm-working-dir
+      - name: HELM_DATA_HOME
+        value: /helm-working-dir
+      image: quay.io/argoproj/argocd:v2.14.11
+      name: helm-login
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        runAsUser: 999
+        seccompProfile:
+          type: RuntimeDefault
+      volumeMounts:
+      - mountPath: /helm-working-dir
+        name: helm-working-dir
+      - mountPath: /helm-custom-binary
+        name: helm-custom-binary
+    replicas: 3
+    volumeMounts:
+    - mountPath: /usr/local/bin/helm
+      name: helm-custom-binary
+      subPath: helm
+    - mountPath: /usr/local/bin/helm.bin
+      name: helm-custom-binary
+      subPath: helm.bin
+    volumes:
+    - emptyDir: {}
+      name: helm-custom-binary
+  server:
+    ingress:
+      ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
+    ingressGrpc:
+      ingressClassName: <path:forge-dso/data/env/conf-dso/apps/common/values#ingressClassName>
+    replicas: 3

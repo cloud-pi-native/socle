@@ -1,0 +1,26 @@
+{% if dsc.global.platform == "openshift" %}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ dsc_name }}-argocd-system:openshift:scc:privileged"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:privileged
+subjects:
+- kind: ServiceAccount
+  name: "{{ dsc_name }}-argocd-repo-server"
+  namespace: "{{ dsc.argocd.namespace }}"
+- kind: ServiceAccount
+  name: argocd-server
+  namespace: "{{ dsc.argocd.namespace }}"
+- kind: ServiceAccount
+  name: "{{ dsc_name }}-redis"
+  namespace: "{{ dsc.argocd.namespace }}"
+- kind: ServiceAccount
+  name: "{{ dsc_name }}-redis-ha"
+  namespace: "{{ dsc.argocd.namespace }}"
+- kind: ServiceAccount
+  name: "{{ dsc_name }}-redis-ha-haproxy"
+  namespace: "{{ dsc.argocd.namespace }}"
+{% endif %}

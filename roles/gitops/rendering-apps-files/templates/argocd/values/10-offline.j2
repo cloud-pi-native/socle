@@ -1,0 +1,7 @@
+{% if dsc.global.offline %}
+argocd:
+  configs:
+    tls:
+      certificates:
+        {{ dsc.argocd.privateGitlabDomain }}: <path:forge-dso/data/env/conf-dso/apps/common/values#exposedCa>
+{% endif %}

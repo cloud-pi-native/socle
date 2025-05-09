@@ -109,6 +109,7 @@
     state: present
   with_items:
     - helm-docker-registry-secret.yml.j2
+    - repo-creds.yml.j2
 
 # Argo CD Infra installation
 

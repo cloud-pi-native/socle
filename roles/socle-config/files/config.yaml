@@ -137,14 +137,14 @@ spec:
   nexus:
     chartVersion: 5.8.3
     helmRepoName: stevehipwell
-    helmRepoUrl: https://stevehipwell.github.io/helm-charts/
+    helmRepoUrl: oci://ghcr.io/stevehipwell/helm-charts
     chartReference: stevehipwell/nexus3
     release: nexus
     imageTag: 3.78.2
     namespace: dso-nexus
     subDomain: nexus
     storageSize: 25Gi
-    proxyEnabled: false
+    proxyEnabled: true
     proxyCacheSize: 25Gi
     values:
       replicaCount: 1

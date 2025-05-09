@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+  name: oci-dockerhub-creds
+  namespace: {{ dsc.argocdInfra.namespace }}
+stringData:
+  url: registry-1.docker.io
+  name: bitnamicharts
+  type: helm
+  enableOCI: "true"
+  username: {{ dsc.global.dockerAccount.username }} 
+  password: {{ dsc.global.dockerAccount.password }}
+{% if dsc.proxy.enabled %}
+  proxy: "{{ dsc.proxy.http_proxy }}" 
+{% endif %}

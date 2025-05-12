@@ -55,7 +55,8 @@ grafana:
     id: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.id}>
     secret: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.secret}>
     aud: grafana
-    scopes: profile, email, openid, offline_access
+    scopes: profile, email, openid, group
+    groups_attribute_path: group
   server:
     certManager:
       enabled: true
@@ -63,6 +64,6 @@ grafana:
     url: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.grafana}>
   grafana:
     isOpenShift: {{ dsc.global.platform == "openshift" | ternary(true, false) }}
-    observatorium_url: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+    observatorium_url: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
   dashboard:
     default: true

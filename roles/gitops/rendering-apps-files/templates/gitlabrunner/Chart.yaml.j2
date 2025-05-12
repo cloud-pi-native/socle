@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: gitlab-runner
+type: application
+version: {{ dsc.gitlabRunner.chartVersion }}
+dependencies:
+- name: gitlab-runner
+  alias: gitlab-runner
+  version: {{ dsc.gitlabRunner.chartVersion }}
+  repository: "{{ dsc.gitlabRunner.helmRepoUrl }}"

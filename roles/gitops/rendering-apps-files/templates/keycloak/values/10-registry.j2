@@ -4,7 +4,7 @@ keycloak:
     security:
       allowInsecureImages: true
   image:
-    registry: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>
+    registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>
 {% endif %}
 
 {% if use_image_pull_secrets %}

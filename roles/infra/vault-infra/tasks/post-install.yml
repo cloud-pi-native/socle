@@ -205,17 +205,17 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/forge-dso"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/{{ vaultinfra_kv_name }}"
     status_code: [200, 400]
     headers:
       "X-Vault-Token": "{{ vault_token }}"
   register: get_engines
 
-- name: Create default 'forge-dso/' kv engine
+- name: Create default {{ vaultinfra_kv_name }} kv engine
   when: get_engines.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/forge-dso"
+    url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/{{ vaultinfra_kv_name }}"
     method: POST
     status_code: [204]
     headers:

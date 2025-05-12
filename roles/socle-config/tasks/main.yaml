@@ -124,21 +124,25 @@
   ansible.builtin.set_fact:
     root_domain: "{{ dsc.global.rootDomain }}"
 
+- name: Set infra_root_domain fact
+  ansible.builtin.set_fact:
+    infra_root_domain: "{{ dsc.global.infraRootDomain }}"
+
 - name: Set tools domains facts
   ansible.builtin.set_fact:
     argocd_domain: "{{ dsc.argocd.subDomain }}{{ root_domain }}"
-    argocdinfra_domain: "{{ dsc.argocdInfra.subDomain }}{{ root_domain }}"
+    argocdinfra_domain: "{{ dsc.argocdInfra.subDomain }}{{ infra_root_domain }}"
     console_domain: "{{ dsc.console.subDomain }}{{ root_domain }}"
     gitlab_domain: "{{ dsc.gitlab.subDomain }}{{ root_domain }}"
     grafana_domain: "{{ dsc.grafana.subDomain }}{{ root_domain }}"
     harbor_domain: "{{ dsc.harbor.subDomain }}{{ root_domain }}"
     keycloak_domain: "{{ dsc.keycloak.subDomain }}{{ root_domain }}"
-    keycloakinfra_domain: "{{ dsc.keycloakInfra.subDomain }}{{ root_domain }}"
+    keycloakinfra_domain: "{{ dsc.keycloakInfra.subDomain }}{{ infra_root_domain }}"
     nexus_domain: "{{ dsc.nexus.subDomain }}{{ root_domain }}"
     observatorium_domain: "{{ dsc.observatorium.subDomain }}{{ root_domain }}"
     sonar_domain: "{{ dsc.sonarqube.subDomain }}{{ root_domain }}"
     vault_domain: "{{ dsc.vault.subDomain }}{{ root_domain }}"
-    vaultinfra_domain: "{{ dsc.vaultInfra.subDomain }}{{ root_domain }}"
+    vaultinfra_domain: "{{ dsc.vaultInfra.subDomain }}{{ infra_root_domain }}"
 
 - name: Debug domains facts
   ansible.builtin.debug:
@@ -156,6 +160,14 @@
       - "sonar_domain: {{ sonar_domain }}"
       - "vault_domain: {{ vault_domain }}"
       - "vaultinfra_domain: {{ vaultinfra_domain }}"
+
+- name: Set vaultinfra_kv_name fact
+  ansible.builtin.set_fact:
+    vaultinfra_kv_name: "{{ dsc.global.gitOps.envName }}"
+
+- name: Set keycloak_reset_password fact
+  ansible.builtin.set_fact:
+    keycloak_reset_password: false
 
 # - name: End playbook
 #   ansible.builtin.meta: end_play

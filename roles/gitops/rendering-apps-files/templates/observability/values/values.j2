@@ -1,68 +1,69 @@
 observatorium:
   ingress:
     enabled: true
-    ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
     hosts:
-      - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+      - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
         paths:
           - path: /
             pathType: ImplementationSpecific
     tls:
       - hosts:
-          - <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
-        secretName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>-tls
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+        secretName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>-tls
 
   api:
-    loglevel: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.loglevel}>
+    loglevel: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.loglevel}>
     config:
       # Default tenant config
-      id: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.id}>
-      name: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.name}>
+      id: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.id}>
+      name: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.name}>
       groups: [/admin]
       # Default oidc config
       clientID: "account"
-      issuerURL: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
+      issuerURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
       usernameClaim: "preferred_username"
       groupClaim: "groups"
   logs:
-    enabled: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.enabled}>
+    enabled: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.enabled}>
     read:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
     tail:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
     write:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
     rules:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
   metrics:
-    enabled: <path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.enabled}>
+    enabled: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.enabled}>
     tenantHeader: 'X-Scope-OrgId'
     read:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
     alertmanager:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
     write:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
     rules:
-      endpoint: "<path:forge-dso/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
 grafana:
   grafanaNamespace: "{{ dsc.grafana.namespace }}"
   default:
     name: console
   oauth:
     enabled: true
-    url: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
-    id: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.id}>
-    secret: <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.secret}>
+    url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
+    id: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.id}>
+    secret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.secret}>
     aud: grafana
-    scopes: profile, email, openid, offline_access
+    scopes: profile, email, openid, group
+    groups_attribute_path: group
   server:
     certManager:
       enabled: true
     ingressClassName: nginx
-    url: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.grafana}>
+    url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.grafana}>
   grafana:
     isOpenShift: {{ dsc.global.platform == "openshift" | ternary(true, false) }}
-    observatorium_url: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+    observatorium_url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
   dashboard:
     default: true

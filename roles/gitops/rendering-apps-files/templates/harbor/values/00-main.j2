@@ -4,10 +4,10 @@ harbor:
     imagePullPolicy: IfNotPresent
     type: ingress
     ingress:
-      className: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+      className: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
       hosts:
-        core: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
-        notary: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harborNotary}>
+        core: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
+        notary: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harborNotary}>
       notary:
         annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
@@ -26,18 +26,18 @@ harbor:
 {% for key, val in dsc.ingress.labels.items() %}
           {{ key }}: {{ val }}
 {% endfor %}
-  externalURL: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
+  externalURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
   persistence:
     enabled: true
     resourcePolicy: keep
 {% if dsc.harbor.s3ImageChartStorage.enabled %}
     imageChartStorage:
       s3:
-        bucket: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.bucket}>
-        region: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.region}>
-        regionendpoint: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.regionendpoint}>
-        accesskey: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.accesskey}> 
-        secretkey: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.secretkey}>
+        bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.bucket}>
+        region: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.region}>
+        regionendpoint: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.regionendpoint}>
+        accesskey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.accesskey}> 
+        secretkey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.secretkey}>
       type: s3
 {% endif %}
     persistentVolumeClaim:
@@ -52,7 +52,7 @@ harbor:
         size: "{{ dsc.harbor.pvcRedisSize }}"
       trivy:
         size: "{{ dsc.harbor.pvcTrivySize }}"
-  harborAdminPassword: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.harborAdminPassword}>
+  harborAdminPassword: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.harborAdminPassword}>
   nginx:
     replicas: 2
     serviceAccountName: harbor-sa
@@ -83,8 +83,8 @@ harbor:
     external:
       host: "pg-cluster-harbor-rw"
       port: "5432"
-      username: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.username}>
-      password: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.password}>
+      username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.username}>
+      password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.password}>
       coreDatabase: "registry"
   metrics:
     enabled: {{ dsc.global.metrics.enabled }}

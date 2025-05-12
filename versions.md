@@ -14,6 +14,7 @@
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
 | keycloak                  | 26.1.3           | 24.4.11       | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                                                      |
+| observatorium             | main-2025-02-10-1bcf722 | 0.5.2  | [observatorium](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/observatorium)                                                                   |
 | nexus                     | 3.76.0           | N/A           | [nexus](https://hub.docker.com/r/sonatype/nexus3/)                                                                   |
 | sonarqube                 | 10.8.1-community | 10.8.1        | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube)                                                |
 | vault                     | 1.18.1           | 0.29.1        | [vault](https://artifacthub.io/packages/helm/hashicorp/vault)                                                        |

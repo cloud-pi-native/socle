@@ -88,6 +88,7 @@ keycloak_clients:
       - email
       - offline_access
       - profile
+      - group
     publicClient: false
 
   - clientId: vault-client

@@ -1,0 +1,28 @@
+- name: Check GitOps repository local clone
+  when: lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') == ''
+  block:
+    - ansible.builtin.debug:
+        msg:
+          - "La variable d'environnement GITOPS_REPO_PATH n'est pas définie."
+          - "Veuillez la définir avec le chemin absolu vers votre clone local du dépôt GitOps à utiliser."
+          - "Les fichiers générés y seront déposés."
+    - ansible.builtin.meta: end_play
+
+- name: "Déclaration du clone GitOps local"
+  when: lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') != ''
+  ansible.builtin.set_fact:
+    gitops_local_repo: "{{ lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') }}"
+
+- name: Check infrastructure cluster access
+  when: lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') == ''
+  block:
+    - ansible.builtin.debug:
+        msg:
+          - "La variable d'environnement KUBECONFIG_INFRA n'est pas définie."
+          - "Veuillez la définir avec le chemin absolu vers votre kubeconfig pour accéder au cluster d'admnistration (ArgoCD et Vault d'infra)."
+    - ansible.builtin.meta: end_play
+
+- name: "Déclaration du kubeconfig infra"
+  when: lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') != ''
+  ansible.builtin.set_fact:
+    kubeconfig_infra: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') }}"

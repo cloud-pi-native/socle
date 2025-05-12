@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.11.0](https://github.com/cloud-pi-native/socle/compare/v3.10.0...v3.11.0) (2025-05-12)
+
+
+### Features
+
+* :arrow_up: Upgrade GitLab to 17.11.2 version ([83de0b7](https://github.com/cloud-pi-native/socle/commit/83de0b7b8a0d862fb6332c56a36935ecfbea1f54))
+* :construction: adding the gitlab token in Vault ([3a8a902](https://github.com/cloud-pi-native/socle/commit/3a8a9026df9ce6020c8962547db556bd3baa461f))
+* :sparkles: add vault update secret ([963507e](https://github.com/cloud-pi-native/socle/commit/963507ee304510a8da3af6d8ffeab22ae6d46703))
+* :sparkles: Grafana instances GitOps install ([53dc04c](https://github.com/cloud-pi-native/socle/commit/53dc04c08a1a7fc74f0cee6bfa6d35ed747dc4b3))
+
+
+### Bug Fixes
+
+* :bug: GitOps Sonar db username ([bf3d1bb](https://github.com/cloud-pi-native/socle/commit/bf3d1bb84b45c5b30966a18b5e98cb9b90a8554d))
+* :bug: missing repo-creds ([5369c95](https://github.com/cloud-pi-native/socle/commit/5369c956f730dbffc710dfbc44ffee81e71fddf7))
+
 ## [3.10.0](https://github.com/cloud-pi-native/socle/compare/v3.9.1...v3.10.0) (2025-04-29)
 
 

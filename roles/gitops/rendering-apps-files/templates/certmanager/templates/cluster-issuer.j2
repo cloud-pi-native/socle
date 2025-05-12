@@ -1,0 +1,29 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+
+{% if dsc.ingress.tls.type == 'ca' %}
+metadata:
+  name: ca-issuer
+spec:
+  ca:
+    secretName: {{ dsc.ingress.tls.ca.secretName }}
+
+{% elif dsc.ingress.tls.type == 'acme' %}
+metadata:
+  name: acme-issuer
+spec:
+  acme:
+    email: {{ dsc.ingress.tls.acme.email }}
+{% if dsc.ingress.tls.acme.environment == 'staging' %}
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+{% else %}
+    server: https://acme-v02.api.letsencrypt.org/directory
+{% endif %}
+    privateKeySecretRef:
+      name: acme-issuer-account-key
+    solvers:
+    - http01:
+        ingress: {}
+
+{% endif %}

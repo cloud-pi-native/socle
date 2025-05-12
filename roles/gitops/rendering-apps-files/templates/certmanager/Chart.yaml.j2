@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: certmanager
+type: application
+version: {{ dsc.certmanager.chartVersion }}
+dependencies:
+- name: cert-manager
+  alias: certmanager
+  version: {{ dsc.certmanager.chartVersion }}
+  repository: {{ dsc.certmanager.helmRepoUrl }}

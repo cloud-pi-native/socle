@@ -1,0 +1,18 @@
+gitlab-ci-pipelines-exporter:
+  fullnameOverride: "glexporter"
+  config:
+    gitlab:
+      url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/
+      token: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
+    redis:
+      url: "redis://glexporter-redis-master.{{ dsc.gitlab.namespace }}.svc:6379"
+    wildcards:
+      - {}
+  serviceMonitor :
+    enabled: true
+    endpoints:
+      - port: http
+        interval: 30s
+        path: /metrics
+  redis:
+    fullnameOverride: "glexporter-redis"

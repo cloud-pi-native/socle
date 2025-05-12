@@ -1,0 +1,12 @@
+{% if dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret" %}
+gitlab-ci-pipelines-exporter:
+  command: ["sh", "-c", "echo \"$CUSTOM_CA_CERT\" > /tmp/custom-ca.crt && gitlab-ci-pipelines-exporter run --config /etc/config.yml"]
+  envVariables:
+    - name: SSL_CERT_FILE
+      value: /tmp/custom-ca.crt
+    - name: CUSTOM_CA_CERT
+      valueFrom:
+        secretKeyRef:
+          name: exposed-ca
+          key: tls.crt
+{% endif %}

@@ -10,6 +10,7 @@ envs:
               docker: "{{ dsc.global.registry | default('docker.io') }}"
               ghcr: "{{ dsc.global.registry | default('ghcr.io') }}"
               gitlab: "{{ dsc.global.registry | default('registry.gitlab.com') }}"
+              quay: "{{ dsc.global.registry | default('quay.io') }}"
           domain:
             console: "{{ console_domain }}"
             gitlab: "{{ gitlab_domain }}"

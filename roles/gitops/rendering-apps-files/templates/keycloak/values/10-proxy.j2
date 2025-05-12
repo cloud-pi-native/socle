@@ -2,9 +2,9 @@
 keycloak:
   extraEnvVars:
     - name: HTTP_PROXY
-      value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
     - name: HTTPS_PROXY
-      value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
     - name: NO_PROXY
-      value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
 {% endif %}

@@ -193,6 +193,9 @@ spec:
                         Argo CD Vault plugin version (e.g., "1.18.1").
                         See https://github.com/argoproj-labs/argocd-vault-plugin/releases
                       type: string
+                    projectName:
+                      type: string
+                      description: AppProject name to use when creating Applications
                   required:
                     - admin
                     - installEnabled
@@ -570,6 +573,12 @@ spec:
                       type: string
                       default: .example.com
                       pattern: "^\\..*$"
+                    infraRootDomain:
+                      description: The top level of your domain for infrastructure tools. To expose Argo as "argo.example.com",
+                        the value should be ".example.com" (notice the leading dot).
+                      type: string
+                      default: .infra.example.com
+                      pattern: "^\\..*$"
                     logs:
                       description: Configuration for logs feature.
                       properties:
@@ -799,6 +808,18 @@ spec:
                       type: string
                     gitOps:
                       properties:
+                        repo:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              description: URL of the Git repository to watch as GitOps source of truth.
+                            revision:
+                              type: string
+                              description: Branch or tag name to watch as GitOps source of truth.
+                            path:
+                              type: string
+                              description: Root directory to use as GitOps source of truth (must contains Application yamls and environment subdirectories).
                         watchpointEnabled:
                           default: true
                           description: |
@@ -810,6 +831,9 @@ spec:
                           description: |
                             Specifies whether the Socle deployment is GitOps or not.
                           type: boolean
+                        envName:
+                          type: string
+                          description: Name of the current environment where resides this DSC instance.
                       type: object
                     dockerAccount:
                       properties:

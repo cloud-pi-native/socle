@@ -16,7 +16,7 @@ vault:
     ha:
       enabled: true
       replicas: 3
-      apiAddr: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.vault}>"
+      apiAddr: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.vault}>"
       raft:
         enabled: true
 {% if dsc.global.metrics.enabled %}

@@ -49,9 +49,9 @@
   - [Prérequis](#prérequis-1)
   - [Principe d'installation GitOps](#principe-dinstallation-gitops)
   - [Exemple de déploiement GitOps](#exemple-de-déploiement-gitops)
-  - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
-    - [Harbor GitOps](#harbor-gitops)
-    - [Vault GitOps](#vault-gitops)
+- [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
+  - [Harbor GitOps](#harbor-gitops)
+  - [Vault GitOps](#vault-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1035,7 +1035,7 @@ Il est donc possible de déployer le Socle en mode « hybride », en installant 
 Le mode de déploiement GitOps fait encore appel pour partie à Ansible et nécessite donc les prérequis déjà spécifiés plus haut.
 
 Quatre prérequis supplémentaires sont toutefois à prendre en compte :
-* Disposer de **votre propre dépôt Git** dans lequel vous devez réaliser une **copie du présent dépôt Socle** (et non pas un fork). Ce peut-être initialement dans votre prope espace sur GitHub.
+* Disposer de **votre propre dépôt Git** dans lequel seront déposés les fichiers utiles à ArgoCD. Ce peut-être dans votre propre espace sur GitHub.
 * Une instance **Vault d'infrastructure**. Elle sert à stocker les secrets des applications du Socle (mots de passe, URLs, etc.).
 * Une instance **Argo CD d'infrastructure**, disposant du [plugin Vault](https://argocd-vault-plugin.readthedocs.io/en/stable/) paramétré pour communiquer avec l'instance Vault d'infrastructure. C'est cette instance d'Argo CD qui utilise l'applicationSet pour déployer les applications du Socle dans le cluster cible.
 * Une instance **Keycloak d'infrastructure**, utilisée pour la connexion aux deux outils précédents. Optionnelle mais recommandée en termes de sécurité et de contrôles d'accès.
@@ -1108,9 +1108,9 @@ L'installation en mode GitOps est à lancer à l'aide du playbook `install-gitop
 
 Ce playbook, après avoir réalisé des tâches de pré-configuration, fait notamment appel aux roles suivants :
 * `vault-secrets` : sert à peupler le Vault d'infrastructure avec les values de secrets pour notre environnement et les applications associées.
-* `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `./gitops/envs/nom_de_notre_environnement`. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
+* `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `gitops/envs/nom_de_notre_environnement`. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
 * `watchpoint` : sert à arrêter le playbook suite à la génération des fichiers de charts, afin de permettre un passage en revue par l'utilisateur avant que ce-dernier n'effectue si besoin un `git push` des changements. Affiche un message en ce sens. Il s'agit du comportement par défaut, contôlé par le paramètre `spec.global.gitOps.watchpointEnabled` de la dsc (positionné à `true` par défaut).
-* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `./gitops/dso-app.yaml`, lequel déploie lui-même l'applicationSet défini dans `./gitops/dso-appset.yaml`. Ceci permet notamment de rendre l'applicationSet visible dans la web UI d'Argo CD. C'est ensuite ce même applicationSet qui déploie les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `./gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
+* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `roles/gitops/dso-app/templates/dso-app.yaml.j2`. La création de cette Application dans ArgoCD viendra consommer l'applicationSet généré par `roles/gitops/dso-app/templates/dso-appset.yaml.j2` et déposé dans le dépôt GitOps. Ceci permet notamment de rendre l'applicationSet visible dans la web UI d'Argo CD. C'est ensuite ce même applicationSet qui déploie les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
 
 Viennent ensuite les roles situés dans le répertoire `./roles/gitops/post-install` et qui vont lancer des tasks de post installation pour les outils concernés.
 
@@ -1127,14 +1127,11 @@ Pour cela :
 * Positionnez-vous dans un répertoire distinct de votre dépôt local. Ce peut être par exemple votre répertoire habituel de téléchargement.
 * Lancez la commande `git clone https://github.com/cloud-pi-native/socle.git` afin de cloner le présent dépôt du Socle dans cet autre répertoire.
 * Positionnez-vous dans le répertoire `socle` du présent dépôt que vous venez de cloner, et assurez vous d'être bien positionné sur la branche `main` à l'aide de la commande `git branch`. Listez également les fichiers présents.
-* Positionnez-vous à nouveau dans votre dépôt local, pour l'instant vide, à l'intérieur du répertoire socle (ou tout autre nom que vous avez choisi).
-* Copiez l'intégralité des fichiers du dépôt Socle que vous venez de cloner (contenu du répertoire `socle`) dans votre propre dépôt local, c'est à dire à l'emplacement actuel. Exemple à adapter : `cp -r /chemin-du-dépôt-Socle-cloné/socle/* .`
-* Listez les fichiers que vous venez de copier.
-* Ajoutez l'intégralité des fichiers à l'index de votre dépôt, via la commande suivante : `git add -A`
-* Effecuez votre premier commit sur la branche main de votre dépôt, exemple : `git commit -m "feat/first-commit"`
+* Créez une variable d'environnement avec `export GITOPS_REPO_PATH=/chemin/absolu/vers/votre/dépôt`.
+* Créez une variable d'environnement avec `export KUBECONFIG_INFRA=/chemin/absolu/vers/votre/kubeconfig-infra` pour configurer les accès au cluster d'infrastructure.
+* Lancez le playbook gitops avec cette variable, pour peupler votre clone local.
+* Effectuez votre premier commit sur la branche main de votre dépôt, exemple : `git commit -am "feat/first-commit"`
 * Poussez vos changements sur la branche main distante : `git push`
-
-Vous disposez maintenant de votre propre copie du code du Socle dans votre propre dépôt Git, aussi bien localement qu'à distance.
 
 Vous pouvez vérifier que votre branche main locale est effectivement à jour par rapport à son homologue distante, via la commande  suivante :
 
@@ -1165,9 +1162,9 @@ Passez en revue la ressource dsc de configuration `conf-dso` pour paramétrer le
 
 Vérifiez aussi que le paramètre `spec.global.gitOps.watchpointenabled` est bien positionné à `true`. 
 
-Dans le code du Socle en local, toujours dans votre branche, positionnez-vous dans le répertoire `./gitops/envs` puis dans le sous-répertoire correspondant à l'environnement cible, lequel, pour rappel, **doit impérativement correspondre au nom de votre dsc**.
+Dans le dépôt GitOps en local, toujours dans votre branche, positionnez-vous dans le répertoire `gitops/envs` puis dans le sous-répertoire correspondant à l'environnement cible, lequel, pour rappel, **doit impérativement correspondre au nom de votre dsc**.
 
-Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. Le sous-répertoire `./gitops/envs/conf-dso` existe donc déjà. Positionnez-vous dans ce sous-répertoire puis éditez le fichier `conf-dso.json` qui par défaut se présente ainsi :
+Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. Le sous-répertoire `gitops/envs/conf-dso` existe donc déjà. Positionnez-vous dans ce sous-répertoire puis éditez le fichier `conf-dso.json` qui par défaut se présente ainsi :
 
 ```json
 {
@@ -1187,13 +1184,13 @@ Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. 
 ```
 
 Passez en revue les paramètres de ce fichier, et notamment :
-* `env` : doit correspondre au nom de l'environnement tel qu'indiqué dans le répertoire `./gitops/envs/conf-dso` et dans lequel se trouve le fichier `conf-dso.json`, qui est-lui même nommé d'après le nom de ce même environnement. Ce nom doit également correspondre au nom de la `dsc` que vous utilisez (spécifié via le paramètre `metadata.name` de cette même dsc). Il y a donc **correspondance rigoureuse** entre le nom de l'environnement utilisé ici par le paramètre `env` et celui de la `dsc`. Ce même nom doit se retrouver impérativement dans le nom du répertoire de l'environnement (soit dans notre exemple `./gitops/envs/conf-dso`) et celui du fichier de configuration JSON associé (`conf-dso.json`). Sans ces correspondances strictes, l'installation échouera.
+* `env` : doit correspondre au nom de l'environnement tel qu'indiqué dans le répertoire `gitops/envs/conf-dso` et dans lequel se trouve le fichier `conf-dso.json`, qui est-lui même nommé d'après le nom de ce même environnement. Ce nom doit également correspondre au nom de la `dsc` que vous utilisez (spécifié via le paramètre `metadata.name` de cette même dsc). Il y a donc **correspondance rigoureuse** entre le nom de l'environnement utilisé ici par le paramètre `env` et celui de la `dsc`. Ce même nom doit se retrouver impérativement dans le nom du répertoire de l'environnement (soit dans notre exemple `gitops/envs/conf-dso`) et celui du fichier de configuration JSON associé (`conf-dso.json`). Sans ces correspondances strictes, l'installation échouera.
 * `prefix` : Il s'agit ici du péfixe de vos namespaces. Ce préfixe doit impérativement se retrouver dans tous les paramètres `namespace` des outils spécifiés dans votre `dsc`, à l'exception des outils d'infrastructure vus précédemment et qui ne sont pas installés en mode GitOps.
 * `destination.clustername` : Si votre Argo CD d'infrastructure n'est pas installé dans le même cluster que le cluster de destination vers lequel vous déployez, préciser alors ici le nom du cluster de destination tel qu'il est connu par votre Argo CD d'infrastructure.
 * `targetRevision` : Il s'agit du nom de la branche à partir de laquelle vous déployez et depuis laquelle votre instance Argo CD d'infrastructure va aller tirer les fichiers. Dans notre exemple, vous le modifierez et le remplacerez par "ma-branche". 
-* `apps` : Ce paramètre est un array qui contient lui-même des objets correspondant chacun à l'une des applications du Socle qui seront déployées, ainsi qu'aux paramètres de cette application lus par l'applicationSet Argo CD (`./gitops/dso-appset.yaml`). Nous voyons ici que la ligne correspondant à l'application keycloak comprend le paramètre `enabled` positionné à `true`. Ce paramètre est **très important** puisqu'il détermine si une application est installée (`true`) ou pas (`false`). Veuillez noter que si ce paramètre est positionné à `false` et que l'application en question est déjà installée et gérée par notre applicationSet, alors elle est désinstallée. Notons aussi la présence du paramètre `namespace`, qui indique le nom du namespace hors préfixe. Il en résulte qu'ici l'application keycloak sera finalement déployée dans le namespace "dso-keycloak", le préfixe venant s'ajouter au nom du namespace.
+* `apps` : Ce paramètre est un array qui contient lui-même des objets correspondant chacun à l'une des applications du Socle qui seront déployées, ainsi qu'aux paramètres de cette application lus par l'applicationSet Argo CD (`gitops/dso-appset.yaml`). Nous voyons ici que la ligne correspondant à l'application keycloak comprend le paramètre `enabled` positionné à `true`. Ce paramètre est **très important** puisqu'il détermine si une application est installée (`true`) ou pas (`false`). Veuillez noter que si ce paramètre est positionné à `false` et que l'application en question est déjà installée et gérée par notre applicationSet, alors elle est désinstallée. Notons aussi la présence du paramètre `namespace`, qui indique le nom du namespace hors préfixe. Il en résulte qu'ici l'application keycloak sera finalement déployée dans le namespace "dso-keycloak", le préfixe venant s'ajouter au nom du namespace.
 
-Compte-tenu des éléments que nous venons de vérifier, et si nous nous voulons bien déployer keycloak dans le namespace dso-keycloak, avec un Argo CD d'infrastructure également présent dans le cluster cible, alors notre fichier `./gitops/envs/conf-dso/conf-dso.json`, tenant compte de notre branche de déploiement, se présentera finalement ainsi après édition :
+Compte-tenu des éléments que nous venons de vérifier, et si nous voulons bien déployer keycloak dans le namespace dso-keycloak, avec un Argo CD d'infrastructure également présent dans le cluster cible, alors notre fichier `gitops/envs/conf-dso/conf-dso.json`, tenant compte de notre branche de déploiement, se présentera finalement ainsi après édition :
 
 ```json
 {
@@ -1212,66 +1209,6 @@ Compte-tenu des éléments que nous venons de vérifier, et si nous nous voulons
 }
 ```
 
-Lorsque ce fichier est prêt, il vous reste encore à éditer le fichier `./gitops/dso-app.yaml` dont la section `spec.sources` se présente par défaut ainsi :
-
-```yaml
-  sources:
-    - repoURL: https://github.com/cloud-pi-native/socle.git
-      targetRevision: main
-      path: ./gitops
-      directory:
-        include: dso-appset.yaml
-```
-
-Nous allons devoir corriger cette section du fichier, en précisant l'URL de notre propre dépôt, ainsi que la branche à partir de laquelle nous déployons. Dans notre exemple (à adapter avec votre URL), cela donne donc ceci :
-
-```yaml
-  sources:
-    - repoURL: https://github.com/mon-utilisateur-ici/socle.git
-      targetRevision: ma-branche
-      path: ./gitops
-      directory:
-        include: dso-appset.yaml
-```
-
-Nous faisons ensuite de même avec le fichier `./gitops/dso-appset.yaml`, au niveau de la section `spec.generators`, en adaptant les paramètres `repoURL` et `revision`. Après édition, la section en question doit dans notre exemple ressembler à ceci :
-
-```yaml
-  generators:
-    - matrix:
-        generators:
-          - git:
-              repoURL: https://github.com/mon-utilisateur-ici/socle.git
-              revision: ma-branche
-              files:
-                - path: "./gitops/envs/*/*.json"
-          - list:
-              elementsYaml: "{{ .apps | toJson }}"
-            selector:
-              matchExpressions:
-                - key: enabled
-                  operator: In
-                  values:
-                    - "true"
-```
-
-Puis au niveau de la section `spec.template.spec.source` qui doit ressembler à ceci après adaptation du paramètre `repoURL` :
-
-```yaml
-      source:
-        repoURL: https://github.com/mon-utilisateur-ici/socle.git
-        path: "./gitops/envs/{{.env}}/apps/{{.app}}"
-        targetRevision: "{{.targetRevision}}"
-        plugin:
-          env:
-            - name: AVP_SECRET
-              value: vault-plugin-secret
-            - name: HELM_ARGS
-              value: -f values.yaml
-            - name: HELM_VALUES
-              value: ""
-```
-
 Finalement, nous lançons une première fois notre installation en GitOps de l'application Keycloak s'appuyant sur la dsc `conf-dso` (configuration par défaut) via la commande suivante :
 
 ```shell
@@ -1286,9 +1223,9 @@ ok: [localhost] => {
         "Paramètre global.gitOps.watchpointEnabled positionné à true dans votre resource dsc 'conf-dso'.",
         "Arrêt de l'installation suite à génération automatique des fichiers d'applications pour l'environnement 'conf-dso'.",
         "",
-        "Veuillez vous assurer de la cohérence des fichiers générés dans le répertoire './gitops/envs/conf-dso/apps'.",
+        "Veuillez vous assurer de la cohérence des fichiers générés dans le répertoire '/chemin/absolu/vers/votre/dépôt/gitops/envs/conf-dso/apps'.",
         "",
-        "Vous devrez par ailleurs créer le fichier './gitops/envs/conf-dso/conf-dso.json' s'il n'existe pas déjà",
+        "Vous devrez par ailleurs créer le fichier '/chemin/absolu/vers/votre/dépôt/gitops/envs/conf-dso/conf-dso.json' s'il n'existe pas déjà",
         "et y ajuster les paramètres souhaités. Se référer à la documentation README à ce sujet.",
         "",
         "Assurez-vous également de la cohérence des secrets qui ont été générés dans votre instance Vault d'infrastructure,",

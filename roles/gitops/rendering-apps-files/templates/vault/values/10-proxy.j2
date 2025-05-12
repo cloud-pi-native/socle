@@ -2,7 +2,7 @@
 vault:
   server:
     extraEnvironmentVars:
-      HTTP_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
-      HTTPS_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
-      NO_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,.{{ dsc.vault.namespace }}-internal"
+      HTTP_PROXY: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+      HTTPS_PROXY: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+      NO_PROXY: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,.{{ dsc.vault.namespace }}-internal"
 {% endif %}

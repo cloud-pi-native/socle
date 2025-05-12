@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: observability-gitlab-token
+  namespace: {{ dsc.argocdInfra.namespace }}
+type: Opaque
+stringData:
+  password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
+  url: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/observability/observability.git"
+  username: "root"

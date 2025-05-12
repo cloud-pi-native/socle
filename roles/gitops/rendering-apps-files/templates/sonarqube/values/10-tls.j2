@@ -3,7 +3,7 @@ sonarqube:
   ingress:
     tls:
       - hosts:
-          - <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.sonarqube}>
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.sonarqube}>
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
         secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}

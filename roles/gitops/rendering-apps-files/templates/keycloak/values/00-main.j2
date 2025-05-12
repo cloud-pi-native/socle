@@ -85,10 +85,10 @@ keycloak:
 
   ingress:
     enabled: true
-    ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
     pathType: "Prefix"
     apiVersion: ""
-    hostname: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>
+    hostname: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>
     path: /
     servicePort: "http"
     annotations:
@@ -304,7 +304,7 @@ keycloak:
 
   extraEnvVars:
     - name: DSFR_THEME_HOME_URL
-      value: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.console}>
+      value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.console}>
     - name: DSFR_THEME_SERVICE_TITLE
       value: Cloud Pi Native
     - name: DSFR_THEME_BRAND_TOP
@@ -313,22 +313,22 @@ keycloak:
       value: cloudpinative-relations@interieur.gouv.fr
   initContainers:
     - name: realm-ext-provider
-      image: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1"
+      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1"
       imagePullPolicy: IfNotPresent
       command:
         - sh
       args:
         - -c
-        - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:forge-dso/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}>
+        - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}>
       volumeMounts:
         - name: empty-dir
           mountPath: /emptydir
 {% if dsc.proxy.enabled %}
       env:
         - name: HTTP_PROXY
-          value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
         - name: HTTPS_PROXY
-          value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
         - name: NO_PROXY
-          value: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
 {% endif %}

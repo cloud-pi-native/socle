@@ -54,6 +54,12 @@
         - argo-infra
       when: dsc.argocdInfra.installEnabled
 
+    - role: gitops/local-config
+      tags:
+        - rendering-apps-files
+        - apps-files
+        - dso-app
+
     - role: gitops/vault-secrets
       tags:
         - vault-secrets

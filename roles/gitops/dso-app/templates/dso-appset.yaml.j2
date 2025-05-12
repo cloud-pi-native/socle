@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: dso-install-manager
-  namespace: infra-argocd
+  namespace: {{ dsc.argocdInfra.namespace }}
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
@@ -14,10 +14,11 @@ spec:
     - matrix:
         generators:
           - git:
-              repoURL: https://github.com/cloud-pi-native/socle.git
-              revision: develop
+              repoURL: {{ dsc.global.gitOps.repo.url }}
+              revision: {{ dsc.global.gitOps.repo.revision }}
               files:
-                - path: "./gitops/envs/*/*.json"
+                - path: "{{ dsc.global.gitOps.repo.path }}/envs/*/*.json"
+{%- raw %}
           - list:
               elementsYaml: "{{ .apps | toJson }}"
             selector:
@@ -38,12 +39,14 @@ spec:
         platform.region: "{{.region}}"
       finalizers:
         - resources-finalizer.argocd.argoproj.io
+{% endraw %}
     spec:
-      project: default
+      project: {{ dsc.argocdInfra.projectName }}
       revisionHistoryLimit: 3
       source:
-        repoURL: https://github.com/cloud-pi-native/socle.git
-        path: "./gitops/envs/{{.env}}/apps/{{.app}}"
+        repoURL: {{ dsc.global.gitOps.repo.url }}
+        path: "{{ dsc.global.gitOps.repo.path }}{% raw %}/envs/{{.env}}/apps/{{.app}}{% endraw %}"
+{%- raw %}
         targetRevision: "{{.targetRevision}}"
         plugin:
           env:
@@ -52,10 +55,11 @@ spec:
             - name: HELM_ARGS
               value: -f values.yaml
             - name: HELM_VALUES
-              value: ""
+              value: |
+                destinationClusterName: {{.destination.clusterName}}
       destination:
-        name: "{{.destination.clusterName}}"
-        namespace: "{{.prefix}}{{.namespace}}"
+        name: "{{ default .destination.clusterName .clusterName }}"
+        namespace: "{{ default .prefix .customPrefix }}{{.namespace}}"
       syncPolicy:
         automated:
           prune: true
@@ -68,3 +72,4 @@ spec:
     preserveResourcesOnDeletion: true
     # automated:
     #   selfHeal: true
+{% endraw %}

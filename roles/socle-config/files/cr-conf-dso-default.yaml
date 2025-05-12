@@ -21,25 +21,32 @@ spec:
     projectsRootDir:
       - forge
     rootDomain: .example.com
+    infraRootDomain: .infra.example.com
     logs: {}
     metrics: {}
     alerting: {}
+    dockerAccount:
+      enabled: false
     backup:
-      backup:
-        cnpg:
-          enabled: false
-          pathPrefix: cnpg
-        gitlab:
-          enabled: false
-          pathPrefix: gitlab
-        vault:
-          enabled: false
-          pathPrefix: vault
-        vaultInfra:
-          enabled: false
-          pathPrefix: vault-infra
+      cnpg:
+        enabled: false
+        pathPrefix: cnpg
+      gitlab:
+        enabled: false
+        pathPrefix: gitlab
+      vault:
+        enabled: false
+        pathPrefix: vault
+      vaultInfra:
+        enabled: false
+        pathPrefix: vault-infra
     gitOps:
+      repo:
+        url: https://github.com/cloud-pi-native/socle.git
+        revision: develop
+        path: gitops
       watchpointEnabled: true
+      envName: sandbox
   argocd:
     admin:
       enabled: false
@@ -47,6 +54,8 @@ spec:
   argocdInfra:
     admin:
       enabled: false
+    namespace: infra-argocd
+    projectName: default
   #    password: WeAreThePasswords
   certmanager: {}
   cloudnativepg: {}
@@ -74,6 +83,7 @@ spec:
     cnpg:
       mode: primary
     adminPassword: anotherGreatPassword
+    pvcRegistrySize: 50Gi
   ingress:
     annotations:
       route.openshift.io/termination: edge

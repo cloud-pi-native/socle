@@ -9,7 +9,7 @@
     auth_method: token
     token: "{{ vault_infra_token }}"
     namespace: "{{ dsc.vaultInfra.namespace }}"
-    engine_mount_point: "forge-dso"
+    engine_mount_point: "{{ vaultinfra_kv_name }}"
     path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
   register: current_vault_values
@@ -53,7 +53,7 @@
     auth_method: token
     token: "{{ vault_infra_token }}"
     namespace: "{{ dsc.vaultInfra.namespace }}"
-    engine_mount_point: "forge-dso"
+    engine_mount_point: "{{ vaultinfra_kv_name }}"
     path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
     data: "{{ current_vault_values_combined.stdout | from_json }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"

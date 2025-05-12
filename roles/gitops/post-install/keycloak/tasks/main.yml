@@ -349,6 +349,26 @@
       consent.screen.text: ""
     protocolMappers: "{{ lookup('ansible.builtin.file', 'generic-client-scope-protocolMappers.yaml') | from_yaml }}"
 
+- name: Create group keycloak client scope
+  when: kc_client_scopes.json | selectattr('name', 'equalto', 'group') | length == 0
+  community.general.keycloak_clientscope:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloak_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    name: group
+    realm: dso
+    description: Group client scope
+    protocol: openid-connect
+    attributes:
+      include.in.token.scope: true
+      display.on.consent.screen: true
+      gui.order: ""
+      consent.screen.text: ""
+    protocolMappers: "{{ lookup('ansible.builtin.file', 'group-client-scope-protocolMappers.yaml') | from_yaml }}"
+
 - name: Create clients
   ansible.builtin.include_tasks:
     file: client.yaml

@@ -1,13 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: grafana
-  namespace: infra-argocd
+  name: dso-grafana
+  namespace: {{ dsc.argocdInfra.namespace }}
 spec:
   destination:
     namespace: {{ dsc.grafana.namespace }}
-    server: https://kubernetes.default.svc
-  project: default
+    name: {% raw %}{{ .Values.destinationClusterName }}
+{% endraw %}
+  project: {{ dsc.argocdInfra.projectName }}
   sources:
   - chart: dso-grafana
     repoURL: {{ dsc.grafana.helmRepoUrl }}
@@ -20,7 +21,7 @@ spec:
       - ./values.yaml
       - $tenants/helm/values.yaml
   - ref: tenants
-    repoURL: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/observability/observability.git"
+    repoURL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/observability/observability.git"
     targetRevision: main
   syncPolicy:
     automated:

@@ -59,6 +59,10 @@
         - rendering-apps-files
         - apps-files
         - dso-app
+        - vault-secrets
+        - vault-secrets-post-install
+        - post-install
+        - post-install-vault
 
     - role: gitops/vault-secrets
       tags:

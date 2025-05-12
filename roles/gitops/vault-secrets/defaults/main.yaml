@@ -81,5 +81,19 @@ envs:
               accesskey: "{{ dsc.harbor.s3ImageChartStorage.accesskey | default('') }}"
               secretkey: "{{ dsc.harbor.s3ImageChartStorage.secretkey | default('') }}"
           cnpg:
-            username: "{{ 'harbor' if dsc.harbor.cnpg.initPassword else (pg_harbor_db_secret.resources[0].data.username | b64decode) }}"
-            password: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) if dsc.harbor.cnpg.initPassword else (pg_harbor_db_secret.resources[0].data.password | b64decode) }}"
+            username: >-
+              {{
+                (pg_harbor_db_secret.resources[0].data.username | b64decode)
+                if not dsc.harbor.cnpg.initPassword
+                and pg_harbor_db_secret is defined
+                and pg_harbor_db_secret.resources | length > 0
+                else 'harbor'
+              }}
+            password: >-
+              {{
+                (pg_harbor_db_secret.resources[0].data.password | b64decode)
+                if not dsc.harbor.cnpg.initPassword
+                and pg_harbor_db_secret is defined
+                and pg_harbor_db_secret.resources | length > 0
+                else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
+              }}

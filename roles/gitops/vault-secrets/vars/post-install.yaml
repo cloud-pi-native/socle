@@ -6,6 +6,7 @@ envs:
       - argocd_app: "gitlab"
         vault_values:
           gitlabToken: "{{ gitlab_token | default('') }}"
+          runnerToken: "{{ default_runner.json.token }}"
       - argocd_app: "keycloak"
         vault_values:
           client:

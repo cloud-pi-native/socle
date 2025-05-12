@@ -1,0 +1,107 @@
+gitlab-runner:
+  fullnameOverride: gitlab-runner
+  replicas: 1
+
+## How many old ReplicaSets for this Deployment you want to retain
+  revisionHistoryLimit: 2
+  
+  gitlabUrl: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/
+  
+  runnerToken: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#runnerToken>
+  
+  rbac:
+    create: true
+    rules:
+  #    - apiGroups: [""]
+  #      resources: ["pods", "secrets", "configmaps"]
+  #      verbs: ["list", "get", "watch", "create", "delete", "update"]
+  #    - apiGroups: [""]
+  #      resources: ["pods/exec", "pods/attach"]
+  #      verbs: ["create"]
+  #    - apiGroups: [""]
+  #      resources: ["pods/log"]
+  #      verbs: ["get"]
+      - resources: ["configmaps", "events", "pods", "pods/attach", "pods/exec", "secrets", "services"]
+        verbs: ["get", "list", "watch", "create", "patch", "update", "delete"]
+      - apiGroups: [""]
+        resources: ["pods/exec"]
+        verbs: ["create", "patch", "delete"]
+    serviceAccountName: gitlab-runner
+    podSecurityPolicy:
+      enabled: true
+  
+  resources:
+    requests:
+      ephemeral-storage: "500Mi"
+    limits:
+      ephemeral-storage: "2Gi"
+  
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  
+  ## Configure a service resource e.g., to allow scraping metrics via
+  ## prometheus-operator serviceMonitor
+  service:
+    enabled: true
+{% endif %}
+  
+  runners:
+    # runner configuration, where the multi line strings is evaluated as
+    # template so you can specify helm values inside of it.
+    #
+    # tpl: https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
+    # runner configuration: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+    config: |
+      [[runners]]
+{% if dsc.exposedCA.type != 'none' %}
+        tls-ca-file = "/home/gitlab-runner/.gitlab-runner/certs/tls.crt"
+{% endif %}
+        [runners.kubernetes]
+          namespace = "{{ dsc.gitlab.namespace }}"
+          image = "ubuntu:22.04"
+          # multiple "always" to retry pull on fail (see. https://docs.gitlab.com/runner/executors/kubernetes.html#set-a-pull-policy)
+          pull_policy = ["always", "always"]
+{% if dsc.gitlabRunner.resources is defined and dsc.gitlabRunner.resources != 'none' %}
+          # request and limit of build pod and override allowed in ci
+{% if dsc.gitlabRunner.resources.requests is defined and dsc.gitlabRunner.resources.requests != 'none' %}
+          cpu_request = "{{ dsc.gitlabRunner.resources.requests.cpu }}"
+          memory_request = "{{ dsc.gitlabRunner.resources.requests.memory }}"
+{% endif %}
+{% if dsc.gitlabRunner.resources.limits is defined and dsc.gitlabRunner.resources.limits != 'none' %}
+          cpu_limit = "{{ dsc.gitlabRunner.resources.limits.cpu }}"
+          memory_limit = "{{ dsc.gitlabRunner.resources.limits.memory }}"
+{% endif %}
+{% if dsc.gitlabRunner.resources.overwrite is defined and dsc.gitlabRunner.resources.overwrite != 'none' %}
+{% if dsc.gitlabRunner.resources.overwrite.requests != 'none' %}
+          cpu_request_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.requests.cpu }}"
+          memory_request_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.requests.memory }}"
+{% endif %}
+{% if dsc.gitlabRunner.resources.overwrite.limits != 'none' %}
+          memory_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.cpu }}"
+          cpu_limit_overwrite_max_allowed = "{{ dsc.gitlabRunner.resources.overwrite.limits.memory }}"
+{% endif %}
+{% endif %}
+{% endif %}
+  
+    ## Specify the name for the runner.
+    name: gitlab-runner
+  
+    ## The name of the secret containing runner-token and runner-registration-token
+    secret: gitlab-runner-secret
+  
+  ## Configure environment variables that will be present when the registration command runs
+  ## This provides further control over the registration process and the config.toml file
+  ## ref: `gitlab-runner register --help`
+  ## ref: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+  ##
+  volumeMounts:
+    - name: root-gitlab-runner
+      mountPath: /.gitlab-runner
+  
+  volumes:
+    - name: root-gitlab-runner
+      emptyDir:
+        medium: "Memory"

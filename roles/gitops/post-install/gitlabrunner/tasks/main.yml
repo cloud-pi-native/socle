@@ -1,0 +1,39 @@
+---
+- name: Get Gitlab namespace
+  kubernetes.core.k8s_info:
+    kind: Namespace
+    name: "{{ dsc.gitlab.namespace }}"
+  register: gitlab_ns
+
+- name: Fail if Gitlab namespace is not present
+  ansible.builtin.fail:
+    msg: Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant
+  when: gitlab_ns | length == 0
+
+- name: Get dso-config inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: dso-config
+  register: ansible_inventory
+
+- name: Get gitlab token
+  ansible.builtin.set_fact:
+    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
+
+- name: Initiate a runner in GitLab instance
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ gitlab_domain }}/api/v4/user/runners
+    method: POST
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body:
+      runner_type: instance_type
+      description: dso-runner
+      platform:
+      run_untagged: true
+    body_format: form-urlencoded
+    status_code: [201]
+  changed_when: true
+  register: default_runner

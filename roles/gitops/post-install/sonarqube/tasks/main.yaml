@@ -70,7 +70,7 @@
     kind: Endpoints
     namespace: "{{ dsc.sonarqube.namespace }}"
     label_selectors:
-      - "release={{ dsc.sonarqube.namespace }}"
+      - "release={{ dsc.global.gitOps.envName }}-{{ dsc.sonarqube.namespace }}"
   register: endpoint
   until: endpoint.resources[0].subsets[0].addresses[0].ip is defined
   retries: 45
@@ -90,7 +90,7 @@
 
 - name: Get Sonarqube admin password secret
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.global.gitOps.envName }}-{{ dsc.sonarqube.namespace }}"
+    namespace: "{{ dsc.sonarqube.namespace }}"
     kind: Secret
     name: "sonarqube"
   register: sonarqube_pwd

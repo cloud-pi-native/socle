@@ -26,3 +26,17 @@
   when: lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') != ''
   ansible.builtin.set_fact:
     kubeconfig_infra: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') }}"
+
+- name: Check infrastructure cluster access
+  when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') == ''
+  block:
+    - ansible.builtin.debug:
+        msg:
+          - "La variable d'environnement KUBECONFIG_PROXY_INFRA n'est pas définie."
+          - "Elle est nécessaire en cas d'utilisation de tsh proxy kube."
+          - "Dans ce cas, veuillez la définir avec la valeur requises pour accéder au cluster d'admnistration (ArgoCD et Vault d'infra)."
+
+- name: "Déclaration du kubeconfig proxy infra"
+  when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') != ''
+  ansible.builtin.set_fact:
+    kubeconfig_proxy_infra: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') }}"

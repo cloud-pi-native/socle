@@ -142,7 +142,16 @@
     observatorium_domain: "{{ dsc.observatorium.subDomain }}{{ root_domain }}"
     sonar_domain: "{{ dsc.sonarqube.subDomain }}{{ root_domain }}"
     vault_domain: "{{ dsc.vault.subDomain }}{{ root_domain }}"
+
+- name: Set Vault infra domain fact
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') == ''
+  ansible.builtin.set_fact:
     vaultinfra_domain: "{{ dsc.vaultInfra.subDomain }}{{ infra_root_domain }}"
+
+- name: Set Vault infra domain fact
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') != ''
+  ansible.builtin.set_fact:
+    vaultinfra_domain: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') }}"
 
 - name: Debug domains facts
   ansible.builtin.debug:

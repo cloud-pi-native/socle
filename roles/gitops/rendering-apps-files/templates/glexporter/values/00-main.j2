@@ -1,0 +1,15 @@
+gitlab-ci-pipelines-exporter:
+  config:
+    gitlab:
+      url: https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/
+      token: <path:forge-dso/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
+    redis:
+      url: null
+    wildcards:
+      - {}
+  serviceMonitor :
+    enabled: true
+    endpoints:
+      - port: http
+        interval: 30s
+        path: /metrics

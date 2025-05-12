@@ -13,6 +13,7 @@
     { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 },
     { "app": "sonarqube", "enabled": "false", "namespace": "sonarqube", "syncWave": 10 },
     { "app": "harbor", "enabled": "false", "namespace": "harbor", "syncWave": 10 },
-    { "app": "argocd", "enabled": "true", "namespace": "argocd", "syncWave": 10 }
+    { "app": "argocd", "enabled": "false", "namespace": "argocd", "syncWave": 10 },
+    { "app": "glexporter", "enabled": "true", "namespace": "gitlab", "syncWave": 10 }
   ]
 }

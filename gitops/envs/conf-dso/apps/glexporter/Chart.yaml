@@ -1,0 +1,9 @@
+apiVersion: v2
+dependencies:
+- alias: gitlab-ci-pipelines-exporter
+  name: gitlab-ci-pipelines-exporter
+  repository: https://charts.visonneau.fr
+  version: 0.3.5
+name: gitlab-ci-pipelines-exporter
+type: application
+version: 0.3.5

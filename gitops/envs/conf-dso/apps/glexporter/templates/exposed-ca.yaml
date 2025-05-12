@@ -1,0 +1,9 @@
+kind: Secret
+apiVersion: v1
+type: Opaque
+metadata:
+  name: exposed-ca
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+data:
+  tls.crt: <path:forge-dso/data/env/conf-dso/apps/common/values#exposedCa | base64encode>

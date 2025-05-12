@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -10,3 +11,19 @@ stringData:
   password: <path:forge-dso/data/env/conf-dso/apps/gitlab/values#gitlabToken>
   url: "https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain | jsonPath {.gitlab}>/my-root-dir/projects-sub-dir"
   username: "root"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+  name: oci-dockerhub-creds
+  namespace: dso-argocd
+stringData:
+  url: registry-1.docker.io
+  name: bitnamicharts
+  type: helm
+  enableOCI: "true"
+  username: <path:forge-dso/data/env/conf-dso/apps/common/values#dockerAccount | jsonPath {.username}>
+  password: <path:forge-dso/data/env/conf-dso/apps/common/values#dockerAccount | jsonPath {.password}>
+  proxy: <path:forge-dso/data/env/conf-dso/apps/common/values#proxy | jsonPath {.httpProxy}> 

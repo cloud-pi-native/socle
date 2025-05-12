@@ -1,3 +1,13 @@
+envs:
+  - name: "{{ dsc_name }}"
+    apps:
+      - argocd_app: keycloak
+#      - argocd_app: vault
+#      - argocd_app: sonarqube
+#      - argocd_app: observability
+#      - argocd_app: harbor
+      - argocd_app: glexporter
+
 values:
   argocd:
     configs: |

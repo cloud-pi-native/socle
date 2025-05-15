@@ -314,6 +314,8 @@
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
     purge: false
     variables:
+      - name: ROOT_DOMAIN
+        value: "{{ dsc.global.rootDomain }}"
       - name: VAULT_KV
         value: forge-dso
       - name: CATALOG_PATH

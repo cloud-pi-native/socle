@@ -17,16 +17,16 @@ spec:
 {% if not dsc.ingress.tls.type == 'none' %}
   tls:
   - hosts:
-    - <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexusDockerProxy}>
+    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexusDockerProxy}>
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
     secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
     secretName: nexus-docker-proxy-tls-secret
 {% endif %}
 {% endif %}
-  ingressClassName: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
   rules:
-    - host: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexusDockerProxy}>
+    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexusDockerProxy}>
       http:
         paths:
           - path: /

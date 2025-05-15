@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.11.1](https://github.com/cloud-pi-native/socle/compare/v3.11.0...v3.11.1) (2025-05-15)
+
+
+### Bug Fixes
+
+* :wrench: avoid failure with missing harbor ([436396e](https://github.com/cloud-pi-native/socle/commit/436396eb36d6b1bfe2ace0f9ac38ecb5bd852c3d))
+* :wrench: missing conditions for infra tools ([72b2de3](https://github.com/cloud-pi-native/socle/commit/72b2de3df56900d3591aa1b6ca4f833d3e7cc114))
+* add root domain var to gitlab ci variables ([2b462b6](https://github.com/cloud-pi-native/socle/commit/2b462b6a5d879fba62987d33238209fff724c1bd))
+
 ## [3.11.0](https://github.com/cloud-pi-native/socle/compare/v3.10.0...v3.11.0) (2025-05-12)
 
 

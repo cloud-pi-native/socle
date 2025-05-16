@@ -1,0 +1,18 @@
+---
+apiVersion: v2
+name: AWX
+type: application
+version: {{ dsc.awx.chartVersion }}
+dependencies:
+- name: cluster
+  alias: cluster
+  version: {{ dsc.cloudnativepg.cluster.chartVersion }}
+  repository: {{ dsc.cloudnativepg.cluster.helmRepoUrl }}
+- name: awx-operator
+  alias: awx
+  version: {{ dsc.awx.chartVersion }}
+  repository: {{ dsc.awx.helmRepoUrl }}
+- name: cpn-ansible-job
+  alias: cpn-ansible-job
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}

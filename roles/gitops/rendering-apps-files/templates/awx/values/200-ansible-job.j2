@@ -1,0 +1,19 @@
+cpn-ansible-job:
+  job:
+    name: "awx-oidc"
+    dscName: "{{ dsc_name }}"
+{% if use_private_registry %}
+    image:
+      repository: "{{ dsc.global.registry }}/cloud-pi-native/git-ansible"
+{% endif %}
+{% if dsc.proxy.enabled %}
+    extraEnv:
+    - name: http_proxy
+      value: "{{ dsc.proxy.http_proxy }}"
+    - name: https_proxy
+      value: "{{ dsc.proxy.https_proxy }}"
+    - name: no_proxy
+      value: "{{ dsc.proxy.no_proxy }}"
+    - name: GIT_HTTP_PROXY_AUTHMETHOD
+      value: basic
+{% endif %}

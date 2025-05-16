@@ -1,0 +1,14 @@
+---
+apiVersion: v2
+name: AWX
+type: application
+version: {{ dsc.awx.chartVersion }}
+dependencies:
+- name: cpn-cnpg
+  alias: cpn-cnpg
+  repository: {{ dsc.cpnCnpg.helmRepoUrl }}
+  version: {{ dsc.cpnCnpg.chartVersion }}
+- name: awx-operator
+  alias: awx
+  version: {{ dsc.awx.chartVersion }}
+  repository: {{ dsc.awx.helmRepoUrl }}

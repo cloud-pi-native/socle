@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: dso-install-manager
+  name: dso-install-manager-{{ dsc.global.gitOps.envName }}
   namespace: {{ dsc.argocdInfra.namespace }}
 spec:
   goTemplate: true
@@ -27,9 +27,11 @@ spec:
                   operator: In
                   values:
                     - "true"
+{% endraw %}
   template:
     metadata:
-      name: "{{.prefix}}{{.app}}"
+      name: "{{"{{"}}.prefix{{"}}"}}{{"{{"}}.app{{"}}"}}-{{ dsc.global.gitOps.envName }}"
+{%- raw %}
       annotations:
         argocd.argoproj.io/compare-options: ServerSideDiff=true
         argocd.argoproj.io/sync-wave: "{{.syncWave}}"

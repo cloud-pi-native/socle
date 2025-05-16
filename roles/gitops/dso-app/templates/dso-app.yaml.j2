@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dso-install-manager
+  name: dso-install-manager-{{ dsc.global.gitOps.envName }}
   namespace: {{ dsc.argocdInfra.namespace }}
 spec:
   project: {{ dsc.argocdInfra.projectName }}

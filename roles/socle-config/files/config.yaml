@@ -17,6 +17,12 @@ spec:
     subDomain: infra-argocd
     helmRepoUrl: https://argoproj.github.io/argo-helm
     values: {}
+  awx:
+    installEnabled: false
+    namespace: dso-awx
+    subDomain: awx
+    helmRepoUrl: https://ansible-community.github.io/awx-operator-helm
+    values: {}
   certmanager:
     installEnabled: false
     helmRepoUrl: https://charts.jetstack.io

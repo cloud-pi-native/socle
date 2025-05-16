@@ -10,6 +10,10 @@ spec:
     # https://artifacthub.io/packages/helm/argo/argo-cd
     chartVersion: 7.9.0
     vaultPluginVersion: 1.18.1
+  awx:
+    # https://artifacthub.io/packages/helm/awx-operator-helm/awx-operator
+    chartVersion: 2.19.1
+    defaultAwxVersion: 24.6.1
   certmanager:
     # https://github.com/cert-manager/cert-manager/releases
     chartVersion: v1.14.3

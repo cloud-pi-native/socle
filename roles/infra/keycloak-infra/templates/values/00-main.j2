@@ -318,7 +318,7 @@ initContainers:
       - sh
     args:
       - -c
-      - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
+      - mkdir -p /emptydir/app-providers-dir && curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
     volumeMounts:
       - name: empty-dir
         mountPath: /emptydir
@@ -330,4 +330,15 @@ initContainers:
         value: {{ dsc.proxy.https_proxy }}
       - name: NO_PROXY
         value: {{ dsc.proxy.no_proxy }}
+{% endif %}
+{% if dsc.global.platform == "kubernetes" %}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
 {% endif %}

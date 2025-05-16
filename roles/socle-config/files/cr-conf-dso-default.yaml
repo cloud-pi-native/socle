@@ -58,6 +58,7 @@ spec:
     namespace: infra-argocd
     projectName: default
   #    password: WeAreThePasswords
+  awx: {}
   certmanager: {}
   cloudnativepg: {}
   console: {}

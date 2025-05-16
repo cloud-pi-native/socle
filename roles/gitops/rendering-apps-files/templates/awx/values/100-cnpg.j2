@@ -1,0 +1,46 @@
+cluster:
+  nameOverride: "pg-cluster-awx"
+  fullnameOverride: "pg-cluster-awx"
+  cluster:
+    primaryUpdateMethod: restart
+    enablePDB: false
+{% if use_image_pull_secrets %}
+    imagePullSecrets:
+    - name: dso-config-pull-secret
+{% endif %}
+    initdb:
+      owner: awx
+      database: awx
+      secret:
+        name: pg-cluster-awx-db
+    postgresql:
+      pg_hba:
+        - host awx awx all md5
+        - host awx streaming_replica all md5
+
+{% if dsc.global.backup.velero.enabled %}
+    annotations:
+      pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d awx > /var/lib/postgresql/data/app.dump-${index}"]'
+      pre.hook.backup.velero.io/container: postgres
+      pre.hook.backup.velero.io/on-error: Fail
+      pre.hook.backup.velero.io/timeout: 90s
+{% endif %}
+
+    monitoring:
+      enabled: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled %}
+  backups:
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
+    enabled: true
+    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
+    retentionPolicy: 14d
+    s3:
+      accessKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
+      secretKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
+    scheduledBackups:
+    - name: pg-cluster-awx
+      schedule: 0 0 */6 * * *
+      backupOwnerReference: self
+      method: barmanObjectStore
+{% endif %}

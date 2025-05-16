@@ -6,6 +6,7 @@
     pod: "{{ vault_pod }}"
     namespace: "{{ dsc.vaultInfra.namespace }}"
     command: vault status -format=json
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
   register: vault_status
   ignore_errors: true
 

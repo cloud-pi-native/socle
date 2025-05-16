@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: "dso-grafana-{{ dsc.global.gitOps.envName }}"
+  name: "{{ dsc.global.gitOps.envName }}-dso-grafana"
   namespace: {{ dsc.argocdInfra.namespace }}
 spec:
   destination:

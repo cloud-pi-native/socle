@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: dso-install-manager-{{ dsc.global.gitOps.envName }}
+  name: {{ dsc.global.gitOps.envName }}-dso-install-manager
   namespace: {{ dsc.argocdInfra.namespace }}
 spec:
   goTemplate: true
@@ -30,7 +30,7 @@ spec:
 {% endraw %}
   template:
     metadata:
-      name: "{{"{{"}}.prefix{{"}}"}}{{"{{"}}.app{{"}}"}}-{{ dsc.global.gitOps.envName }}"
+      name: "{{ dsc.global.gitOps.envName }}-{{"{{"}}.prefix{{"}}"}}{{"{{"}}.app{{"}}"}}"
 {%- raw %}
       annotations:
         argocd.argoproj.io/compare-options: ServerSideDiff=true

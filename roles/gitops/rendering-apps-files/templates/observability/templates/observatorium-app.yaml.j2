@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: "dso-observatorium-{{ dsc.global.gitOps.envName }}"
+  name: "{{ dsc.global.gitOps.envName }}-dso-observatorium"
   namespace: {{ dsc.argocdInfra.namespace }}
 spec:
   destination:

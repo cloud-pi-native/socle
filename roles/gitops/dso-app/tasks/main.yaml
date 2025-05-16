@@ -4,7 +4,7 @@
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
     proxy: "{{ kubeconfig_proxy_infra | default('')}}"
-    namespace: dsc.argocdInfra.namespace
+    namespace: "{{ dsc.argocdInfra.namespace }}"
     definition: "{{ lookup('ansible.builtin.template', role_path + '/templates/dso-app.yaml.j2') | from_yaml }}"
     state: present
 

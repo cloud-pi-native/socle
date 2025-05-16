@@ -1,4 +1,16 @@
 crds:
+{% if dsc.global.platform == "kubernetes" %}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 999
+    seccompProfile:
+      type: RuntimeDefault
+{% endif %}
   install: true
   keep: true
 {% if dsc.global.platform == "openshift" %}
@@ -108,11 +120,23 @@ configs:
 {% if dsc.global.environment == 'development' %}
     accounts.cpin-sa: apiKey
 {% endif %}
+global:
+{% if use_private_registry %}
+  image:
+    repository: "{{ dsc.global.registry }}/argoproj/argocd"
+{% endif %}
 redis-ha:
   enabled: true
+{% if use_private_registry %}
   image:
-    repository: docker.io/library/redis
+    repository: "{{ dsc.global.registry }}/library/redis"
     tag: 7.4.1-alpine
+{% endif %}
+{% if use_private_registry %}
+  haproxy:
+    image:
+      repository: "{{ dsc.global.registry }}/haproxy"
+{% endif %}
 controller:
   replicas: 3
 dex:
@@ -138,8 +162,18 @@ repoServer:
         name: helm-docker-registry-secret
         key: password
 {% endif %}
-  initContainers:
+{% if dsc.global.platform == "kubernetes" %}
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 999
+{% endif %}
 {% if dsc.global.dockerAccount.enabled %}
+  initContainers:
   - name: helm-login
     image: quay.io/argoproj/argocd:{{ argo_app_version }}
     command: ["sh", "-c"]
@@ -169,7 +203,7 @@ repoServer:
         - ALL
       readOnlyRootFilesystem: false
       runAsNonRoot: true
-      runAsUser: 999 
+      runAsUser: 999
       seccompProfile:
         type: RuntimeDefault
 {% endif %}
@@ -205,10 +239,15 @@ repoServer:
     image: registry.access.redhat.com/ubi8
 {% if dsc.global.platform != "openshift" %}
     securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
       runAsNonRoot: true
       runAsUser: 999
-      runAsGroup: 999
-      fsGroup: 999
+      seccompProfile:
+        type: RuntimeDefault
 {% endif %}
     env:
     - name: AVP_VERSION
@@ -236,10 +275,15 @@ repoServer:
     image: quay.io/argoproj/argocd:{{ argo_app_version }}
 {% if dsc.global.platform != "openshift" %}
     securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
       runAsNonRoot: true
       runAsUser: 999
-      runAsGroup: 999
-      fsGroup: 999
+      seccompProfile:
+        type: RuntimeDefault
 {% endif %}
     env:
     - name: HELM_CACHE_HOME
@@ -283,10 +327,15 @@ repoServer:
     image: quay.io/argoproj/argocd:{{ argo_app_version }}
 {% if dsc.global.platform != "openshift" %}
     securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
       runAsNonRoot: true
       runAsUser: 999
-      runAsGroup: 999
-      fsGroup: 999
+      seccompProfile:
+        type: RuntimeDefault
 {% endif %}
     env:
     - name: HELM_CACHE_HOME
@@ -330,10 +379,15 @@ repoServer:
     image: quay.io/argoproj/argocd:{{ argo_app_version }}
 {% if dsc.global.platform != "openshift" %}
     securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false
       runAsNonRoot: true
       runAsUser: 999
-      runAsGroup: 999
-      fsGroup: 999
+      seccompProfile:
+        type: RuntimeDefault
 {% endif %}
     env:
     - name: HELM_CACHE_HOME

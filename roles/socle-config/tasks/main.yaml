@@ -163,7 +163,7 @@
 
 - name: Set vaultinfra_kv_name fact
   ansible.builtin.set_fact:
-    vaultinfra_kv_name: "{{ dsc.global.gitOps.envName }}"
+    vaultinfra_kv_name: "dso-{{ dsc.global.gitOps.envName }}"
 
 - name: Set keycloak_reset_password fact
   ansible.builtin.set_fact:

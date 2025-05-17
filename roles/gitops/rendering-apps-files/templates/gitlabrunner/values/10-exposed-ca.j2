@@ -1,0 +1,4 @@
+{% if dsc.exposedCA.type != 'none' %}
+gitlab-runner:
+  certsSecretName: exposed-ca
+{% endif %}

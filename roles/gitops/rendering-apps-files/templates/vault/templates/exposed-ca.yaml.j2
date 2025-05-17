@@ -7,5 +7,5 @@ metadata:
   annotations:
     avp.kubernetes.io/remove-missing: "true"
 data:
-  tsl.crt: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#exposedCa | base64encode>
+  tls.crt: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#exposedCa | base64encode>
 {% endif %}

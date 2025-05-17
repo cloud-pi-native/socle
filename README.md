@@ -1129,6 +1129,9 @@ Pour cela :
 * Positionnez-vous dans le répertoire `socle` du présent dépôt que vous venez de cloner, et assurez vous d'être bien positionné sur la branche `main` à l'aide de la commande `git branch`. Listez également les fichiers présents.
 * Créez une variable d'environnement avec `export GITOPS_REPO_PATH=/chemin/absolu/vers/votre/dépôt`.
 * Créez une variable d'environnement avec `export KUBECONFIG_INFRA=/chemin/absolu/vers/votre/kubeconfig-infra` pour configurer les accès au cluster d'infrastructure.
+* (Optionnel) Créez une variable d'environnement avec `export KUBECONFIG_PROXY_INFRA=http://127.0.0.1:<port>` en cas d'utilisation de `tsh proxy kube --port <port>`.
+* (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_DOMAIN=<nom de domaine du vault d'infrastructure>` en cas de permissions restreinte sur le cluster d'infrastructure.
+* (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_TOKEN=<token du vault d'infrastructure>` en cas de permissions restreinte sur le cluster d'infrastructure.
 * Lancez le playbook gitops avec cette variable, pour peupler votre clone local.
 * Effectuez votre premier commit sur la branche main de votre dépôt, exemple : `git commit -am "feat/first-commit"`
 * Poussez vos changements sur la branche main distante : `git push`

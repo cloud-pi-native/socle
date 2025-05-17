@@ -90,7 +90,7 @@
 
 - name: Get Sonarqube admin password secret
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.sonarqube.namespace }}"
+    namespace: "{{ dsc.global.gitOps.envName }}-{{ dsc.sonarqube.namespace }}"
     kind: Secret
     name: "sonarqube"
   register: sonarqube_pwd

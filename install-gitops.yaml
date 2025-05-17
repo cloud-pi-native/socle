@@ -59,6 +59,10 @@
         - rendering-apps-files
         - apps-files
         - dso-app
+        - vault-secrets
+        - vault-secrets-post-install
+        - post-install
+        - post-install-vault
 
     - role: gitops/vault-secrets
       tags:
@@ -95,12 +99,6 @@
         - post-install
         - post-install-harbor
 
-    - role: gitops/post-install/vault
-      tags:
-        - post-install
-        - post-install-vault
-        - vault-secrets-post-install
-
   tasks:
     - name: Gitlab post-install
       ansible.builtin.import_role:
@@ -119,6 +117,14 @@
       ansible.builtin.import_role:
         name: gitops/vault-secrets
       tags:
+        - vault-secrets-post-install
+
+    - name: Vault post-install
+      ansible.builtin.import_role:
+        name: gitops/post-install/vault
+      tags:
+        - post-install
+        - post-install-vault
         - vault-secrets-post-install
 
     - name: Sonarqube post-install

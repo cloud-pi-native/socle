@@ -12,7 +12,7 @@ spec:
     - alert: Nexus instance not available
       annotations:
         message: Nexus instance in namespace {{ dsc.nexus.namespace }} has not been available for the last 5 minutes.
-        summary: Nexus instance down (no ready container)"
+        summary: Nexus instance down (no ready container)
       expr: |
         (absent(kube_pod_container_status_ready{
         pod=~"nexus-.*",
@@ -25,10 +25,11 @@ spec:
       for: 5m
       labels:
         severity: critical
+
     - alert: Nexus PVC has low remaining disk space
       annotations:
-        message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{"{{"}} $labels.namespace {{"}}"}} is running out of disk space (< 20% left). VALUE = {{"{{"}} $value {{"}}"}}%
-        summary: Nexus PVC is running out of disk space in namespace {{"{{"}} $labels.namespace {{"}}"}}
+        {% raw %}message: {{ printf "PVC {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is running out of disk space (< 20%% left). VALUE = {{ $value }}%%"{% endraw %} {{"}}"}}
+        {% raw %}summary: {{ printf "Nexus PVC is running out of disk space in namespace {{ $labels.namespace }}"{% endraw %} {{"}}"}}
       expr: |
         round(
         kubelet_volume_stats_available_bytes{
@@ -40,10 +41,11 @@ spec:
       for: 1m
       labels:
         severity: warning
+
     - alert: Nexus PVC almost out of disk space
       annotations:
-        message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ dsc.nexus.namespace }} is almost full (< 10% left). VALUE = {{"{{"}} $value {{"}}"}}%
-        summary: Nexus PVC almost out of disk space in namespace {{ dsc.nexus.namespace }}
+        {% raw %}message: {{ printf "PVC {{ $labels.persistentvolumeclaim }} in namespace {% endraw %}{{ dsc.nexus.namespace }}{% raw %} is almost full (< 10%% left). VALUE = {{ $value }}%%"{% endraw %} {{"}}"}}
+        {% raw %}summary: {{ printf "Nexus PVC almost out of disk space in namespace {% endraw %}{{ dsc.nexus.namespace }}{% raw %}"{% endraw %} {{"}}"}}
       expr: |
         round(
         kubelet_volume_stats_available_bytes{
@@ -55,10 +57,11 @@ spec:
       for: 1m
       labels:
         severity: critical
+
     - alert: Nexus PVC out of disk space
       annotations:
-        message: PVC {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{ dsc.nexus.namespace }} is full (0% left).
-        summary: Nexus PVC out of disk space in namespace {{ dsc.nexus.namespace }}
+        {% raw %}message: {{ printf "PVC {{ $labels.persistentvolumeclaim }} in namespace {% endraw %}{{ dsc.nexus.namespace }}{% raw %} is full (0%% left)."{% endraw %} {{"}}"}}
+        {% raw %}summary: {{ printf "Nexus PVC out of disk space in namespace {% endraw %}{{ dsc.nexus.namespace }}{% raw %}"{% endraw %} {{"}}"}}
       expr: |
         kubelet_volume_stats_available_bytes{
         persistentvolumeclaim=~"nexus-data-.*",

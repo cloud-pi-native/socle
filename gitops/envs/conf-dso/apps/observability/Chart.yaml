@@ -1,8 +1,0 @@
-apiVersion: v2
-dependencies:
-- name: grafana-operator
-  repository: oci://ghcr.io/grafana/helm-charts
-  version: v5.10.0
-name: observability
-type: application
-version: 1.0.0

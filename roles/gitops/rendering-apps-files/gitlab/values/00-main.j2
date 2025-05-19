@@ -1,0 +1,157 @@
+certmanager:
+  install: true
+
+registry:
+  enabled: false
+
+nginx-ingress:
+  enabled: false
+
+gitlab:
+  webservice:
+    registry:
+      enabled: false
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% if dsc.global.metrics.additionalLabels is defined %} 
+        additionalLabels:
+          "{{ dsc.global.metrics.additionalLabels }}"
+{% endif %}
+{% endif %}
+  sidekiq:
+    registry:
+      enabled: false
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      podMonitor:
+        enabled: true
+{% if dsc.global.metrics.additionalLabels is defined %} 
+        additionalLabels:
+          "{{ dsc.global.metrics.additionalLabels }}"
+{% endif %}
+{% endif %}
+  unicorn:
+    registry:
+      enabled: false
+  gitaly:
+    priorityClassName: gitlab-gitaly
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    securityContext:
+      fsGroupChangePolicy: OnRootMismatch
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% if dsc.global.metrics.additionalLabels is defined %} 
+        additionalLabels:
+          "{{ dsc.global.metrics.additionalLabels }}"
+{% endif %}
+{% endif %}
+    persistence:
+      size: "{{ dsc.gitlab.pvcGitalySize }}"
+  gitlab-exporter:
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% if dsc.global.metrics.additionalLabels is defined %} 
+        additionalLabels:
+          "{{ dsc.global.metrics.additionalLabels }}"
+{% endif %}
+{% endif %}
+  kas:
+    enabled: false
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% if dsc.global.metrics.additionalLabels is defined %} 
+        additionalLabels:
+          "{{ dsc.global.metrics.additionalLabels }}"
+{% endif %}
+{% endif %}
+  toolbox:
+    backups:
+      cron:
+        enabled: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlab | jsonPath {.toolbox.backups.cron.enabled}>
+        schedule: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlab | jsonPath {.toolbox.backups.cron.schedule}>
+        extraArgs: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlab | jsonPath {.toolbox.backups.cron.extraArgs}>
+{% if dsc.global.backup.gitlab.enabled %}
+      objectStorage:
+        config:
+          secret: gitlab-backup
+          key: config
+{% endif %}
+
+global:
+  psql:
+    serviceName: pooler-pg-cluster-gitlab-rw
+    port: 5432
+    database: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#cnpg | jsonPath {.database}>
+    username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#cnpg | jsonPath {.username}>
+    password:
+      secret: pg-cluster-gitlab-app
+      key: password
+  registry:
+    enabled: false
+  certificates:
+    customCAs:
+{% for item in dsc.additionalsCA %}
+{% if item.kind == 'ConfigMap' %}
+      - configMap: {{ item.name }}
+{% endif %}
+{% if item.kind == 'Secret' %}
+      - secret: {{ item.name }}
+{% endif %}
+{% endfor %}
+{% if dsc.exposedCA.type != 'none' %}
+      - secret: exposed-ca
+{% endif %}
+  hosts:
+    domain: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common#rootDomain>
+    registry:
+      name: gitlab-registry.example.com
+    minio:
+      name: "{{ dsc_name }}-minio.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common#rootDomain>"
+    kas:
+      name: "{{ dsc_name }}-kas.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common#rootDomain>"
+{% if gitlab_domain %}
+    gitlab:
+      name: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>
+{% endif %}
+
+  appConfig:
+    defaultProjectsFeatures:
+      containerRegistry: false
+    ldap:
+      preventSignin: true
+    omniauth:
+      enabled: true
+      syncProfileAttributes: ["email"]
+      allowSingleSignOn: ["openid_connect"]
+      blockAutoCreatedUsers: false
+      autoSignInWithProvider: "openid_connect"
+      autoLinkLdapUser: false
+      autoLinkSamlUser: false
+      autoLinkUser: ["openid_connect"]
+      providers:
+        - secret: openid-connect
+    backups:
+      bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3.bucketName}>
+
+  extraEnv:
+    GITLAB_ROOT_EMAIL: "admin@example.com"
+
+prometheus:
+  install: false
+
+postgresql:
+  install: false

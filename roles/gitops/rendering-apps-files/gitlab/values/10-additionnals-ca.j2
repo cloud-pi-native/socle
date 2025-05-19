@@ -1,0 +1,11 @@
+global:
+  certificates:
+    customCAs:
+{% for item in dsc.additionalsCA %}
+{% if item.kind == 'ConfigMap' %}
+      - configMap: {{ item.name }}
+{% endif %}
+{% if item.kind == 'Secret' %}
+      - secret: {{ item.name }}
+{% endif %}
+{% endfor %}

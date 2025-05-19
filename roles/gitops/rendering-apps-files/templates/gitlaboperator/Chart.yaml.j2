@@ -1,0 +1,14 @@
+---
+apiVersion: v2
+name: gitlab-operator
+type: application
+version: {{ dsc.gitlabOperator.chartVersion }}
+dependencies:
+- name: cpn-cnpg
+  alias: cpn-cnpg
+  version: {{ dsc.cpnCnpg.chartVersion }}
+  repository: {{ dsc.cpnCnpg.helmRepoUrl }}
+- name: gitlab-operator
+  alias: gitlab-operator
+  version: {{ dsc.gitlabOperator.chartVersion }}
+  repository: "{{ dsc.gitlabOperator.helmRepoUrl }}"

@@ -1,0 +1,6 @@
+{% if dsc.global.platform == "openshift" %}
+global:
+  certificates:
+    customCAs:
+      - configMap: openshift-service-ca.crt
+{% endif %}

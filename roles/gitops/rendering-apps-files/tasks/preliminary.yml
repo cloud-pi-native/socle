@@ -34,3 +34,38 @@
       {{ (argocd_crd.resources | length > 0 and
           'meta.helm.sh/release-namespace' in argocd_crd.resources[0].metadata.annotations and
           argocd_crd.resources[0].metadata.annotations['meta.helm.sh/release-namespace'] == "{{ dsc.argocdInfra.namespace }}") | bool }}
+
+# GitLab instance template generation
+
+- name: Set path fact
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/gitlab/values' }}"
+
+- name: Compute Gitlab Helm values
+  ansible.builtin.include_role:
+    name: combine
+  vars:
+    combine_path: "{{ path }}"
+    combine_user_values: "{{ dsc.gitlab['values'] }}"
+    combine_dest_var: "gitlab_values"
+
+- name: Set gitlab_definition fact
+  ansible.builtin.set_fact:
+    gitlab_definition: "{{ content }}"
+  vars:
+    content:
+      apiVersion: apps.gitlab.com/v1beta1
+      kind: GitLab
+      metadata:
+        name: gitlab
+        namespace: "{{ dsc.gitlab.namespace }}"
+      spec:
+        chart:
+          version: "{{ dsc.gitlab.chartVersion }}"
+          values: "{{ gitlab_values }}"
+
+- name: Render gitlab instance file into GitOps local repo
+  ansible.builtin.copy:
+    content: "{{ gitlab_definition | to_nice_yaml(indent=2) }}"
+    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/gitlaboperator/templates/gitlab.yaml"
+    mode: "0644"

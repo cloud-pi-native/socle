@@ -1,0 +1,64 @@
+<settings>
+  <servers>
+    <server>
+      <id>mirror-dso</id>
+      <username>$${env.NEXUS_USERNAME}</username>
+      <password>$${env.NEXUS_PASSWORD}</password>
+    </server>
+    <server>
+      <id>nexus</id>
+      <username>$${env.NEXUS_USERNAME}</username>
+      <password>$${env.NEXUS_PASSWORD}</password>
+    </server>
+  </servers>
+  <mirrors>
+    <mirror>
+      <id>mirror-dso</id>
+      <name>mirror-dso</name>
+      <url>https://{{ nexus_domain }}/repository/$${env.PROJECT_PATH}-repository-group/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>nexus</id>
+      <name>nexus</name>
+      <url>https://{{ nexus_domain }}/repository/maven-public/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>mirror-dso</id>
+      <name>mirror-dso</name>
+      <url>https://{{ nexus_domain }}/repository/public/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+  </mirrors>
+  <profiles>
+    <profile>
+      <id>generic-user</id>
+      <repositories>
+        <repository>
+          <id>nexus</id>
+          <url>https://{{ nexus_domain }}/repository/$${env.PROJECT_PATH}-repository-group/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+{% if dsc.proxy.enabled %}
+  <proxies>
+    <proxy>
+      <id>default</id>
+      <active>true</active>
+      <host>{{ dsc.proxy.host }}</host>
+      <port>{{ dsc.proxy.port }}</port>
+    </proxy>
+  </proxies>
+{% endif %}
+  <activeProfiles>
+    <activeProfile>generic-user</activeProfile>
+  </activeProfiles>
+</settings>

@@ -1,3 +1,10 @@
+- name: Set some facts
+  ansible.builtin.set_fact:
+    vault_auth_path: jwt
+    vault_auth_role: default-ci
+    npm_file: "{{ lookup('ansible.builtin.template', 'npm_file.j2') }}"
+    mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
+
 - name: Find GitLab token in inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
@@ -21,16 +28,186 @@
   register: test_token
   ignore_errors: true
 
-- name: Get GitLab token
-  when: (set_token_inv.skipped is not defined or not set_token_inv.skipped) and (test_token.status == 200)
+- name: Initialize GitLab token
+  when: (set_token_inv.skipped is defined and set_token_inv.skipped) or (test_token.status != 200)
   block:
-    - name: Find gitlab token in inventory
+    - name: Get toolbox pod name
       kubernetes.core.k8s_info:
-        namespace: "{{ dsc.console.namespace }}"
+        kind: pod
+        label_selectors:
+          - app = toolbox
+        namespace: "{{ dsc.gitlab.namespace }}"
+      register: toolbox_pods
+
+    - name: Set toolbox pod name
+      ansible.builtin.set_fact:
+        tb_pod: "{{ toolbox_pods.resources[0].metadata.name }}"
+
+    - name: Create Token
+      kubernetes.core.k8s_exec:
+        pod: "{{ tb_pod }}"
+        namespace: "{{ dsc.gitlab.namespace }}"
+        command: >
+          bash -c "echo 'PersonalAccessToken.create!(user_id: 1
+          , name: \"ANSIBLE-DSO\"
+          , scopes: [:api, :read_repository, :write_repository, :create_runner]
+          , expires_at: 365.days.from_now).token' | gitlab-rails console"
+      register: token
+
+    - name: Set new GitLab token
+      ansible.builtin.set_fact:
+        gitlab_token: "{{ token.stdout_lines[-2][1:-1] }}"
+
+    - name: Update inventory
+      kubernetes.core.k8s:
         kind: Secret
         name: dso-config
-      register: ansible_inventory
+        namespace: "{{ dsc.console.namespace }}"
+        state: patched
+        definition:
+          data:
+            GITLAB_TOKEN: "{{ gitlab_token | b64encode }}"
 
-    - name: Set GitLab token
-      ansible.builtin.set_fact:
-        gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
+- name: Get settings
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ gitlab_domain }}/api/v4/application/settings
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+  register: get_settings
+  ignore_errors: true
+
+- name: Set some parameters
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ gitlab_domain }}/api/v4/application/settings
+    method: PUT
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body:
+      signup_enabled: false
+      outbound_local_requests_allowlist_raw: "0.0.0.0/0"
+      default_branch_protection: 0
+      import_sources:
+        - git
+    body_format: form-urlencoded
+  changed_when: true
+
+- name: Set parent group name
+  ansible.builtin.set_fact:
+    index: "0"
+    parent: ""
+
+- name: Include create group
+  ansible.builtin.include_tasks:
+    file: create-group.yaml
+
+- name: Set or update some CI/CD variables
+  community.general.gitlab_group_variable:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    purge: false
+    variables:
+      - name: ROOT_DOMAIN
+        value: "{{ dsc.global.rootDomain }}"
+      - name: VAULT_KV
+        value: forge-dso
+      - name: CATALOG_PATH
+        value: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+      - name: PROJECTS_ROOT_DIR
+        value: "{{ dsc.global.projectsRootDir | join('/') }}"
+      - name: NEXUS_HOST_URL
+        value: https://{{ nexus_domain }}
+      - name: NEXUS_HOSTNAME
+        value: "{{ nexus_domain }}"
+      - name: SONAR_HOST_URL
+        value: https://{{ sonar_domain }}
+      - name: VAULT_AUTH_PATH
+        value: "{{ vault_auth_path }}"
+      - name: VAULT_AUTH_ROLE
+        value: "{{ vault_auth_role }}"
+      - name: VAULT_SERVER_URL
+        value: https://{{ vault_domain }}
+      - name: MVN_CONFIG_FILE
+        variable_type: file
+        value: "{{ mvn_config_file }}"
+      - name: NPM_FILE
+        variable_type: file
+        value: "{{ npm_file }}"
+
+- name: Set or update proxy CI/CD variables
+  community.general.gitlab_group_variable:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    purge: false
+    state: "{{ dsc.proxy.enabled | ternary('present', 'absent') }}"
+    variables:
+      - name: HTTP_PROXY
+        value: "{{ dsc.proxy.http_proxy | default('') }}"
+      - name: HTTPS_PROXY
+        value: "{{ dsc.proxy.https_proxy | default('') }}"
+      - name: NO_PROXY
+        value: "{{ dsc.proxy.no_proxy | default('') }}"
+      - name: PROXY_HOST
+        value: "{{ dsc.proxy.host | default('') }}"
+      - name: PROXY_PORT
+        value: "{{ dsc.proxy.port | default('') }}"
+      - name: http_proxy
+        value: "{{ dsc.proxy.http_proxy | default('') }}"
+      - name: https_proxy
+        value: "{{ dsc.proxy.https_proxy | default('') }}"
+      - name: no_proxy
+        value: "{{ dsc.proxy.no_proxy | default('') }}"
+
+- name: Set or update CA_BUNDLE variable
+  community.general.gitlab_group_variable:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    purge: false
+    state: "{{ dsc.additionalsCA | ternary('present', 'absent') }}"
+    variables:
+      - name: CA_BUNDLE
+        value: "{{ [additionals_ca_pem, exposed_ca_pem] | join('\n') }}"
+        variable_type: file
+
+- name: Append registry mirror arguments to extra_kaniko_args
+  ansible.builtin.set_fact:
+    extra_kaniko_args: "{{ extra_kaniko_args | default('') }} --registry-mirror {{ harbor_domain | regex_replace('^https?://', '') }}/{{ item.name }}"
+  loop: "{{ dsc.harbor.proxyCache }}"
+  when: dsc.harbor.proxyCache is defined
+
+- name: Set or update insecure args variables
+  community.general.gitlab_group_variable:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    purge: false
+    state: "{{ dsc.gitlab.insecureCI | ternary('present', 'absent') }}"
+    variables:
+      - name: EXTRA_KANIKO_ARGS
+        value: --skip-tls-verify {{ extra_kaniko_args | default('') }}
+      - name: EXTRA_GIT_ARGS
+        value: -c http.sslVerify=false
+      - name: EXTRA_VAULT_ARGS
+        value: -tls-skip-verify
+
+- name: Set or update additional CI/CD variables
+  community.general.gitlab_group_variable:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    purge: false
+    variables:
+      - name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        masked: "{{ item.masked }}"
+        protected: "{{ item.protected }}"
+  with_items: "{{ dsc.gitlab.extraCIVars }}"

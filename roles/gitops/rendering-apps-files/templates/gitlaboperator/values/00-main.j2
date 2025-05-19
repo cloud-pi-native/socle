@@ -1,0 +1,67 @@
+gitlab-operator:
+  watchCluster: false
+  
+  image:
+    repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlabOperator}>/gitlab-org/cloud-native
+    name: gitlab-operator
+    tag: {{ dsc.gitlabOperator.chartVersion }}
+    # digest:
+    pullPolicy: IfNotPresent
+    # pullSecrets: []
+    prepend: "false"
+  
+  nameOverride: "{{ dsc_name }}-gitlab-operator"
+  fullnameOverride: ""
+  
+  extraEnvs: []
+  
+  podAnnotations: {}
+
+{% if dsc.gitlabOperator.resources is defined and dsc.gitlabOperator.resources != 'none' %}
+  resources:
+{% if dsc.gitlabOperator.resources.limits is defined and dsc.gitlabOperator.resources.limits != 'none' %}
+    limits:
+      cpu: "{{ dsc.gitlabOperator.resources.limits.cpu }}"
+      memory: "{{ dsc.gitlabOperator.resources.limits.memory }}"
+{% endif %}
+{% if dsc.gitlabOperator.resources.requests is defined and dsc.gitlabOperator.resources.requests != 'none' %}
+    requests:
+      cpu: "{{ dsc.gitlabOperator.resources.requests.cpu }}"
+      memory: "{{ dsc.gitlabOperator.resources.requests.memory }}"
+{% endif %}
+{% endif %}
+
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+  
+  manager:
+    debug:
+      enabled: true
+    serviceAccount:
+      create: true
+      annotations: {}
+    webhook:
+      selfSignedCert:
+        create: true
+  
+  app:
+    serviceAccount:
+      create: true
+      annotations: {}
+  
+  nginx-ingress:
+    serviceAccount:
+      create: false
+  
+  prometheus:
+    serviceAccount:
+      server:
+        create: true
+        annotations: {}
+  
+  scc: {}
+  
+  cert-manager:
+    install: false
+  

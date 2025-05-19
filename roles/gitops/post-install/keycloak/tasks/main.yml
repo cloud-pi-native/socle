@@ -399,3 +399,33 @@
     auth_password: "{{ keycloak_admin_password }}"
     realm: dso
     otp_policy_algorithm: SHA256
+
+- name: Set GitLab OIDC provider fact
+  block:
+    - name: Get Gitlab client secret
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: "{{ dsc.keycloak.namespace }}"
+        name: keycloak-client-secret-gitlab-client
+      register: gitlab_secret
+      failed_when: gitlab_secret.resources | length == 0
+
+    - name: Define GitLab OIDC provider secret content
+      ansible.builtin.set_fact:
+        gitlab_oidc_provider: |
+          name: openid_connect
+          label: Keycloak
+          args:
+            name: openid_connect
+            scope:
+              - openid
+              - generic
+            response_type: code
+            issuer: https://{{ keycloak_domain }}/realms/dso
+            client_auth_method: query
+            discovery: true
+            uid_field: email
+            client_options:
+              identifier: {{ gitlab_secret.resources[0].data.CLIENT_ID | b64decode }}
+              secret: {{ gitlab_secret.resources[0].data.CLIENT_SECRET | b64decode }}
+              redirect_uri: https://{{ gitlab_domain }}/users/auth/openid_connect/callback

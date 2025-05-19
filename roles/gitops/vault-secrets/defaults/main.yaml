@@ -10,7 +10,10 @@ envs:
               docker: "{{ dsc.global.registry | default('docker.io') }}"
               ghcr: "{{ dsc.global.registry | default('ghcr.io') }}"
               gitlab: "{{ dsc.global.registry | default('registry.gitlab.com') }}"
+              gitlabOperator: "{{ dsc.global.registry | default('registry.gitlab.com') }}"
+              minio: "{{ dsc.global.registry | default('minio') }}"
               quay: "{{ dsc.global.registry | default('quay.io') }}"
+          rootDomain: "{{ root_domain[1:] }}"
           domain:
             argocd: "{{ argocd_domain }}"
             console: "{{ console_domain }}"
@@ -46,6 +49,19 @@ envs:
           dockerAccount:
             username: "{{ dsc.global.dockerAccount.username | default('') }}"
             password: "{{ dsc.global.dockerAccount.password | default('') }}"
+          backup:
+            s3:
+              bucketName: "{{ dsc.global.backup.s3.bucketName | default('') }}"
+              endpointURL: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
+              credentials:
+                accessKeyId:
+                  value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
+                secretAccessKey:
+                  value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
+            gitlab:
+              mcExtraArgs: "{{ dsc.global.backup.gitlab.mcExtraArgs | default('') }}"
+              pathPrefix: "{{ dsc.global.backup.gitlab.pathPrefix | default('') }}"
+              retentionPolicy: "{{ dsc.global.backup.gitlab.retentionPolicy | default('') }}"
       - argocd_app: "keycloak"
         vault_values:
           auth:
@@ -124,3 +140,37 @@ envs:
       - argocd_app: "argocd"
         vault_values:
           argocdServerAdminPassword: "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+      - argocd_app: "gitlab"
+        vault_values:
+          cnpg:
+            username: >-
+              {{
+                (pg_gitlab_db_secret.resources[0].data.username | b64decode)
+                if not dsc.gitlab.cnpg.initPassword
+                and pg_gitlab_db_secret is defined
+                and pg_gitlab_db_secret.resources | length > 0
+                else 'gitlab'
+              }}
+            password: >-
+              {{
+                (pg_gitlab_db_secret.resources[0].data.password | b64decode)
+                if not dsc.gitlab.cnpg.initPassword
+                and pg_gitlab_db_secret is defined
+                and pg_gitlab_db_secret.resources | length > 0
+                else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
+              }}
+            database: >-
+              {{
+                (pg_gitlab_db_secret.resources[0].data.dbname | b64decode)
+                if not dsc.gitlab.cnpg.initPassword
+                and pg_gitlab_db_secret is defined
+                and pg_gitlab_db_secret.resources | length > 0
+                else 'gitlabhq_production'
+              }}
+          gitlab:
+            toolbox:
+              backups:
+                cron:
+                  enabled: "{{ dsc.global.backup.gitlab.enabled | default('false') }}"
+                  schedule: "{{ dsc.global.backup.gitlab.cron | default('0 */6 * * *') }}"
+                  extraArgs: "{{ dsc.global.backup.gitlab.extraArgs | default('') }}"

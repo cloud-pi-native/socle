@@ -466,6 +466,30 @@ spec:
                     chartVersion:
                       description: GitLab Operator release version (e.g., "0.24.1").
                       type: string
+                    resources:
+                      description: Resources for GitLab Operator.
+                      type: object
+                      properties:
+                        requests:
+                          description: Resources requests for GitLab Operator.
+                          type: object
+                          properties:
+                            cpu:
+                              description: CPU request for GitLab Operator. Unit is m (e.g. 200m).
+                              type: string
+                            memory:
+                              description: Memory request for GitLab Operator. Unit is Mi (e.g. 100Mi).
+                              type: string
+                        limits:
+                          description: Resources limits for GitLab Operator.
+                          type: object
+                          properties:
+                            cpu:
+                              description: CPU limit for GitLab Operator. Unit is m (e.g. 200m).
+                              type: string
+                            memory:
+                              description: Memory limit for GitLab Operator. Unit is Mi (e.g. 300Mi).
+                              type: string
                     values:
                       description: |
                         You can add custom values for GitLab Operator, they will be merged with roles/gitlab-operator/templates/values/

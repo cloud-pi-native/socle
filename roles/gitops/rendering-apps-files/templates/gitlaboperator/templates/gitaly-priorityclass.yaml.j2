@@ -1,0 +1,7 @@
+apiVersion: scheduling.k8s.io/v1
+description: "GitLab Gitaly priority class"
+globalDefault: false
+kind: PriorityClass
+metadata:
+  name: gitlab-gitaly
+value: 1000000

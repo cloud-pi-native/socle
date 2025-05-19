@@ -1,0 +1,42 @@
+global:
+  ingress:
+    class: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+      {{ key }}: {{ val }}
+{% endfor %}
+    labels:
+{% for key, val in dsc.ingress.labels.items() %}
+      {{ key }}: {{ val }}
+{% endfor %}
+    configureCertmanager: false
+{% if dsc.ingress.tls.type == 'none' %}
+    tls:
+      enabled: false
+{% else %}
+    tls:
+      enabled: true
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+      secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% endif %}
+{% endif %}
+
+{% if dsc.ingress.tls.type != 'tlsSecret' %}
+gitlab:
+  webservice:
+    ingress:
+      tls:
+        secretName: gitlab-webservice
+minio:
+  ingress:
+    tls:
+      secretName: gitlab-minio-secret
+{% else %}
+gitlab:
+  webservice:
+    ingress:
+      tls: {}
+minio:
+  ingress:
+    tls: {}
+{% endif %}

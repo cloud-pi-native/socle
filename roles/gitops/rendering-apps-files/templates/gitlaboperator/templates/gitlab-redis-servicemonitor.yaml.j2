@@ -1,0 +1,21 @@
+{% if dsc.global.metrics.enabled %}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gitlab-redis
+spec:
+  endpoints:
+  - bearerTokenSecret:
+      key: ""
+    interval: 30s
+    path: /metrics
+    port: http-metrics
+  namespaceSelector: {}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: master
+      app.kubernetes.io/instance: gitlab
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: redis
+      gitlab.io/component: redis
+{% endif %}

@@ -1,0 +1,9 @@
+---
+- name: Check Argo CD infra namespace
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_infra }}"
+    proxy: "{{ kubeconfig_proxy_infra | default('')}}"
+    name: "{{ dsc.argocdInfra.namespace }}"
+    kind: Namespace
+  register: argo_infra_ns_check
+  ignore_errors: true

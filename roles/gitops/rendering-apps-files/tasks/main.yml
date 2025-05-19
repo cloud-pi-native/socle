@@ -19,3 +19,4 @@
           - argocd_app: gitlabrunner
           - argocd_app: glexporter
           - argocd_app: argocd
+          - argocd_app: nexus

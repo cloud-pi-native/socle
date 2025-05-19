@@ -1,0 +1,29 @@
+---
+- name: Set group name
+  ansible.builtin.set_fact:
+    group_name: "{{ dsc.global.projectsRootDir[index | int] }}"
+
+- name: Create group {{ group_name }}
+  community.general.gitlab_group:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    name: "{{ group_name }}"
+    parent: "{{ parent }}"
+    subgroup_creation_level: owner
+    project_creation_level: developer
+    state: present
+    visibility: internal
+
+- name: Update parent group
+  ansible.builtin.set_fact:
+    index: "{{ index | int + 1 }}"
+
+- name: Update parent group
+  ansible.builtin.set_fact:
+    parent: "{{ dsc.global.projectsRootDir[0:(index | int)] | join('/') }}"
+
+- name: Include create group
+  ansible.builtin.include_tasks:
+    file: create-group.yaml
+  when: (index | int) < (dsc.global.projectsRootDir | length)

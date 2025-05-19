@@ -1,0 +1,6 @@
+{% if dsc.exposedCA.type != 'none' %}
+global:
+  certificates:
+    customCAs:
+      - secret: exposed-ca
+{% endif %}

@@ -98,6 +98,14 @@
     name: pg-cluster-harbor-app
   register: pg_harbor_db_secret
 
+- name: Get pg-cluster-gitlab-app secret
+  when: not dsc.gitlab.cnpg.initPassword
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.gitlab.namespace }}"
+    kind: Secret
+    name: pg-cluster-gitlab-app
+  register: pg_gitlab_db_secret
+
 # Write Vault Infra secrets
 
 - name: Write secrets

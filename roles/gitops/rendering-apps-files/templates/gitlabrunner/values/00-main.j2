@@ -26,10 +26,13 @@ gitlab-runner:
       - apiGroups: [""]
         resources: ["pods/exec"]
         verbs: ["create", "patch", "delete"]
-    serviceAccountName: gitlab-runner
     podSecurityPolicy:
       enabled: true
-  
+
+  serviceAccount:
+    create: true
+    name: gitlab-runner
+
   resources:
     requests:
       ephemeral-storage: "500Mi"

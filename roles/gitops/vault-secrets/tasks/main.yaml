@@ -93,13 +93,13 @@
 # Argo application hard refresh and sync
 
 - name: Argo application hard refresh and sync
-  when: vault_secrets_post_install and not keycloak_reset_password
+  when: vault_secrets_post_install and not keycloak_reset_password and not argo_infra_ns_check.failed
   ansible.builtin.include_tasks: argocd.yml
   loop:
     - "{{ dsc.sonarqube.namespace }}"
 
 - name: Argo application hard refresh and sync
-  when: vault_secrets_post_install and keycloak_reset_password
+  when: vault_secrets_post_install and keycloak_reset_password and not argo_infra_ns_check.failed
   ansible.builtin.include_tasks: argocd.yml
   loop:
     - "{{ dsc.keycloak.namespace }}"

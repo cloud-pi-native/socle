@@ -1,5 +1,6 @@
 ---
 - name: Create dso-install-manager application in infrastructure ArgoCD cluster/namespace
+  when: not argo_infra_ns_check.failed
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
     proxy: "{{ kubeconfig_proxy_infra | default('')}}"

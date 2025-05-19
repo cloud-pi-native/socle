@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: gitlab-operator
+type: application
+version: {{ dsc.gitlabOperator.chartVersion }}
+dependencies:
+- name: gitlab-operator
+  alias: gitlab-operator
+  version: {{ dsc.gitlabOperator.chartVersion }}
+  repository: "{{ dsc.gitlabOperator.helmRepoUrl }}"

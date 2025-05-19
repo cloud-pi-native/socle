@@ -35,6 +35,11 @@ envs:
                     value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
                   secretAccessKey:
                     value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
+      - argocd_app: "console"
+        vault_values:
+          auth:
+            keycloakAdmin: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+            keycloakAdminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
       - argocd_app: "keycloak"
         vault_values:
           auth:
@@ -69,6 +74,7 @@ envs:
           auth:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
             monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+            sonarApiToken : "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
       - argocd_app: "harbor"
         vault_values:
           global:

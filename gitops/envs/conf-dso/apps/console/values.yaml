@@ -1,0 +1,342 @@
+cnpg:
+  annotations: {}
+  backup:
+    compression: ''
+    cron: 0 0 */6 * * *
+    destinationPath: ''
+    enabled: false
+    endpointCA:
+      key: ''
+      name: ''
+    endpointURL: ''
+    maxParallelWal: 8
+    recoveryTarget: {}
+    retentionPolicy: 30d
+    s3Credentials:
+      accessKeyId:
+        key: accessKeyId
+        value: ''
+      create: false
+      secretAccessKey:
+        key: secretAccessKey
+        value: ''
+      secretName: ''
+  dbName: dso-console-db
+  enableSuperuserAccess: true
+  enabled: true
+  exposed: false
+  imageName: ''
+  instances: 3
+  labels: {}
+  mode: primary
+  nameOverride: ''
+  nodePort: null
+  postgresWalMaxSlotKeepSize: ''
+  primaryUpdateStrategy: unsupervised
+  pvcSize: 10Gi
+  replica:
+    host: ''
+    port: 5432
+  username: dso
+  walPvcSize: null
+cnpg-operator:
+  enabled: false
+console:
+  postgresql:
+    enabled: false
+cpn-cnpg:
+  backup:
+    compression: gzip
+    destinationPath: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+      | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
+    enabled: false
+    endpointURL: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+      | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
+    retentionPolicy: 14d
+    s3Credentials:
+      accessKeyId:
+        key: accessKeyId
+        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.accessKeyId.value}>
+      create: true
+      secretAccessKey:
+        key: secretAccessKey
+        value: <path:forge-dso/data/env/conf-dso/apps/common/values#externalClusters
+          | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.secretAccessKey.value}>
+      secretName: pg-cluster-backup
+  dbName: registry
+  imageName: <path:forge-dso/data/env/conf-dso/apps/common/values#image | jsonPath
+    {.repository.ghcr}>/cloudnative-pg/postgresql:16.1
+  monitoring:
+    enabled: true
+  nameOverride: pg-cluster-console
+  parameters:
+    max_slot_wal_keep_size: 19GB
+    max_worker_processes: '60'
+  pvcSize:
+    data: 20Gi
+    wal: 20Gi
+  username: console
+cpn-console:
+  client:
+    affinity: {}
+    autoscaling:
+      enabled: false
+      maxReplicas: 3
+      minReplicas: 1
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    container:
+      args: []
+      command: []
+      port: 8080
+      securityContext: {}
+    env: {}
+    envFrom: []
+    extraContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    healthcheckPath: /
+    hostAliases: []
+    image:
+      pullPolicy: Always
+      repository: ghcr.io/cloud-pi-native/console/client
+      tag: ''
+    initContainers: []
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 5
+    nodeSelector: {}
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext: {}
+    readinessProbe:
+      enabled: true
+      failureThreshold: 2
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      successThreshold: 2
+      timeoutSeconds: 5
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+    secrets: {}
+    service:
+      port: 80
+      type: ClusterIP
+    startupProbe:
+      enabled: true
+      failureThreshold: 10
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    strategy:
+      type: RollingUpdate
+    tolerations: []
+  config:
+    create: true
+    name: dso-config
+    projectsRootDir: forge
+    secrets:
+      ARGOCD_URL: https://argo.sdid-hp.cpin.numerique-interieur.com/
+      ARGO_NAMESPACE: dso-argocd
+      GITLAB_TOKEN: <path:forge-dso/data/env/conf-dso/apps/console/values#auth | jsonPath
+        {.gitlabToken}>
+      GITLAB_URL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain|
+        jsonPath {.gitlab}>/
+      HARBOR_ADMIN: admin
+      HARBOR_ADMIN_PASSWORD: <path:forge-dso/data/env/conf-dso/apps/harbor/values#global|
+        jsonPath {.harborAdminPassword}>
+      HARBOR_URL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain|
+        jsonPath {.harbor}>/
+      KEYCLOAK_ADMIN: <path:forge-dso/data/env/conf-dso/apps/console/values#auth |
+        jsonPath {.keycloakAdmin}>
+      KEYCLOAK_ADMIN_PASSWORD: <path:forge-dso/data/env/conf-dso/apps/console/values#auth
+        | jsonPath {.keycloakAdminPassword}>
+      KEYCLOAK_URL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain|
+        jsonPath {.keycloak}>/
+      NEXUS_ADMIN: <path:forge-dso/data/env/conf-dso/apps/nexus/values#auth | jsonPath
+        {.adminUsername}>
+      NEXUS_ADMIN_PASSWORD: <path:forge-dso/data/env/conf-dso/apps/nexus/values#auth
+        | jsonPath {.adminPassword}>
+      NEXUS_URL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain|
+        jsonPath {.nexus}>/
+      SONARQUBE_URL: https://<path:forge-dso/data/env/conf-dso/apps/common/values#domain|
+        jsonPath {.sonarqube}>/
+      SONAR_API_TOKEN: https://<path:forge-dso/data/env/conf-dso/apps/sonarqube/values#auth|
+        jsonPath {.sonarApiToken}>/
+      VAULT_TOKEN: <path:forge-dso/data/env/conf-dso/apps/vault/values#backupSecrets
+        | jsonPath {.vaultToken}>
+      VAULT_URL: https://infra-<path:forge-dso/data/env/conf-dso/apps/common/values#domain|
+        jsonPath {.vault}>/
+  fullnameOverride: ''
+  global:
+    env:
+      NODE_ENV: production
+    keycloak:
+      clientIds:
+        backend: console-backend
+        frontend: console-frontend
+      clientSecrets:
+        backend: ''
+      devRealm: false
+      domain: <path:forge-dso/data/env/conf-dso/apps/common/values#domain| jsonPath
+        {.keycloak}>
+      protocol: https
+      realm: dso
+      redirectUri: https://fabrice-<path:forge-dso/data/env/conf-dso/apps/common/values#domain|
+        jsonPath {.console}>
+      sessionSecret: a-very-strong-secret-with-more-than-32-char
+    postgresql:
+      dbUrl: ''
+    secrets: {}
+  ingress:
+    annotations: {}
+    className: ''
+    enabled: true
+    hosts:
+    - fabrice-<path:forge-dso/data/env/conf-dso/apps/common/values#domain| jsonPath
+      {.console}>
+    labels: {}
+    tls:
+    - hosts:
+      - console.sdid-hp.cpin.numerique-interieur.com
+      secretName: tls-secret
+  nameOverride: ''
+  server:
+    affinity: {}
+    autoscaling:
+      enabled: false
+      maxReplicas: 3
+      minReplicas: 1
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    container:
+      args: []
+      command: []
+      port: 8080
+      securityContext: {}
+    dbDataCm: ''
+    disabledPlugins: ''
+    env: {}
+    envFrom: []
+    extraCa:
+      key: ''
+      mountSubPath: ca_certs
+      name: ''
+    extraContainers: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    fetchContainer:
+      image: docker.io/wbitt/network-multitool:alpine-minimal
+      pullPolicy: IfNotPresent
+    healthcheckPath: /api/v1/healthz
+    hostAliases: []
+    image:
+      pullPolicy: Always
+      repository: ghcr.io/cloud-pi-native/console/server
+      tag: ''
+    initContainers: []
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 5
+    nodeSelector: {}
+    plugins: []
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext: {}
+    readinessProbe:
+      enabled: true
+      failureThreshold: 2
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      successThreshold: 2
+      timeoutSeconds: 5
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+    secrets: {}
+    service:
+      port: 80
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: cpn-console-server
+    startupProbe:
+      enabled: true
+      failureThreshold: 10
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    strategy:
+      type: RollingUpdate
+    tolerations: []
+features:
+  vaultSecrets:
+    enabled: true
+keycloak:
+  auth:
+    adminPassword: default
+    adminUser: default
+  enabled: false
+  ingress:
+    annotations: {}
+    enabled: true
+    hostname: keycloak.dso.local
+    ingressClassName: ''
+    path: /
+    secrets: []
+    tls: false
+  nameOverride: cpn-keycloak
+  postgresql:
+    auth:
+      architecture: standalone
+      database: default
+      password: default
+      postgresPassword: default
+      username: default
+    enabled: true
+    nameOverride: cpn-keycloak-db
+    primary:
+      persistence:
+        size: 1Gi
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 128Mi
+      service:
+        ports:
+          postgresql: 5432
+        type: ClusterIP
+    readReplicas:
+      persistence:
+        size: 1Gi
+  production: true
+  proxy: edge
+  tls:
+    autoGenerated: false
+    enabled: false

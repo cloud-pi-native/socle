@@ -2,12 +2,13 @@
   "env": "conf-dso",
   "provider": "self-hosted",
   "region": "fr-par",
-  "prefix": "dso-",
+  "prefix": "fabrice-",
   "destination": {
     "clusterName": "in-cluster"
   },
-  "targetRevision": "develop",
+  "targetRevision": "feat/gitops-console-deployment3",
   "apps": [
+    { "app": "console", "enabled": "true", "namespace": "console", "syncWave": 10 },
     { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
     { "app": "vault", "enabled": "true", "namespace": "vault", "syncWave": 10 },
     { "app": "sonarqube", "enabled": "true", "namespace": "sonarqube", "syncWave": 10 },

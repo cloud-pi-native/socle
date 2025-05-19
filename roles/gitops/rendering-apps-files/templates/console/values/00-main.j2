@@ -1,0 +1,421 @@
+cpn-console:
+  nameOverride: ""
+  fullnameOverride: ""
+
+  config:
+    create: true
+    name: "dso-config"
+    projectsRootDir: "forge"
+    secrets:
+    #  ARGO_NAMESPACE: "dso-argocd"
+    #  ARGOCD_URL: "https://argo.sdid-hp.cpin.numerique-interieur.com/"
+      GITLAB_TOKEN: <path:forge-dso/data/env/{{ dsc_name }}/apps/console/values#auth | jsonPath {.gitlabToken}>
+      GITLAB_URL: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.gitlab}>/"
+      HARBOR_ADMIN: "admin"
+      HARBOR_ADMIN_PASSWORD: <path:forge-dso/data/env/{{ dsc_name }}/apps/harbor/values#global| jsonPath {.harborAdminPassword}>
+      HARBOR_URL: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.harbor}>/"
+      KEYCLOAK_ADMIN: <path:forge-dso/data/env/{{ dsc_name }}/apps/console/values#auth | jsonPath {.keycloakAdmin}>
+      KEYCLOAK_ADMIN_PASSWORD: <path:forge-dso/data/env/{{ dsc_name }}/apps/console/values#auth | jsonPath {.keycloakAdminPassword}>
+      KEYCLOAK_URL:  "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.keycloak}>/"
+      NEXUS_ADMIN: <path:forge-dso/data/env/{{ dsc_name }}/apps/nexus/values#auth | jsonPath {.adminUsername}>
+      NEXUS_ADMIN_PASSWORD: <path:forge-dso/data/env/{{ dsc_name }}/apps/nexus/values#auth | jsonPath {.adminPassword}>
+      NEXUS_URL: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.nexus}>/"
+      SONAR_API_TOKEN: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/sonarqube/values#auth| jsonPath {.sonarApiToken}>/"
+      SONARQUBE_URL: "https://<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.sonarqube}>/"
+      VAULT_TOKEN: <path:forge-dso/data/env/{{ dsc_name }}/apps/vault/values#backupSecrets | jsonPath {.vaultToken}>
+      VAULT_URL: "https://infra-<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.vault}>/"
+
+  global:
+    env:
+      NODE_ENV: "production"
+    secrets: {}
+    keycloak:
+      domain: "<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.keycloak}>"
+      realm: "dso"
+      protocol: "https"
+      clientIds:
+        backend: "console-backend"
+        frontend: "console-frontend"
+      clientSecrets:
+        backend: ""
+      redirectUri: "https://fabrice-<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.console}>"
+      sessionSecret: "a-very-strong-secret-with-more-than-32-char"
+      devRealm: false
+    postgresql:
+      # -- Postgres database connection string used to override computed db url, usefull if external database.
+      ## For postgres it should look like this "postgresql://db_user:db_password@db_service:db_port/db_name?schema=public"
+      dbUrl: ""
+
+  ingress:
+    enabled: true
+    className: ""
+    annotations: {}
+    labels: {}
+    hosts:
+    - "fabrice-<path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.console}>"
+    tls: []
+    # - secretName: console.dso.local-tls
+    #   hosts:
+    #   - console.dso.local
+
+  # Console CPN client configuration.
+  client:
+    replicaCount: 1
+    ## Console CPN client image
+    image:
+      repository: "ghcr.io/cloud-pi-native/console/client"
+      pullPolicy: "Always"
+      tag: ""
+    podAnnotations: {}
+    podLabels: {}
+    podSecurityContext: {}
+      # fsGroup: 2000
+    initContainers: []
+    container:
+      # -- Console CPN client container port.
+      port: 8080
+      # -- Console CPN client container command.
+      command: []
+      # -- Console CPN client container command args.
+      args: []
+      # -- Toggle and define container-level security context.
+      securityContext: {}
+        # capabilities:
+        #   drop:
+        #   - ALL
+        # readOnlyRootFilesystem: true
+        # runAsNonRoot: true
+        # runAsUser: 1000
+    # -- Extra containers to add to the Console CPN client pod as sidecars.
+    extraContainers: []
+    # - name: fluentd
+    #   image: "fluentd"
+    #   volumeMounts:
+    #     - mountPath: /my-volume/config
+    #       name: config
+    # -- Console CPN client container env variables loaded from configmap or secret reference.
+    envFrom: []
+    # - configMapRef:
+    #     name: my-config
+    # - secretRef:
+    #     name: my-secret
+    # -- Console CPN client container env variables, it will be injected into a configmap and loaded into the container.
+    env: {}
+    # -- Console CPN client container env secrets, it will be injected into a secret and loaded into the container.
+    secrets: {}
+    # -- Console CPN client container healthcheck endpoint.
+    healthcheckPath: "/"
+    ## Deployment strategy for CPN client deployment.
+    strategy:
+      # -- Strategy type used to replace old Pods by new ones, can be "Recreate" or "RollingUpdate".
+      type: "RollingUpdate"
+    ## Startup probe for Console CPN client.
+    startupProbe:
+      # -- Whether or not enable the probe.
+      enabled: true
+      # -- Number of seconds after the container has started before probe is initiated.
+      initialDelaySeconds: 0
+      # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+      successThreshold: 1
+      # -- Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 10
+      # -- How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # -- Number of seconds after which the probe times out.
+      timeoutSeconds: 5
+    ## Readiness probe for Console CPN client.
+    readinessProbe:
+      # -- Whether or not enable the probe.
+      enabled: true
+      # -- Number of seconds after the container has started before probe is initiated.
+      initialDelaySeconds: 15
+      # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+      successThreshold: 2
+      # -- Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 2
+      # -- How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # -- Number of seconds after which the probe times out.
+      timeoutSeconds: 5
+    ## Liveness probe for Console CPN client.
+    livenessProbe:
+      # -- Whether or not enable the probe.
+      enabled: true
+      # -- Number of seconds after the container has started before probe is initiated.
+      initialDelaySeconds: 30
+      # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+      successThreshold: 1
+      # -- Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 3
+      # -- How often (in seconds) to perform the probe.
+      periodSeconds: 30
+      # -- Number of seconds after which the probe times out
+      timeoutSeconds: 5
+    # -- Host aliases that will be injected at pod-level into /etc/hosts.
+    hostAliases: []
+    # - ip: "127.0.0.1"
+    #   hostnames:
+    #   - "foo.local"
+    #   - "bar.local"
+    # - ip: "10.1.2.3"
+    #   hostnames:
+    #   - "foo.remote"
+    #   - "bar.remote"
+    # -- List of extra volumes to add.
+    extraVolumes: []
+    # - name: extra-vol
+    #   path: /host/path
+    #   type: hostPath
+    # - name: extra-vol-cm
+    #   type: configMap
+    # -- List of extra mounts to add (normally used with extraVolumes).
+    extraVolumeMounts: []
+    # - name: extra-vol
+    #   mountPath: /volume/path
+    # - name: extra-vol-cm
+    #   mountPath: /volume/cm/path
+    service:
+      # -- Console CPN client service type.
+      type: "ClusterIP"
+      # -- Console CPN client service port.
+      port: 80
+    resources:
+      requests:
+        # -- Memory request for the Console CPN client.
+        memory: "128Mi"
+        # -- CPU request for the Console CPN client.
+        cpu: "250m"
+      limits:
+        # -- Memory limit for the Console CPN client.
+        memory: "512Mi"
+        # -- CPU limit for the Console CPN client.
+        cpu: "500m"
+    ## Console CPN client Horizontal Pod Autoscaler
+    autoscaling:
+      # -- Enable Horizontal Pod Autoscaler ([HPA]) for the Console CPN client.
+      enabled: false
+      # -- Minimum number of replicas for the Console CPN client [HPA].
+      minReplicas: 1
+      # -- Maximum number of replicas for the Console CPN client [HPA].
+      maxReplicas: 3
+      # -- Average CPU utilization percentage for the Console CPN client [HPA].
+      targetCPUUtilizationPercentage: 80
+      # -- Average memory utilization percentage for the Console CPN client [HPA].
+      targetMemoryUtilizationPercentage: 80
+    # -- Default node selector for Console CPN client.
+    nodeSelector: {}
+    # -- Default tolerations for Console CPN client.
+    tolerations: []
+    # -- Default affinity for Console CPN client.
+    affinity: {}
+
+  # Console CPN server configuration.
+  server:
+    # -- The number of application controller pods to run.
+    replicaCount: 1
+    ## Console CPN server image.
+    image:
+      # -- Repository to use for the Console CPN server.
+      repository: "ghcr.io/cloud-pi-native/console/server"
+      # -- Image pull policy for the Console CPN server.
+      pullPolicy: "Always"
+      # -- Tag to use for the Console CPN server.
+      ## Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+    # -- Annotations for the Console CPN server deployed pods.
+    podAnnotations: {}
+    # -- Labels for the Console CPN server deployed pods.
+    podLabels: {}
+    # -- Toggle and define pod-level security context.
+    podSecurityContext: {}
+      # fsGroup: 2000
+    # -- Init containers to add to the Console CPN client pod.
+    initContainers: []
+    # - name: wait-for-keycloak
+    #   image: docker.io/curlimages/curl:latest
+    #   command:
+    #   - "/bin/sh"
+    #   - "-c"
+    #   args:
+    #   - "while [ $(curl -sw '%{http_code}' http://webserver.svc.cluster.local -o /dev/null) -ne 200 ]; do sleep 5; echo 'Waiting for the webserver...'; done"
+    #   volumeMounts:
+    #   - mountPath: /custom-volume
+    #     name: custom-volume
+    container:
+      # -- Console CPN server container port.
+      port: 8080
+      # -- Console CPN server container command.
+      command: []
+      # -- Console CPN server container command args.
+      args: []
+      # -- Toggle and define container-level security context.
+      securityContext: {}
+        # capabilities:
+        #   drop:
+        #   - ALL
+        # readOnlyRootFilesystem: true
+        # runAsNonRoot: true
+        # runAsUser: 1000
+    # -- Extra containers to add to the Console CPN server pod as sidecars.
+    extraContainers: []
+    # - name: fluentd
+    #   image: "fluentd"
+    #   volumeMounts:
+    #     - mountPath: /my-volume/config
+    #       name: config
+    # -- Console CPN server container env variables loaded from configmap or secret reference.
+    envFrom: []
+    # - configMapRef:
+    #     name: my-config
+    # - secretRef:
+    #     name: my-secret
+    # -- Console CPN server container env variables, it will be injected into a configmap and loaded into the container.
+    env: {}
+      ## csv list of plugins to disabled
+      # DISABLED_PLUGINS: ""
+    # -- Console CPN server container env secrets, it will be injected into a secret and loaded into the container.
+    secrets: {}
+    # -- Name of the configmap with javascript data that need to be imported by the server at start up.
+    dbDataCm: ""
+    # -- Console CPN server container healthcheck endpoint.
+    healthcheckPath: "/api/v1/healthz"
+    ## Deployment strategy for CPN server deployment.
+    strategy:
+      # -- Strategy type used to replace old Pods by new ones, can be "Recreate" or "RollingUpdate".
+      type: "RollingUpdate"
+    ## Startup probe for Console CPN server.
+    startupProbe:
+      # -- Whether or not enable the probe.
+      enabled: true
+      # -- Number of seconds after the container has started before probe is initiated.
+      initialDelaySeconds: 0
+      # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+      successThreshold: 1
+      # -- Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 10
+      # -- How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # -- Number of seconds after which the probe times out.
+      timeoutSeconds: 5
+    ## Readiness probe for Console CPN server.
+    readinessProbe:
+      # -- Whether or not enable the probe.
+      enabled: true
+      # -- Number of seconds after the container has started before probe is initiated.
+      initialDelaySeconds: 15
+      # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+      successThreshold: 2
+      # -- Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      failureThreshold: 2
+      # -- How often (in seconds) to perform the probe.
+      periodSeconds: 10
+      # -- Number of seconds after which the probe times out.
+      timeoutSeconds: 5
+    ## Liveness probe for Console CPN server.
+    livenessProbe:
+      # -- Whether or not enable the probe.
+      enabled: true
+      # -- Whether or not enable the probe.
+      initialDelaySeconds: 30
+      # -- Number of seconds after the container has started before probe is initiated.
+      successThreshold: 1
+      # -- Minimum consecutive successes for the probe to be considered successful after having failed.
+      failureThreshold: 3
+      # -- Minimum consecutive failures for the probe to be considered failed after having succeeded.
+      periodSeconds: 30
+      # -- How often (in seconds) to perform the probe.
+      timeoutSeconds: 5
+    # -- Host aliases that will be injected at pod-level into /etc/hosts.
+    hostAliases: []
+    # - ip: "127.0.0.1"
+    #   hostnames:
+    #   - "foo.local"
+    #   - "bar.local"
+    # - ip: "10.1.2.3"
+    #   hostnames:
+    #   - "foo.remote"
+    #   - "bar.remote"
+    ## Extra certificate to add to the container, it should be provide as a configmap.
+    extraCa:
+      # -- The name of the configmap in namespace where certificates are stored.
+      name: ""
+      # -- The key to lookup.
+      key: ""
+      # -- The path inside the container where the certificate file should be mount.
+      # This is a native Nodejs environment variable to extends certificates, see: https://nodejs.org/api/cli.html#node_extra_ca_certsfile.
+      # This mount path represent the subpath to use under the `/config` config root path.
+      mountSubPath: "ca_certs"
+    # -- List of extra volumes to add.
+    extraVolumes: []
+    # - name: extra-vol
+    #   path: /host/path
+    #   type: hostPath
+    # - name: extra-vol-cm
+    #   type: configMap
+    # -- List of extra mounts to add (normally used with extraVolumes)
+    extraVolumeMounts: []
+    # - name: extra-vol
+    #   mountPath: /volume/path
+    # - name: extra-vol-cm
+    #   mountPath: /volume/cm/path
+    service:
+      # -- Console CPN server service type.
+      type: "ClusterIP"
+      # -- Console CPN server service port.
+      port: 80
+    fetchContainer:
+      # -- Image used to fetch plugins inside the initContainer.
+      image: docker.io/wbitt/network-multitool:alpine-minimal
+      # -- Image pull policy to fetch plugins inside the initContainer.
+      pullPolicy: "IfNotPresent"
+    # -- List of zips to download; basically curl url, unzip and stores it in plugins/external/<dir_name>.
+    plugins: []
+    # -- CSV list of plugins to disabled.
+    disabledPlugins: ""
+    resources:
+      requests:
+        # -- Memory request for the Console CPN server.
+        memory: "128Mi"
+        # -- CPU request for the Console CPN server.
+        cpu: "250m"
+      limits:
+        # -- Memory limit for the Console CPN server.
+        memory: "512Mi"
+        # -- CPU limit for the Console CPN server.
+        cpu: "500m"
+    autoscaling:
+      # -- Enable Horizontal Pod Autoscaler ([HPA]) for the Console CPN server.
+      enabled: false
+      # -- Minimum number of replicas for the Console CPN server [HPA].
+      minReplicas: 1
+      # -- Maximum number of replicas for the Console CPN server [HPA].
+      maxReplicas: 3
+      # -- Average CPU utilization percentage for the Console CPN server [HPA].
+      targetCPUUtilizationPercentage: 80
+      # -- Average memory utilization percentage for the Console CPN server [HPA].
+      targetMemoryUtilizationPercentage: 80
+    # -- Default node selector for Console CPN server.
+    nodeSelector: {}
+    # -- Default tolerations for Console CPN server.
+    tolerations: []
+    # -- Default affinity for Console CPN server.
+    affinity: {}
+    serviceAccount:
+      # -- Create a service account for the Console CPN server.
+      create: true
+      # -- Annotations applied to created service account.
+      annotations: {}
+      # -- Service account name.
+      name: "cpn-console-server"
+
+    # CNPG operator configuration
+  cnpg-operator:
+    # -- Whether or not cnpg operator should be deployed.
+    enabled: false
+
+  # -- Set of feature settings - experimental
+  features:
+    # -- vault secrets support
+    vaultSecrets:
+      # -- enabling vault secret
+      enabled: true

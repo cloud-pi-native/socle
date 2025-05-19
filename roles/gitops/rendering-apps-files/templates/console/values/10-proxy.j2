@@ -1,0 +1,11 @@
+{% if dsc.proxy.enabled %}
+cpn-console:
+  global:
+    env:
+      HTTP_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+      HTTPS_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+      NO_PROXY: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,{{ kubernetes_service_clusterip | from_yaml | json_query('resources[0].spec.clusterIP')}}
+      http_proxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+      https_proxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+      no_proxy: <path:forge-dso/data/env/{{ dsc_name }}/apps/common/values#proxy,{{ kubernetes_service_clusterip | from_yaml | json_query('resources[0].spec.clusterIP')}}
+{% endif %}

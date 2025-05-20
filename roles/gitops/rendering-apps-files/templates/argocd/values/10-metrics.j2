@@ -29,15 +29,6 @@ argocd:
 {% if dsc.global.metrics.additionalLabels is defined %}
         labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
-  controller:
-    metrics:
-      enabled: true
-      serviceMonitor:
-        enabled: true
-        namespace: "{{ dsc.argocd.namespace }}"
-{% if dsc.global.metrics.additionalLabels is defined %}
-        labels: {{ dsc.global.metrics.additionalLabels }}
-{% endif %}
   server:
     metrics:
       enabled: true

@@ -1,0 +1,12 @@
+---
+- name: Special parsing for argocd
+  ansible.builtin.include_tasks: ./parsing/argocd.yml
+  when: item.1.argocd_app == 'argocd'
+
+- name: Special parsing for keycloak
+  ansible.builtin.include_tasks: ./parsing/keycloak.yml
+  when: item.1.argocd_app == 'keycloak'
+
+- name: Special parsing for vault
+  ansible.builtin.include_tasks: ./parsing/vault.yml
+  when: item.1.argocd_app == 'vault'

@@ -62,6 +62,5 @@
     dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
     mode: "0644"
 
-- name: Special parsing for argocd
-  ansible.builtin.include_tasks: ./argocd.yml
-  when: item.1.argocd_app == 'argocd'
+- name: Special parsing for pipe after colon
+  ansible.builtin.include_tasks: ./parsing.yml

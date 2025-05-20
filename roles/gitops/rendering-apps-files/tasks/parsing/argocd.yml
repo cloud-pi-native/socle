@@ -23,6 +23,30 @@
         }, recursive=True)
       }}
 
+- name: Add additionalLabels
+  when: dsc.global.metrics.additionalLabels is defined
+  ansible.builtin.set_fact:
+    values: >-
+      {{
+        values | combine({
+          'argocd': values.argocd | combine({
+            'controller_metrics': values.argocd.controller_metrics + values.argocd.controller_metrics_labels | indent(4, true)
+          })
+        }, recursive=True)
+      }}
+
+- name: Add metrics rules
+  when: dsc.global.alerting.enabled
+  ansible.builtin.set_fact:
+    values: >-
+      {{
+        values | combine({
+          'argocd': values.argocd | combine({
+            'controller_metrics': values.argocd.controller_metrics + values.argocd.controller_metrics_rules | indent(2, true)
+          })
+        }, recursive=True)
+      }}
+
 - name: Inject rbac block under configs
   ansible.builtin.blockinfile:
     path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
@@ -36,3 +60,10 @@
     insertafter: '^    cm:\s*$'
     block: "{{ values.argocd.cm | indent(6, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: resource.exclusions and oidc.config"
+
+- name: Inject controller_metrics under controller
+  ansible.builtin.blockinfile:
+    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    insertafter: '^  controller:\s*$'
+    block: "{{ values.argocd.controller_metrics | indent(4, true) }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: controller_metrics"

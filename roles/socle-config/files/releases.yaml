@@ -38,7 +38,7 @@ spec:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"
     # https://github.com/cloud-pi-native/helm-charts/tags
-    chartVersion: 1.1.0
+    chartVersion: 1.2.1
   grafanaOperator:
     # https://github.com/grafana/grafana-operator/tags
     chartVersion: "v5.10.0"

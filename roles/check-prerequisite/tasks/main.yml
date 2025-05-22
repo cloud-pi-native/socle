@@ -7,3 +7,29 @@
     kind: Namespace
   register: argo_infra_ns_check
   ignore_errors: true
+
+- name: Validate cert-manager is first install
+  block:
+    - name: Get cluster infos
+      kubernetes.core.k8s_cluster_info:
+      register: cluster_infos
+
+    - name: Check if cert-manager api exists
+      ansible.builtin.set_fact:
+        cm_api: "{{ cluster_infos.apis['cert-manager.io/v1'] | default('absent') }}"
+
+    - name: Check if cert-manager-webhook exists
+      kubernetes.core.k8s_info:
+        kind: MutatingWebhookConfiguration
+        name: cert-manager-webhook
+      register: cm_mwhc
+
+    - name: Check if cert-manager is absent
+      ansible.builtin.assert:
+        that:
+          - >
+            cm_api == 'absent' or
+            cm_mwhc.resources | length == 0 or
+            dsc.certmanager.forcedInstall
+        fail_msg: " Certmanager is already installed in your cluster"
+      ignore_errors: true

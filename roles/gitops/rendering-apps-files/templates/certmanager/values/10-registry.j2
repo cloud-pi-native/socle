@@ -1,0 +1,19 @@
+certmanager:
+  image:
+    repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/cert-manager-controller"
+
+  webhook:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/cert-manager-webhook"
+
+  cainjector:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/cert-manager-cainjector"
+
+  acmesolver:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/cert-manager-acmesolver"
+
+  startupapicheck:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/cert-manager-startupapicheck"

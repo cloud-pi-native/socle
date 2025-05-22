@@ -65,5 +65,3 @@ grafana:
   grafana:
     isOpenShift: {{ dsc.global.platform == "openshift" | ternary(true, false) }}
     observatorium_url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
-  dashboard:
-    default: true

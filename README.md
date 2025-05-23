@@ -52,7 +52,7 @@
 - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
   - [Harbor GitOps](#harbor-gitops)
   - [Vault GitOps](#vault-gitops)
-  - [Argocd GitOps](#argocd-gitops)
+  - [Nexus GitOps](#nexus-gitops)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1027,9 +1027,9 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur un [applicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) Argo CD déployant lui-même les applications du socle, en fonction d'un environnement donné et des paramètres qui le caractérisent.
 
-Pour l'instant **seuls les déploiements de Keycloak, Sonarqube, Harbor, Vault, Gitlab-runner, Glexporter, Nexus et Argocd** sont gérés en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
+Pour l'instant **seuls les déploiements de Cert-manager, Keycloak, Sonarqube, Harbor, Vault, Gitlab-runner, Glexporter, Nexus et Argocd** sont gérés en mode GitOps, et nous travaillons activement à l'intégration des autres applications de la chaîne DSO.
 
-Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Keycloak, Sonarqube, Harbor, Vault (nécessite Gitlab pour la post-configuration), Gitlab-runner, Glexporter, Nexus et Argocd en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
+Il est donc possible de déployer le Socle en mode « hybride », en installant tout d'abord Cert-manager, Keycloak, Sonarqube, Harbor, Vault (nécessite Gitlab pour la post-configuration), Gitlab-runner, Glexporter, Nexus et Argocd en mode GitOps puis le reste de la chaîne en mode legacy, via la méthode expliquée dans les sections précédentes.
 
 ### Prérequis
 
@@ -1181,8 +1181,8 @@ Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. 
   },
   "targetRevision": "main",
   "apps": [
-    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
-    { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 }
+    { "app": "keycloak", "enabled": "true", "clusterName": "", "namespace": "keycloak", "customPrefix": "", "syncWave": 10 },
+    { "app": "vault", "enabled": "false", "clusterName": "", "namespace": "vault", "customPrefix": "", "syncWave": 10 }
   ]
 }
 ```
@@ -1207,8 +1207,8 @@ Compte-tenu des éléments que nous venons de vérifier, et si nous voulons bien
   },
   "targetRevision": "ma-branche",
   "apps": [
-    { "app": "keycloak", "enabled": "true", "namespace": "keycloak", "syncWave": 10 },
-    { "app": "vault", "enabled": "false", "namespace": "vault", "syncWave": 10 }
+    { "app": "keycloak", "enabled": "true", "clusterName": "", "namespace": "keycloak", "customPrefix": "", "syncWave": 10 },
+    { "app": "vault", "enabled": "false", "clusterName": "", "namespace": "vault", "customPrefix": "", "syncWave": 10 }
   ]
 }
 ```
@@ -1281,6 +1281,18 @@ ansible-playbook install-gitops.yaml -t post-install-keycloak
 
 ## Migration vers le déploiement GitOps
 
+Avant la synchronisation Argocd, il faudra lancer le playbook d'installation avec le tag suivant pour récupérer le `vaultToken` pour le service Vault et pour alimenter les client id et secret du service Keycloak.
+```shell
+ansible-playbook install-gitops.yaml -t vault-secrets-post-install
+```
+
+Après la synchronisation Argocd, pour tous les services, il sera nécessaire de supprimer les deployments, statefulsets et jobs parce qu'il y a nécessité de modification des champs immuables `spec.selector.matchLabels` lors de la prise d'ownership d'Argocd.  
+Ceci peut être fait avec la commande suivante en se positionnant sur les namespaces concernés.
+```shell
+kubectl config set-context --current --namespace=<namespace>
+kubectl get deploy | grep -v NAME | awk '{print $1}' | xargs --no-run-if-empty kubectl delete deploy && kubectl get sts | grep -v NAME | awk '{print $1}' | xargs --no-run-if-empty kubectl delete sts && kubectl get job | grep -v NAME | awk '{print $1}' | xargs --no-run-if-empty kubectl delete job
+``` 
+
 ### Harbor GitOps
 
 En cas d'utilisation de `imageChartStorage` dans la `dsc` comme suit.
@@ -1308,100 +1320,24 @@ harbor:
     regionendpoint: <regionendpoint>
     secretkey: <secretkey>
 ```
-
-Conserver `dsc.harbor.cnpg.initPassword` à `false`.
-
-Il y aura potentiellement des erreurs de ce type pour les statefulsets `harbor-redis` et `harbor-trivy` et pour les deployments `harbor-core`, `harbor-jobservice`, `harbor-portal` et `harbor-registry`.
-
-```
-# deployments.apps "harbor-portal" was not valid:
-# * spec.template.metadata.labels: Invalid value: map[string]string{"app":"harbor", "app.kubernetes.io/component":"portal", "app.kubernetes.io/instance":"harbor", "app.kubernetes.io/managed-by":"Helm", "app.kubernetes.io/name":"harbor", "app.kubernetes.io/part-of":"harbor", "app.kubernetes.io/version":"2.12.0", "chart":"harbor", "component":"portal", "heritage":"Helm", "release":"harbor"}: selector does not match template labels
-# * spec.selector: Invalid value: v1.LabelSelector{MatchLabels:map[string]string{"app":"harbor", "component":"portal", "release":"dso-harbor"}, MatchExpressions:[]v1.LabelSelectorRequirement(nil)}: field is immutable
-```
-
-Ceci étant du à un changement du champ immutable
-```yaml
-spec:
-  selector:
-    matchLabels:
-      release: harbor
-```
-en
-```yaml
-spec:
-  selector:
-    matchLabels:
-      release: {{ dsc.global.gitOps.envName }}-dso-harbor
-```
-Pour résoudre, il suffit de supprimer les deployments et statefulsets
-```
-kubectl delete deploy harbor-core harbor-jobservice harbor-portal harbor-registry
-kubectl delete sts harbor-redis harbor-trivy
+Conserver `dsc.harbor.cnpg.initPassword` à `false`.  
+Puis lancer le playbook d'insertion des secrets dans le Vault d'infrastructure. 
+```shell
+ansible-playbook install-gitops.yaml -t vault-secrets
 ```
 
 ### Vault GitOps
 
-Lancer le playbook d'installation avec le tag suivant pour récupérer le `vaultToken`.
-```
-ansible-playbook install-gitops.yaml -t vault-secrets-post-install
-```
-
-Il y aura potentiellement des erreurs de ce type pour les statefulsets `harbor-redis` et `harbor-trivy` et pour les deployments `harbor-core`, `harbor-jobservice`, `harbor-portal` et `harbor-registry`.
-
-```
-Failed to compare desired state to live state: failed to calculate diff: error calculating server side diff: serverSideDiff error: error running server side apply in dryrun mode for resource StatefulSet/conf-dso-vault: StatefulSet.apps "conf-dso-vault" is invalid: spec: Forbidden: updates to statefulset spec for fields other than 'replicas', 'ordinals', 'template', 'updateStrategy', 'persistentVolumeClaimRetentionPolicy' and 'minReadySeconds' are forbidden
-```
-
-Ceci étant du à un changement du champ immutable
-```
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: conf-dso-vault
-```
-en
-```
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-dso-vault
-```
-Pour résoudre, il suffit de supprimer les deployments et statefulsets avant de synchroniser sur Argocd.
-```
-kubectl delete deploy conf-dso-vault-agent-injector 
-kubectl delete sts conf-dso-vault 
-```
-Puis lancer le playbook de post-installation.
-```
+Puis lancer le playbook de post-installation pour descellé le vault.
+```shell
 ansible-playbook install-gitops.yaml -t post-install-vault
 ```
 
-### Argocd GitOps
+### Nexus GitOps
 
-Il y aura potentiellement des erreurs de ce type pour les statefulsets `conf-dso-redis-ha-server` et `conf-dso-argocd-application-controller` et pour les deployments `conf-dso-argocd-applicationset-controller`, `conf-dso-argocd-repo-server`, `conf-dso-argocd-server` et `conf-dso-redis-ha-haproxy`.
-
-```
-Failed to compare desired state to live state: failed to calculate diff: error calculating server side diff: serverSideDiff error: error running server side apply in dryrun mode for resource Deployment/conf-dso-redis-ha-haproxy: Deployment.apps "conf-dso-redis-ha-haproxy" is invalid: spec.selector: Invalid value: v1.LabelSelector{MatchLabels:v1.LabelSelectorRequirement(nil)}: field is immutable
-```
-
-Ceci étant du à un changement du champ immutable
-```
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: conf-dso-argocd
-```
-en
-```
-spec:
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-dso-argocd
-```
-Pour résoudre, il suffit de supprimer les deployments et statefulsets avant de synchroniser sur Argocd.
-```
-kubectl delete deploy conf-dso-argocd-applicationset-controller conf-dso-argocd-repo-server conf-dso-argocd-server conf-dso-redis-ha-haproxy
-kubectl delete sts conf-dso-redis-ha-server conf-dso-argocd-application-controller
+Lancer le playbook de post-installation pour mettre à jour le mot de passe Nexus dans le secret `dso-config`.
+```shell
+ansible-playbook install-gitops.yaml -t post-install-nexus
 ```
 
 ## Contributions

@@ -73,6 +73,7 @@
         - vault-secrets
         - post-install
         - post-install-harbor
+        - post-install-nexus
 
     - role: gitops/rendering-apps-files
       tags:
@@ -102,6 +103,11 @@
       tags:
         - post-install
         - post-install-harbor
+
+    - role: gitops/post-install/nexus
+      tags:
+        - post-install
+        - post-install-nexus
 
     - role: gitops/post-install/gitlab
       tags:

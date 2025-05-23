@@ -57,3 +57,7 @@
     path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
     data: "{{ current_vault_values_combined.stdout | from_json }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+
+- name:
+  ansible.builtin.set_fact:
+    "{{ item.1.argocd_app }}_current_vault_values": "{{ current_vault_values_combined }}"

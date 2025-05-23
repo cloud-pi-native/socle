@@ -28,7 +28,7 @@
     state: patched
     definition:
       data:
-        HARBOR_ADMIN_PASSWORD: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') | b64encode }}"
+        HARBOR_ADMIN_PASSWORD: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') | b64encode }}"
 
 - name: Get all endpoints in the namespace
   kubernetes.core.k8s_info:
@@ -57,7 +57,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ harbor_domain }}/api/v2.0/configurations
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -112,7 +112,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: PUT
     url: https://{{ harbor_domain }}/api/v2.0/configurations
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -124,7 +124,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ harbor_domain }}/api/v2.0/system/scanAll/schedule
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -147,7 +147,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: POST
     url: https://{{ harbor_domain }}/api/v2.0/system/scanAll/schedule
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json

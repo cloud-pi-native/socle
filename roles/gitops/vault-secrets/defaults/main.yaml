@@ -49,7 +49,13 @@ envs:
       - argocd_app: "keycloak"
         vault_values:
           auth:
-            adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+            adminPassword: >-
+              {{
+                (dso_config_secret.resources[0].data.KEYCLOAK_ADMIN_PASSWORD | b64decode
+                 if (dso_config_secret.resources[0].data.KEYCLOAK_ADMIN_PASSWORD is defined and
+                     dso_config_secret.resources[0].data.KEYCLOAK_ADMIN_PASSWORD | length > 0)
+                 else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
+              }}
           initcontainers:
             pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
       - argocd_app: "observatorium"
@@ -76,7 +82,13 @@ envs:
       - argocd_app: "sonarqube"
         vault_values:
           auth:
-            adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+            adminPassword: >-
+              {{
+                (sonarqube_secret.resources[0].data.password | b64decode
+                 if (sonarqube_secret.resources[0].data.password is defined and
+                     sonarqube_secret.resources[0].data.password | length > 0)
+                 else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
+              }}
             monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
       - argocd_app: "nexus"
         vault_values:

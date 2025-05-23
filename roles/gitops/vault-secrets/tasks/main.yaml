@@ -74,6 +74,22 @@
 
 # Get existing values for migration
 
+- name: Get dso-config secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: dso-config
+  register: dso_config_secret
+  ignore_errors: true
+
+- name: Get sonarqube secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.sonarqube.namespace }}"
+    kind: Secret
+    name: sonarqube
+  register: sonarqube_secret
+  ignore_errors: true
+
 - name: Get pg-cluster-harbor-app secret
   when: not dsc.harbor.cnpg.initPassword
   kubernetes.core.k8s_info:

@@ -99,6 +99,12 @@
         - post-install-keycloak
         - vault-secrets-post-install
 
+    - name: gitops/post-install/vault
+      tags:
+        - post-install
+        - post-install-vault
+        - vault-secrets-post-install
+
     - role: gitops/post-install/harbor
       tags:
         - post-install
@@ -133,13 +139,6 @@
         name: gitops/vault-secrets
       tags:
         - vault-secrets-post-install
-
-    - name: Vault post-install
-      ansible.builtin.import_role:
-        name: gitops/post-install/vault
-      tags:
-        - post-install
-        - post-install-vault
 
     - name: Sonarqube post-install
       ansible.builtin.import_role:

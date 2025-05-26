@@ -1,8 +1,5 @@
 keycloak:
   fullnameOverride: keycloak 
-  image:
-    registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>
-    pullPolicy: "IfNotPresent"
 
   auth:
     adminUser: "dsoadmin"

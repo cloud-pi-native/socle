@@ -1,9 +1,10 @@
-{% if use_private_registry %}
 keycloak:
-  global:                                                                                                                                       
+  global:
     security:
       allowInsecureImages: true
-{% endif %}
+  image:
+    registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>
+    pullPolicy: "IfNotPresent"
 
 {% if use_image_pull_secrets %}
 keycloak:

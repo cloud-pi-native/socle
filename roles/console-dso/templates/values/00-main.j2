@@ -26,6 +26,8 @@ server:
   envFrom:
     - secretRef:
         name: dso-config
+  plugins:
+   - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/v1.0.1/build-artifact.zip
 
 cnpg:
   enabled: true

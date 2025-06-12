@@ -5,10 +5,10 @@
 | cloudnativepg             | 1.22.1           | 0.20.1        | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                  |
 | console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | cpn-cnpg                  | 2.3.1            | 2.3.1         | [cpn-cnpg](https://github.com/cloud-pi-native/helm-charts)                                                           |
-| gitlab                    | 17.11.2          | 8.11.2        | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
+| gitlab                    | 18.0.2          | 9.0.2        | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
 | gitlabCiPipelinesExporter | 0.5.10           | 0.3.5         | [gitlabCiPipelinesExporter](https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter) |
-| gitlabOperator            | 1.12.2           | 1.12.2        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
-| gitlabRunner              | 17.11.1          | 0.76.1        | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)                                            |
+| gitlabOperator            | 2.0.2           | 2.0.2        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
+| gitlabRunner              | 18.0.2          | 0.77.2        | [gitlabRunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)                                            |
 | grafana                   | 10.4.3           | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
 | grafanaOperator           | 5.10.0           | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                                                  |
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |

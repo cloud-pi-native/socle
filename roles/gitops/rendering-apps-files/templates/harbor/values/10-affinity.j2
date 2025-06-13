@@ -1,0 +1,92 @@
+harbor:
+  portal:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.harbor.namespace }}
+                  app.kubernetes.io/name: harbor
+                  app.kubernetes.io/component: portal
+              topologyKey: kubernetes.io/hostname
+  
+  core:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.harbor.namespace }}
+                  app.kubernetes.io/name: harbor
+                  app.kubernetes.io/component: core
+              topologyKey: kubernetes.io/hostname
+  
+  jobservice:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.harbor.namespace }}
+                  app.kubernetes.io/name: harbor
+                  app.kubernetes.io/component: jobservice
+              topologyKey: kubernetes.io/hostname
+  
+  registry:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.harbor.namespace }}
+                  app.kubernetes.io/name: harbor
+                  app.kubernetes.io/component: registry
+              topologyKey: kubernetes.io/hostname
+
+  trivy:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.harbor.namespace }}
+                  app.kubernetes.io/name: harbor 
+                  app.kubernetes.io/component: trivy
+              topologyKey: kubernetes.io/hostname
+  
+  redis:
+    internal:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.harbor.namespace }}
+                    app.kubernetes.io/name: harbor 
+                    app.kubernetes.io/component: redis
+                topologyKey: kubernetes.io/hostname
+  
+  exporter:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.harbor.namespace }}
+                  app.kubernetes.io/name: harbor
+                  app.kubernetes.io/component: exporter
+              topologyKey: kubernetes.io/hostname

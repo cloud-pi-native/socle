@@ -13,3 +13,16 @@ spec:
     parameters:
       max_client_conn: "1000"
       default_pool_size: "100"
+  template:
+    spec:
+      containers: []
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    cnpg.io/cluster: pg-cluster-gitlab
+                    cnpg.io/podRole: pooler
+                topologyKey: kubernetes.io/hostname

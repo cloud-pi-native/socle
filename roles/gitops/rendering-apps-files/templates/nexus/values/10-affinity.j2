@@ -1,0 +1,12 @@
+nexus3:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.nexus.namespace }}
+                app.kubernetes.io/name: nexus3
+                app.kubernetes.io/component: repository
+            topologyKey: kubernetes.io/hostname

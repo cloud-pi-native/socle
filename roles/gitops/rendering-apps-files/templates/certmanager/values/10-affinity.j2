@@ -1,0 +1,51 @@
+certmanager:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.certmanager.namespace }}
+                app.kubernetes.io/name: {{ dsc.certmanager.namespace }}
+                app.kubernetes.io/component: controller
+            topologyKey: kubernetes.io/hostname
+
+  webhook:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.certmanager.namespace }}
+                  app.kubernetes.io/name: webhook
+                  app.kubernetes.io/component: webhook 
+              topologyKey: kubernetes.io/hostname
+
+  cainjector:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.certmanager.namespace }}
+                  app.kubernetes.io/name: cainjector
+                  app.kubernetes.io/component: cainjector
+              topologyKey: kubernetes.io/hostname
+
+  startupapicheck-job:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.certmanager.namespace }}
+                  app.kubernetes.io/name: startupapicheck
+                  app.kubernetes.io/component: startupapicheck
+              topologyKey: kubernetes.io/hostname

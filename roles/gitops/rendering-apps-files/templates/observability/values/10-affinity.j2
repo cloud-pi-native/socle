@@ -1,0 +1,26 @@
+observatorium:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.observatorium.namespace }}
+                app.kubernetes.io/name: observatorium
+                app.kubernetes.io/component: api
+            topologyKey: kubernetes.io/hostname
+
+grafana:
+  grafana-operator:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.grafana.namespace }}
+                  app.kubernetes.io/name: grafana-operator
+                  app.kubernetes.io/component: operator
+              topologyKey: kubernetes.io/hostname

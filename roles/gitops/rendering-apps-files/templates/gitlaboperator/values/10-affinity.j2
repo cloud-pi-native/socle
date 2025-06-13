@@ -1,0 +1,10 @@
+gitlab-operator:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                control-plane: controller-manager
+            topologyKey: kubernetes.io/hostname

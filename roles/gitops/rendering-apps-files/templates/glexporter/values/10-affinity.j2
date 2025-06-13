@@ -1,0 +1,16 @@
+gitlab-ci-pipelines-exporter:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-dso-glexporter
+                app.kubernetes.io/name: gitlab-ci-pipelines-exporter
+                app.kubernetes.io/component: prometheus-exporter
+            topologyKey: kubernetes.io/hostname
+
+  redis:
+    master:
+      podAntiAffinityPreset: soft

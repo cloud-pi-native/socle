@@ -1,5 +1,40 @@
 # Changelog
 
+## [3.12.0](https://github.com/cloud-pi-native/socle/compare/v3.11.1...v3.12.0) (2025-06-13)
+
+
+### Features
+
+* :arrow_up: Upgrade GitLab Operator and GitLab ([3743711](https://github.com/cloud-pi-native/socle/commit/37437113d1bfb880e452d42dc7697b071598ebef))
+* :arrow_up: upgrade grafana dashboards ([62689cf](https://github.com/cloud-pi-native/socle/commit/62689cfdbea4dae34c21161ca0820482fdec466d))
+* :lipstick: prefix argo Application with environment name ([e162171](https://github.com/cloud-pi-native/socle/commit/e162171ed80576b04da36999217d7571973d9dfe))
+* :lipstick: suffix argo Application with environment name ([cc63780](https://github.com/cloud-pi-native/socle/commit/cc6378081790ec5acd38ecff69ac47910cbf9ca6))
+* :rocket: add external GitOps repo config ([5d3ff39](https://github.com/cloud-pi-native/socle/commit/5d3ff39d44d40850b5c60d39ff56e615475cae92))
+* :sparkles: Add certmanager GitOps ([cc34f1e](https://github.com/cloud-pi-native/socle/commit/cc34f1e10fd68bea3d2df50798070f4266877368))
+* :sparkles: allow GitOps infra variables override ([cd4a325](https://github.com/cloud-pi-native/socle/commit/cd4a32503513c1132b6ed852e281ff62185c4637))
+* :sparkles: Argocd GitOps deployment ([0a2e688](https://github.com/cloud-pi-native/socle/commit/0a2e688fc17067cbfb95d1e618a9004f2fc082a9))
+* :sparkles: Gitlab-ci pipelines exporter GitOps deployment ([da67ab9](https://github.com/cloud-pi-native/socle/commit/da67ab9a97f46a027d1f21fcb9b290d4154c7a1d))
+* :sparkles: Gitlab-runner GitOps deployment ([28f776f](https://github.com/cloud-pi-native/socle/commit/28f776f9d6b9f40638a92a81b9088e743979d680))
+* :zap: prefix kv name with dso- ([a79f6dd](https://github.com/cloud-pi-native/socle/commit/a79f6dd79470716cca7140e1b2faf8e0d70bb1e7))
+* gitops nexus deployment ([80879b4](https://github.com/cloud-pi-native/socle/commit/80879b4ff141a42cb4ff6499f59905954c46040c))
+
+
+### Bug Fixes
+
+* :bug: Adapt get-credentials admin tools ([ec302c9](https://github.com/cloud-pi-native/socle/commit/ec302c93fc73842d9105c7588c5e6a656d6d331a))
+* :bug: add missing prefix in secret name ([06ed67f](https://github.com/cloud-pi-native/socle/commit/06ed67f5d405a8306af8303645843fe1bc1a470c))
+* :construction: report missing refactoring on Nexus values ([9023019](https://github.com/cloud-pi-native/socle/commit/902301971ea197767485901da5171585ae082201))
+* :wrench: ": |" rendering values ([6602560](https://github.com/cloud-pi-native/socle/commit/6602560fc6d31aacc47f372e6bf0019c26f3bd35))
+* :wrench: escape $ character ([255802f](https://github.com/cloud-pi-native/socle/commit/255802f12435998e8fc027759c5c5c7c09b75b9a))
+* :wrench: existing secrets retrieval for migration ([b719144](https://github.com/cloud-pi-native/socle/commit/b719144cc43fa363797dbd8608cb8828ef6e9b89))
+* :wrench: tasks execution condition ([459c5e8](https://github.com/cloud-pi-native/socle/commit/459c5e8f0aff5ffd1339457711553a5506031930))
+* :wrench: vault post-install order ([f02eb13](https://github.com/cloud-pi-native/socle/commit/f02eb13d02d54bcfa44fa415d277ae7b4b25432f))
+* 🐛 Change registry for certmanager ([7147af4](https://github.com/cloud-pi-native/socle/commit/7147af4ff5022923b22eb1e9b1a90a3def1deb3e))
+* 🐛 Change registry for certmanager ([c28c41b](https://github.com/cloud-pi-native/socle/commit/c28c41b9c4b67deadf021cb6c174c8784203040c))
+* 🐛 Override fullname ([7147af4](https://github.com/cloud-pi-native/socle/commit/7147af4ff5022923b22eb1e9b1a90a3def1deb3e))
+* adding kubeinfra var before checks ([02e2a66](https://github.com/cloud-pi-native/socle/commit/02e2a66ebb201850753c39a1b9782d7b0bc5adbd))
+* need allowInsecureImages with vault path ([68ed760](https://github.com/cloud-pi-native/socle/commit/68ed760de8cb22e666eaacf6c3e1afa096915472))
+
 ## [3.11.1](https://github.com/cloud-pi-native/socle/compare/v3.11.0...v3.11.1) (2025-05-15)
 
 

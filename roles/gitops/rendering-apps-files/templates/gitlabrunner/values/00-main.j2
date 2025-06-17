@@ -9,6 +9,10 @@ gitlab-runner:
   
   runnerToken: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#runnerToken>
   
+  serviceAccount:
+    create: true
+    name: gitlab-runner
+
   rbac:
     create: true
     rules:
@@ -26,7 +30,6 @@ gitlab-runner:
       - apiGroups: [""]
         resources: ["pods/exec"]
         verbs: ["create", "patch", "delete"]
-    serviceAccountName: gitlab-runner
     podSecurityPolicy:
       enabled: true
   

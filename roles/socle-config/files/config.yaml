@@ -59,6 +59,8 @@ spec:
     values: {}
   gitlabRunner:
     helmRepoUrl: https://charts.gitlab.io
+    taint:
+      enabled: false
     values: {}
   global:
     backup:

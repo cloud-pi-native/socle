@@ -8,7 +8,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
     url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -44,7 +44,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: "{{ method }}"
     url: https://{{ harbor_domain }}/api/v2.0/registries/{{ url_id_param }}
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -56,7 +56,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
     url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -68,7 +68,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
     url: https://{{ harbor_domain }}/api/v2.0/projects?q=name={{ proxy_cache.name }}
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -85,7 +85,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: "{{ method }}"
     url: https://{{ harbor_domain }}/api/v2.0/projects/{{ url_id_param }}
-    password: "{{ current_vault_values_combined.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
     user: admin
     force_basic_auth: true
     body_format: json

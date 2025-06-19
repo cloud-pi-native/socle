@@ -539,6 +539,14 @@ spec:
                                 memory:
                                   description: Memory limit max overwrite for GitLab Runner.
                                   type: string
+                    taint:
+                      description: Configuration for taint.
+                      type: object
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether taint should be enabled.
+                          type: boolean
                     values:
                       description: |
                         You can add custom values for GitLab Runner, they will be merged with roles/gitlab-runner/templates/values/

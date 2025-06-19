@@ -382,7 +382,7 @@
 
 - name: Append registry mirror arguments to extra_kaniko_args
   ansible.builtin.set_fact:
-    extra_kaniko_args: "{{ extra_kaniko_args | default('') }} --registry-mirror {{ item.registry.endpointUrl | regex_replace('^https?://', '') }}/{{ item.name }}"
+    extra_kaniko_args: "{{ extra_kaniko_args | default('') }} --registry-mirror {{ harbor_domain | regex_replace('^https?://', '') }}/{{ item.name }}"
   loop: "{{ dsc.harbor.proxyCache }}"
   when: dsc.harbor.proxyCache is defined
 

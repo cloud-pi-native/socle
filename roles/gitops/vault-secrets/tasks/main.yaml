@@ -97,6 +97,19 @@
     kind: Secret
     name: pg-cluster-harbor-app
   register: pg_harbor_db_secret
+- name: Get pg-cluster-console-app secret
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: pg-cluster-console-app
+  register: pg_console_db_secret
+
+- name: Get kubernetes service
+  kubernetes.core.k8s_info:
+    namespace: default
+    kind: Service
+    name: kubernetes
+  register: kubernetes_service_clusterip
 
 # Write Vault Infra secrets
 

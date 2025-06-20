@@ -141,3 +141,11 @@
     access.token.claim: true
     claim.name: email
     jsonType.label: String
+- id: 8cce9fe2-4374-4f3f-9073-10153714ad47
+  name: audience resolve
+  protocol: openid-connect
+  protocolMapper: oidc-audience-resolve-mapper
+  config:
+    lightweight.claim: false
+    introspection.token.claim: true
+    access.token.claim: true

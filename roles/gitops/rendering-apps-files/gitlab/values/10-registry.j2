@@ -1,78 +1,78 @@
 gitlab:
   gitaly:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitaly"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitaly"
   gitlab-exporter:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-exporter"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-exporter"
   gitlab-shell:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-shell"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-shell"
   kas:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-kas"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-kas"
   toolbox:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-toolbox-ee"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ee"
 
 global:
   kubectl:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/kubectl"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/kubectl"
   gitlabBase:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-base"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-base"
   certificates:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/certificates"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/certificates"
   enterpriseImages:
     migrations:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-toolbox-ee"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ee"
     sidekiq:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-sidekiq-ee"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-sidekiq-ee"
     toolbox:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-toolbox-ee"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ee"
     webservice:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-webservice-ee"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-webservice-ee"
     workhorse:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-workhorse-ee"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-workhorse-ee"
     geo-logcursor:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-geo-logcursor"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-geo-logcursor"
   communityImages:
     migrations:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-toolbox-ce"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ce"
     sidekiq:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-sidekiq-ce"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-sidekiq-ce"
     toolbox:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-toolbox-ce"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-toolbox-ce"
     webservice:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-webservice-ce"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-webservice-ce"
     workhorse:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/gitlab-workhorse-ce"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-workhorse-ce"
 
 shared-secrets:
   selfsign:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/gitlab-org/build/cng/cfssl-self-sign"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/cfssl-self-sign"
 
 minio:
-  image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/minio"
+  image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/minio"
   minioMc:
-    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/mc"
+    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/mc"
 
 postgresql:
   image:
-    registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>"
+    registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>"
   metrics:
     image:
-      registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>"
+      registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>"
 
 redis:
   image:
-    registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>"
+    registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>"
   metrics:
     image:
-      registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>"
+      registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>"
 
 {% if use_image_pull_secrets %}
 global:

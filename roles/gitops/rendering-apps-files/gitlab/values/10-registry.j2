@@ -73,10 +73,10 @@ redis:
   metrics:
     image:
       registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>"
-{% endif %}
 
 {% if use_image_pull_secrets %}
 global:
   image:
     pullSecrets:
     - name: dso-config-pull-secret
+{% endif %}

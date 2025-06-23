@@ -115,13 +115,13 @@ global:
       - secret: exposed-ca
 {% endif %}
   hosts:
-    domain: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common#rootDomain>
+    domain: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#rootDomain>
     registry:
       name: gitlab-registry.example.com
     minio:
-      name: "{{ dsc_name }}-minio.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common#rootDomain>"
+      name: "{{ dsc_name }}-minio.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#rootDomain>"
     kas:
-      name: "{{ dsc_name }}-kas.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common#rootDomain>"
+      name: "{{ dsc_name }}-kas.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#rootDomain>"
 {% if gitlab_domain %}
     gitlab:
       name: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>

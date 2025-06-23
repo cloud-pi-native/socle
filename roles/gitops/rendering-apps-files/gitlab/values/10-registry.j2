@@ -56,9 +56,9 @@ shared-secrets:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/cfssl-self-sign"
 
 minio:
-  image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/minio"
+  image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.minio}>/minio"
   minioMc:
-    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>/mc"
+    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.minio}>/mc"
 
 postgresql:
   image:
@@ -69,10 +69,10 @@ postgresql:
 
 redis:
   image:
-    registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>"
+    registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>"
   metrics:
     image:
-      registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>"
+      registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>"
 
 {% if use_image_pull_secrets %}
 global:

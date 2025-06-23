@@ -58,6 +58,6 @@
     data: "{{ current_vault_values_combined.stdout | from_json }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
 
-- name:
+- name: Set {{ item.1.argocd_app }}_current_vault_values
   ansible.builtin.set_fact:
     "{{ item.1.argocd_app }}_current_vault_values": "{{ current_vault_values_combined }}"

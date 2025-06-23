@@ -1,0 +1,18 @@
+console:
+  server:
+    container:
+      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/console/server:{{ dsc.console.release }}"
+      
+  client:
+    container:
+      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/console/client:{{ dsc.console.release }}"
+
+  postgres:
+    container:
+      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/postgres:15.3"
+
+{% if use_image_pull_secrets %}
+  global:
+    imagePullSecrets:
+    - dso-config-pull-secret
+{% endif %}

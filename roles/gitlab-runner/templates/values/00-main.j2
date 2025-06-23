@@ -84,6 +84,14 @@ runners:
     {% endif %}
   {% endif %}
 {% endif %}
+{% if dsc.gitlabRunner.taint.enabled %}
+        [runners.kubernetes.node_selector]
+          role = "gitlab-runner"
+        [runners.kubernetes.node_tolerations]
+          "role=gitlab-runner" = "NoSchedule"
+{% endif %}
+
+  global:
 
   ## Specify the name for the runner.
   name: gitlab-runner
@@ -109,3 +117,14 @@ volumes:
   - name: root-gitlab-runner
     emptyDir:
       medium: "Memory"
+
+{% if dsc.gitlabRunner.taint.enabled %}
+nodeSelector:
+  role: "gitlab-runner"
+
+tolerations:
+  - effect: NoSchedule
+    key: role
+    operator: Equal
+    value: gitlab-runner
+{% endif %}

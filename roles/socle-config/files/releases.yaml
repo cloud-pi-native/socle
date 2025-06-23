@@ -18,22 +18,22 @@ spec:
     chartVersion: 0.20.1
   console:
     # https://github.com/cloud-pi-native/console/releases
-    release: "2.*.*"
+    release: "2.1.9"
   cpnCnpg:
     # https://github.com/cloud-pi-native/helm-charts/releases
     chartVersion: 2.3.1
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "8.11.2"
+    chartVersion: "9.0.2"
   gitlabCiPipelinesExporter:
     # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
     chartVersion: "0.3.5"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "1.12.2"
+    chartVersion: "2.0.2"
   gitlabRunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.76.1"
+    chartVersion: "0.77.2"
   grafana:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"

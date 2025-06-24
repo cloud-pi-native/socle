@@ -41,3 +41,12 @@ envs:
         vault_values:
           backupSecrets:
             vaultToken: "{{ vault_token | default('') }}"
+      - argocd_app: "console"
+        vault_values:
+          uri: >-
+            {{
+              (pg_console_db_secret.resources[0].data.uri | b64decode)
+              if pg_console_db_secret is defined and
+              pg_console_db_secret.resources | length > 0
+              else ''
+            }}

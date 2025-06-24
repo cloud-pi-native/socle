@@ -33,6 +33,7 @@ envs:
             noProxy: "{{ dsc.proxy.no_proxy | default('') }}"
             hostProxy: "{{ dsc.proxy.host | default('') }}"
             portProxy: "{{ dsc.proxy.port | default('') }}"
+            kubeIp: "{{ kubernetes_service_clusterip.resources[0].spec.clusterIP }}"
           exposedCa: "{{ exposed_ca_pem | default('') }}"
           cnpgS3CaPem: "{{ cnpg_s3_ca_pem | default('') }}"
           ingressClassName: "{{ dsc.ingress.className | default('') }}"
@@ -140,6 +141,15 @@ envs:
       - argocd_app: "argocd"
         vault_values:
           argocdServerAdminPassword: "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+      - argocd_app: "console"
+        vault_values:
+          uri: >-
+            {{
+              (pg_console_db_secret.resources[0].data.uri | b64decode)
+              if pg_console_db_secret is defined and
+              pg_console_db_secret.resources | length > 0
+              else ''
+            }}
       - argocd_app: "gitlab"
         vault_values:
           cnpg:

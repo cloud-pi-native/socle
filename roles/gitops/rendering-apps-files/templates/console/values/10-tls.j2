@@ -1,0 +1,8 @@
+{% if dsc.ingress.tls.type != 'none' and (dsc.ingress.tls.type == 'tlsSecret' or dsc.ingress.tls.type == 'acme') %}
+console:
+  ingress:
+    tls:
+      - secretName: {{ dsc.ingress.tls.tlsSecret.name | default('tls-secret') }}
+        hosts:
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.console}>
+{% endif %}

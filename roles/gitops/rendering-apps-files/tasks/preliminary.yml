@@ -64,6 +64,12 @@
           version: "{{ dsc.gitlab.chartVersion }}"
           values: "{{ gitlab_values }}"
 
+- name: Create destination dir
+  ansible.builtin.file:
+    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/gitlaboperator/templates"
+    state: directory
+    mode: 0775
+
 - name: Render gitlab instance file into GitOps local repo
   ansible.builtin.copy:
     content: "{{ gitlab_definition | to_nice_yaml(indent=2) }}"

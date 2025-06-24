@@ -2,7 +2,7 @@ gitlab-operator:
   watchCluster: false
   
   image:
-    repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlabOperator}>
+    repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlabOperator}>/cloud-native
     name: gitlab-operator
     tag: {{ dsc.gitlabOperator.chartVersion }}
     # digest:

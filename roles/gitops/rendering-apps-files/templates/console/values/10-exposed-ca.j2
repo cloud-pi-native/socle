@@ -1,0 +1,7 @@
+{% if dsc.exposedCA.type != 'none' %}
+console:
+  server:
+    extraCa:
+      name: bundle
+      key: ca.pem
+{% endif %}

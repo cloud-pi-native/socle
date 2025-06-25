@@ -320,6 +320,23 @@ spec:
                           type: boolean
                           default: false
                   type: object
+                cpnAnsibleJob:
+                  description: Configuration for cpn-ansible-job.
+                  properties:
+                    helmRepoUrl:
+                      description: Cloud-Pi-Native helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Cloud-Pi-Native helm chart version (e.g., "1.0.0").
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for cpn-ansible-job, they will be merged with roles/gitops/rendering-apps-files/
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job
+                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
                 cpnCnpg:
                   description: Configuration for cpn-cnpg.
                   properties:
@@ -582,6 +599,15 @@ spec:
                 global:
                   description: Global configuration not specific to one service.
                   properties:
+                    namespace:
+                      description: The namespace for Global configuration.
+                      type: string
+                    values:
+                      description: |
+                        You can add custom values for Global configuration, they will be merged with roles/gitops/rendering-apps-files/templates/global/
+                        https://github.com/cloud-pi-native/socle
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
                     environment:
                       default: production
                       description: Defines DSO environment type, i.e. development or production.

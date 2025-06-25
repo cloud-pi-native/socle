@@ -2,13 +2,13 @@
 - name: Create or update DsoSocleConfig CRD
   kubernetes.core.k8s:
     definition: "{{ lookup('ansible.builtin.file', 'crd-conf-dso.yaml') | from_yaml }}"
+  when: post_conf_job is not defined
 
 - name: Get socle config from conf-dso dsc (default)
   kubernetes.core.k8s_info:
     kind: dsc
     name: conf-dso
     api_version: cloud-pi-native.fr/v1alpha
-  #  register: socle_config_default
   register: socle_config
 
 - name: Get socle config from dsc_cr extra var when defined
@@ -38,10 +38,6 @@
 
     - name: Exit playbook
       ansible.builtin.meta: end_play
-
-# - name: Set default socle_config fact
-#   ansible.builtin.set_fact:
-#     socle_config: "{{ socle_config_default }}"
 
 - name: Set socle_config fact when dsc_cr defined and not empty
   ansible.builtin.set_fact:
@@ -177,6 +173,3 @@
 - name: Set keycloak_reset_password fact
   ansible.builtin.set_fact:
     keycloak_reset_password: false
-
-# - name: End playbook
-#   ansible.builtin.meta: end_play

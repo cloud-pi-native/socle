@@ -35,6 +35,9 @@ spec:
       exposed: false
       initPassword: false
     values: {}
+  cpnAnsibleJob:
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    values: {}
   cpnCnpg:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
@@ -63,6 +66,8 @@ spec:
       enabled: false
     values: {}
   global:
+    namespace: dso-global
+    values: {}
     backup:
       velero:
         enabled: false

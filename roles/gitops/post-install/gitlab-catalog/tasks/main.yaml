@@ -1,0 +1,58 @@
+---
+- name: Find gitlab token in inventory
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.console.namespace }}"
+    kind: Secret
+    name: dso-config
+  register: ansible_inventory
+
+- name: Get gitlab token
+  ansible.builtin.set_fact:
+    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
+  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
+  register: set_token_inv
+
+- name: Clone Git repository as bare
+  ansible.builtin.git:
+    repo: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
+    dest: /tmp/test
+    bare: true
+  environment:
+    GIT_SSL_NO_VERIFY: "1"
+
+- name: Remove branch protection
+  community.general.gitlab_protected_branch:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+    name: main
+    state: absent
+  ignore_errors: true
+
+- name: Sync Git repository with push mirror
+  ansible.builtin.shell: |
+    set -e
+    git config --add http.sslVerify false
+    git push --mirror "https://admin:{{ gitlab_token }}@{{ gitlab_domain }}/{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+  args:
+    chdir: /tmp/test
+
+- name: Update Catalog visibility and path
+  community.general.gitlab_project:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    import_url: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
+    name: Catalog
+    path: catalog
+    group: "{{ dsc.global.projectsRootDir | join('/') }}"
+    visibility: internal
+
+- name: Apply branch protection
+  community.general.gitlab_protected_branch:
+    api_url: https://{{ gitlab_domain }}
+    api_token: "{{ gitlab_token }}"
+    project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+    name: main
+    push_access_level: nobody
+    state: present

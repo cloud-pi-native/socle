@@ -11,6 +11,7 @@
     envs:
       - name: "{{ dsc_name }}"
         apps:
+          - argocd_app: global
           - argocd_app: keycloak
           - argocd_app: vault
           - argocd_app: sonarqube

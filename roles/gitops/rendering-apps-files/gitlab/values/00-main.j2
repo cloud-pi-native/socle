@@ -16,7 +16,9 @@ gitlab:
         enabled: true
 {% if dsc.global.metrics.additionalLabels is defined %} 
         additionalLabels:
-          "{{ dsc.global.metrics.additionalLabels }}"
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+          {{ key }}: {{ value }}
+{% endfor %}
 {% endif %}
 {% endif %}
   sidekiq:
@@ -28,7 +30,9 @@ gitlab:
         enabled: true
 {% if dsc.global.metrics.additionalLabels is defined %} 
         additionalLabels:
-          "{{ dsc.global.metrics.additionalLabels }}"
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+          {{ key }}: {{ value }}
+{% endfor %}
 {% endif %}
 {% endif %}
   unicorn:
@@ -51,7 +55,9 @@ gitlab:
         enabled: true
 {% if dsc.global.metrics.additionalLabels is defined %} 
         additionalLabels:
-          "{{ dsc.global.metrics.additionalLabels }}"
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+          {{ key }}: {{ value }}
+{% endfor %}
 {% endif %}
 {% endif %}
     persistence:
@@ -63,7 +69,9 @@ gitlab:
         enabled: true
 {% if dsc.global.metrics.additionalLabels is defined %} 
         additionalLabels:
-          "{{ dsc.global.metrics.additionalLabels }}"
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+          {{ key }}: {{ value }}
+{% endfor %}
 {% endif %}
 {% endif %}
   kas:
@@ -74,7 +82,9 @@ gitlab:
         enabled: true
 {% if dsc.global.metrics.additionalLabels is defined %} 
         additionalLabels:
-          "{{ dsc.global.metrics.additionalLabels }}"
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+          {{ key }}: {{ value }}
+{% endfor %}
 {% endif %}
 {% endif %}
   toolbox:

@@ -1,0 +1,14 @@
+---
+- name: Gitlab-ci-catalog repository synchronisation
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: "{{ playbook_dir}}/../roles/socle-config"
+
+    - name: Import gitlab-catalog role
+      ansible.builtin.import_role:
+        name: "{{ playbook_dir}}/../roles/gitops/post-install/gitlab-catalog"

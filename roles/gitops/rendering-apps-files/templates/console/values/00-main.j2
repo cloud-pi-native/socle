@@ -21,7 +21,7 @@ console:
       NEXUS_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.nexus}>/"
       SONAR_API_TOKEN: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/sonarqube/values#auth| jsonPath {.sonarApiToken}>"
       SONARQUBE_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.sonarqube}>/"
-      VAULT_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vault/values#backupSecrets| jsonPath {.vaultToken}>
+      VAULT_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vault/values#vaultToken>
       VAULT_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.vault}>/"
   global:
     env:

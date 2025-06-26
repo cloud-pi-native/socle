@@ -22,3 +22,4 @@
           - argocd_app: nexus
           - argocd_app: certmanager
           - argocd_app: gitlaboperator
+          - argocd_app: kyverno

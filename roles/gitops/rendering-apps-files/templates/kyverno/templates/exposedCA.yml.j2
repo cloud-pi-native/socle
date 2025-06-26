@@ -1,0 +1,93 @@
+{% if dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret" %}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: exposed-ca-dso-gitlab-runner
+  annotations:
+    policies.kyverno.io/title: Mount exposed ca-certificates
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Pod
+        namespaces:
+        - "{{ dsc.gitlab.namespace }}"
+        names:
+        - "runner-*"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          containers:
+          - name: build
+            env:
+            - name: VAULT_CACERT
+              value: "/tmp/local/share/ca-certificates/tls.crt"
+            - name: GIT_SSL_CAINFO
+              value: "/tmp/local/share/ca-certificates/tls.crt"
+            volumeMounts:
+              - name: custom-ca-certificates
+                mountPath: /tmp/local/share/ca-certificates
+                readOnly: true
+          volumes:
+          - name: custom-ca-certificates
+            projected:
+              defaultMode: 292
+              sources:
+              - secret:
+                  name: exposed-ca
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: exposed-ca-dso-vault
+  annotations:
+    policies.kyverno.io/title: Mount exposed ca-certificates
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: StatefulSet
+spec:
+  validationFailureAction: Enforce
+spec:
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - StatefulSet
+        namespaces:
+        - "{{ dsc.vault.namespace }}"
+        names:
+        - "conf-dso-vault"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              containers:
+              - name: "vault"
+                env:
+                - name: VAULT_CACERT
+                  value: "/tmp/local/share/ca-certificates/tls.crt"
+                - name: SSL_CERT_FILE
+                  value: "/tmp/local/share/ca-certificates/tls.crt"
+                volumeMounts:
+                  - name: custom-ca-certificates
+                    mountPath: /tmp/local/share/ca-certificates
+                    readOnly: true
+              volumes:
+              - name: custom-ca-certificates
+                projected:
+                  defaultMode: 292
+                  sources:
+                  - secret:
+                      name: exposed-ca
+{% endif %}

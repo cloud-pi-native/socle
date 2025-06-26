@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: kyverno
+type: application
+version: {{ dsc.kyverno.chartVersion }}
+dependencies:
+- name: kyverno
+  alias: kyverno
+  version: {{ dsc.kyverno.chartVersion }}
+  repository: {{ dsc.kyverno.helmRepoUrl }} 

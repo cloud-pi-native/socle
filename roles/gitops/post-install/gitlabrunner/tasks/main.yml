@@ -10,6 +10,85 @@
     msg: Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant
   when: gitlab_ns | length == 0
 
+# Retrieve Vault Infra token
+
+- name: Get Vault Infra token
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') != ''
+  ansible.builtin.set_fact:
+    vault_infra_token: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') }}"
+
+- name: Get Vault Infra keys and token
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') == ''
+  block:
+    - name: Get Vault Infra secrets
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_infra }}"
+        proxy: "{{ kubeconfig_proxy_infra | default('')}}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+      register: vault_infra_secrets
+
+    - name: Set vault_infra_keys_secret_name
+      ansible.builtin.set_fact:
+        vault_infra_keys_secret_name: "{{ vault_infra_secrets.resources
+          | selectattr('metadata.name', 'contains', 'vault-keys')
+          | map(attribute='metadata.name') | first }}"
+
+    - name: Get Vault Infra keys
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_infra }}"
+        proxy: "{{ kubeconfig_proxy_infra | default('')}}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+        name: "{{ vault_infra_keys_secret_name }}"
+      register: vault_infra_keys
+
+    - name: Get Vault Infra token
+      ansible.builtin.set_fact:
+        vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
+
+- name: Get runner token from infra Vault
+  block:
+    - name: Retrieve GitLab values from infra Vault
+      community.hashi_vault.vault_kv2_get:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ dsc_name }}/apps/gitlab/values"
+      register: gitlab_vault_values
+      ignore_errors: true
+
+    - name: Set runner_token fact
+      when: gitlab_vault_values.data.data.runnerToken is defined
+      ansible.builtin.set_fact:
+        runner_token: "{{ gitlab_vault_values.data.data.runnerToken }}"
+
+- name: Check if GitLab Runner is installed and needs upgrade
+  block:
+    - name: Get GitLab Runner deployment
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        name: gitlab-runner
+        namespace: "{{ dsc.gitlab.namespace }}"
+        api_version: apps/v1
+      register: grunner_deploy
+      ignore_errors: true
+
+    - name: Set grunner_installed fact
+      ansible.builtin.set_fact:
+        grunner_installed: "{{ grunner_deploy.resources | length > 0 }}"
+
+    - name: Set GitLab Runner version
+      when: grunner_installed
+      ansible.builtin.set_fact:
+        grunner_version: "{{ grunner_deploy.resources[0].metadata.labels.chart | regex_search('[0-9].*') }}"
+
+    - name: Set needs_update fact
+      when: grunner_installed
+      ansible.builtin.set_fact:
+        needs_upgrade: "{{ grunner_version is version(dsc.gitlabRunner.chartVersion, operator='lt', strict=True) }}"
+
 - name: Get dso-config inventory
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.console.namespace }}"
@@ -21,7 +100,28 @@
   ansible.builtin.set_fact:
     gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
 
-- name: Initiate a runner in GitLab instance
+- name: Get GitLab online admin runners
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: https://{{ gitlab_domain }}/api/v4/runners/all?status=online
+    method: GET
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body_format: json
+    status_code: [200]
+  register: online_admin_runners
+
+- name: Set dso_runner fact
+  when: online_admin_runners.json | length > 0
+  ansible.builtin.set_fact:
+    dso_runner: "{{ online_admin_runners.json | selectattr('description', 'contains', 'dso-runner') | last }}"
+
+- name: Initiate dso-runner in GitLab instance
+  when: |
+    (dso_runner is not defined) or
+    (runner_token is defined and runner_token | length == 0) or
+    (needs_upgrade is defined and needs_upgrade) or
+    (not grunner_installed)
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ gitlab_domain }}/api/v4/user/runners
@@ -37,3 +137,60 @@
     status_code: [201]
   changed_when: true
   register: default_runner
+
+- name: Get and delete old admin runners
+  when: |
+    default_runner is skipped and
+    dso_runner is defined
+  block:
+    - name: Get all GitLab admin runners
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: https://{{ gitlab_domain }}/api/v4/runners/all
+        method: GET
+        headers:
+          PRIVATE-TOKEN: "{{ gitlab_token }}"
+        body_format: json
+        status_code: [200]
+      register: admin_runners
+
+    - name: Set old admin runners fact
+      ansible.builtin.set_fact:
+        old_admin_runners: "{{ admin_runners.json | selectattr('id', '!=', dso_runner.id) }}"
+
+    - name: Delete old admin runners
+      when: old_admin_runners | length > 0
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: "https://{{ gitlab_domain }}/api/v4/runners/{{ item }}"
+        method: DELETE
+        headers:
+          PRIVATE-TOKEN: "{{ gitlab_token }}"
+        status_code: [204]
+      changed_when: true
+      loop: "{{ old_admin_runners | map(attribute='id') }}"
+
+- name: Delete deprecated dso-runner
+  when: |
+    default_runner is not skipped and
+    dso_runner is defined
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "https://{{ gitlab_domain }}/api/v4/runners/{{ dso_runner.id }}"
+    method: DELETE
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    status_code: [204]
+  changed_when: true
+
+# We need this task here because default_runner is always registered, even when skipped.
+# Without the task below, it would otherwise become empty when skipped.
+
+- name: Keep runner token from infra Vault if default_runner was skipped
+  when: |
+    default_runner is skipped and
+    (runner_token is defined and runner_token | length > 0)
+  ansible.builtin.set_fact:
+    default_runner:
+      json:
+        token: "{{ runner_token }}"

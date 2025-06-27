@@ -1,0 +1,23 @@
+{% set apps = [] %}
+{% for env, app in envs | subelements('apps', skip_missing=True) %}
+{% set _ = apps.append({
+  "app": app.argocd_app,
+  "enabled": "true",
+  "clusterName": app.clusterName | default(""),
+  "namespace": app.nameSpace,
+  "customPrefix": app.customPrefix | default(""),
+  "syncWave": app.syncWave | default(10) | int
+}) %}
+{% endfor %}
+{% set json_data = {
+  "env": envs[0].name,
+  "provider": "self-hosted",
+  "region": "fr-par",
+  "prefix": prefix | default("dso-"),
+  "destination": {
+    "clusterName": clusterName | default("sdid-hp")
+  },
+  "targetRevision": "main",
+  "apps": apps
+} %}
+{{ json_data | to_json }}

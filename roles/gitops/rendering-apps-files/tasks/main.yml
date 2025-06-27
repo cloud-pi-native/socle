@@ -2,6 +2,9 @@
 - name: Preliminary tasks
   ansible.builtin.include_tasks: ./preliminary.yml
 
+- name: Generate dsc.json
+  ansible.builtin.include_tasks: ./generate_dsc_json.yml
+
 - name: Loop over services to render templates
   ansible.builtin.include_tasks: ./template.yml
   loop: "{{ envs | subelements('apps') }}"

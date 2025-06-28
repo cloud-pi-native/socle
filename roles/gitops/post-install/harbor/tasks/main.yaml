@@ -1,48 +1,4 @@
 ---
-- name: Wait pg-cluster-harbor-rw endpoint
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.harbor.namespace }}"
-    name: pg-cluster-harbor-rw
-  register: endpoint
-  until: endpoint.resources[0].subsets[0].addresses[0] is defined
-  retries: 30
-  delay: 5
-
-- name: Wait job.batch/pg-cluster-harbor-1-initdb to be terminated
-  kubernetes.core.k8s_info:
-    kind: Job
-    api_version: batch/v1
-    namespace: "{{ dsc.harbor.namespace }}"
-    name: pg-cluster-harbor-1-initdb
-  register: job1
-  until: job1.resources | length == 0
-  retries: 45
-  delay: 5
-
-- name: Get all endpoints in the namespace
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.harbor.namespace }}"
-  register: all_endpoints
-
-- name: Find the core and jobservice endpoint names
-  ansible.builtin.set_fact:
-    harbor_core_endpoint_name: >-
-      {{ all_endpoints.resources | selectattr('metadata.name', 'search', '-core$') | map(attribute='metadata.name') | list | first }}
-    harbor_jobservice_endpoint_name: >-
-      {{ all_endpoints.resources | selectattr('metadata.name', 'search', '-jobservice$') | map(attribute='metadata.name') | list | first }}
-
-- name: Wait harbor-core endpoint
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.harbor.namespace }}"
-    name: "{{ harbor_core_endpoint_name }}"
-  register: endpoint
-  until: endpoint.resources[0].subsets[0].addresses[0] is defined
-  retries: 30
-  delay: 5
-
 - name: Get harbor config
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -121,16 +77,6 @@
     status_code: [200, 503]
   until: get_trivy_schedule_config.status != 503
   register: get_trivy_schedule_config
-
-- name: Wait harbor-jobservice endpoint
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.harbor.namespace }}"
-    name: "{{ harbor_jobservice_endpoint_name }}"
-  register: endpoint
-  until: endpoint.resources[0].subsets[0].addresses[0] is defined
-  retries: 30
-  delay: 5
 
 - name: Enable daily trivy scans
   ansible.builtin.uri:

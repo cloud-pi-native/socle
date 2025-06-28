@@ -1,0 +1,42 @@
+---
+- name: Harbor post-configuration
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+    argo_infra_ns_check:
+      failed: true
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Get pg-cluster-harbor-app secret
+      when: not dsc.harbor.cnpg.initPassword
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.harbor.namespace }}"
+        kind: Secret
+        name: pg-cluster-harbor-app
+      register: pg_harbor_db_secret
+
+    - name: Reset envs vars
+      ansible.builtin.set_fact:
+        envs: []
+
+    - name: Set envs vars
+      ansible.builtin.set_fact:
+        envs:
+          - name: "{{ dsc_name }}"
+            apps:
+              - argocd_app: harbor
+                vault_values:
+                  global:
+                    harborAdminPassword: "{{ dsc.harbor.adminPassword | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+
+    - name: Get harbor_current_vault_values
+      ansible.builtin.import_role:
+        name: gitops/vault-secrets
+
+    - name: Import harbor role
+      ansible.builtin.import_role:
+        name: gitops/post-install/harbor

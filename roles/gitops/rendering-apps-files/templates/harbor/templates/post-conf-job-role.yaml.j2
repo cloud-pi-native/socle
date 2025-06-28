@@ -1,0 +1,52 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: get-keycloak-client-secret-role
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "get"]
+    resourceNames: ["keycloak-client-secret-harbor-client"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: get-keycloak-client-secret-role-binding
+  namespace: {{ dsc.keycloak.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: get-keycloak-client-secret-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.harbor.namespace }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secrets-podmonitors-access-role
+  namespace: {{ dsc.harbor.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["podmonitors.monitoring.coreos.com"]
+    verbs: ["list", "get", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: secrets-podmonitors-access-role-binding
+  namespace: {{ dsc.harbor.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: secrets-podmonitors-access-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.harbor.namespace }}

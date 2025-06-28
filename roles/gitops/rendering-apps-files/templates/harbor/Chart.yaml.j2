@@ -12,3 +12,7 @@ dependencies:
   alias: harbor
   version: {{ dsc.harbor.chartVersion }}
   repository: {{ dsc.harbor.helmRepoUrl }}
+- name: cpn-ansible-job
+  alias: cpn-ansible-job
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}

@@ -115,12 +115,6 @@
         - post-install
         - post-install-nexus
 
-    - role: gitops/post-install/gitlab
-      tags:
-        - post-install
-        - post-install-gitlab
-        - vault-secrets-post-install
-
     - role: gitops/post-install/gitlabrunner
       tags:
         - post-install

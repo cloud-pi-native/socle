@@ -1,0 +1,41 @@
+---
+- name: Gitlab post-configuration
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+    post_vault_update: true
+    argo_infra_ns_check:
+      failed: true
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Import ca role
+      ansible.builtin.import_role:
+        name: ca
+
+    - name: Import gitlab role
+      ansible.builtin.import_role:
+        name: gitops/post-install/gitlab
+
+    - name: Reset envs vars
+      ansible.builtin.set_fact:
+        envs: []
+
+    - name: Post-install vault-secrets run
+      ansible.builtin.import_role:
+        name: gitops/vault-secrets
+      vars:
+        vault_secrets_post_install: true
+        envs:
+          - name: "{{ dsc_name }}"
+            apps:
+              - argocd_app: "gitlab"
+                vault_values:
+                  gitlabToken: "{{ gitlab_token | default('') }}"
+
+    - name: Import gitlab-catalog role
+      ansible.builtin.import_role:
+        name: gitops/post-install/gitlab-catalog

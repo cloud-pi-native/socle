@@ -12,3 +12,33 @@ subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
     namespace: {{ dsc.gitlab.namespace }}
+{% if dsc.global.backup.s3.endpointCA.namespace is defined %}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-access-cnpg-s3-ca-secret
+  namespace: {{ dsc.global.backup.s3.endpointCA.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: access-cnpg-s3-ca-secret
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.gitlab.namespace }}
+{% endif %}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-access-vault-infra-secret
+  namespace: {{ dsc.vaultInfra.namespace }} 
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: access-vault-infra-secret
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.gitlab.namespace }}

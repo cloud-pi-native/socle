@@ -41,4 +41,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
+    namespace: {{ dsc.keycloak.namespace }}
+  - kind: ServiceAccount
+    name: cpn-ansible-job
     namespace: {{ dsc.gitlab.namespace }}

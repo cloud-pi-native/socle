@@ -1,0 +1,29 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keycloak-secret-access-role
+  namespace: {{ dsc.keycloak.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+    resourceNames: ["keycloak"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "create", "update", "patch"]
+    resourceNames: ["dso-admin-user-secret", "keycloak-client-secret-argo-client", "keycloak-client-secret-console-backend", "keycloak-client-secret-console-frontend", "keycloak-client-secret-gitlab-client", "keycloak-client-secret-grafana-projects", "keycloak-client-secret-harbor-client", "keycloak-client-secret-portail-client", "keycloak-client-secret-sonar-client", "keycloak-client-secret-vault-client"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keycloak-secret-access-role-binding
+  namespace: {{ dsc.keycloak.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: keycloak-secret-access-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.keycloak.namespace }}

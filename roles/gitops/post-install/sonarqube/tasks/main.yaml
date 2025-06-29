@@ -1,25 +1,4 @@
 ---
-- name: Wait pg-cluster-sonar-rw endpoint
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.sonarqube.namespace }}"
-    name: pg-cluster-sonar-rw
-  register: endpoint
-  until: endpoint.resources[0].subsets[0].addresses[0] is defined
-  retries: 30
-  delay: 5
-
-- name: Wait job.batch/pg-cluster-sonar-1-initdb to be terminated
-  kubernetes.core.k8s_info:
-    kind: Job
-    api_version: batch/v1
-    namespace: "{{ dsc.sonarqube.namespace }}"
-    name: pg-cluster-sonar-1-initdb
-  register: job1
-  until: job1.resources | length == 0
-  retries: 30
-  delay: 5
-
 - name: Get Sonarqube admin password secret
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.sonarqube.namespace }}"

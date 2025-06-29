@@ -1,0 +1,62 @@
+---
+- name: Keycloak post-configuration
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+    post_vault_update: true
+    argo_infra_ns_check:
+      failed: true
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Import keycloak role
+      ansible.builtin.import_role:
+        name: gitops/post-install/keycloak
+
+    - name: Reset envs vars
+      ansible.builtin.set_fact:
+        envs: []
+
+    - name: Post-install vault-secrets run
+      ansible.builtin.import_role:
+        name: gitops/vault-secrets
+      vars:
+        vault_secrets_post_install: true
+        envs:
+          - name: "{{ dsc_name }}"
+            apps:
+              - argocd_app: "gitlab"
+                vault_values:
+                  oidcProvider: "{{ gitlab_oidc_provider | b64encode | default('') }}"
+              - argocd_app: "keycloak"
+                vault_values:
+                  client:
+                    argo:
+                      id: "{{ argo_client_id | default('') }}"
+                      secret: "{{ argo_client_secret | default('') }}"
+                    consoleBackend:
+                      id: "{{ console_backend_id | default('') }}"
+                      secret: "{{ console_backend_secret | default('') }}"
+                    consoleFrontend:
+                      id: "{{ console_frontend_id | default('') }}"
+                    gitlab:
+                      id: "{{ gitlab_client_id | default('') }}"
+                      secret: "{{ gitlab_client_secret | default('') }}"
+                    grafana:
+                      id: "{{ grafana_projects_id | default('') }}"
+                      secret: "{{ grafana_projects_secret | default('') }}"
+                    harbor:
+                      id: "{{ harbor_client_id | default('') }}"
+                      secret: "{{ harbor_client_secret | default('') }}"
+                    portail:
+                      id: "{{ portail_client_id | default('') }}"
+                      secret: "{{ portail_client_secret | default('') }}"
+                    sonar:
+                      id: "{{ sonar_client_id | default('') }}"
+                      secret: "{{ sonar_client_secret | default('') }}"
+                    vault:
+                      id: "{{ vault_client_id | default('') }}"
+                      secret: "{{ vault_client_secret | default('') }}"

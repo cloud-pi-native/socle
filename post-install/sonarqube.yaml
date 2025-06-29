@@ -1,0 +1,14 @@
+---
+- name: Sonarqube post-configuration
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Import sonarqube role
+      ansible.builtin.import_role:
+        name: gitops/post-install/sonarqube

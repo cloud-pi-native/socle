@@ -38,7 +38,7 @@
     - name: Get certmanager secret
       kubernetes.core.k8s_info:
         name: "{{ dsc.ingress.tls.ca.secretName }}"
-        namespace: cert-manager
+        namespace: "{{ dsc.certmanager.namespace }}"
         kind: Secret
       register: exposed_ca_resource
 

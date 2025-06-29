@@ -14,5 +14,5 @@ dependencies:
   repository: "{{ dsc.gitlabOperator.helmRepoUrl }}"
 - name: cpn-ansible-job
   alias: cpn-ansible-job
-  version: {{ dsc.cpnAnsibleJob.chartVersion }}
-  repository: "{{ dsc.cpnAnsibleJob.helmRepoUrl }}"
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}

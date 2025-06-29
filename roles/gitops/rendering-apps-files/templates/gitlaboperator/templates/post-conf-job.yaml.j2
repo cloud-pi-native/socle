@@ -1,0 +1,70 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: gitlab-token-access-role
+  namespace: {{ dsc.gitlab.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gitlab-token-access-role-binding
+  namespace: {{ dsc.gitlab.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: gitlab-token-access-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.gitlab.namespace }}
+
+{% if dsc.exposedCA.type != 'none' %}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ca-role
+rules:
+{% if dsc.exposedCA.type == 'configmap' %}
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["list", "get"]
+    resourceNames: ["{{ dsc.exposedCA.configmap.name }}"]
+{% endif %}
+{% if dsc.exposedCA.type in ['secret', 'certmanager']  %}
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "get"]
+    resourceNames: ["{{ dsc.exposedCA.secret.name }}"]
+{% endif %}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ca-role-binding
+{% if dsc.exposedCA.type == 'configmap' %}
+  namespace: "{{ dsc.exposedCA.configmap.namespace }}"
+{% endif %}
+{% if dsc.exposedCA.type == 'secret' %}
+  namespace: "{{ dsc.exposedCA.secret.namespace }}"
+{% endif %}
+{% if dsc.exposedCA.type == 'certmanager' %}
+  namespace: "{{ dsc.certmanager.namespace }}"
+{% endif %}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ca-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.gitlab.namespace }}
+{% endif %}

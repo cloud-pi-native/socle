@@ -1,5 +1,9 @@
 cpn-ansible-job:
   job:
-    name: "gitlab-ci-catalog" 
+    name: "gitlab" 
+    extraEnv:
+      - name: VAULT_INFRA_TOKEN
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#vault_infra_token>
   cronJob:
     create: true
+    name: "gitlab-ci-catalog"

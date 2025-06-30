@@ -75,6 +75,15 @@ envs:
           metrics:
             enabled: "{{ dsc.global.metrics.enabled | default('') }}"
             endpoint: "{{ dsc.global.metrics.endpoint | default('') }}"
+      - argocd_app: "vault"
+        vault_values:
+          vaultToken: >-
+            {{
+              (vault_keys.resources[0].data.root_token | b64decode)
+              if vault_keys.resources[0].data.root_token is defined and
+              vault_keys.resources[0].data.root_token | length > 0
+              else ''
+            }}
       - argocd_app: "sonarqube"
         vault_values:
           auth:
@@ -90,10 +99,12 @@ envs:
         vault_values:
           auth:
             adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+            adminUsername: "admin"
       - argocd_app: "harbor"
         vault_values:
           global:
             harborAdminPassword: "{{ dsc.harbor.adminPassword | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+            harborAdmin: "admin"
             s3ImageChartStorage:
               bucket: "{{ dsc.harbor.s3ImageChartStorage.bucket | default('') }}"
               region: "{{ dsc.harbor.s3ImageChartStorage.region | default('') }}"

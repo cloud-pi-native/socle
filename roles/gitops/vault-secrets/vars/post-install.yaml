@@ -39,7 +39,13 @@ envs:
               secret: "{{ vault_client_secret | default('') }}"
       - argocd_app: "vault"
         vault_values:
-          vaultToken: "{{ vault_token | default('') }}"
+          vaultToken: >-
+            {{
+              (vault_keys.resources[0].data.root_token)
+              if vault_keys.resources[0].data.root_token is defined and
+              vault_keys.resources[0].data.root_token | length > 0
+              else ''
+            }}
       - argocd_app: "console"
         vault_values:
           uri: >-
@@ -49,3 +55,12 @@ envs:
               pg_console_db_secret.resources | length > 0
               else ''
             }}
+      - argocd_app: "sonarqube"
+        vault_values:
+          auth:
+            sonarApiToken: >-
+              {{
+                (token_pass.json.token)if token_pass is defined and
+                token_pass.json.token | length > 0
+                else ''
+              }}

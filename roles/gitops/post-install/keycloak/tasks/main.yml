@@ -131,17 +131,6 @@
           - name: admin
             state: present
 
-- name: Update console inventory
-  kubernetes.core.k8s:
-    kind: Secret
-    name: dso-config
-    namespace: "{{ dsc.console.namespace }}"
-    state: patched
-    definition:
-      data:
-        KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password | b64encode }}"
-        KEYCLOAK_ADMIN: "{{ 'dsoadmin' | b64encode }}"
-
 # Remove Keycloak temporary admin
 
 - name: Set temporary_admin_present fact

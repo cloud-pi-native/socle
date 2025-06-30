@@ -20,16 +20,6 @@
   retries: 45
   delay: 5
 
-- name: Update inventory
-  kubernetes.core.k8s:
-    kind: Secret
-    name: dso-config
-    namespace: "{{ dsc.console.namespace }}"
-    state: patched
-    definition:
-      data:
-        HARBOR_ADMIN_PASSWORD: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') | b64encode }}"
-
 - name: Get all endpoints in the namespace
   kubernetes.core.k8s_info:
     kind: Endpoints

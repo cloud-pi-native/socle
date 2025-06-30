@@ -37,28 +37,15 @@ envs:
           exposedCa: "{{ exposed_ca_pem | default('') }}"
           cnpgS3CaPem: "{{ cnpg_s3_ca_pem | default('') }}"
           ingressClassName: "{{ dsc.ingress.className | default('') }}"
-          externalClusters:
-            pgCluster:
-              barmanObjectStore:
-                destinationPath: "s3://{{ dsc.global.backup.s3.bucketName | default('') }}/{{ dsc.global.backup.cnpg.pathPrefix | default('') }}"
-                endpointURL: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
-                s3Credentials:
-                  accessKeyId:
-                    value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
-                  secretAccessKey:
-                    value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
           dockerAccount:
             username: "{{ dsc.global.dockerAccount.username | default('') }}"
             password: "{{ dsc.global.dockerAccount.password | default('') }}"
           backup:
-            s3:
-              bucketName: "{{ dsc.global.backup.s3.bucketName | default('') }}"
-              endpointURL: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
-              credentials:
-                accessKeyId:
-                  value: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default ('') }}"
-                secretAccessKey:
-                  value: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
+            s3BucketName: "{{ dsc.global.backup.s3.bucketName | default('') }}"
+            s3BucketPrefix: "{{ dsc.global.backup.vault.pathPrefix | default('') }}"
+            s3Endpoint: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
+            s3AccessKey: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default('') }}"
+            s3SecretKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
             gitlab:
               mcExtraArgs: "{{ dsc.global.backup.gitlab.mcExtraArgs | default('') }}"
               pathPrefix: "{{ dsc.global.backup.gitlab.pathPrefix | default('') }}"
@@ -88,14 +75,6 @@ envs:
           metrics:
             enabled: "{{ dsc.global.metrics.enabled | default('') }}"
             endpoint: "{{ dsc.global.metrics.endpoint | default('') }}"
-      - argocd_app: "vault"
-        vault_values:
-          backupSecrets:
-            s3BucketName: "{{ dsc.global.backup.s3.bucketName | default('') }}"
-            s3BucketPrefix: "{{ dsc.global.backup.vault.pathPrefix | default('') }}"
-            s3Endpoint: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
-            s3AccessKey: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default('') }}"
-            s3SecretKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
       - argocd_app: "sonarqube"
         vault_values:
           auth:

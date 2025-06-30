@@ -68,8 +68,8 @@ cpn-cnpg:
 
 {% if dsc.global.backup.cnpg.enabled or dsc.sonarqube.cnpg.mode == "restore" %}
   backup:
-    destinationPath: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.destinationPath}>
-    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.endpointURL}>
+    destinationPath: "s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3BucketName}>/{{ dsc.global.backup.cnpg.pathPrefix | default('') }}"
+    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3Endpoint}>
 {% if dsc.global.backup.cnpg.enabled and dsc.sonarqube.cnpg.mode != "restore" %}
     enabled: true
 {% if dsc.global.backup.s3.endpointCA.key is defined %}
@@ -85,10 +85,10 @@ cpn-cnpg:
       secretName: pg-cluster-backup
       accessKeyId:
         key: {{ dsc.global.backup.s3.credentials.accessKeyId.key | default ('') }}
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.accessKeyId.value}>
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3AccessKey}>
       secretAccessKey:
         key: {{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#externalClusters | jsonPath {.pgCluster.barmanObjectStore.s3Credentials.secretAccessKey.value}>
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3SecretKey}>
 {% if dsc.global.backup.cnpg.compression != 'none' %}
     compression: "{{ dsc.global.backup.cnpg.compression }}"
 {% endif %}

@@ -154,7 +154,7 @@ global:
       providers:
         - secret: openid-connect
     backups:
-      bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3.bucketName}>
+      bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3BucketName}>
 
   extraEnv:
     GITLAB_ROOT_EMAIL: "admin@example.com"

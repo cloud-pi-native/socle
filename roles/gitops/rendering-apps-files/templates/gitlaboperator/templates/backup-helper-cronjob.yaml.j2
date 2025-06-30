@@ -14,13 +14,13 @@ spec:
             image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/minio/mc:latest
             env:
             - name: S3_ENDPOINT
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3.endpointURL}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3Endpoint}>"
             - name: S3_BUCKET_NAME
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3.bucketName}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3BucketName}>"
             - name: S3_ACCESS_KEY
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3.credentials.accessKeyId.value}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3AccessKey}>"
             - name: S3_SECRET_KEY
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3.credentials.secretAccessKey.value}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3SecretKey}>"
             - name: S3_PATH_PREFIX
               value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.gitlab.pathPrefix}>"
             - name: RETENTION

@@ -123,3 +123,13 @@ spec:
 {% else %}
   backup: null
 {% endif %}
+
+{% if dsc.proxy.enabled and dsc.global.platform == "kubernetes" %}
+  env:
+  - name: http_proxy
+    value: {{ dsc.proxy.http_proxy }}
+  - name: https_proxy
+    value: {{ dsc.proxy.https_proxy }}
+  - name: no_proxy
+    value: {{ dsc.proxy.no_proxy }}
+{% endif %}

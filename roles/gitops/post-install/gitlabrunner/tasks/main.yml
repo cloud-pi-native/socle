@@ -64,7 +64,7 @@
       ansible.builtin.set_fact:
         runner_token: "{{ gitlab_vault_values.data.data.runnerToken }}"
 
-- name: Check if GitLab Runner is installed and needs upgrade
+- name: Check if GitLab Runner is installed
   block:
     - name: Get GitLab Runner deployment
       kubernetes.core.k8s_info:
@@ -78,16 +78,6 @@
     - name: Set grunner_installed fact
       ansible.builtin.set_fact:
         grunner_installed: "{{ grunner_deploy.resources | length > 0 }}"
-
-    - name: Set GitLab Runner version
-      when: grunner_installed
-      ansible.builtin.set_fact:
-        grunner_version: "{{ grunner_deploy.resources[0].metadata.labels.chart | regex_search('[0-9].*') }}"
-
-    - name: Set needs_update fact
-      when: grunner_installed
-      ansible.builtin.set_fact:
-        needs_upgrade: "{{ grunner_version is version(dsc.gitlabRunner.chartVersion, operator='lt', strict=True) }}"
 
 - name: Get dso-config inventory
   kubernetes.core.k8s_info:
@@ -120,7 +110,6 @@
   when: |
     (dso_runner is not defined) or
     (runner_token is defined and runner_token | length == 0) or
-    (needs_upgrade is defined and needs_upgrade) or
     (not grunner_installed)
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"

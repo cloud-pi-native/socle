@@ -1,0 +1,6 @@
+{% if dsc.global.platform == "openshift" %}
+cloudnativepg:
+  containerSecurityContext:
+    runAsUser: null
+    runAsGroup: null
+{% endif %}

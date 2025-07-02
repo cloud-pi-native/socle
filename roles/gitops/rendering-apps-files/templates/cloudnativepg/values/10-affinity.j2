@@ -1,0 +1,11 @@
+cloudnativepg:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: cloudnative-pg
+                app.kubernetes.io/name: cloudnative-pg
+            topologyKey: kubernetes.io/hostname

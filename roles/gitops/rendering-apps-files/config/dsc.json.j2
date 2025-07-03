@@ -15,7 +15,7 @@
   "region": "fr-par",
   "prefix": prefix | default("dso-"),
   "destination": {
-    "clusterName": clusterName | default("sdid-hp")
+    "clusterName": dsc.global.gitOps.envName | default("")
   },
   "targetRevision": "main",
   "apps": apps

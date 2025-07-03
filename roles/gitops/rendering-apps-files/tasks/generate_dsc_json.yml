@@ -2,20 +2,12 @@
 - name: Define template dsc.json.j2 path
   ansible.builtin.set_fact:
     json_template_path: "{{ role_path }}/config/dsc.json.j2"
-  tags: apps-files
 
-- block:
-    - name: Render dsc.json.j2 template into config directory
-      ansible.builtin.copy:
-        content: "{{ lookup('ansible.builtin.template', json_template_path) }}"
-        dest: "{{ role_path }}/config/dsc.json"
-        mode: "0644"
-      tags: apps-files
-
-    - name: Format JSON and generate to destination
-      ansible.builtin.shell:
-        cmd: "jq '.' {{ role_path }}/config/dsc.json > {{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ envs[0].name }}/{{ socle_config.resources[0].metadata.name }}.json"
-      tags: apps-files
+- name: Render dsc.json.j2 into local repository
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.template', json_template_path) | from_json | to_json(indent=2) }}"
+    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ envs[0].name }}/{{ socle_config.resources[0].metadata.name }}.json"
+    mode: "0644"
   vars:
     envs:
       - name: "{{ dsc_name }}"

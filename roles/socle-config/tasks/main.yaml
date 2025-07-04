@@ -173,3 +173,7 @@
 - name: Set keycloak_reset_password fact
   ansible.builtin.set_fact:
     keycloak_reset_password: false
+
+- name: Set envs fact
+  ansible.builtin.include_tasks:
+    file: envs.yaml

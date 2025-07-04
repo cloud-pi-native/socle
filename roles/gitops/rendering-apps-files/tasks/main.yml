@@ -1,8 +1,10 @@
 ---
 - name: Preliminary tasks
+  when: post_conf_job is not defined
   ansible.builtin.include_tasks: ./preliminary.yml
 
 - name: Generate dsc.json
+  when: post_conf_job is not defined
   ansible.builtin.include_tasks: ./generate_dsc_json.yml
 
 - name: Loop over services to render templates
@@ -10,20 +12,3 @@
   loop: "{{ envs | subelements('apps') }}"
   loop_control:
     label: "{{ item.0.name }}"
-  vars:
-    envs:
-      - name: "{{ dsc_name }}"
-        apps:
-          - argocd_app: global
-          - argocd_app: keycloak
-          - argocd_app: vault
-          - argocd_app: sonarqube
-          - argocd_app: observability
-          - argocd_app: harbor
-          - argocd_app: gitlabrunner
-          - argocd_app: glexporter
-          - argocd_app: argocd
-          - argocd_app: nexus
-          - argocd_app: certmanager
-          - argocd_app: gitlaboperator
-          - argocd_app: kyverno

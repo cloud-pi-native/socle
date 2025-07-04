@@ -110,14 +110,6 @@
     name: pg-cluster-console-app
   register: pg_db_secret
 
-- name: Get kubernetes service
-  kubernetes.core.k8s_info:
-    namespace: default
-    kind: Service
-    name: kubernetes
-  register: kubernetes_service_clusterip
-  when: dsc.proxy.enabled
-
 - name: Compute Console Helm values
   ansible.builtin.include_role:
     name: combine

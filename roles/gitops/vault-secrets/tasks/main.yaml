@@ -74,103 +74,106 @@
 
 # Get existing values for migration
 
-- name: Get dso-config secret
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.console.namespace }}"
-    kind: Secret
-    name: dso-config
-  register: dso_config_secret
-  ignore_errors: true
+- name: Get existing values for migration
+  when: post_conf_job is not defined
+  block:
+    - name: Get dso-config secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.console.namespace }}"
+        kind: Secret
+        name: dso-config
+      register: dso_config_secret
+      ignore_errors: true
 
-- name: Get sonarqube secret
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.sonarqube.namespace }}"
-    kind: Secret
-    name: sonarqube
-  register: sonarqube_secret
-  ignore_errors: true
+    - name: Get sonarqube secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        kind: Secret
+        name: sonarqube
+      register: sonarqube_secret
+      ignore_errors: true
 
-- name: Get SonarQube admin password secret
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.sonarqube.namespace }}"
-    kind: Secret
-    name: "sonarqube"
-  register: sonarqube_pwd
+    - name: Get SonarQube admin password secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        kind: Secret
+        name: "sonarqube"
+      register: sonarqube_pwd
 
-- name: Check existence of SonarQube DSO admin token
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ sonar_domain }}/api/user_tokens/search?login=admin"
-    user: "admin"
-    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
-    force_basic_auth: true
-    method: GET
-    status_code: [200]
-  register: token_check
+    - name: Check existence of SonarQube DSO admin token
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: "https://{{ sonar_domain }}/api/user_tokens/search?login=admin"
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: GET
+        status_code: [200]
+      register: token_check
 
-- name: Revoke SonarQube DSO admin token
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ sonar_domain }}/api/user_tokens/revoke"
-    user: "admin"
-    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
-    force_basic_auth: true
-    method: POST
-    body_format: form-urlencoded
-    body:
-      login: "admin"
-      name: "DSO"
-    status_code: [204]
-  when: "'DSO' in (token_check.json.userTokens | map(attribute='name') | list)"
-  ignore_errors: true
+    - name: Revoke SonarQube DSO admin token
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: "https://{{ sonar_domain }}/api/user_tokens/revoke"
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: POST
+        body_format: form-urlencoded
+        body:
+          login: "admin"
+          name: "DSO"
+        status_code: [204]
+      when: "'DSO' in (token_check.json.userTokens | map(attribute='name') | list)"
+      ignore_errors: true
 
-- name: Generate new SonarQube DSO admin token
-  ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ sonar_domain }}/api/user_tokens/generate?name=DSO"
-    user: "admin"
-    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
-    force_basic_auth: true
-    method: POST
-    status_code: [200, 204]
-  register: token_pass
+    - name: Generate new SonarQube DSO admin token
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: "https://{{ sonar_domain }}/api/user_tokens/generate?name=DSO"
+        user: "admin"
+        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+        force_basic_auth: true
+        method: POST
+        status_code: [200, 204]
+      register: token_pass
 
-- name: Get Vault keys
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.vault.namespace }}"
-    kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
+    - name: Get Vault keys
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vault.namespace }}"
+        kind: Secret
+        name: "{{ dsc_name }}-vault-keys"
+      register: vault_keys
 
-- name: Get pg-cluster-harbor-app secret
-  when: not dsc.harbor.cnpg.initPassword
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.harbor.namespace }}"
-    kind: Secret
-    name: pg-cluster-harbor-app
-  register: pg_harbor_db_secret
+    - name: Get pg-cluster-harbor-app secret
+      when: not dsc.harbor.cnpg.initPassword
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.harbor.namespace }}"
+        kind: Secret
+        name: pg-cluster-harbor-app
+      register: pg_harbor_db_secret
 
-- name: Get pg-cluster-console-app secret
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.console.namespace }}"
-    kind: Secret
-    name: pg-cluster-console-app
-  register: pg_console_db_secret
-
-- name: Get kubernetes service
-  kubernetes.core.k8s_info:
-    namespace: default
-    kind: Service
-    name: kubernetes
-  register: kubernetes_service_clusterip
-
-- name: Get pg-cluster-gitlab-app secret
-  when: not dsc.gitlab.cnpg.initPassword
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.gitlab.namespace }}"
-    kind: Secret
-    name: pg-cluster-gitlab-app
-  register: pg_gitlab_db_secret
+    - name: Get pg-cluster-console-app secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.console.namespace }}"
+        kind: Secret
+        name: pg-cluster-console-app
+      register: pg_console_db_secret
+    
+    - name: Get kubernetes service
+      kubernetes.core.k8s_info:
+        namespace: default
+        kind: Service
+        name: kubernetes
+      register: kubernetes_service_clusterip
+    
+    - name: Get pg-cluster-gitlab-app secret
+      when: not dsc.gitlab.cnpg.initPassword
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.gitlab.namespace }}"
+        kind: Secret
+        name: pg-cluster-gitlab-app
+      register: pg_gitlab_db_secret
 
 # Write Vault Infra secrets
 

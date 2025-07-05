@@ -1,14 +1,13 @@
 ---
-- name: Get Gitlab namespace
+- name: Wait gitlab-webservice-default endpoint
   kubernetes.core.k8s_info:
-    kind: Namespace
-    name: "{{ dsc.gitlab.namespace }}"
-  register: gitlab_ns
-
-- name: Fail if Gitlab namespace is not present
-  ansible.builtin.fail:
-    msg: Gitlab ne semble pas avoir été provisionné sur le cluster veuillez l'installer avant
-  when: gitlab_ns | length == 0
+    kind: Endpoints
+    namespace: "{{ dsc.gitlab.namespace }}"
+    name: gitlab-webservice-default
+  register: endpoint
+  until: endpoint.resources[0].subsets[0].addresses[0] is defined
+  retries: 15
+  delay: 5
 
 # Retrieve Vault Infra token
 

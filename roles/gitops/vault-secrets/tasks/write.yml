@@ -47,7 +47,9 @@
   register: json_comparison_result
 
 - name: Update vault secret
-  when: json_comparison_result.changed
+  when:
+    - json_comparison_result.changed
+    - post_conf_job is not defined or post_vault_update
   community.hashi_vault.vault_kv2_write:
     url: "https://{{ vaultinfra_domain }}"
     auth_method: token

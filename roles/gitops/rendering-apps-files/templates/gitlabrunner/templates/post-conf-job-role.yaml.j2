@@ -1,0 +1,29 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: get-gitlab-role
+  namespace: {{ dsc.gitlab.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["list", "get"]
+    resourceNames: ["gitlab-webservice-default"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["list", "get"]
+    resourceNames: ["gitlab-runner"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: get-gitlab-role-binding
+  namespace: {{ dsc.gitlab.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: get-gitlab-role
+subjects:
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.gitlab.namespace }}

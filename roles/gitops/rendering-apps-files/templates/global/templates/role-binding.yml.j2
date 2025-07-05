@@ -12,6 +12,9 @@ subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
     namespace: {{ dsc.gitlab.namespace }}
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.sonarqube.namespace }}
 {% if dsc.global.backup.s3.endpointCA.namespace is defined %}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -45,6 +48,3 @@ subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
     namespace: {{ dsc.gitlab.namespace }}
-  - kind: ServiceAccount
-    name: cpn-ansible-job
-    namespace: {{ dsc.sonarqube.namespace }}

@@ -7,8 +7,8 @@
   tasks:
     - name: Import socle-config role
       ansible.builtin.import_role:
-        name: "{{ playbook_dir}}/../roles/socle-config"
+        name: socle-config
 
     - name: Import gitlab-catalog role
       ansible.builtin.import_role:
-        name: "{{ playbook_dir}}/../roles/gitops/post-install/gitlab-catalog"
+        name: gitops/post-install/gitlab-catalog

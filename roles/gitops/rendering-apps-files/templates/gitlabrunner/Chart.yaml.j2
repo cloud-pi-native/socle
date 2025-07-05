@@ -8,3 +8,7 @@ dependencies:
   alias: gitlab-runner
   version: {{ dsc.gitlabRunner.chartVersion }}
   repository: "{{ dsc.gitlabRunner.helmRepoUrl }}"
+- name: cpn-ansible-job
+  alias: cpn-ansible-job
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}

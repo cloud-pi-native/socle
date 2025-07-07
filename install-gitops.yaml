@@ -98,17 +98,6 @@
         - post-install-vault
         - vault-secrets-post-install
 
-    - role: gitops/post-install/nexus
-      tags:
-        - post-install
-        - post-install-nexus
-
-    - role: gitops/post-install/gitlabrunner
-      tags:
-        - post-install
-        - post-install-gitlabrunner
-        - vault-secrets-post-install
-
   tasks:
     - name: Load variables for the vault-secrets post-install role
       ansible.builtin.include_vars:

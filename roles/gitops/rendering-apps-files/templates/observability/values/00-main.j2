@@ -65,3 +65,24 @@ grafana:
   grafana:
     isOpenShift: {{ dsc.global.platform == "openshift" | ternary(true, false) }}
     observatorium_url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+  global:
+    projects:
+      console:
+        envs:
+          hprod:
+            groups:
+              - /admin
+              - /admin
+            tenants:
+              hprod-dso-console: {}
+          prod:
+            groups:
+              - /admin
+              - /admin
+            tenants:
+              prod-dso-console: {}
+        projectName: console
+        projectRepository:
+          url: https://github.com/cloud-pi-native/socle.git
+          path: observability
+

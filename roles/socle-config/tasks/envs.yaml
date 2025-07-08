@@ -223,7 +223,7 @@
                   pg_console_db_secret.resources | length > 0
                   else ''
                 }}
-          - argocd_app: observatorium
+          - argocd_app: observability
             clusterName: "in-cluster"
             nameSpace: "argo"
             customPrefix: "infra-"

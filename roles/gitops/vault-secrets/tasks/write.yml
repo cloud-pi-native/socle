@@ -49,7 +49,7 @@
 - name: Update vault secret
   when:
     - json_comparison_result.changed
-    - post_conf_job is not defined or post_vault_update
+    - post_conf_job is not defined or post_vault_update is defined
   community.hashi_vault.vault_kv2_write:
     url: "https://{{ vaultinfra_domain }}"
     auth_method: token
@@ -62,4 +62,4 @@
 
 - name: Set {{ item.1.argocd_app }}_current_vault_values
   ansible.builtin.set_fact:
-    "{{ item.1.argocd_app }}_current_vault_values": "{{ current_vault_values_combined }}"
+    "{{ item.1.argocd_app }}_current_vault_values": "{{ current_vault_values }}"

@@ -5,19 +5,6 @@
     npm_file: "{{ lookup('ansible.builtin.template', 'npm_file.j2') }}"
     mvn_config_file: "{{ lookup('ansible.builtin.template', 'mvn_conf_file.j2') }}"
 
-- name: Find GitLab token in inventory
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.console.namespace }}"
-    kind: Secret
-    name: dso-config
-  register: ansible_inventory
-
-- name: Get GitLab token
-  ansible.builtin.set_fact:
-    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
-  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
-  register: set_token_inv
-
 - name: Test GitLab token
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:

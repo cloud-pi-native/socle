@@ -1,17 +1,4 @@
 ---
-- name: Find gitlab token in inventory
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.console.namespace }}"
-    kind: Secret
-    name: dso-config
-  register: ansible_inventory
-
-- name: Get gitlab token
-  ansible.builtin.set_fact:
-    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
-  when: ansible_inventory.resources[0].data.GITLAB_TOKEN is defined and ansible_inventory.resources[0].data.GITLAB_TOKEN | length != 0
-  register: set_token_inv
-
 - name: Clone Git repository as bare
   ansible.builtin.git:
     repo: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"

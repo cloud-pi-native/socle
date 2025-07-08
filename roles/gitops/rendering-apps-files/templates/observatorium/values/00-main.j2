@@ -1,4 +1,24 @@
 observatorium:
+  global:
+    projects:
+      console:
+        envs:
+          hprod:
+            groups:
+            - /admin
+            - /admin
+            tenants:
+              hprod-dso: {}
+          prod:
+            groups:
+            - /admin
+            - /admin
+            tenants:
+              prod-dso: {}
+        projectName: console
+        projectRepository:
+          path: observability
+          url: https://github.com/cloud-pi-native/socle.git
   ingress:
     enabled: true
     ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
@@ -11,7 +31,6 @@ observatorium:
       - hosts:
           - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
         secretName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>-tls
-
   api:
     loglevel: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.loglevel}>
     config:
@@ -74,15 +93,14 @@ grafana:
               - /admin
               - /admin
             tenants:
-              hprod-dso-console: {}
+              hprod-dso: {}
           prod:
             groups:
               - /admin
               - /admin
             tenants:
-              prod-dso-console: {}
+              prod-dso: {}
         projectName: console
         projectRepository:
           url: https://github.com/cloud-pi-native/socle.git
           path: observability
-

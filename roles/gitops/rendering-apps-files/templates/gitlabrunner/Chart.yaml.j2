@@ -1,13 +1,13 @@
 ---
 apiVersion: v2
-name: gitlab-runner
+name: gitlabrunner
 type: application
-version: {{ dsc.gitlabRunner.chartVersion }}
+version: {{ dsc.gitlabrunner.chartVersion }}
 dependencies:
 - name: gitlab-runner
-  alias: gitlab-runner
-  version: {{ dsc.gitlabRunner.chartVersion }}
-  repository: "{{ dsc.gitlabRunner.helmRepoUrl }}"
+  alias: gitlabrunner
+  version: {{ dsc.gitlabrunner.chartVersion }}
+  repository: "{{ dsc.gitlabrunner.helmRepoUrl }}"
 - name: cpn-ansible-job
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}

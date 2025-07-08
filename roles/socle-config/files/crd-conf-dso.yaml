@@ -107,6 +107,10 @@ spec:
                 argocd:
                   description: Configuration for ArgoCD.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Argo CD instance.
+                      type: boolean
                     admin:
                       description: Configuration for the ArgoCD admin user.
                       properties:
@@ -145,6 +149,7 @@ spec:
                       type: string
                   required:
                     - admin
+                    - installEnabled
                   type: object
                 argocdInfra:
                   description: Configuration for Argo CD infrastructure instance that will be used to deploy everything else.
@@ -203,6 +208,10 @@ spec:
                 certmanager:
                   description: Configuration for Cert Manager.
                   properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Cert-manager instance.
+                      type: boolean
                     helmRepoUrl:
                       description: Cert-manager helm repository url.
                       type: string
@@ -223,10 +232,16 @@ spec:
                         https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 cloudnativepg:
                   description: Configuration for CloudNativePG.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install CloudNativePG instance.
+                      type: boolean
                     namespace:
                       description: The namespace for CloudNativePG.
                       type: string
@@ -250,10 +265,16 @@ spec:
                         https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 console:
                   description: Configuration for the console.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Console instance.
+                      type: boolean
                     namespace:
                       description: The namespace for console.
                       type: string
@@ -319,6 +340,8 @@ spec:
                           description: Whether or not the cnpg cluster db password should be initialized with a secret.
                           type: boolean
                           default: false
+                  required:
+                    - installEnabled
                   type: object
                 cpnAnsibleJob:
                   description: Configuration for cpn-ansible-job.
@@ -357,6 +380,10 @@ spec:
                 gitlab:
                   description: Configuration for GitLab.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Gitlab instance.
+                      type: boolean
                     namespace:
                       description: The namespace for GitLab.
                       type: string
@@ -455,10 +482,16 @@ spec:
                           description: Whether or not the cnpg cluster db password should be initialized with a secret.
                           type: boolean
                           default: false
+                  required:
+                    - installEnabled
                   type: object
-                gitlabCiPipelinesExporter:
+                glexporter:
                   description: Configuration for GitLab CI Pipelines Exporter.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Gitlab-ci pipelines exporter instance.
+                      type: boolean
                     helmRepoUrl:
                       description: GitLab CI Pipelines Exporter helm repository url.
                       type: string
@@ -473,6 +506,8 @@ spec:
                         https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 gitlabOperator:
                   description: Configuration for GitLab Operator.
@@ -523,9 +558,13 @@ spec:
                       default: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
                       type: string
                   type: object
-                gitlabRunner:
+                gitlabrunner:
                   description: Configuration for GitLab Runner.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Gitlab-runner instance.
+                      type: boolean
                     helmRepoUrl:
                       description: GitLab Runner helm repository url.
                       type: string
@@ -595,10 +634,16 @@ spec:
                         https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 global:
                   description: Global configuration not specific to one service.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Global instance.
+                      type: boolean
                     namespace:
                       description: The namespace for Global configuration.
                       type: string
@@ -968,10 +1013,16 @@ spec:
                         https://github.com/grafana/grafana-operator/tree/master/deploy/helm/grafana-operator
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 harbor:
                   description: Configuration for Harbor.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Harbor instance.
+                      type: boolean
                     adminPassword:
                       description: Administrator password for Harbor.
                       type: string
@@ -1125,6 +1176,7 @@ spec:
                           default: false
                   required:
                     - pvcRegistrySize
+                    - installEnabled
                   type: object
                 ingress:
                   description: General configuration for ingress.
@@ -1218,6 +1270,10 @@ spec:
                 keycloak:
                   description: Configuration for Keycloak.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Keycloak instance.
+                      type: boolean
                     namespace:
                       description: The namespace for Keycloak.
                       type: string
@@ -1289,6 +1345,8 @@ spec:
                           description: Whether or not the cnpg cluster db password should be initialized with a secret.
                           type: boolean
                           default: false
+                  required:
+                    - installEnabled
                   type: object
                 keycloakInfra:
                   description: Configuration for Keycloak infrastructure instance.
@@ -1371,6 +1429,10 @@ spec:
                 kyverno:
                   description: Configuration for Kyverno.
                   properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Kyverno instance.
+                      type: boolean
                     namespace:
                       description: The namespace for Kyverno.
                       type: string
@@ -1394,10 +1456,16 @@ spec:
                         https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 nexus:
                   description: Configuration for Nexus.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Nexus instance.
+                      type: boolean
                     helmRepoName:
                       description: Nexus helm repository name (e.g., "stevehipwell").
                       type: string
@@ -1443,6 +1511,8 @@ spec:
                         https://github.com/stevehipwell/helm-charts/blob/main/charts/nexus3/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 prometheus:
                   description: Minimal configuration for prometheus CRDs.
@@ -1462,9 +1532,9 @@ spec:
                 observatorium:
                   description: Configuration for Observatorium.
                   properties:
-                    enabled:
+                    installEnabled:
                       default: false
-                      description: Enable or disable Observatorium.
+                      description: Specifies whether we should install Observatorium instance.
                       type: boolean
                     namespace:
                       description: The namespace for Observatorium.
@@ -1505,11 +1575,15 @@ spec:
                       description: Distant proxy port listening.
                       type: string
                   required:
-                    - enabled
+                    - installEnabled
                   type: object
                 sonarqube:
                   description: Configuration for SonarQube.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install SonarQube instance.
+                      type: boolean
                     namespace:
                       description: The namespace for SonarQube.
                       type: string
@@ -1584,10 +1658,16 @@ spec:
                           description: Whether or not the cnpg cluster db password should be initialized with a secret.
                           type: boolean
                           default: false
+                  required:
+                    - installEnabled
                   type: object
                 vault:
                   description: Configuration for Vault.
                   properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install Vault instance.
+                      type: boolean
                     namespace:
                       description: The namespace for Vault.
                       type: string
@@ -1610,6 +1690,8 @@ spec:
                         https://github.com/hashicorp/vault-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
                 vaultInfra:
                   description: Configuration for Vault infrastructure instance.
@@ -1640,6 +1722,8 @@ spec:
                         https://github.com/hashicorp/vault-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
                   type: object
               required:
                 - additionalsCA
@@ -1650,9 +1734,9 @@ spec:
                 - console
                 - exposedCA
                 - gitlab
-                - gitlabCiPipelinesExporter
+                - glexporter
                 - gitlabOperator
-                - gitlabRunner
+                - gitlabrunner
                 - global
                 - grafana
                 - grafanaDatasource

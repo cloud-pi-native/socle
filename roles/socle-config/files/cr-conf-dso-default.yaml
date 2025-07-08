@@ -65,9 +65,9 @@ spec:
   gitlab:
     cnpg:
       mode: primary
-  gitlabCiPipelinesExporter: {}
+  glexporter: {}
   gitlabOperator: {}
-  gitlabRunner: {}
+  gitlabrunner: {}
   #  resources:
   #    overwrite:
   #      requests:

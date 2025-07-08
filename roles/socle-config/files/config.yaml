@@ -6,6 +6,7 @@ metadata:
   name: conf-dso
 spec:
   argocd:
+    installEnabled: true
     namespace: dso-argocd
     subDomain: argocd
     helmRepoUrl: https://argoproj.github.io/argo-helm
@@ -17,16 +18,19 @@ spec:
     helmRepoUrl: https://argoproj.github.io/argo-helm
     values: {}
   certmanager:
+    installEnabled: false
     helmRepoUrl: https://charts.jetstack.io
     namespace: cert-manager
     forcedInstall: false
     values: {}
   cloudnativepg:
+    installEnabled: true
     namespace: dso-cloudnativepg
     helmRepoUrl: https://cloudnative-pg.github.io/charts
     forcedInstall: false
     values: {}
   console:
+    installEnabled: true
     namespace: dso-console
     subDomain: console
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
@@ -42,6 +46,7 @@ spec:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
   gitlab:
+    installEnabled: true
     namespace: dso-gitlab
     subDomain: gitlab
     insecureCI: false
@@ -53,19 +58,22 @@ spec:
     values: {}
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
-  gitlabCiPipelinesExporter:
+  glexporter:
+    installEnabled: true
     helmRepoUrl: https://charts.visonneau.fr
     values: {}
   gitlabOperator:
     namespace: dso-gitlab
     helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
     values: {}
-  gitlabRunner:
+  gitlabrunner:
+    installEnabled: true
     helmRepoUrl: https://charts.gitlab.io
     taint:
       enabled: false
     values: {}
   global:
+    installEnabled: true
     namespace: dso-global
     values: {}
     backup:
@@ -95,6 +103,7 @@ spec:
     ociChartUrl: oci://ghcr.io/grafana/helm-charts
     values: {}
   harbor:
+    installEnabled: true
     namespace: dso-harbor
     subDomain: harbor
     helmRepoUrl: https://helm.goharbor.io
@@ -111,6 +120,7 @@ spec:
       initPassword: false # switch to true when only GitOps deployment remain
     values: {}
   keycloak:
+    installEnabled: true
     namespace: dso-keycloak
     subDomain: keycloak
     helmRepoUrl: oci://registry-1.docker.io/bitnamicharts
@@ -133,16 +143,19 @@ spec:
       exposed: false
     values: {}
   kyverno:
+    installEnabled: false
     namespace: dso-kyverno
     helmRepoUrl: https://kyverno.github.io/kyverno
     forcedInstall: false
     values: {}
   observatorium:
+    installEnabled: false
     namespace: dso-observatorium
     subDomain: observatorium
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
   nexus:
+    installEnabled: true
     chartVersion: 5.8.3
     helmRepoName: stevehipwell
     helmRepoUrl: oci://ghcr.io/stevehipwell/helm-charts
@@ -157,6 +170,7 @@ spec:
     values:
       replicaCount: 1
   sonarqube:
+    installEnabled: true
     namespace: dso-sonarqube
     subDomain: sonar
     helmRepoUrl: https://sonarsource.github.io/helm-chart-sonarqube
@@ -167,6 +181,7 @@ spec:
       initPassword: false
     values: {}
   vault:
+    installEnabled: true
     namespace: dso-vault
     subDomain: vault
     helmRepoUrl: https://helm.releases.hashicorp.com

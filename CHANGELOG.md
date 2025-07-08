@@ -1,5 +1,41 @@
 # Changelog
 
+## [3.13.0](https://github.com/cloud-pi-native/socle/compare/v3.12.0...v3.13.0) (2025-07-08)
+
+
+### Features
+
+* :arrow_up: Upgrade GitLab to 18.1.1 ([ec556bc](https://github.com/cloud-pi-native/socle/commit/ec556bc3066776350b90cbdd47e633b6edc3bf00))
+* :art: Adapt observability for DSO grafana ([1305322](https://github.com/cloud-pi-native/socle/commit/1305322b24e4a217a44dabf6fd8e6e4ef21a74d1))
+* :bricks: enable preferred podAntiAffinity ([aa31721](https://github.com/cloud-pi-native/socle/commit/aa31721d7384a59f6305c5f07aaa2539e1d46d98))
+* :sparkles: GitOps deployment for Gitlab ([bd92a28](https://github.com/cloud-pi-native/socle/commit/bd92a28d9ea78c70967e7d60a33b0e0de2cf79f9))
+* :sparkles: Gitops for Gitlab-ci-catalog job ([2372667](https://github.com/cloud-pi-native/socle/commit/2372667578c775f3d80a4ee812b991f42a803317))
+* :zap: add gitlab-runner tolerations ([00cc788](https://github.com/cloud-pi-native/socle/commit/00cc788c39231e36f08548dd0f332b9a568dd190))
+* :zap: GitOps jobs for Gitlab post-configuration ([5ad6df0](https://github.com/cloud-pi-native/socle/commit/5ad6df0a2299cf10d57e44ec3ec513a886221fd2))
+* :zap: GitOps jobs for Gitlab-runner post-configuration ([a81d337](https://github.com/cloud-pi-native/socle/commit/a81d337dffb7f74922356284b9cc4f4b3c70431a))
+* :zap: GitOps jobs for Harbor post-configuration ([92be39a](https://github.com/cloud-pi-native/socle/commit/92be39a06eea8fb3cd56c6efda06fd3bc5dd9c52))
+* :zap: GitOps jobs for Keycloak post-configuration ([d1b2ef9](https://github.com/cloud-pi-native/socle/commit/d1b2ef996a1ac7517641e5cbb77ddedcef780225))
+* :zap: GitOps jobs for Sonarqube post-configuration ([5e10768](https://github.com/cloud-pi-native/socle/commit/5e1076885842d011b3bcfc721dff0264856e95bd))
+* ✨ Add Kyverno in GitOps mode ([9af1182](https://github.com/cloud-pi-native/socle/commit/9af1182fdc9a4cf7963436f3956a481086e0def0))
+* automate the generation of the {{ dsc_name }}.json ([973dbaf](https://github.com/cloud-pi-native/socle/commit/973dbaf90b06f0f429c56d7f8ae5870c1fb2c874))
+* gitops console deployment ([1802764](https://github.com/cloud-pi-native/socle/commit/1802764d6b10574f390c897558e5085574fca3a2))
+* remove update inventory task from post-install ([9e6ab59](https://github.com/cloud-pi-native/socle/commit/9e6ab5923ee114c8e564ee312d477381fd45b5b9))
+
+
+### Bug Fixes
+
+* :art: GitLab runner generation ([58c0151](https://github.com/cloud-pi-native/socle/commit/58c0151fff6d6a44889c3c71a393244548115e9d))
+* :art: JSON conf generation ([e21b186](https://github.com/cloud-pi-native/socle/commit/e21b186eabc8ffee455a324d01243575f7e5cfcc))
+* :art: Missing or bad observatorium global values ([488039b](https://github.com/cloud-pi-native/socle/commit/488039b7d570735fcb60326eb3df821c120c3ee9))
+* :bug: add missing mapper in generic client scope ([448c5c4](https://github.com/cloud-pi-native/socle/commit/448c5c43e6419fec048736909f67a6d7cfd3b8c1))
+* :bug: GitLab metrics additionalLabels ([81ceb68](https://github.com/cloud-pi-native/socle/commit/81ceb682759513d782661a116ea13320b8121537))
+* :bug: gitOps post-conf ([4a4d857](https://github.com/cloud-pi-native/socle/commit/4a4d857f76386cd6107b85a86c8802aabd20d302))
+* :bug: kaniko config used the wrong url ([ca37f0a](https://github.com/cloud-pi-native/socle/commit/ca37f0a6f46d2927a7a32fd8452d9b9cc95ccc34))
+* :bug: proxy wrong required installEnabled ([f312177](https://github.com/cloud-pi-native/socle/commit/f312177161a1b8e6e6dcd6bcab11568255b1d506))
+* :bug: remove grafana required installEnabled ([7753292](https://github.com/cloud-pi-native/socle/commit/77532928991c8de2789ce6425fabc5353296844c))
+* :bug: Wrong GitLab Operator repository value ([3e40bbe](https://github.com/cloud-pi-native/socle/commit/3e40bbee6721e246c3d0ccad287b763ae9a60385))
+* :fire: Remove needs update check ([e44b0d6](https://github.com/cloud-pi-native/socle/commit/e44b0d65132237be4a686ef42f0525e1d6e0df98))
+
 ## [3.12.0](https://github.com/cloud-pi-native/socle/compare/v3.11.1...v3.12.0) (2025-06-13)
 
 

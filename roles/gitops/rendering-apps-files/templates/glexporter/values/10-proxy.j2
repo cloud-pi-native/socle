@@ -1,5 +1,5 @@
 {% if dsc.proxy.enabled %}
-gitlab-ci-pipelines-exporter:
+glexporter:
   envVariables:
     - name: HTTP_PROXY
       value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>

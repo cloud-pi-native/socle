@@ -28,13 +28,13 @@ spec:
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "9.1.1"
-  gitlabCiPipelinesExporter:
+  glexporter:
     # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
     chartVersion: "0.3.5"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
     chartVersion: "2.1.1"
-  gitlabRunner:
+  gitlabrunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
     chartVersion: "0.78.1"
   grafana:

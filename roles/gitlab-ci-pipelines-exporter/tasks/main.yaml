@@ -28,7 +28,7 @@
     - name: Add GitLab CI Pipelines Exporter helm repo
       kubernetes.core.helm_repository:
         name: mvisonneau
-        repo_url: "{{ dsc.gitlabCiPipelinesExporter.helmRepoUrl }}"
+        repo_url: "{{ dsc.glexporter.helmRepoUrl }}"
         force_update: true
 
     - name: Set path fact
@@ -40,13 +40,13 @@
         name: combine
       vars:
         combine_path: "{{ path }}"
-        combine_user_values: "{{ dsc.gitlabCiPipelinesExporter['values'] }}"
+        combine_user_values: "{{ dsc.glexporter['values'] }}"
         combine_dest_var: "gl_ci_pipelines_exporter_values"
 
     - name: Deploy GitLab CI Pipelines helm
       kubernetes.core.helm:
         name: gitlab-ci-pipelines-exporter
         chart_ref: mvisonneau/gitlab-ci-pipelines-exporter
-        chart_version: "{{ dsc.gitlabCiPipelinesExporter.chartVersion }}"
+        chart_version: "{{ dsc.glexporter.chartVersion }}"
         release_namespace: "{{ dsc.gitlab.namespace }}"
         values: "{{ gl_ci_pipelines_exporter_values }}"

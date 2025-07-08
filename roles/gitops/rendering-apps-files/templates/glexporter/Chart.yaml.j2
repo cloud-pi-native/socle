@@ -1,10 +1,10 @@
 ---
 apiVersion: v2
-name: gitlab-ci-pipelines-exporter
+name: glexporter 
 type: application
-version: {{ dsc.gitlabCiPipelinesExporter.chartVersion }}
+version: {{ dsc.glexporter.chartVersion }}
 dependencies:
 - name: gitlab-ci-pipelines-exporter
-  alias: gitlab-ci-pipelines-exporter
-  version: {{ dsc.gitlabCiPipelinesExporter.chartVersion }}
-  repository: "{{ dsc.gitlabCiPipelinesExporter.helmRepoUrl }}"
+  alias: glexporter 
+  version: {{ dsc.glexporter.chartVersion }}
+  repository: "{{ dsc.glexporter.helmRepoUrl }}"

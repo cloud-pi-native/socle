@@ -70,6 +70,10 @@
             customPrefix: ""
             syncWave: 10
           - argocd_app: kyverno
+            clusterName: ""
+            nameSpace: "kyverno"
+            customPrefix: ""
+            syncWave: 10
           - argocd_app: keycloak
             clusterName: ""
             nameSpace: "keycloak"

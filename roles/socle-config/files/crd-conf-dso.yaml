@@ -1548,6 +1548,8 @@ spec:
                     chartVersion:
                       description: Observatorium helm chart version (e.g., "0.25.0").
                       type: string
+                  required:
+                    - installEnabled
                   type: object
                 proxy:
                   description: Proxy configuration for tools.
@@ -1574,8 +1576,6 @@ spec:
                     port:
                       description: Distant proxy port listening.
                       type: string
-                  required:
-                    - installEnabled
                   type: object
                 sonarqube:
                   description: Configuration for SonarQube.

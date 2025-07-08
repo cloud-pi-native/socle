@@ -2,7 +2,7 @@
 {% for env, app in envs | subelements('apps', skip_missing=True) %}
 {% set _ = apps.append({
   "app": app.argocd_app,
-  "enabled": dsc[app.argocd_app].installEnabled  | default(false),
+  "enabled": (dsc.observatorium.installEnabled if app.argocd_app == "observability" else dsc[app.argocd_app].installEnabled) | default(false),
   "clusterName": app.clusterName | default(""),
   "namespace": app.nameSpace,
   "customPrefix": app.customPrefix | default(""),

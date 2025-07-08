@@ -1013,8 +1013,6 @@ spec:
                         https://github.com/grafana/grafana-operator/tree/master/deploy/helm/grafana-operator
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - installEnabled
                   type: object
                 harbor:
                   description: Configuration for Harbor.

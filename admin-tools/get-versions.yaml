@@ -17,9 +17,9 @@
           - "nexus"
           - "sonar (or sonarqube)"
           - "gitlab"
-          - "gitlabCiPipelinesExporter (or gitlab-ci-pipelines-exporter)"
+          - "glexporter (or gitlab-ci-pipelines-exporter)"
           - "gitlabOperator (or gitlab-operator)"
-          - "gitlabRunner (or gitlab-runner)"
+          - "gitlabrunner (or gitlab-runner)"
           - "vault"
           - "argo (or argocd)"
           - "harbor"
@@ -340,7 +340,7 @@
 
     - name: Get gitlab-ci-pipelines-exporter app and chart versions
       tags:
-        - gitlabCiPipelinesExporter
+        - glexporter
         - gitlab-ci-pipelines-exporter
       block:
         - name: Retrieve gitlab-ci-pipelines-exporter infos
@@ -380,7 +380,7 @@
 
     - name: Get gitlab-runner app and chart versions
       tags:
-        - gitlabRunner
+        - gitlabrunner
         - gitlab-runner
       block:
         - name: Retrieve gitlab-runner infos

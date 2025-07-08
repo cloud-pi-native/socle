@@ -955,7 +955,7 @@ En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devron
 - `dsc.argocd.privateGitlabDomain`
 - `dsc.grafanaOperator.ociChartUrl`
 - `helmRepoUrl` pour chaque service à savoir :
-  - `argocd`, `certmanager`, `cloudnativepg`, `console`, `gitlabCiPipelinesExporter`, `gitlabOperator`, `gitlabRunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
+  - `argocd`, `certmanager`, `cloudnativepg`, `console`, `glexporter`, `gitlabOperator`, `gitlabrunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
 
 ## Platform
 

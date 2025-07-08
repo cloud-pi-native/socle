@@ -1,3 +1,3 @@
-gitlab-runner:
+gitlabrunner:
   image:
     registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.gitlab}>

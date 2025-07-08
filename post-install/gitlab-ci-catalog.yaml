@@ -9,6 +9,30 @@
       ansible.builtin.import_role:
         name: socle-config
 
+    - name: Get gitlab_current_vault_values
+      block:
+        - name: Reset envs vars
+          ansible.builtin.set_fact:
+            envs: []
+
+        - name: Set minimal envs vars
+          ansible.builtin.set_fact:
+            envs:
+              - name: "{{ dsc_name }}"
+                apps:
+                  - argocd_app: gitlab
+                    vault_values:
+                      gitlabToken: "itDoesNotMatterWhatWeWriteHere"
+
+        - name: Call vault-secrets role
+          ansible.builtin.import_role:
+            name: gitops/vault-secrets
+
+        - name: Get GitLab token
+          ansible.builtin.set_fact:
+            gitlab_token: "{{ gitlab_current_vault_values.data.data.gitlabToken }}"
+          register: set_token_inv
+
     - name: Import gitlab-catalog role
       ansible.builtin.import_role:
         name: gitops/post-install/gitlab-catalog

@@ -3,7 +3,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ harbor_domain }}/api/v2.0/configurations
-    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -58,7 +58,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: PUT
     url: https://{{ harbor_domain }}/api/v2.0/configurations
-    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -70,7 +70,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     url: https://{{ harbor_domain }}/api/v2.0/system/scanAll/schedule
-    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json
@@ -83,7 +83,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: POST
     url: https://{{ harbor_domain }}/api/v2.0/system/scanAll/schedule
-    password: "{{ harbor_current_vault_values.stdout | from_json | json_query('global.harborAdminPassword') }}"
+    password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
     body_format: json

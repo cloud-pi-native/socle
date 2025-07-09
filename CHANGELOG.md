@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.13.1](https://github.com/cloud-pi-native/socle/compare/v3.13.0...v3.13.1) (2025-07-09)
+
+
+### Bug Fixes
+
+* :bug: post-conf job ([116ee75](https://github.com/cloud-pi-native/socle/commit/116ee75d7c936121f99444e58ce727f0ba66b833))
+
 ## [3.13.0](https://github.com/cloud-pi-native/socle/compare/v3.12.0...v3.13.0) (2025-07-08)
 
 

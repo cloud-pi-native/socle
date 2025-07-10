@@ -46,7 +46,7 @@
       ansible.builtin.set_fact:
         vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
 
-- name: Get runner token from infra Vault
+- name: Get GitLab and runner tokens from infra Vault
   block:
     - name: Retrieve GitLab values from infra Vault
       community.hashi_vault.vault_kv2_get:
@@ -58,10 +58,11 @@
       register: gitlab_vault_values
       ignore_errors: true
 
-    - name: Set runner_token fact
+    - name: Set runner_token and gitlab_token facts
       when: gitlab_vault_values.data.data.runnerToken is defined
       ansible.builtin.set_fact:
         runner_token: "{{ gitlab_vault_values.data.data.runnerToken }}"
+        gitlab_token: "{{ gitlab_vault_values.data.data.gitlabToken }}"
 
 - name: Check if GitLab Runner is installed
   block:
@@ -77,17 +78,6 @@
     - name: Set grunner_installed fact
       ansible.builtin.set_fact:
         grunner_installed: "{{ grunner_deploy.resources | length > 0 }}"
-
-- name: Get dso-config inventory
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.console.namespace }}"
-    kind: Secret
-    name: dso-config
-  register: ansible_inventory
-
-- name: Get gitlab token
-  ansible.builtin.set_fact:
-    gitlab_token: "{{ ansible_inventory.resources[0].data.GITLAB_TOKEN | b64decode }}"
 
 - name: Get GitLab online admin runners
   ansible.builtin.uri:

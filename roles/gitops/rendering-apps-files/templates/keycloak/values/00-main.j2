@@ -82,10 +82,10 @@ keycloak:
 
   ingress:
     enabled: true
-    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     pathType: "Prefix"
     apiVersion: ""
-    hostname: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>
+    hostname: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
     path: /
     servicePort: "http"
     annotations:
@@ -202,7 +202,7 @@ keycloak:
 
   extraEnvVars:
     - name: DSFR_THEME_HOME_URL
-      value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.console}>
+      value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.console}>
     - name: DSFR_THEME_SERVICE_TITLE
       value: Cloud Pi Native
     - name: DSFR_THEME_BRAND_TOP
@@ -211,7 +211,7 @@ keycloak:
       value: cloudpinative-relations@interieur.gouv.fr
   initContainers:
     - name: realm-ext-provider
-      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1"
+      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1"
       imagePullPolicy: IfNotPresent
       command:
         - sh
@@ -224,9 +224,9 @@ keycloak:
 {% if dsc.proxy.enabled %}
       env:
         - name: HTTP_PROXY
-          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
         - name: HTTPS_PROXY
-          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
         - name: NO_PROXY
-          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
 {% endif %}

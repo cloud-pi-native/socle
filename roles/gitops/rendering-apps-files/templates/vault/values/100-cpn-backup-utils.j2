@@ -4,13 +4,13 @@ cpn-backup-utils:
   vault:
     enabled: true
     secrets:
-      S3_BUCKET_NAME: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3BucketName}>
-      S3_BUCKET_PREFIX: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3BucketPrefix}>
-      S3_ENDPOINT: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3Endpoint}>
+      S3_BUCKET_NAME: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>
+      S3_BUCKET_PREFIX: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketPrefix}>
+      S3_ENDPOINT: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
       VAULT_ADDR: "http://{{ dsc.vault.namespace }}-active:8200"
       VAULT_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vault/values#vaultToken>
-      S3_ACCESS_KEY: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3AccessKey}>
-      S3_SECRET_KEY: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3SecretKey}>
+      S3_ACCESS_KEY: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
+      S3_SECRET_KEY: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
     env:
       RETENTION: "{{ dsc.global.backup.vault.retentionPolicy }}"
       MC_EXTRA_ARGS: "{{ dsc.global.backup.vault.mcExtraArgs }}"

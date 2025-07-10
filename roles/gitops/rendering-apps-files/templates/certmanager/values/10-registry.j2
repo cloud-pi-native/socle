@@ -1,19 +1,19 @@
 certmanager:
   image:
-    repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-controller"
+    repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-controller"
 
   webhook:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-webhook"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-webhook"
 
   cainjector:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-cainjector"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-cainjector"
 
   acmesolver:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-acmesolver"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-acmesolver"
 
   startupapicheck:
     image:
-      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-startupapicheck"
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/jetstack/cert-manager-startupapicheck"

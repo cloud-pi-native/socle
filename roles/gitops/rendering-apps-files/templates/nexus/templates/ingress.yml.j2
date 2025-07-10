@@ -17,16 +17,16 @@ spec:
 {% if not dsc.ingress.tls.type == 'none' %}
   tls:
   - hosts:
-    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexus}>
+    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
     secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
     secretName: nexus-tls-secret
 {% endif %}
 {% endif %}
-  ingressClassName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>"
+  ingressClassName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>"
   rules:
-    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.nexus}>
+    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
       http:
         paths:
           - path: /

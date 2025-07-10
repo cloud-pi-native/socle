@@ -3,5 +3,5 @@ argocd:
   configs:
     tls:
       certificates:
-        {{ gitlab_domain }}: <path:{{ vaultinfra_kv_name }}/data/env/conf-dso/apps/common/values#exposedCa>
+        {{ gitlab_domain }}: <path:{{ vaultinfra_kv_name }}/data/env/conf-dso/apps/global/values#exposedCa>
 {% endif %}

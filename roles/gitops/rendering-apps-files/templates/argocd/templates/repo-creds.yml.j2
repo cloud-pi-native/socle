@@ -9,7 +9,7 @@ metadata:
 type: Opaque
 stringData:
   password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
-  url: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/{{ dsc.global.projectsRootDir | flatten | join ('/') }}"
+  url: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.gitlab}>/{{ dsc.global.projectsRootDir | flatten | join ('/') }}"
   username: "root"
 ---
 apiVersion: v1
@@ -24,8 +24,8 @@ stringData:
   name: bitnamicharts
   type: helm
   enableOCI: "true"
-  username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#dockerAccount | jsonPath {.username}>
-  password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#dockerAccount | jsonPath {.password}>
+  username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#dockerAccount | jsonPath {.username}>
+  password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#dockerAccount | jsonPath {.password}>
 {% if dsc.proxy.enabled %}
-  proxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}> 
+  proxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}> 
 {% endif %}

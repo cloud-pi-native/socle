@@ -1,18 +1,18 @@
 {% if dsc.proxy.enabled %}
 sonarqube:
   prometheusExporter:
-    httpProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
-    httpsProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
-    noProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
+    httpProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
+    httpsProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
+    noProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
   
   plugins:
-    httpProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
-    httpsProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
-    noProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>
+    httpProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
+    httpsProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
+    noProxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
   
   sonarProperties:
-    http.proxyHost: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.hostProxy}>
-    http.proxyPort: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.portProxy}>
-    https.proxyHost: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.hostProxy}>
-    https.proxyPort: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.portProxy}>
+    http.proxyHost: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.hostProxy}>
+    http.proxyPort: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.portProxy}>
+    https.proxyHost: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.hostProxy}>
+    https.proxyPort: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.portProxy}>
 {% endif %}

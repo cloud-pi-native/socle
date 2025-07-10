@@ -3,7 +3,7 @@ cpn-cnpg:
 {% if dsc.gitlab.cnpg.imageName is defined %}
   imageName: "{{ dsc.gitlab.cnpg.imageName }}"
 {% else %}
-  imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/cloudnative-pg/postgresql:16.1"
+  imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloudnative-pg/postgresql:16.1"
 {% endif %}
 {% if use_image_pull_secrets %}
   imagePullSecrets:
@@ -68,8 +68,8 @@ cpn-cnpg:
 
 {% if dsc.global.backup.cnpg.enabled or dsc.gitlab.cnpg.mode == "restore" %}
   backup:
-    destinationPath: "s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3BucketName}>/{{ dsc.global.backup.cnpg.pathPrefix | default('') }}"
-    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3Endpoint}>
+    destinationPath: "s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/{{ dsc.global.backup.cnpg.pathPrefix | default('') }}"
+    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
 {% if dsc.global.backup.cnpg.enabled and dsc.gitlab.cnpg.mode != "restore" %}
     enabled: true
 {% if dsc.global.backup.s3.endpointCA.key is defined %}
@@ -77,7 +77,7 @@ cpn-cnpg:
       create: true
       name: "bundle-cnpg-s3"
       key: "ca.pem"
-      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#cnpgS3CaPem>
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#cnpgS3CaPem>
 {% endif %}
 {% endif %}
     s3Credentials:
@@ -85,10 +85,10 @@ cpn-cnpg:
       secretName: pg-cluster-backup
       accessKeyId:
         key: {{ dsc.global.backup.s3.credentials.accessKeyId.key | default ('') }}
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3AccessKey}>
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
       secretAccessKey:
         key: {{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3SecretKey}>
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
 {% if dsc.global.backup.cnpg.compression != 'none' %}
     compression: "{{ dsc.global.backup.cnpg.compression }}"
 {% endif %}

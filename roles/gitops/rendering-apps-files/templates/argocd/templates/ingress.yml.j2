@@ -13,11 +13,11 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
-  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
 {% if not dsc.ingress.tls.type == 'none' %}
   tls:
   - hosts:
-    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.argocd}>
+    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
     secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
@@ -25,7 +25,7 @@ spec:
 {% endif %}
 {% endif %}
   rules:
-    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.argocd}>
+    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
       http:
         paths:
           - path: /
@@ -51,11 +51,11 @@ metadata:
     {{ key }}: {{ val }}
 {% endfor %}
 spec:
-  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
 {% if not dsc.ingress.tls.type == 'none' %}
   tls:
   - hosts:
-    - appset.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.argocd}>
+    - appset.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
 {% if dsc.ingress.tls.type == 'tlsSecret' %}
     secretName: {{ dsc.ingress.tls.tlsSecret.name }}
 {% else %}
@@ -63,7 +63,7 @@ spec:
 {% endif %}
 {% endif %}
   rules:
-    - host: appset.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.argocd}>
+    - host: appset.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
       http:
         paths:
           - path: /api/webhook

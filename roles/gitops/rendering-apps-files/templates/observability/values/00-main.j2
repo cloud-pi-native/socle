@@ -21,16 +21,16 @@ observatorium:
           url: https://github.com/cloud-pi-native/socle.git
   ingress:
     enabled: true
-    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     hosts:
-      - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+      - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
         paths:
           - path: /
             pathType: ImplementationSpecific
     tls:
       - hosts:
-          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
-        secretName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>-tls
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
+        secretName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>-tls
   api:
     loglevel: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.loglevel}>
     config:
@@ -40,7 +40,7 @@ observatorium:
       groups: [/admin]
       # Default oidc config
       clientID: "account"
-      issuerURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
+      issuerURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/dso
       usernameClaim: "preferred_username"
       groupClaim: "groups"
   logs:
@@ -70,7 +70,7 @@ grafana:
     name: console
   oauth:
     enabled: true
-    url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso
+    url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/dso
     id: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.id}>
     secret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.secret}>
     aud: grafana
@@ -80,10 +80,10 @@ grafana:
     certManager:
       enabled: true
     ingressClassName: nginx
-    url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.grafana}>
+    url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.grafana}>
   grafana:
     isOpenShift: {{ dsc.global.platform == "openshift" | ternary(true, false) }}
-    observatorium_url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.observatorium}>
+    observatorium_url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
   global:
     projects:
       console:

@@ -4,7 +4,6 @@
   gather_facts: false
   vars:
     post_conf_job: true
-    post_vault_update: true
     argo_infra_ns_check:
       failed: true
   tasks:
@@ -69,27 +68,30 @@
         status_code: [200, 204]
       register: token_pass
 
-    - name: Reset envs vars
-      ansible.builtin.set_fact:
-        envs: []
+    - name: Update vault-secrets sonarApiToken
+      block:
+        - name: Reset envs vars
+          ansible.builtin.set_fact:
+            envs: []
 
-    - name: Set envs vars
-      ansible.builtin.set_fact:
-        envs:
-          - name: "{{ dsc_name }}"
-            apps:
-              - argocd_app: "sonarqube"
-                vault_values:
-                  auth:
-                    sonarApiToken: >-
-                      {{
-                        (token_pass.json.token)if token_pass is defined and
-                        token_pass.json.token | length > 0
-                        else ''
-                      }}
+        - name: Set minimal envs vars
+          ansible.builtin.set_fact:
+            envs:
+              - name: "{{ dsc_name }}"
+                apps:
+                  - argocd_app: sonarqube
+                    vault_values:
+                      auth:
+                        sonarApiToken: >-
+                          {{
+                            (token_pass.json.token)if token_pass is defined and
+                            token_pass.json.token | length > 0
+                            else ''
+                          }}
 
-    - name: Post-install vault-secrets run
-      ansible.builtin.import_role:
-        name: gitops/vault-secrets
-      vars:
-        vault_secrets_post_install: true
+        - name: Post-install vault-secrets run
+          ansible.builtin.import_role:
+            name: gitops/vault-secrets
+          vars:
+            vault_secrets_post_install: true
+            post_vault_update: true

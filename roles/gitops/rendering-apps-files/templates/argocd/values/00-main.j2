@@ -19,7 +19,7 @@ argocd:
       application.instanceLabelKey: argocd.argoproj.io/instance.{{ instance_name }}
 {% endif %}
       clusterResources: "true"
-      url: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.argocd}>"
+      url: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>"
       users.anonymous.enabled: "false"
       admin.enabled: "{{ dsc.argocd.admin.enabled }}"
       kustomize.buildOptions: "--enable-helm"
@@ -36,9 +36,9 @@ argocd:
   server:
     replicas: 3
     ingress:
-      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     ingressGrpc:
-      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
   repoServer:
     replicas: 3
     initContainers:
@@ -95,11 +95,11 @@ argocd:
         value: /helm-working-dir
 {% if dsc.proxy.enabled %}
       - name: HTTP_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpProxy}>
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
       - name: HTTPS_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.httpsProxy}>
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
       - name: NO_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#proxy | jsonPath {.noProxy}>,{{ dsc_name }}-argocd-repo-server
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>,{{ dsc_name }}-argocd-repo-server
 {% endif %}
     volumes:
     - name: helm-custom-binary
@@ -117,9 +117,9 @@ argocd:
     replicas: 2
     webhook:
       ingress:
-        ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+        ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
   notifications:
     enabled: false
     webhook:
       ingress:
-        ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+        ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>

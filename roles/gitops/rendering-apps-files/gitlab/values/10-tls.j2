@@ -1,6 +1,6 @@
 global:
   ingress:
-    class: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    class: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
       {{ key }}: {{ val }}

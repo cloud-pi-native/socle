@@ -4,10 +4,10 @@ harbor:
     imagePullPolicy: IfNotPresent
     type: ingress
     ingress:
-      className: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+      className: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
       hosts:
-        core: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
-        notary: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harborNotary}>
+        core: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.harbor}>
+        notary: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.harborNotary}>
       notary:
         annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
@@ -26,7 +26,7 @@ harbor:
 {% for key, val in dsc.ingress.labels.items() %}
           {{ key }}: {{ val }}
 {% endfor %}
-  externalURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.harbor}>
+  externalURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.harbor}>
   persistence:
     enabled: true
     resourcePolicy: keep

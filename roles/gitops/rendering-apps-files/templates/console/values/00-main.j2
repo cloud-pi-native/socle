@@ -7,27 +7,27 @@ console:
     projectsRootDir: "{{ dsc.global.projectsRootDir | flatten | join ('/') }}"
     secrets:
       ARGO_NAMESPACE: {{ dsc.argocd.namespace }}
-      ARGOCD_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.argocd}>/"
+      ARGOCD_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.argocd}>/"
       GITLAB_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
-      GITLAB_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.gitlab}>/"
+      GITLAB_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.gitlab}>/"
       HARBOR_ADMIN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global| jsonPath {.harborAdmin}>
       HARBOR_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global| jsonPath {.harborAdminPassword}>
-      HARBOR_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.harbor}>/"
+      HARBOR_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.harbor}>/"
       KEYCLOAK_ADMIN: "dsoadmin"
       KEYCLOAK_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#auth| jsonPath {.adminPassword}>
-      KEYCLOAK_URL:  "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.keycloak}>/"
+      KEYCLOAK_URL:  "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.keycloak}>/"
       NEXUS_ADMIN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminUsername}>
       NEXUS_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminPassword}>
-      NEXUS_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.nexus}>/"
+      NEXUS_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.nexus}>/"
       SONAR_API_TOKEN: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/sonarqube/values#auth| jsonPath {.sonarApiToken}>"
-      SONARQUBE_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.sonarqube}>/"
+      SONARQUBE_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.sonarqube}>/"
       VAULT_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vault/values#vaultToken>
-      VAULT_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.vault}>/"
+      VAULT_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.vault}>/"
   global:
     env:
       NODE_ENV: "production"
     keycloak:
-      domain: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.keycloak}>"
+      domain: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.keycloak}>"
       realm: "dso"
       protocol: "https"
       clientIds:
@@ -35,16 +35,16 @@ console:
         frontend: "console-frontend"
       clientSecrets:
         backend: ""
-      redirectUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.console}>"
+      redirectUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.console}>"
       sessionSecret: "a-very-strong-secret-with-more-than-32-char"
       devRealm: false
     postgresql:
       dbUrl: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/console/values#uri>?schema=public"
   ingress:
-    className: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    className: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     enabled: true
     hosts:
-    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.console}>
+    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.console}>
     annotations: {{ dsc.ingress.annotations }}
     labels: {{ dsc.ingress.labels }}
   client:

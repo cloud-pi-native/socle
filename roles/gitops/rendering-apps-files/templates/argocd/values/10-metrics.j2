@@ -3,7 +3,7 @@ argocd:
   redis-ha:
     exporter:
       enabled: true
-      image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.ghcr}>/oliver006/redis_exporter
+      image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/oliver006/redis_exporter
       serviceMonitor:
         enabled: true
         namespace: "{{ dsc.argocd.namespace }}"
@@ -12,7 +12,7 @@ argocd:
 {% endif %}
     haproxy:
       image:
-        repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/library/haproxy
+        repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/library/haproxy
       metrics:
         enabled: true
         serviceMonitor:

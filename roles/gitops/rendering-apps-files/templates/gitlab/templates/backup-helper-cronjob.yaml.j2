@@ -11,22 +11,22 @@ spec:
         spec:
           containers:
           - name: gitlab-backup-helper
-            image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/minio/mc:latest
+            image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/minio/mc:latest
             env:
             - name: S3_ENDPOINT
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3Endpoint}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>"
             - name: S3_BUCKET_NAME
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3BucketName}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>"
             - name: S3_ACCESS_KEY
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3AccessKey}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>"
             - name: S3_SECRET_KEY
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.s3SecretKey}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>"
             - name: S3_PATH_PREFIX
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.gitlab.pathPrefix}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.gitlab.pathPrefix}>"
             - name: RETENTION
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.gitlab.retentionPolicy}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.gitlab.retentionPolicy}>"
             - name: MC_EXTRA_ARGS
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#backup | jsonPath {.gitlab.mcExtraArgs}>"
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.gitlab.mcExtraArgs}>"
             args:
             - /bin/sh
             - -c

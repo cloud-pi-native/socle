@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.13.2](https://github.com/cloud-pi-native/socle/compare/v3.13.1...v3.13.2) (2025-07-10)
+
+
+### Bug Fixes
+
+* :arrow_up: Upgrade GitLab to 18.1.2 ([0f53e0f](https://github.com/cloud-pi-native/socle/commit/0f53e0f6ec96ea7843552b6f0b61c9d0d11eba11))
+
 ## [3.13.1](https://github.com/cloud-pi-native/socle/compare/v3.13.0...v3.13.1) (2025-07-09)
 
 

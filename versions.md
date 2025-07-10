@@ -6,9 +6,9 @@
 | console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | cpn-ansible-job           | 1.\*.\*            | 1.\*.\*         | [cpn-ansible-job](https://github.com/cloud-pi-native/helm-charts)                                                    |
 | cpn-cnpg                  | 2.3.1            | 2.3.1         | [cpn-cnpg](https://github.com/cloud-pi-native/helm-charts)                                                           |
-| gitlab                    | 18.1.1          | 9.1.1        | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
+| gitlab                    | 18.1.2          | 9.1.2        | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
 | glexporter | 0.5.10           | 0.3.5         | [glexporter](https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter) |
-| gitlabOperator            | 2.1.1           | 2.1.1        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
+| gitlabOperator            | 2.1.2           | 2.1.2        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
 | gitlabrunner              | 18.1.1          | 0.78.1        | [gitlabrunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)                                            |
 | grafana                   | 10.4.3           | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
 | grafanaOperator           | 5.10.0           | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                                                  |

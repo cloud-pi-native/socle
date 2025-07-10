@@ -3,7 +3,7 @@ sonarqube:
   nameOverride: sonar
   image:
     pullPolicy: IfNotPresent
-    repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/sonarqube
+    repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/sonarqube
   
   sonarWebContext: /
   
@@ -11,7 +11,7 @@ sonarqube:
     enabled: true
     # Used to create an Ingress record.
     hosts:
-      - name: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.sonarqube}>
+      - name: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.sonarqube}>
         pathType: Prefix
         path: "/"
     annotations:
@@ -20,7 +20,7 @@ sonarqube:
 {% endfor %}
     # This property allows for reports up to a certain size to be uploaded to SonarQube
       nginx.ingress.kubernetes.io/proxy-body-size: "64m"
-    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#ingressClassName>
+    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     labels:
       app: "sonar"
   
@@ -61,8 +61,8 @@ sonarqube:
     sonar.auth.oidc.loginStrategy.customClaim.name: "upn"
     sonar.auth.oidc.clientId.secured: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.sonar.id}>
     sonar.auth.oidc.clientSecret.secured: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.sonar.secret}>
-    sonar.auth.oidc.issuerUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>/realms/dso"
-    sonar.core.serverBaseURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.sonarqube}>
+    sonar.auth.oidc.issuerUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/dso"
+    sonar.core.serverBaseURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.sonarqube}>
     sonar.plugins.risk.consent: "ACCEPTED"
   
   ## Override JDBC values
@@ -95,7 +95,7 @@ sonarqube:
       requests:
         cpu: 100m
         memory: 128Mi
-  curlContainerImage: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.11.0
+  curlContainerImage: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.11.0
   adminJobAnnotations: {}
   
   terminationGracePeriodSeconds: 60

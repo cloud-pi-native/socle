@@ -3,6 +3,6 @@ keycloak:
   ingress:
     extraTls:
       - hosts:
-        - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.keycloak}>
+        - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
         secretName: "{{ dsc.ingress.tls.tlsSecret.name }}"
 {% endif %}

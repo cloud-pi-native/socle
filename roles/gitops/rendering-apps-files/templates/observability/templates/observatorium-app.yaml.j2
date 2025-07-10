@@ -21,7 +21,7 @@ spec:
       - ./values.yaml
       - $tenants/helm/values.yaml
   - ref: tenants
-    repoURL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain | jsonPath {.gitlab}>/observability/observability.git"
+    repoURL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.gitlab}>/observability/observability.git"
     targetRevision: main
   syncPolicy:
     automated:

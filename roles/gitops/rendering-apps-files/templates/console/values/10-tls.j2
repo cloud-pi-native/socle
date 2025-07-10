@@ -4,5 +4,5 @@ console:
     tls:
       - secretName: {{ dsc.ingress.tls.tlsSecret.name | default('tls-secret') }}
         hosts:
-          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/common/values#domain| jsonPath {.console}>
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.console}>
 {% endif %}

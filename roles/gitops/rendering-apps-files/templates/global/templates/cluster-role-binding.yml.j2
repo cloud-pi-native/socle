@@ -16,6 +16,9 @@ subjects:
     namespace: {{ dsc.gitlab.namespace }}
   - kind: ServiceAccount
     name: cpn-ansible-job
+    namespace: {{ dsc.vault.namespace }}
+  - kind: ServiceAccount
+    name: cpn-ansible-job
     namespace: {{ dsc.harbor.namespace }}
   - kind: ServiceAccount
     name: cpn-ansible-job

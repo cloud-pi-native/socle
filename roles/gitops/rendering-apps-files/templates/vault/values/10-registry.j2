@@ -1,4 +1,3 @@
-{% if use_private_registry %}
 vault:
   injector:
     image:
@@ -16,7 +15,6 @@ vault:
     agent:
       image:
         repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
-{% endif %}
 
 {% if use_image_pull_secrets %}
 vault:

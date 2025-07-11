@@ -60,22 +60,15 @@
         - apps-files
         - dso-app
         - vault-secrets
-        - vault-secrets-post-install
-        - post-install
-        - post-install-vault
 
     - role: gitops/vault-secrets
       tags:
         - vault-secrets
-        - post-install
 
     - role: gitops/rendering-apps-files
       tags:
         - rendering-apps-files
         - apps-files
-        - post-install
-        - post-install-vault
-        - vault-secrets-post-install
 
     - role: gitops/watchpoint
       tags:
@@ -86,22 +79,3 @@
     - role: gitops/dso-app
       tags:
         - dso-app
-
-    - name: gitops/post-install/vault
-      tags:
-        - post-install
-        - post-install-vault
-        - vault-secrets-post-install
-
-  tasks:
-    - name: Load variables for the vault-secrets post-install role
-      ansible.builtin.include_vars:
-        file: roles/gitops/vault-secrets/vars/post-install.yaml
-      tags:
-        - vault-secrets-post-install
-
-    - name: Post-install vault-secrets run
-      ansible.builtin.import_role:
-        name: gitops/vault-secrets
-      tags:
-        - vault-secrets-post-install

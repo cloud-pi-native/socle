@@ -1,5 +1,6 @@
 ---
 - name: Hard refresh argocd applications
+  when: kubeconfig_infra is defined
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
     proxy: "{{ kubeconfig_proxy_infra | default('')}}"
@@ -14,6 +15,7 @@
     state: patched
 
 - name: Sync argocd applications
+  when: kubeconfig_infra is defined
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
     proxy: "{{ kubeconfig_proxy_infra | default('')}}"

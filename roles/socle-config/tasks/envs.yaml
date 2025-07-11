@@ -74,6 +74,11 @@
             nameSpace: "kyverno"
             customPrefix: ""
             syncWave: 10
+          - argocd_app: cloudnativepg
+            clusterName: ""
+            nameSpace: "cloudnativepg"
+            customPrefix: ""
+            syncWave: 10
           - argocd_app: keycloak
             clusterName: ""
             nameSpace: "keycloak"

@@ -72,56 +72,6 @@
         version: 2
     body_format: json
 
-# Get existing values for migration
-
-- name: Get existing values for migration
-  when: post_conf_job is not defined
-  block:
-    - name: Get dso-config secret
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.console.namespace }}"
-        kind: Secret
-        name: dso-config
-      register: dso_config_secret
-      ignore_errors: true
-
-    - name: Get Vault keys
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.vault.namespace }}"
-        kind: Secret
-        name: "{{ dsc_name }}-vault-keys"
-      register: vault_keys
-
-    - name: Get pg-cluster-harbor-app secret
-      when: not dsc.harbor.cnpg.initPassword
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.harbor.namespace }}"
-        kind: Secret
-        name: pg-cluster-harbor-app
-      register: pg_harbor_db_secret
-
-    - name: Get pg-cluster-console-app secret
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.console.namespace }}"
-        kind: Secret
-        name: pg-cluster-console-app
-      register: pg_console_db_secret
-
-    - name: Get kubernetes service
-      kubernetes.core.k8s_info:
-        namespace: default
-        kind: Service
-        name: kubernetes
-      register: kubernetes_service_clusterip
-
-    - name: Get pg-cluster-gitlab-app secret
-      when: not dsc.gitlab.cnpg.initPassword
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.gitlab.namespace }}"
-        kind: Secret
-        name: pg-cluster-gitlab-app
-      register: pg_gitlab_db_secret
-
 # Write Vault Infra secrets
 
 - name: Write secrets

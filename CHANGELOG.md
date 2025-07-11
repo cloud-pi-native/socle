@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.13.3](https://github.com/cloud-pi-native/socle/compare/v3.13.2...v3.13.3) (2025-07-11)
+
+
+### Bug Fixes
+
+* :bug: Argo CD Vault infra paths ([bd22cb5](https://github.com/cloud-pi-native/socle/commit/bd22cb568224df7a54a2a821258c736eba315643))
+
 ## [3.13.2](https://github.com/cloud-pi-native/socle/compare/v3.13.1...v3.13.2) (2025-07-11)
 
 

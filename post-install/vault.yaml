@@ -1,0 +1,58 @@
+---
+- name: Vault post-configuration
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+    argo_infra_ns_check:
+      failed: true
+    gitops_local_repo: /tmp
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Import ca role
+      ansible.builtin.import_role:
+        name: ca
+
+    - name: Get vault_values
+      ansible.builtin.include_role:
+        name: gitops/rendering-apps-files
+      vars:
+        envs:
+          - name: "{{ dsc_name }}"
+            apps:
+              - argocd_app: "vault"
+
+    - name: Import vault role
+      ansible.builtin.import_role:
+        name: gitops/post-install/vault
+
+    - name: Update vault-secrets vaultToken
+      block:
+        - name: Reset envs vars
+          ansible.builtin.set_fact:
+            envs: []
+
+        - name: Set minimal envs vars
+          ansible.builtin.set_fact:
+            envs:
+              - name: "{{ dsc_name }}"
+                apps:
+                  - argocd_app: vault
+                    vault_values:
+                      vaultToken: >-
+                        {{
+                          (vault_keys.resources[0].data.root_token)
+                          if vault_keys.resources[0].data.root_token is defined and
+                          vault_keys.resources[0].data.root_token | length > 0
+                          else ''
+                        }}
+
+        - name: Post-install vault-secrets run
+          ansible.builtin.import_role:
+            name: gitops/vault-secrets
+          vars:
+            vault_secrets_post_install: true
+            post_vault_update: true

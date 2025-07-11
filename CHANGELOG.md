@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.13.2](https://github.com/cloud-pi-native/socle/compare/v3.13.1...v3.13.2) (2025-07-11)
+
+
+### Bug Fixes
+
+* :arrow_up: Upgrade GitLab to 18.1.2 ([0f53e0f](https://github.com/cloud-pi-native/socle/commit/0f53e0f6ec96ea7843552b6f0b61c9d0d11eba11))
+* :bug: GitLab Runner post-install ([0ce0d0a](https://github.com/cloud-pi-native/socle/commit/0ce0d0a90db9f248a3686ea86ac458200bb2166d))
+* :bug: post-conf envs set_fact ([ad9ed53](https://github.com/cloud-pi-native/socle/commit/ad9ed53aa3a88f0ee33bd0e30908701c097410f1))
+* :bug: Renaming infra Vault path for global values ([de9fb25](https://github.com/cloud-pi-native/socle/commit/de9fb252f597d28981668379799b52d117f17f4a))
+
 ## [3.13.1](https://github.com/cloud-pi-native/socle/compare/v3.13.0...v3.13.1) (2025-07-09)
 
 

@@ -39,7 +39,7 @@ console:
       sessionSecret: "a-very-strong-secret-with-more-than-32-char"
       devRealm: false
     postgresql:
-      dbUrl: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/console/values#uri>?schema=public"
+      cnpgSecretName: pg-cluster-console-app
   ingress:
     className: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     enabled: true

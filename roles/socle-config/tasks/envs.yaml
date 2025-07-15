@@ -83,9 +83,9 @@
               auth:
                 adminPassword: >-
                   {{
-                    (dso_config_secret.resources[0].data.KEYCLOAK_ADMIN_PASSWORD | b64decode
-                     if (dso_config_secret.resources[0].data.KEYCLOAK_ADMIN_PASSWORD is defined and
-                         dso_config_secret.resources[0].data.KEYCLOAK_ADMIN_PASSWORD | length > 0)
+                    (keycloak_admin_creds.resources[0].data['admin-password'] | b64decode
+                     if (keycloak_admin_creds.resources[0].data['admin-password'] is defined and
+                         keycloak_admin_creds.resources[0].data['admin-password'] | length > 0)
                      else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
                   }}
               initcontainers:

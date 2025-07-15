@@ -77,14 +77,6 @@
 - name: Get existing values for migration
   when: post_conf_job is not defined
   block:
-    - name: Get dso-config secret
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.console.namespace }}"
-        kind: Secret
-        name: dso-config
-      register: dso_config_secret
-      ignore_errors: true
-
     - name: Get Vault keys
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.vault.namespace }}"
@@ -121,6 +113,13 @@
         kind: Secret
         name: pg-cluster-gitlab-app
       register: pg_gitlab_db_secret
+
+    - name: Get Keycloak admin Secret from keycloak namespace
+      kubernetes.core.k8s_info:
+        kind: Secret
+        name: keycloak
+        namespace: "{{ dsc.keycloak.namespace }}"
+      register: keycloak_admin_secret
 
 # Write Vault Infra secrets
 

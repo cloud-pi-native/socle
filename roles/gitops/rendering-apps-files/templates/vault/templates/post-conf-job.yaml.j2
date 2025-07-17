@@ -5,9 +5,14 @@ metadata:
   name: vault-secret-access-role
   namespace: {{ dsc.vault.namespace }}
 rules:
+  # The "create" verb cannot apply to resourceNames, hence this first rule.
+  # See:  https://kubernetes.io/docs/reference/access-authn-authz/rbac/#referring-to-resources
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get", "list", "create"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
     resourceNames: ["{{ dsc_name }}-vault-keys"]
   - apiGroups: [""]
     resources: ["pods"]

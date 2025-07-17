@@ -83,8 +83,8 @@ harbor:
     external:
       host: "pg-cluster-harbor-rw"
       port: "5432"
-      username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.username}>
-      password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#cnpg | jsonPath {.password}>
+      username: "harbor"
+      existingSecret: "pg-cluster-harbor-app"
       coreDatabase: "registry"
   metrics:
     enabled: {{ dsc.global.metrics.enabled }}

@@ -5,13 +5,18 @@ metadata:
   name: keycloak-secret-access-role
   namespace: {{ dsc.keycloak.namespace }}
 rules:
+  # The "create" verb cannot apply to resourceNames, hence this first rule.
+  # See:  https://kubernetes.io/docs/reference/access-authn-authz/rbac/#referring-to-resources
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list"]
     resourceNames: ["keycloak"]
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get", "list", "create", "update", "patch"]
+    verbs: ["get", "list", "update", "patch"]
     resourceNames: ["dso-admin-user-secret", "keycloak-client-secret-argo-client", "keycloak-client-secret-console-backend", "keycloak-client-secret-console-frontend", "keycloak-client-secret-gitlab-client", "keycloak-client-secret-grafana-projects", "keycloak-client-secret-harbor-client", "keycloak-client-secret-portail-client", "keycloak-client-secret-sonar-client", "keycloak-client-secret-vault-client"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

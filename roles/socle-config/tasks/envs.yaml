@@ -167,23 +167,6 @@
                   regionendpoint: "{{ dsc.harbor.s3ImageChartStorage.regionendpoint | default('') }}"
                   accesskey: "{{ dsc.harbor.s3ImageChartStorage.accesskey | default('') }}"
                   secretkey: "{{ dsc.harbor.s3ImageChartStorage.secretkey | default('') }}"
-              cnpg:
-                username: >-
-                  {{
-                    (pg_harbor_db_secret.resources[0].data.username | b64decode)
-                    if not dsc.harbor.cnpg.initPassword
-                    and pg_harbor_db_secret is defined
-                    and pg_harbor_db_secret.resources | length > 0
-                    else 'harbor'
-                  }}
-                password: >-
-                  {{
-                    (pg_harbor_db_secret.resources[0].data.password | b64decode)
-                    if not dsc.harbor.cnpg.initPassword
-                    and pg_harbor_db_secret is defined
-                    and pg_harbor_db_secret.resources | length > 0
-                    else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
-                  }}
           - argocd_app: argocd
             clusterName: ""
             nameSpace: "argocd"

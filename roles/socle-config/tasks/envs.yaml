@@ -128,6 +128,8 @@
                       enabled: "{{ dsc.global.backup.gitlab.enabled | default('false') }}"
                       schedule: "{{ dsc.global.backup.gitlab.cron | default('0 */6 * * *') }}"
                       extraArgs: "{{ dsc.global.backup.gitlab.extraArgs | default('') }}"
+              gitlabToken: ""
+              runnerToken: ""
           - argocd_app: glexporter
             clusterName: ""
             nameSpace: "gitlab"

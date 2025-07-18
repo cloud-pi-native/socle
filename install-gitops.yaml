@@ -16,10 +16,6 @@
       tags:
         - always
 
-    - role: console-dso-config
-      tags:
-        - always
-
     - role: imagepullsecret
       tags:
         - always

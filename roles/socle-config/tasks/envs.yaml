@@ -195,7 +195,7 @@
                     (sonarqube_secret.resources[0].data.password | b64decode
                      if (sonarqube_secret.resources[0].data.password is defined and
                          sonarqube_secret.resources[0].data.password | length > 0)
-                     else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits', 'punctuation']))
+                     else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
                   }}
                 monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
                 sonarApiToken: >-

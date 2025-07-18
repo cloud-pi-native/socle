@@ -12,10 +12,6 @@
       ansible.builtin.import_role:
         name: socle-config
 
-    - name: Import gitlab-runner role
-      ansible.builtin.import_role:
-        name: gitops/post-install/gitlab-runner
-
     - name: Reset envs vars
       ansible.builtin.set_fact:
         envs: []

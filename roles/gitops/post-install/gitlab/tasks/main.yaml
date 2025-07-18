@@ -236,7 +236,7 @@
       ansible.builtin.set_fact:
         vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
 
-- name: Get GitLab and runner tokens from infra Vault
+- name: Get runner token from infra Vault
   block:
     - name: Retrieve GitLab values from infra Vault
       community.hashi_vault.vault_kv2_get:
@@ -252,7 +252,6 @@
       when: gitlab_vault_values.data.data.runnerToken is defined
       ansible.builtin.set_fact:
         runner_token: "{{ gitlab_vault_values.data.data.runnerToken }}"
-        gitlab_token: "{{ gitlab_vault_values.data.data.gitlabToken }}"
 
 - name: Check if GitLab Runner is installed
   block:

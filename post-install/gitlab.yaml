@@ -43,7 +43,7 @@
       ansible.builtin.import_role:
         name: gitops/post-install/gitlab
 
-    - name: Update vault-secrets gitlabToken
+    - name: Update vault-secrets gitlabToken and runnerToken
       block:
         - name: Reset envs vars
           ansible.builtin.set_fact:
@@ -57,6 +57,7 @@
                   - argocd_app: gitlab
                     vault_values:
                       gitlabToken: "{{ gitlab_token | default('') }}"
+                      runnerToken: "{{ default_runner.json.token | default('') }}"
 
         - name: Post-install vault-secrets run
           ansible.builtin.import_role:

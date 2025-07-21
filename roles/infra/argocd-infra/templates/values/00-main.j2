@@ -54,6 +54,20 @@ configs:
     users.anonymous.enabled: "false"
     admin.enabled: "{{ dsc.argocdInfra.admin.enabled }}"
     kustomize.buildOptions: "--enable-helm"
+    resource.customizations.useOpenLibs.apps.gitlab.com_GitLab: true
+    resource.customizations.health.apps.gitlab.com_GitLab: |
+      health_status = {}
+      health_status.status = "Progressing"
+      health_status.message = "Gitlab is Preparing"
+      if obj.status ~= nil then
+        if obj.status.phase ~= nil then
+          if obj.status.phase == "Running" then
+            health_status.status = "Healthy"
+            health_status.message = "Gitlab is Running"
+          end
+        end
+      end
+      return health_status
     resource.exclusions: |
       - apiGroups:
         - tekton.dev

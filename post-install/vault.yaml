@@ -44,7 +44,7 @@
                     vault_values:
                       vaultToken: >-
                         {{
-                          (vault_keys.resources[0].data.root_token)
+                          (vault_keys.resources[0].data.root_token | b64decode)
                           if vault_keys.resources[0].data.root_token is defined and
                           vault_keys.resources[0].data.root_token | length > 0
                           else ''

@@ -30,7 +30,7 @@ spec:
 {% endraw %}
   template:
     metadata:
-      name: "{{ dsc.global.gitOps.envName }}-{{"{{"}}.prefix{{"}}"}}{{"{{"}}.app{{"}}"}}"
+      name: "{{ dsc.global.gitOps.envName }}-{{"{{"}}.namespacePrefix{{"}}"}}{{"{{"}}.app{{"}}"}}"
 {%- raw %}
       annotations:
         argocd.argoproj.io/compare-options: ServerSideDiff=true
@@ -61,7 +61,7 @@ spec:
                 destinationClusterName: {{.destination.clusterName}}
       destination:
         name: "{{ default .destination.clusterName .clusterName }}"
-        namespace: "{{ default .prefix .customPrefix }}{{.namespace}}"
+        namespace: "{{ default .namespacePrefix .customNamespacePrefix }}{{.namespace}}"
       syncPolicy:
         automated:
           prune: true

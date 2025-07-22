@@ -937,6 +937,11 @@ spec:
                         envName:
                           type: string
                           description: Name of the current environment where resides this DSC instance.
+                        namespacePrefix:
+                          type: string
+                          description: Prefix for all namespaces in the current environment.
+                      required:
+                        - namespacePrefix
                       type: object
                     dockerAccount:
                       properties:

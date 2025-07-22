@@ -1,6 +1,7 @@
 cpn-ansible-job:
   job:
-    name: "keycloak" 
+    name: "keycloak"
+    dscName: "{{ dsc_name }}"
     extraEnv:
     - name: VAULT_INFRA_TOKEN
       value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#vault_infra_token>

@@ -5,7 +5,7 @@
   "enabled": (dsc.observatorium.installEnabled if app.argocd_app == "observability" else dsc[app.argocd_app].installEnabled) | default(false),
   "clusterName": app.clusterName | default(""),
   "namespace": app.nameSpace,
-  "customPrefix": app.customPrefix | default(""),
+  "customNamespacePrefix": app.customNamespacePrefix | default(""),
   "syncWave": app.syncWave | default(10) | int
 }) %}
 {% endfor %}
@@ -13,7 +13,7 @@
   "env": envs[0].name,
   "provider": "self-hosted",
   "region": "fr-par",
-  "prefix": prefix | default("dso-"),
+  "namespacePrefix": dsc.global.gitOps.namespacePrefix,
   "destination": {
     "clusterName": dsc.global.gitOps.envName | default("")
   },

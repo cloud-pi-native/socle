@@ -53,7 +53,13 @@
     name: combine
   vars:
     combine_path: "{{ path }}"
-    combine_user_values: "{{ {} | combine({item.1.argocd_app: dsc[item.1.argocd_app]['values']}) }}"
+    combine_user_values: >-
+      {%- set app_name = item.1.argocd_app -%}
+      {%- if app_name == 'gitlab' -%}
+      {{ {} | combine({app_name: dsc.gitlabOperator['values']}) }}
+      {%- else -%}
+      {{ {} | combine({app_name: dsc[app_name]['values']}) }}
+      {%- endif -%}
     combine_dest_var: "{{ item.1.argocd_app }}_values"
 
 - name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination

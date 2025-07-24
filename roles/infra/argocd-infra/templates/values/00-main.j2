@@ -54,7 +54,6 @@ configs:
     users.anonymous.enabled: "false"
     admin.enabled: "{{ dsc.argocdInfra.admin.enabled }}"
     kustomize.buildOptions: "--enable-helm"
-    resource.customizations.useOpenLibs.apps.gitlab.com_GitLab: true
     resource.customizations.health.apps.gitlab.com_GitLab: |
       health_status = {}
       health_status.status = "Progressing"
@@ -68,6 +67,36 @@ configs:
         end
       end
       return health_status
+    resource.customizations.health.argoproj.io_Application: |
+      hs = {}
+      hs.status = "Progressing"
+      hs.message = ""
+      if obj.status ~= nil then
+        if obj.status.health ~= nil then
+          hs.status = obj.status.health.status
+          if obj.status.health.message ~= nil then
+            hs.message = obj.status.health.message
+          end
+        end
+      end
+      return hs
+    resource.customizations.health.argoproj.io_ApplicationSet: |
+      hs = {}
+      hs.status = "Progressing"
+      hs.message = ""
+      if obj.status ~= nil then
+        if obj.status.resources ~= nil then
+          for i, resource in ipairs(obj.status.resources) do
+            if resource.health.status ~= nil then
+              hs.status = resource.health.status
+              if not (hs.status == 'Healthy') then
+                return hs
+              end
+            end
+          end
+        end
+      end
+      return hs
     resource.exclusions: |
       - apiGroups:
         - tekton.dev

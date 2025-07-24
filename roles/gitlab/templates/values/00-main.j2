@@ -62,9 +62,9 @@ gitlab:
     backups:
       cron:
         enabled: {{ dsc.global.backup.gitlab.enabled }}
+{% if dsc.global.backup.gitlab.enabled %}
         schedule: {{ dsc.global.backup.gitlab.cron }}
         extraArgs: {{ dsc.global.backup.gitlab.extraArgs }}
-{% if dsc.global.backup.gitlab.enabled %}
       objectStorage:
         config:
           secret: gitlab-backup
@@ -124,8 +124,10 @@ global:
       autoLinkUser: ["openid_connect"]
       providers:
         - secret: openid-connect
+{% if dsc.global.backup.s3.enabled %}
     backups:
       bucket: "{{ dsc.global.backup.s3.bucketName }}"
+{% endif %}
 
   extraEnv:
     GITLAB_ROOT_EMAIL: "admin@example.com"

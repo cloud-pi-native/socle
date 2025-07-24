@@ -77,6 +77,8 @@ spec:
     namespace: dso-global
     values: {}
     backup:
+      s3:
+        enabled: false
       velero:
         enabled: false
       cnpg:
@@ -84,6 +86,8 @@ spec:
       vault:
         enabled: false
       vaultInfra:
+        enabled: false
+      gitlab:
         enabled: false
     metrics:
       enabled: false

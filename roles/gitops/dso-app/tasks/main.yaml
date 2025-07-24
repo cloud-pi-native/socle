@@ -14,10 +14,17 @@
     state: directory
     mode: 0775
 
-- name: Render dso-appset template and write yaml file to destination dir
+- name: Calculate all distinct configured sync waves
+  ansible.builtin.set_fact:
+    distinct_waves: "{{ envs | map(attribute='apps') | flatten | map(attribute='syncWave') | unique | sort }}"
+
+- name: Render dso-appset template for each sync-waves and write yaml files to destination dir
   vars:
     rendered_content: "{{ lookup('ansible.builtin.template', role_path + '/templates/dso-appset.yaml.j2') }}"
   ansible.builtin.copy:
     content: "{{ rendered_content }}"
-    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/dso-appset.yaml"
+    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/dso-appset-wave-{{ sync_wave }}.yaml"
     mode: "0644"
+  loop: "{{distinct_waves}}"
+  loop_control:
+    loop_var: sync_wave

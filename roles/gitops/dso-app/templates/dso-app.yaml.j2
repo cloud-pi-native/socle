@@ -11,7 +11,7 @@ spec:
       targetRevision: {{ dsc.global.gitOps.repo.revision }}
       path: {{ dsc.global.gitOps.repo.path }}
       directory:
-        include: dso-appset.yaml
+        include: dso-*.yaml
   destination:
     name: in-cluster
     namespace: {{ dsc.argocdInfra.namespace }}

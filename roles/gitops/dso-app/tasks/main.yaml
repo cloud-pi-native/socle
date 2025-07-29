@@ -23,7 +23,7 @@
     rendered_content: "{{ lookup('ansible.builtin.template', role_path + '/templates/dso-appset.yaml.j2') }}"
   ansible.builtin.copy:
     content: "{{ rendered_content }}"
-    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/dso-appset-wave-{{ sync_wave }}.yaml"
+    dest: "{{ gitops_local_repo }}/applicationSets/dso-appset-wave-{{ sync_wave }}.yaml"
     mode: "0644"
   loop: "{{distinct_waves}}"
   loop_control:

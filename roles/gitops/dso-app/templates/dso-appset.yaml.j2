@@ -4,8 +4,8 @@ kind: ApplicationSet
 metadata:
   name: {{ dsc.global.gitOps.envName }}-dso-install-manager-wave-{{ sync_wave }}
   namespace: {{ dsc.argocdInfra.namespace }}
-annotations:
-  argocd.argoproj.io/sync-wave: "{{ sync_wave }}"
+  annotations:
+    argocd.argoproj.io/sync-wave: "{{ sync_wave }}"
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]

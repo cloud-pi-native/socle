@@ -9,9 +9,11 @@ spec:
   sources:
     - repoURL: {{ dsc.global.gitOps.repo.url }}
       targetRevision: {{ dsc.global.gitOps.repo.revision }}
-      path: {{ dsc.global.gitOps.repo.path }}
-      directory:
-        include: dso-*.yaml
+      path: applicationSets/
+      plugin:
+        env:
+          - name: AVP_SECRET
+            value: vault-plugin-secret
   destination:
     name: in-cluster
     namespace: {{ dsc.argocdInfra.namespace }}

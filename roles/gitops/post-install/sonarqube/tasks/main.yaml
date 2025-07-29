@@ -55,15 +55,57 @@
   retries: 45
   delay: 5
 
-- name: Get DSO Console inventory
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.console.namespace }}"
-    kind: Secret
-    name: dso-config
-  register: ansible_inventory
+# Retrieve Vault Infra token
+
+- name: Get Vault Infra token
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') != ''
+  ansible.builtin.set_fact:
+    vault_infra_token: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') }}"
+
+- name: Get Vault Infra keys and token
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') == ''
+  block:
+    - name: Get Vault Infra secrets
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_infra }}"
+        proxy: "{{ kubeconfig_proxy_infra | default('')}}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+      register: vault_infra_secrets
+
+    - name: Set vault_infra_keys_secret_name
+      ansible.builtin.set_fact:
+        vault_infra_keys_secret_name: "{{ vault_infra_secrets.resources
+          | selectattr('metadata.name', 'contains', 'vault-keys')
+          | map(attribute='metadata.name') | first }}"
+
+    - name: Get Vault Infra keys
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_infra }}"
+        proxy: "{{ kubeconfig_proxy_infra | default('')}}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+        name: "{{ vault_infra_keys_secret_name }}"
+      register: vault_infra_keys
+
+    - name: Get Vault Infra token
+      ansible.builtin.set_fact:
+        vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
+
+- name: Get sonarApiToken from infra Vault
+  block:
+    - name: Retrieve SonarQube values from infra Vault
+      community.hashi_vault.vault_kv2_get:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ dsc_name }}/apps/sonarqube/values"
+      register: sonar_vault_values
+      ignore_errors: true
 
 - name: Reset Admin Password procedure
-  when: ansible_inventory.resources[0].data.SONAR_API_TOKEN is undefined
+  when: sonar_vault_values.data.data.sonarApiToken is undefined
   ansible.builtin.include_tasks:
     file: reset-admin-password.yaml
 

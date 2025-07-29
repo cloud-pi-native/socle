@@ -105,7 +105,7 @@
       ignore_errors: true
 
 - name: Reset Admin Password procedure
-  when: sonar_vault_values.data.data.sonarApiToken is undefined
+  when: sonar_vault_values.data.data.auth.sonarApiToken is undefined
   ansible.builtin.include_tasks:
     file: reset-admin-password.yaml
 

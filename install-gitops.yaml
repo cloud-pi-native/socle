@@ -27,11 +27,6 @@
         - prom
       when: dsc.prometheus.crd.type == 'managed'
 
-    - role: cloudnativepg
-      tags:
-        - cloudnativepg
-        - cnpg
-
     - role: infra/keycloak-infra
       tags:
         - keycloak-infra

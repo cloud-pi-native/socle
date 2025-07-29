@@ -59,6 +59,8 @@
       metadata:
         name: gitlab
         namespace: "{{ dsc.gitlab.namespace }}"
+        annotations:
+          argocd.argoproj.io/sync-wave: "5"
       spec:
         chart:
           version: "{{ dsc.gitlab.chartVersion }}"

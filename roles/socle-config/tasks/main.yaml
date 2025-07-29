@@ -5,6 +5,7 @@
   when: post_conf_job is not defined
 
 - name: Get socle config from conf-dso dsc (default)
+  when: dsc_cr is not defined
   kubernetes.core.k8s_info:
     kind: dsc
     name: conf-dso
@@ -12,12 +13,12 @@
   register: socle_config
 
 - name: Get socle config from dsc_cr extra var when defined
+  when: dsc_cr is defined
   kubernetes.core.k8s_info:
     kind: dsc
     name: "{{ dsc_cr }}"
     api_version: cloud-pi-native.fr/v1alpha
   register: socle_config_custom
-  when: dsc_cr is defined
 
 - name: Check socle_config_custom and exit if empty
   when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)

@@ -15,14 +15,6 @@
       ansible.builtin.import_role:
         name: gitops/post-install/sonarqube
 
-    - name: Get sonarqube secret
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.sonarqube.namespace }}"
-        kind: Secret
-        name: sonarqube
-      register: sonarqube_secret
-      ignore_errors: true
-
     - name: Get SonarQube admin password secret
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.sonarqube.namespace }}"
@@ -41,23 +33,8 @@
         status_code: [200]
       register: token_check
 
-    - name: Revoke SonarQube DSO admin token
-      ansible.builtin.uri:
-        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        url: "https://{{ sonar_domain }}/api/user_tokens/revoke"
-        user: "admin"
-        password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
-        force_basic_auth: true
-        method: POST
-        body_format: form-urlencoded
-        body:
-          login: "admin"
-          name: "DSO"
-        status_code: [204]
-      when: "'DSO' in (token_check.json.userTokens | map(attribute='name') | list)"
-      ignore_errors: true
-
     - name: Generate new SonarQube DSO admin token
+      when: "'DSO' not in (token_check.json.userTokens | map(attribute='name') | list)"
       ansible.builtin.uri:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         url: "https://{{ sonar_domain }}/api/user_tokens/generate?name=DSO"
@@ -67,6 +44,13 @@
         method: POST
         status_code: [200, 204]
       register: token_pass
+
+    - name: Keep current token if not changed
+      when: token_pass.json.token is not defined
+      ansible.builtin.set_fact:
+        token_pass:
+          json:
+            token: "{{ retrieved_token_pass }}"
 
     - name: Update vault-secrets sonarApiToken
       block:
@@ -84,7 +68,7 @@
                       auth:
                         sonarApiToken: >-
                           {{
-                            (token_pass.json.token)if token_pass is defined and
+                            (token_pass.json.token)if token_pass.json.token is defined and
                             token_pass.json.token | length > 0
                             else ''
                           }}

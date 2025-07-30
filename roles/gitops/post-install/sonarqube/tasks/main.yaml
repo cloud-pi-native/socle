@@ -104,8 +104,12 @@
       register: sonar_vault_values
       ignore_errors: true
 
+    - name: Set retrieved_token_pass fact
+      ansible.builtin.set_fact:
+        retrieved_token_pass: "{{ sonar_vault_values.data.data.auth.sonarApiToken }}"
+
 - name: Reset Admin Password procedure
-  when: sonar_vault_values.data.data.auth.sonarApiToken is undefined
+  when: retrieved_token_pass | length == 0
   ansible.builtin.include_tasks:
     file: reset-admin-password.yaml
 

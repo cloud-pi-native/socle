@@ -98,6 +98,8 @@ Cette installation s'effectue par défaut dans un cluster [OpenShift](https://ww
 
 La plateforme [Kubernetes](https://kubernetes.io/fr/) ([vanilla](https://fr.wikipedia.org/wiki/Logiciel_vanilla)) est également supportée si besoin, via l'option de configuration `global.platform` (cf. section [Configuration](#configuration) ci-dessous).
 
+Un tableau synoptique des prérequis minimaux, pour chaque outil positionné dans votre cluster, est proposé dans le fichier [cluster-requirements.md](cluster-requirements.md).
+
 Vous devrez disposer d'un **accès administrateur au cluster**.
 
 Vous aurez besoin d'une machine distincte du cluster, tournant sous GNU/Linux avec une distribution de la famille Debian ou Red Hat. Cette machine vous servira en tant qu'**environnement de déploiement** [Ansible control node](https://docs.ansible.com/ansible/latest/network/getting_started/basic_concepts.html#control-node). Elle nécessitera donc l'installation d'[Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html), et plus précisément du paquet **ansible**, pour disposer au moins de la commande `ansible-playbook` ainsi que de la collection [community.general](https://github.com/ansible-collections/community.general).
@@ -1025,7 +1027,7 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 ## Installation en mode GitOps
 
-Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur un [applicationSet](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) Argo CD déployant lui-même les applications du socle, en fonction d'un environnement donné et des paramètres qui le caractérisent.
+Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur une application Argo CD qui déploie plusieurs [applicationSets](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) par vagues (notion de [sync waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/)). Chaque applicationSet déploie lui-même une ou plusieurs applications du Socle, selon la vague à laquelle elles sont rattachées, ceci en fonction d'un environnement donné et des paramètres qui le caractérisent.
 
 Toutes les applications de la chaîne DSO sont désormais gérées en mode GitOps.
 
@@ -1047,7 +1049,7 @@ Il faudra préalablement que votre CRD soit à jour pour la ressource de type ds
 kubectl apply -f roles/socle-config/files/crd-conf-dso.yaml
 ```
 
-Puis que votre resource de configuration `dsc` soit correctement paramétrée pour installer ces éléments. Exemple (à adapter) :
+Et que votre resource de configuration `dsc` soit correctement paramétrée pour installer ces éléments. Exemple (à adapter) :
 
 ```yaml
 spec:
@@ -1070,6 +1072,11 @@ spec:
     namespace: infra-keycloak
     postgresPvcSize: 5Gi
     subDomain: infra-keycloak
+    values:
+      podSecurityContext:
+        enabled: true
+        fsGroup: 1001
+      replicaCount: 2
   vaultInfra:
     installEnabled: true
     namespace: infra-vault
@@ -1105,13 +1112,14 @@ ansible-playbook install-gitops.yaml -t keycloak-infra,vault-infra,argocd-infra 
 
 L'installation en mode GitOps est à lancer à l'aide du playbook `install-gitops.yaml`.
 
-Ce playbook, après avoir réalisé des tâches de pré-configuration, fait notamment appel aux roles suivants :
+Ce playbook, après avoir réalisé des tâches de pré-configuration, fait notamment appel aux roles suivants, situés dans `roles/gitops` :
+* `local-config` : s'assure que vous avez bien déclaré les variables d'environnement nécessaires à l'exécution de l'installation. Il vous prévient si ce n'est pas le cas, et positionne également les facts associés qui seront utilisés au cours de l'installation.
 * `vault-secrets` : sert à peupler le Vault d'infrastructure avec les values de secrets pour notre environnement et les applications associées.
-* `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `gitops/envs/nom_de_notre_environnement`. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
+* `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `gitops/envs/nom_de_notre_environnement/apps` du clone local de votre dépôt Git. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
 * `watchpoint` : sert à arrêter le playbook suite à la génération des fichiers de charts, afin de permettre un passage en revue par l'utilisateur avant que ce-dernier n'effectue si besoin un `git push` des changements. Affiche un message en ce sens. Il s'agit du comportement par défaut, contôlé par le paramètre `spec.global.gitOps.watchpointEnabled` de la dsc (positionné à `true` par défaut).
-* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `roles/gitops/dso-app/templates/dso-app.yaml.j2`. La création de cette Application dans ArgoCD viendra consommer l'applicationSet généré par `roles/gitops/dso-app/templates/dso-appset.yaml.j2` et déposé dans le dépôt GitOps. Ceci permet notamment de rendre l'applicationSet visible dans la web UI d'Argo CD. C'est ensuite ce même applicationSet qui déploie les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
+* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `roles/gitops/dso-app/templates/dso-app.yaml.j2`. La création de cette Application dans ArgoCD viendra consommer les applicationSets générés à l'aide du template `roles/gitops/dso-app/templates/dso-appset.yaml.j2` et déposés dans votre dépôt Git utilisé pour le déploiement GitOps. Ceci permet notamment de rendre les applicationSets visibles dans la web UI d'Argo CD. Ce sont ensuite ces mêmes applicationSets qui déploient par vagues les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
 
-Viennent ensuite les roles situés dans le répertoire `./roles/gitops/post-install` et qui vont lancer des tasks de post installation pour les outils concernés.
+Vous constaterez aussi la présence de roles situés dans le répertoire `./roles/gitops/post-install` et qui servent à lancer des tasks de post installation pour les outils concernés. Ces roles sont lus et exécutés à l'aide de jobs Argo CD de post-install, générés pour chacun des outils qui le nécessitent. Les jobs exécutent le chart Helm [cpn-ansible-job](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-ansible-job), positionné en tant que dépendance de chart des outils en question dans votre dépôt Git.
 
 ### Exemple de déploiement GitOps
 
@@ -1131,7 +1139,7 @@ Pour cela :
 * (Optionnel) Créez une variable d'environnement avec `export KUBECONFIG_PROXY_INFRA=http://127.0.0.1:<port>` en cas d'utilisation de `tsh proxy kube --port <port>`.
 * (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_DOMAIN=<nom de domaine du vault d'infrastructure>` en cas de permissions restreinte sur le cluster d'infrastructure.
 * (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_TOKEN=<token du vault d'infrastructure>` en cas de permissions restreinte sur le cluster d'infrastructure.
-* Lancez le playbook gitops avec cette variable, pour peupler votre clone local.
+* Lancez le playbook `install-gitops.yaml` pour peupler votre clone local.
 * Effectuez votre premier commit sur la branche main de votre dépôt, exemple : `git commit -am "feat/first-commit"`
 * Poussez vos changements sur la branche main distante : `git push`
 
@@ -1173,40 +1181,260 @@ Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. 
   "env": "conf-dso",
   "provider": "self-hosted",
   "region": "fr-par",
-  "prefix": "dso-",
+  "namespacePrefix": "dso-",
   "destination": {
-    "clusterName": "in-cluster"
+    "clusterName": ""
   },
   "targetRevision": "main",
   "apps": [
-    { "app": "keycloak", "enabled": "true", "clusterName": "", "namespace": "keycloak", "customPrefix": "", "syncWave": 10 },
-    { "app": "vault", "enabled": "false", "clusterName": "", "namespace": "vault", "customPrefix": "", "syncWave": 10 }
+    {
+      "app": "global",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "global",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "certmanager",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "certmanager",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "kyverno",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "kyverno",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "keycloak",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "keycloak",
+      "customNamespacePrefix": "",
+      "syncWave": 20
+    },
+    {
+      "app": "gitlab",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 30
+    },
+    {
+      "app": "glexporter",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "gitlabrunner",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "vault",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "vault",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "harbor",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "harbor",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "argocd",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "argocd",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "nexus",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "nexus",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "sonarqube",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "sonarqube",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "console",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "console",
+      "customNamespacePrefix": "",
+      "syncWave": 60
+    },
+    {
+      "app": "observability",
+      "enabled": false,
+      "clusterName": "in-cluster",
+      "namespace": "argo",
+      "customPrefix": "infra-",
+      "syncWave": 60
+    }
   ]
 }
 ```
 
 Passez en revue les paramètres de ce fichier, et notamment :
 * `env` : doit correspondre au nom de l'environnement tel qu'indiqué dans le répertoire `gitops/envs/conf-dso` et dans lequel se trouve le fichier `conf-dso.json`, qui est-lui même nommé d'après le nom de ce même environnement. Ce nom doit également correspondre au nom de la `dsc` que vous utilisez (spécifié via le paramètre `metadata.name` de cette même dsc). Il y a donc **correspondance rigoureuse** entre le nom de l'environnement utilisé ici par le paramètre `env` et celui de la `dsc`. Ce même nom doit se retrouver impérativement dans le nom du répertoire de l'environnement (soit dans notre exemple `gitops/envs/conf-dso`) et celui du fichier de configuration JSON associé (`conf-dso.json`). Sans ces correspondances strictes, l'installation échouera.
-* `prefix` : Il s'agit ici du péfixe de vos namespaces. Ce préfixe doit impérativement se retrouver dans tous les paramètres `namespace` des outils spécifiés dans votre `dsc`, à l'exception des outils d'infrastructure vus précédemment et qui ne sont pas installés en mode GitOps.
-* `destination.clustername` : Si votre Argo CD d'infrastructure n'est pas installé dans le même cluster que le cluster de destination vers lequel vous déployez, préciser alors ici le nom du cluster de destination tel qu'il est connu par votre Argo CD d'infrastructure.
+* `namespacePrefix` : Il s'agit ici du péfixe de vos namespaces. Ce préfixe doit impérativement se retrouver dans tous les paramètres `namespace` des outils spécifiés dans votre `dsc`, à l'exception des outils d'infrastructure vus précédemment et qui ne sont pas installés en mode GitOps.
+* `destination.clustername` : Si votre Argo CD d'infrastructure n'est pas installé dans le même cluster que le cluster de destination vers lequel vous déployez, préciser alors ici le nom du cluster de destination tel qu'il est connu par votre Argo CD d'infrastructure. S'il est installé dans le même cluster, vous pouvez indiquer "in-cluster".
 * `targetRevision` : Il s'agit du nom de la branche à partir de laquelle vous déployez et depuis laquelle votre instance Argo CD d'infrastructure va aller tirer les fichiers. Dans notre exemple, vous le modifierez et le remplacerez par "ma-branche". 
-* `apps` : Ce paramètre est un array qui contient lui-même des objets correspondant chacun à l'une des applications du Socle qui seront déployées, ainsi qu'aux paramètres de cette application lus par l'applicationSet Argo CD (`gitops/dso-appset.yaml`). Nous voyons ici que la ligne correspondant à l'application keycloak comprend le paramètre `enabled` positionné à `true`. Ce paramètre est **très important** puisqu'il détermine si une application est installée (`true`) ou pas (`false`). Veuillez noter que si ce paramètre est positionné à `false` et que l'application en question est déjà installée et gérée par notre applicationSet, alors elle est désinstallée. Notons aussi la présence du paramètre `namespace`, qui indique le nom du namespace hors préfixe. Il en résulte qu'ici l'application keycloak sera finalement déployée dans le namespace "dso-keycloak", le préfixe venant s'ajouter au nom du namespace.
+* `apps` : Ce paramètre est un array qui contient lui-même des objets correspondant chacun à l'une des applications du Socle qui seront déployées, ainsi qu'aux paramètres de cette application lus par les applicationSets Argo CD (`gitops/dso-appset-wave-XX.yaml`). Nous voyons ici que la ligne correspondant à l'application keycloak comprend le paramètre `enabled` positionné à `true`. Ce paramètre est **très important** puisqu'il détermine si une application est installée (`true`) ou pas (`false`). Veuillez noter que si ce paramètre est positionné à `false` et que l'application en question est déjà installée et gérée par notre applicationSet, **alors elle est désinstallée**. Notons aussi la présence du paramètre `namespace`, qui indique le nom du namespace hors préfixe. Il en résulte qu'ici l'application keycloak sera finalement déployée dans le namespace "dso-keycloak", le préfixe venant s'ajouter au nom du namespace.
 
-Compte-tenu des éléments que nous venons de vérifier, et si nous voulons bien déployer keycloak dans le namespace dso-keycloak, avec un Argo CD d'infrastructure également présent dans le cluster cible, alors notre fichier `gitops/envs/conf-dso/conf-dso.json`, tenant compte de notre branche de déploiement, se présentera finalement ainsi après édition :
+Compte-tenu des éléments que nous venons de vérifier, et si nous voulons bien déployer uniquement Keycloak dans le namespace dso-keycloak, avec un Argo CD d'infrastructure également présent dans le cluster cible, alors notre fichier `gitops/envs/conf-dso/conf-dso.json`, tenant compte de notre branche de déploiement, se présentera finalement ainsi après édition :
 
 ```json
 {
   "env": "conf-dso",
   "provider": "self-hosted",
   "region": "fr-par",
-  "prefix": "dso-",
+  "namespacePrefix": "dso-",
   "destination": {
     "clusterName": "in-cluster"
   },
   "targetRevision": "ma-branche",
   "apps": [
-    { "app": "keycloak", "enabled": "true", "clusterName": "", "namespace": "keycloak", "customPrefix": "", "syncWave": 10 },
-    { "app": "vault", "enabled": "false", "clusterName": "", "namespace": "vault", "customPrefix": "", "syncWave": 10 }
+    {
+      "app": "global",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "global",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "certmanager",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "certmanager",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "kyverno",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "kyverno",
+      "customNamespacePrefix": "",
+      "syncWave": 10
+    },
+    {
+      "app": "keycloak",
+      "enabled": true,
+      "clusterName": "",
+      "namespace": "keycloak",
+      "customNamespacePrefix": "",
+      "syncWave": 20
+    },
+    {
+      "app": "gitlab",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 30
+    },
+    {
+      "app": "glexporter",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "gitlabrunner",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "gitlab",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "vault",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "vault",
+      "customNamespacePrefix": "",
+      "syncWave": 40
+    },
+    {
+      "app": "harbor",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "harbor",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "argocd",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "argocd",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "nexus",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "nexus",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "sonarqube",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "sonarqube",
+      "customNamespacePrefix": "",
+      "syncWave": 50
+    },
+    {
+      "app": "console",
+      "enabled": false,
+      "clusterName": "",
+      "namespace": "console",
+      "customNamespacePrefix": "",
+      "syncWave": 60
+    },
+    {
+      "app": "observability",
+      "enabled": false,
+      "clusterName": "in-cluster",
+      "namespace": "argo",
+      "customPrefix": "infra-",
+      "syncWave": 60
+    }
   ]
 }
 ```
@@ -1227,16 +1455,16 @@ ok: [localhost] => {
         "",
         "Veuillez vous assurer de la cohérence des fichiers générés dans le répertoire '/chemin/absolu/vers/votre/dépôt/gitops/envs/conf-dso/apps'.",
         "",
-        "Vous devrez par ailleurs créer le fichier '/chemin/absolu/vers/votre/dépôt/gitops/envs/conf-dso/conf-dso.json' s'il n'existe pas déjà",
-        "et y ajuster les paramètres souhaités. Se référer à la documentation README à ce sujet.",
+        "Vous devrez par ailleurs adapter le fichier '/chemin/absolu/vers/votre/dépôt/gitops/envs/conf-dso/conf-dso.json'",
+        "afin d'y ajuster les paramètres souhaités. Se référer à la documentation README à ce sujet.",
         "",
         "Assurez-vous également de la cohérence des secrets qui ont été générés dans votre instance Vault d'infrastructure,",
-        "au niveau du secret engine 'forge-dso', pour l'environnement 'conf-dso'.",
+        "au niveau du secret engine 'dso-<dsc.gitOps.envName>', pour l'environnement 'conf-dso'.",
         "",
         "Une fois ces vérifications et ajustements réalisés, poussez les fichiers modifiés dans votre dépôt Git (via 'git push').",
         "",
         "Pour finir vous pouvez soit :",
-        "- Lancer les roles d'installation restants via les tags appropriés.",
+        "- Lancer le role d'installation restant via le tag 'dso-app'.",
         "- Positionner le paramètre global.gitOps.watchpointEnabled à false dans",
         "  votre resource dsc 'conf-dso' puis relancer une installation complète."
     ]
@@ -1254,7 +1482,7 @@ git commit -m "chore/adapt gitops conf-dso files"
 ```
 
 ```shell
-git push --set-upstream origin testcm-deploy
+git push --set-upstream origin ma-branche
 ```
 
 Puis lancer la suite de l'installation gitOps à l'aide du tag `-t dso-app` :
@@ -1271,18 +1499,11 @@ Pour rappel, si vous avez utilisé le role que nous proposons pour son installat
 ansible-playbook admin-tools/get-credentials.yaml -t argo-infra
 ```
 
-Une fois Keyckloak déployé, nous n'avons plus qu'à lancer sa post-configuration via le role approprié :
+Une fois Keycloak déployé, sa post-configuration s'effectuera automatiquement, via le job de post-install.
 
-```shell
-ansible-playbook install-gitops.yaml -t post-install-keycloak
-```
+Celui-ci peut être relancé autant de fois que souhaité, en cliquant sur le bouton `Sync` de l'application Keycloak dans l'Argo CD d'infrastructure.
 
 ## Migration vers le déploiement GitOps
-
-Avant la synchronisation Argocd, il faudra lancer le playbook d'installation avec le tag suivant pour récupérer le `vaultToken` pour le service Vault et pour alimenter les client id et secret du service Keycloak.
-```shell
-ansible-playbook install-gitops.yaml -t vault-secrets-post-install
-```
 
 Après la synchronisation Argocd, pour tous les services, il sera nécessaire de supprimer les deployments, statefulsets et jobs parce qu'il y a nécessité de modification des champs immuables `spec.selector.matchLabels` lors de la prise d'ownership d'Argocd.  
 Ceci peut être fait avec la commande suivante en se positionnant sur les namespaces concernés.

@@ -157,6 +157,9 @@ spec:
     namespace: dso-observatorium
     subDomain: observatorium
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    apiConfig:
+      id: prod-infra
+      name: prod-infra
     values: {}
   nexus:
     installEnabled: true

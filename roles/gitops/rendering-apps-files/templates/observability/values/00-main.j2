@@ -32,11 +32,11 @@ observatorium:
           - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
         secretName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>-tls
   api:
-    loglevel: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.loglevel}>
+    loglevel: info
     config:
       # Default tenant config
-      id: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.id}>
-      name: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#api | jsonPath {.config.name}>
+      id: "{{ dsc.observatorium.apiConfig.id | default('') }}"
+      name: "{{ dsc.observatorium.apiConfig.name | default('') }}"
       groups: [/admin]
       # Default oidc config
       clientID: "account"
@@ -44,26 +44,26 @@ observatorium:
       usernameClaim: "preferred_username"
       groupClaim: "groups"
   logs:
-    enabled: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.enabled}>
+    enabled: {{ dsc.global.logs.enabled | lower | default('') }}
     read:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.logs}>"
     tail:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.logs}>"
     write:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.logs}>"
     rules:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#logs | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.logs}>"
   metrics:
-    enabled: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.enabled}>
+    enabled: {{ dsc.global.metrics.enabled | lower | default('') }}
     tenantHeader: 'X-Scope-OrgId'
     read:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.metrics}>"
     alertmanager:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.metrics}>"
     write:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.metrics}>"
     rules:
-      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observatorium/values#metrics | jsonPath {.endpoint}>"
+      endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.metrics}>"
 grafana:
   grafanaNamespace: "{{ dsc.grafana.namespace }}"
   default:

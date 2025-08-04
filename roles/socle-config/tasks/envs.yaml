@@ -228,14 +228,6 @@
             customNamespacePrefix: "infra-"
             syncWave: 60
             vault_values:
-              api:
-                loglevel: info
-                config:
-                  id: "prod-infra"
-                  name: "prod-infra"
-              logs:
-                enabled: "{{ dsc.global.logs.enabled | default('') }}"
-                endpoint: "{{ dsc.global.logs.endpoint | default('') }}"
-              metrics:
-                enabled: "{{ dsc.global.metrics.enabled | default('') }}"
-                endpoint: "{{ dsc.global.metrics.endpoint | default('') }}"
+              endpoint:
+                logs: "{{ dsc.global.logs.endpoint | default('') }}"
+                metrics: "{{ dsc.global.metrics.endpoint | default('') }}"

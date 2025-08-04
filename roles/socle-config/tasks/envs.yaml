@@ -15,7 +15,7 @@
           - argocd_app: global
             clusterName: ""
             nameSpace: "global"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 10
             vault_values:
               vault_infra_token: "{{ vault_infra_token | default(lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN')) }}"
@@ -67,22 +67,22 @@
           - argocd_app: certmanager
             clusterName: ""
             nameSpace: "certmanager"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 10
           - argocd_app: kyverno
             clusterName: ""
             nameSpace: "kyverno"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 10
           - argocd_app: cloudnativepg
             clusterName: ""
             nameSpace: "cloudnativepg"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 10
           - argocd_app: keycloak
             clusterName: ""
             nameSpace: "keycloak"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 20
             vault_values:
               auth:
@@ -98,7 +98,7 @@
           - argocd_app: gitlab
             clusterName: ""
             nameSpace: "gitlab"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 30
             vault_values:
               cnpg:
@@ -138,17 +138,17 @@
           - argocd_app: glexporter
             clusterName: ""
             nameSpace: "gitlab"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 40
           - argocd_app: gitlabrunner
             clusterName: ""
             nameSpace: "gitlab"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 40
           - argocd_app: vault
             clusterName: ""
             nameSpace: "vault"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 40
             vault_values:
               vaultToken: >-
@@ -161,7 +161,7 @@
           - argocd_app: harbor
             clusterName: ""
             nameSpace: "harbor"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 50
             vault_values:
               global:
@@ -175,14 +175,14 @@
           - argocd_app: argocd
             clusterName: ""
             nameSpace: "argocd"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 50
             vault_values:
               argocdServerAdminPassword: "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
           - argocd_app: nexus
             clusterName: ""
             nameSpace: "nexus"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 50
             vault_values:
               auth:
@@ -191,7 +191,7 @@
           - argocd_app: sonarqube
             clusterName: ""
             nameSpace: "sonarqube"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 50
             vault_values:
               auth:
@@ -212,7 +212,7 @@
           - argocd_app: console
             clusterName: ""
             nameSpace: "console"
-            customPrefix: ""
+            customNamespacePrefix: ""
             syncWave: 60
             vault_values:
               uri: >-
@@ -225,7 +225,7 @@
           - argocd_app: observability
             clusterName: "in-cluster"
             nameSpace: "argo"
-            customPrefix: "infra-"
+            customNamespacePrefix: "infra-"
             syncWave: 60
             vault_values:
               api:

@@ -1551,6 +1551,14 @@ spec:
                     chartVersion:
                       description: Observatorium helm chart version (e.g., "0.25.0").
                       type: string
+                    apiConfig:
+                      description: Observatorium global.api.config.
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                      type: object
                   required:
                     - installEnabled
                   type: object

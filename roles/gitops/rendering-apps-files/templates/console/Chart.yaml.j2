@@ -5,7 +5,7 @@ version: 1.0.0
 dependencies:
 - name: cpn-cnpg
   alias: cpn-cnpg
-  version: {{ dsc.cpnCnpg.chartVersion }}
+  version: {{ dsc.cpnCnpg.chartVersion | quote }}
   repository: {{ dsc.cpnCnpg.helmRepoUrl }}
 - alias: console
   name: cpn-console

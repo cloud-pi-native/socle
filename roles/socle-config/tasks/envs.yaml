@@ -179,15 +179,6 @@
             syncWave: 50
             vault_values:
               argocdServerAdminPassword: "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
-          - argocd_app: nexus
-            clusterName: ""
-            nameSpace: "nexus"
-            customNamespacePrefix: ""
-            syncWave: 50
-            vault_values:
-              auth:
-                adminUsername: "admin"
-                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           - argocd_app: sonarqube
             clusterName: ""
             nameSpace: "sonarqube"
@@ -231,3 +222,12 @@
               endpoint:
                 logs: "{{ dsc.global.logs.endpoint | default('') }}"
                 metrics: "{{ dsc.global.metrics.endpoint | default('') }}"
+          - argocd_app: nexus
+            clusterName: ""
+            nameSpace: "nexus"
+            customNamespacePrefix: ""
+            syncWave: 60
+            vault_values:
+              auth:
+                adminUsername: "admin"
+                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"

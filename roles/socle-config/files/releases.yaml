@@ -24,7 +24,7 @@ spec:
     chartVersion: ">=1.0.0 <2.0.0"
   cpnCnpg:
     # https://github.com/cloud-pi-native/helm-charts/releases
-    chartVersion: 2.3.1
+    chartVersion: ">=2.0.0 <3.0.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "9.1.2"

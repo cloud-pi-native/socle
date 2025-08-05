@@ -6,7 +6,7 @@ version: {{ dsc.sonarqube.chartVersion }}
 dependencies:
 - name: cpn-cnpg
   alias: cpn-cnpg
-  version: {{ dsc.cpnCnpg.chartVersion }}
+  version: {{ dsc.cpnCnpg.chartVersion | quote }}
   repository: {{ dsc.cpnCnpg.helmRepoUrl }}
 - name: sonarqube
   alias: sonarqube

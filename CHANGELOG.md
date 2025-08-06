@@ -1,5 +1,55 @@
 # Changelog
 
+## [3.14.0](https://github.com/cloud-pi-native/socle/compare/v3.13.3...v3.14.0) (2025-08-06)
+
+
+### Features
+
+* :sparkles: add gitlab instance custom health check ([0f87d4b](https://github.com/cloud-pi-native/socle/commit/0f87d4bc06b6fcc73e8dd78ee4e016d31032c636))
+* :sparkles: adding Application and ApplicationSet health checks ([741fd1f](https://github.com/cloud-pi-native/socle/commit/741fd1f77a8d1ecb8585f1149c675d249fcbb4b8))
+* :sparkles: split applicationsets by sync waves ([580f35b](https://github.com/cloud-pi-native/socle/commit/580f35b73d4ae789af80fe0f0ad28cab498e38be))
+* :sparkles: use a wildcard to consume multiple applicationSets ([eddfdee](https://github.com/cloud-pi-native/socle/commit/eddfdeed5d3a14e0b0a82dbd845633a390224162))
+* :sparkles: use avp plugin when deploying application sets ([0d32406](https://github.com/cloud-pi-native/socle/commit/0d3240609e1338aa8c48d4296def04fb03be12ec))
+* :zap: Adding job timeout conf ([951c839](https://github.com/cloud-pi-native/socle/commit/951c839703baf42e5ff30fb18a9d4d11c6b339f6))
+* :zap: vault pod auto-unseal v0 ([d617a80](https://github.com/cloud-pi-native/socle/commit/d617a8013c197f506e605c091bad3baf7436c177))
+* ⚡ GitOps jobs for Vault post-configuration ([b179171](https://github.com/cloud-pi-native/socle/commit/b179171df37e920ec81d9417356b8469b9ae186a))
+* ✨ Add CNPG Operator in GitOps mode ([22e812b](https://github.com/cloud-pi-native/socle/commit/22e812b3ed60755e997fbf8c15d058bc5d9c191b))
+* ✨ Add config for cnpg in envs file ([3809140](https://github.com/cloud-pi-native/socle/commit/3809140b6f1df8d06b6e5a7e729644cd9f52593b))
+* Use cnpg secret instead of Vault generated password ([098fe0b](https://github.com/cloud-pi-native/socle/commit/098fe0bfa9962f3d1381fc70447f8d7edd15af78))
+
+
+### Bug Fixes
+
+* :ambulance: Keycloak default adminUser name ([47bee00](https://github.com/cloud-pi-native/socle/commit/47bee00d6580cfdf6122962a52b3c952250543d1))
+* :ambulance: Post conf RBAC ([e743c50](https://github.com/cloud-pi-native/socle/commit/e743c50a7cc6f8e1bec48afbca9f2cd289f6fa98))
+* :ambulance: Post conf RBAC ([f97d75f](https://github.com/cloud-pi-native/socle/commit/f97d75f166229ece95716b8409cbff0385aebb09))
+* :bug: Add dscName parameter to post-conf job ([001a6bb](https://github.com/cloud-pi-native/socle/commit/001a6bbb8bb55e77beb07823056f17d5d946104a))
+* :bug: add missing client scopes ([2282011](https://github.com/cloud-pi-native/socle/commit/228201108cf8af5858dbd7e745e107c1a0751c73))
+* :bug: Add missing prefix parameter to dsc CRD ([4956ea0](https://github.com/cloud-pi-native/socle/commit/4956ea099a5b80cb4f3daf05a88bd2be1183f8e3))
+* :bug: add missing service account for harbor ([13329f0](https://github.com/cloud-pi-native/socle/commit/13329f0bea2eb6a53f586e0c28569f9c39e273cb))
+* :bug: begin with project creation ([9dc9cd4](https://github.com/cloud-pi-native/socle/commit/9dc9cd4e4425aa346c59e069efb8d5aa733dd2de))
+* :bug: break update loop on keycloak admin password updates ([af2af57](https://github.com/cloud-pi-native/socle/commit/af2af571c7978d17ea847fa2f67dbe4d2d78bc69))
+* :bug: cannot read other namespace secrets in vault post-conf job ([f67670c](https://github.com/cloud-pi-native/socle/commit/f67670c720fdb7f34549eeb123393653de04c393))
+* :bug: custom namespace prefix ([14202bb](https://github.com/cloud-pi-native/socle/commit/14202bbf7d6d77408100a8dd1955d405203d26e0))
+* :bug: GitLab and GitLab Operator user values ([f646db5](https://github.com/cloud-pi-native/socle/commit/f646db597dabc0367c250a7e94a641009f57383d))
+* :bug: GitLab and GitLab Runner post-install ([6d70377](https://github.com/cloud-pi-native/socle/commit/6d70377c2ec88e94753bef4af37104283c171820))
+* :bug: GitLab token retrieval ([9497b36](https://github.com/cloud-pi-native/socle/commit/9497b361495b36f83143a66217b42995314fa180))
+* :bug: Keycloack chart ref and name ([ca7587c](https://github.com/cloud-pi-native/socle/commit/ca7587c0e80622c95fc0f176b00b12e22f817e07))
+* :bug: Missing default envs values ([7345b7d](https://github.com/cloud-pi-native/socle/commit/7345b7d213af75b21cde34714fac3035bee83f34))
+* :bug: Missing GitLab post-conf RBAC ([04313d8](https://github.com/cloud-pi-native/socle/commit/04313d8dd96aab67613274f4e6f9668ded767925))
+* :bug: missing value in vault ([807645e](https://github.com/cloud-pi-native/socle/commit/807645edda986d7a3cdfa0d67447699624951b79))
+* :bug: retrieved_token_pass fact ([8dc859b](https://github.com/cloud-pi-native/socle/commit/8dc859b88b497b1ef152858570892aee6b992c2a))
+* :bug: SonarQube admin password setting ([aa91bf6](https://github.com/cloud-pi-native/socle/commit/aa91bf6fa10bd1c3581e5f2a070faa3beb111c46))
+* :bug: SonarQube adminPassword ([5250819](https://github.com/cloud-pi-native/socle/commit/5250819fcdb98acd62ea7778c952865e693a450c))
+* :bug: SonarQube post-conf ([0b95986](https://github.com/cloud-pi-native/socle/commit/0b95986038cffce27bd4a622d84799739775352e))
+* :bug: SonarQube post-install reset admin task ([28f79ac](https://github.com/cloud-pi-native/socle/commit/28f79ac633aff99b50f0aad92fa360167e287e80))
+* :bug: SonarQube post-install reset admin token ([b328014](https://github.com/cloud-pi-native/socle/commit/b32801470e180e50c0ce17886d29a1354a81cad0))
+* :bug: use db url from existing cnpg secret ([e371e02](https://github.com/cloud-pi-native/socle/commit/e371e028bc93d908aad7f30e673eae209414cb7b))
+* :bug: with global.backup options not defined (gitlab and s3) ([f586cd5](https://github.com/cloud-pi-native/socle/commit/f586cd50f1799bcf94950b9e5fbd58ab0d25d494))
+* :wrench: cnpg gitops values ([165bbc5](https://github.com/cloud-pi-native/socle/commit/165bbc59a96783a92fbfc9697ffa1d31fc96667d))
+* **#729:** :bug: missing when condition ([fd4b4ab](https://github.com/cloud-pi-native/socle/commit/fd4b4ab55db1e2574b4aa0a5bbe30ed8e40a13d5))
+* **#731:** :bug: sync-wave order ([46f6277](https://github.com/cloud-pi-native/socle/commit/46f627718ef26a960c40bbabf9e417d167a9e27d))
+
 ## [3.13.3](https://github.com/cloud-pi-native/socle/compare/v3.13.2...v3.13.3) (2025-07-11)
 
 

@@ -214,6 +214,9 @@ S'agissant du gel des versions de charts ou d'images pour les outils en question
 
 ## Installation
 
+:rotating_light: :rotating_light: :rotating_light: **Dépréciation** :rotating_light: :rotating_light: :rotating_light:  
+Cette installation est dépréciée et ne sera plus maintenue. Veuillez utiliser l'[Installation en mode GitOps](#installation-en-mode-gitops).
+
 ### Lancement
 
 Dès que votre [configuration](#configuration) est prête, c'est-à-dire que la ressource `dsc` par défaut `conf-dso` a bien été mise à jour avec les éléments nécessaires et souhaités, relancez la commande suivante :

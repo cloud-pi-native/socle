@@ -10,9 +10,12 @@
 
 - name: Create dso-appset destination dir
   ansible.builtin.file:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}"
+    path: "{{ gitops_local_repo }}/{{ item }}"
     state: directory
     mode: 0775
+  loop:
+    - "{{ dsc.global.gitOps.repo.path }}"
+    - applicationSets
 
 - name: Calculate all distinct configured sync waves
   ansible.builtin.set_fact:

@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: avp-plugin-trigger-{{ dsc.global.gitOps.envName }}
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"

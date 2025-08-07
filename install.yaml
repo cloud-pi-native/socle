@@ -4,6 +4,10 @@
   gather_facts: false
 
   roles:
+    - role: deprecated-playbook
+      tags:
+        - always
+
     - role: socle-config
       tags:
         - always

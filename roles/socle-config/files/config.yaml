@@ -94,6 +94,7 @@ spec:
     alerting:
       enabled: false
     gitOps:
+      namespacePrefix: dso-
       watchpointEnabled: true
     dockerAccount:
       enabled: false

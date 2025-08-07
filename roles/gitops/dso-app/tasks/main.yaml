@@ -1,6 +1,6 @@
 ---
 - name: Create dso-install-manager application in infrastructure ArgoCD cluster/namespace
-  when: not argo_infra_ns_check.failed
+  when: not (argo_infra_ns_check.resources | length == 0)
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
     proxy: "{{ kubeconfig_proxy_infra | default('')}}"
@@ -31,3 +31,9 @@
   loop: "{{distinct_waves}}"
   loop_control:
     loop_var: sync_wave
+
+- name: Create dummy secret to tell Argocd to use avp plugin # We need to check if we can improve this
+  ansible.builtin.template:
+    src: avp-plugin-trigger.yaml.j2
+    dest: "{{ gitops_local_repo }}/applicationSets/avp-plugin-trigger.yaml"
+    mode: "0644"

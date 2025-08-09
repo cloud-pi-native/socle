@@ -101,31 +101,6 @@
             customNamespacePrefix: ""
             syncWave: 30
             vault_values:
-              cnpg:
-                username: >-
-                  {{
-                    (pg_gitlab_db_secret.resources[0].data.username | b64decode)
-                    if not dsc.gitlab.cnpg.initPassword
-                    and pg_gitlab_db_secret is defined
-                    and pg_gitlab_db_secret.resources | length > 0
-                    else 'gitlab'
-                  }}
-                password: >-
-                  {{
-                    (pg_gitlab_db_secret.resources[0].data.password | b64decode)
-                    if not dsc.gitlab.cnpg.initPassword
-                    and pg_gitlab_db_secret is defined
-                    and pg_gitlab_db_secret.resources | length > 0
-                    else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
-                  }}
-                database: >-
-                  {{
-                    (pg_gitlab_db_secret.resources[0].data.dbname | b64decode)
-                    if not dsc.gitlab.cnpg.initPassword
-                    and pg_gitlab_db_secret is defined
-                    and pg_gitlab_db_secret.resources | length > 0
-                    else 'gitlabhq_production'
-                  }}
               gitlab:
                 toolbox:
                   backups:

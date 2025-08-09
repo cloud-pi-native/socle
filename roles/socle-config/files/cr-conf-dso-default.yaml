@@ -59,12 +59,8 @@ spec:
   #    password: WeAreThePasswords
   certmanager: {}
   cloudnativepg: {}
-  console:
-    cnpg:
-      mode: primary
-  gitlab:
-    cnpg:
-      mode: primary
+  console: {}
+  gitlab: {}
   glexporter: {}
   gitlabOperator: {}
   gitlabrunner: {}
@@ -80,8 +76,6 @@ spec:
   grafanaDatasource: {}
   grafanaOperator: {}
   harbor:
-    cnpg:
-      mode: primary
     adminPassword: anotherGreatPassword
     pvcRegistrySize: 50Gi
   ingress:
@@ -89,12 +83,8 @@ spec:
       route.openshift.io/termination: edge
     tls:
       type: none
-  keycloak:
-    cnpg:
-      mode: primary
-  keycloakInfra:
-    cnpg:
-      mode: primary
+  keycloak: {}
+  keycloakInfra: {}
   kyverno: {}
   nexus: {}
   observatorium:
@@ -109,8 +99,6 @@ spec:
   #  https_proxy: http://192.168.xx.xx:3128/
   #  no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
   #  port: "3128"
-  sonarqube:
-    cnpg:
-      mode: primary
+  sonarqube: {}
   vault: {}
   vaultInfra: {}

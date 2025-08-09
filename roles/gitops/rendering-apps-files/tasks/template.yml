@@ -57,6 +57,8 @@
       {%- set app_name = item.1.argocd_app -%}
       {%- if app_name == 'gitlab' -%}
       {{ {} | combine({app_name: dsc.gitlabOperator['values']}) }}
+      {%- elif app_name == 'cloudnativepg' -%}
+      {{ {} | combine({app_name: dsc[app_name]['operator']['values']}) }}
       {%- else -%}
       {{ {} | combine({app_name: dsc[app_name]['values']}) }}
       {%- endif -%}

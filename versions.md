@@ -2,10 +2,10 @@
 | ------------------------- | ---------------- | ------------- | -------------------------------------------------------------------------------------------------------------------- |
 | argocd                    | 2.14.1           | 7.9.0         | [argocd](https://artifacthub.io/packages/helm/argo/argo-cd)                                                          |
 | certmanager               | 1.14.3           | 1.14.3        | [certmanager](https://github.com/cert-manager/cert-manager/releases)                                                 |
-| cloudnativepg             | 1.22.1           | 0.20.1        | [cloudnativepg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                  |
+| cloudnativepg.cluster     | N/A              | 0.3.1         | [cluster](https://artifacthub.io/packages/helm/cloudnative-pg/cluster)                                               |
+| cloudnativepg.operator    | 1.26.1           | 0.25.0        | [cloudnative-pg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                 |
 | console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | cpn-ansible-job           | 1.\*.\*            | 1.\*.\*         | [cpn-ansible-job](https://github.com/cloud-pi-native/helm-charts)                                                    |
-| cpn-cnpg                  | 2.\*.\*         | 2.\*.\*        | [cpn-cnpg](https://github.com/cloud-pi-native/helm-charts)                                                           |
 | gitlab                    | 18.1.2          | 9.1.2        | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
 | glexporter | 0.5.10           | 0.3.5         | [glexporter](https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter) |
 | gitlabOperator            | 2.1.2           | 2.1.2        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |

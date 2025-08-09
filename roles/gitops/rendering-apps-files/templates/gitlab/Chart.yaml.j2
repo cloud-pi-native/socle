@@ -4,10 +4,10 @@ name: gitlab
 type: application
 version: {{ dsc.gitlabOperator.chartVersion }}
 dependencies:
-- name: cpn-cnpg
-  alias: cpn-cnpg
-  version: {{ dsc.cpnCnpg.chartVersion | quote }}
-  repository: {{ dsc.cpnCnpg.helmRepoUrl }}
+- name: cluster
+  alias: cluster
+  version: {{ dsc.cloudnativepg.cluster.chartVersion }}
+  repository: {{ dsc.cloudnativepg.cluster.helmRepoUrl }}
 - name: gitlab-operator
   alias: gitlab
   version: {{ dsc.gitlabOperator.chartVersion }}

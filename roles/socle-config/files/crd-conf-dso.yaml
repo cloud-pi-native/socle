@@ -237,19 +237,16 @@ spec:
                   type: object
                 cloudnativepg:
                   description: Configuration for CloudNativePG.
+                  type: object
+                  required:
+                    - installEnabled
                   properties:
                     installEnabled:
                       default: true
-                      description: Specifies whether we should install CloudNativePG instance.
+                      description: Specifies whether we should install CloudNativePG Operator instance.
                       type: boolean
                     namespace:
-                      description: The namespace for CloudNativePG.
-                      type: string
-                    helmRepoUrl:
-                      description: CloudNativePG helm repository url.
-                      type: string
-                    chartVersion:
-                      description: CloudNativePG helm chart version (e.g., "0.18.2").
+                      description: The namespace for CloudNativePG Operator.
                       type: string
                     forcedInstall:
                       description: |
@@ -258,16 +255,33 @@ spec:
                         The default value is false, which means no forced installation will occur.
                       default: false
                       type: boolean
-                    values:
-                      description: |
-                        You can add custom values for CloudNativePG, they will be merged with roles/cloudnativepg/templates/values/
-                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
-                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
+                    cluster:
+                      description: Configuration for the cluster.
                       type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - installEnabled
-                  type: object
+                      properties:
+                        helmRepoUrl:
+                          description: CloudNativePG helm repository url.
+                          type: string
+                        chartVersion:
+                          description: CloudNativePG helm chart version (e.g., "0.3.1").
+                          type: string
+                    operator:
+                      description: Configuration for the operator.
+                      type: object
+                      properties:
+                        helmRepoUrl:
+                          description: CloudNativePG helm repository url.
+                          type: string
+                        chartVersion:
+                          description: CloudNativePG helm chart version (e.g., "0.25.0").
+                          type: string
+                        values:
+                          description: |
+                            You can add custom values for CloudNativePG, they will be merged with roles/gitops/rendering-apps-files/
+                            https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
+                            https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                 console:
                   description: Configuration for the console.
                   properties:
@@ -311,24 +325,8 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        mode:
-                          description: Determines whether cnpg clusters should be deployed as a primary cluster
-                            (initdb from scratch) or replica cluster (initdb from external source).
-                          default: primary
-                          type: string
-                          enum:
-                            - primary
-                            - replica
-                            - restore
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
-                        exposed:
-                          description: Whether or not the cnpg cluster should be exposed via NodePort.
-                          type: boolean
-                          default: false
-                        nodePort:
-                          description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
                           description: |
@@ -336,10 +334,6 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
-                        initPassword:
-                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
-                          type: boolean
-                          default: false
                   required:
                     - installEnabled
                   type: object
@@ -357,23 +351,6 @@ spec:
                         You can add custom values for cpn-ansible-job, they will be merged with roles/gitops/rendering-apps-files/
                         https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job
                         https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job/values.yaml
-                      type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                  type: object
-                cpnCnpg:
-                  description: Configuration for cpn-cnpg.
-                  properties:
-                    helmRepoUrl:
-                      description: CloudNativePG helm repository url.
-                      type: string
-                    chartVersion:
-                      description: CloudNativePG helm chart version (e.g., "0.18.2").
-                      type: string
-                    values:
-                      description: |
-                        You can add custom values for CloudNativePG, they will be merged with roles/gitops/rendering-apps-files/
-                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-cnpg
-                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-cnpg/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -453,24 +430,8 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        mode:
-                          description: Determines whether cnpg clusters should be deployed as a primary cluster
-                            (initdb from scratch) or replica cluster (initdb from external source).
-                          default: primary
-                          type: string
-                          enum:
-                            - primary
-                            - replica
-                            - restore
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
-                        exposed:
-                          description: Whether or not the cnpg cluster should be exposed via NodePort.
-                          type: boolean
-                          default: false
-                        nodePort:
-                          description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
                           description: |
@@ -478,10 +439,6 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
-                        initPassword:
-                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
-                          type: boolean
-                          default: false
                   required:
                     - installEnabled
                   type: object
@@ -1148,24 +1105,8 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        mode:
-                          description: Determines whether cnpg clusters should be deployed as a primary cluster
-                            (initdb from scratch) or replica cluster (initdb from external source).
-                          default: primary
-                          type: string
-                          enum:
-                            - primary
-                            - replica
-                            - restore
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
-                        exposed:
-                          description: Whether or not the cnpg cluster should be exposed via NodePort.
-                          type: boolean
-                          default: false
-                        nodePort:
-                          description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
                           description: |
@@ -1173,10 +1114,6 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
-                        initPassword:
-                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
-                          type: boolean
-                          default: false
                   required:
                     - pvcRegistrySize
                     - installEnabled
@@ -1319,24 +1256,8 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        mode:
-                          description: Determines whether cnpg clusters should be deployed as a primary cluster
-                            (initdb from scratch) or replica cluster (initdb from external source).
-                          default: primary
-                          type: string
-                          enum:
-                            - primary
-                            - replica
-                            - restore
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
-                        exposed:
-                          description: Whether or not the cnpg cluster should be exposed via NodePort.
-                          type: boolean
-                          default: false
-                        nodePort:
-                          description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
                           description: |
@@ -1344,10 +1265,6 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
-                        initPassword:
-                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
-                          type: boolean
-                          default: false
                   required:
                     - installEnabled
                   type: object
@@ -1400,32 +1317,12 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        mode:
-                          description: Determines whether cnpg clusters should be deployed as a primary cluster
-                            (initdb from scratch) or replica cluster (initdb from external source).
-                          default: primary
-                          type: string
-                          enum:
-                            - primary
-                            - replica
-                            - restore
-                        exposed:
-                          description: Whether or not the cnpg cluster should be exposed via NodePort.
-                          type: boolean
-                          default: false
-                        nodePort:
-                          description: NodePort used to expose the cnpg cluster instance.
-                          type: string
                         connectionParameters:
                           description: |
                             Connection parameters used for replication, it should contain
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
-                        initPassword:
-                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
-                          type: boolean
-                          default: false
                   required:
                     - installEnabled
                   type: object
@@ -1640,24 +1537,8 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        mode:
-                          description: Determines whether cnpg clusters should be deployed as a primary cluster
-                            (initdb from scratch) or replica cluster (initdb from external source).
-                          default: primary
-                          type: string
-                          enum:
-                            - primary
-                            - replica
-                            - restore
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
-                        exposed:
-                          description: Whether or not the cnpg cluster should be exposed via NodePort.
-                          type: boolean
-                          default: false
-                        nodePort:
-                          description: NodePort used to expose the cnpg cluster instance.
                           type: string
                         connectionParameters:
                           description: |
@@ -1665,10 +1546,6 @@ spec:
                             'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
                             https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
-                        initPassword:
-                          description: Whether or not the cnpg cluster db password should be initialized with a secret.
-                          type: boolean
-                          default: false
                   required:
                     - installEnabled
                   type: object

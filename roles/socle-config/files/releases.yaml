@@ -14,17 +14,18 @@ spec:
     # https://github.com/cert-manager/cert-manager/releases
     chartVersion: v1.14.3
   cloudnativepg:
-    # https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
-    chartVersion: 0.20.1
+    cluster:
+      # https://artifacthub.io/packages/helm/cloudnative-pg/cluster
+      chartVersion: 0.3.1
+    operator:
+      # https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
+      chartVersion: "0.25.0"
   console:
     # https://github.com/cloud-pi-native/console/releases
     chartVersion: 2.1.10
   cpnAnsibleJob:
     # https://github.com/cloud-pi-native/helm-charts/releases
     chartVersion: ">=1.0.0 <2.0.0"
-  cpnCnpg:
-    # https://github.com/cloud-pi-native/helm-charts/releases
-    chartVersion: ">=2.0.0 <3.0.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "9.1.2"

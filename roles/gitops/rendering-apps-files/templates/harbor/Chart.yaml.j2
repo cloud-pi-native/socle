@@ -4,10 +4,10 @@ name: harbor
 type: application
 version: {{ dsc.harbor.chartVersion }}
 dependencies:
-- name: cpn-cnpg
-  alias: cpn-cnpg
-  version: {{ dsc.cpnCnpg.chartVersion | quote }}
-  repository: {{ dsc.cpnCnpg.helmRepoUrl }}
+- name: cluster
+  alias: cluster
+  version: {{ dsc.cloudnativepg.cluster.chartVersion }}
+  repository: {{ dsc.cloudnativepg.cluster.helmRepoUrl }}
 - name: harbor
   alias: harbor
   version: {{ dsc.harbor.chartVersion }}

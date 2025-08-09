@@ -85,7 +85,6 @@
       register: vault_keys
 
     - name: Get pg-cluster-harbor-app secret
-      when: not dsc.harbor.cnpg.initPassword
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.harbor.namespace }}"
         kind: Secret
@@ -107,7 +106,6 @@
       register: kubernetes_service_clusterip
 
     - name: Get pg-cluster-gitlab-app secret
-      when: not dsc.gitlab.cnpg.initPassword
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.gitlab.namespace }}"
         kind: Secret

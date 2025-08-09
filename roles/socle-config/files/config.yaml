@@ -26,23 +26,22 @@ spec:
   cloudnativepg:
     installEnabled: true
     namespace: dso-cloudnativepg
-    helmRepoUrl: https://cloudnative-pg.github.io/charts
-    forcedInstall: false
-    values: {}
+    cluster:
+      helmRepoUrl: https://cloudnative-pg.io/charts
+      values: {}
+    operator:
+      helmRepoUrl: https://cloudnative-pg.io/charts
+      forcedInstall: false
+      values: {}
   console:
     installEnabled: true
     namespace: dso-console
     subDomain: console
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     cnpg:
-      mode: primary
-      exposed: false
-      initPassword: false
+      imageName: cloudnative-pg/postgresql:16.2
     values: {}
   cpnAnsibleJob:
-    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
-    values: {}
-  cpnCnpg:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
   gitlab:
@@ -52,9 +51,7 @@ spec:
     insecureCI: false
     pvcGitalySize: 50Gi
     cnpg:
-      mode: primary
-      exposed: false
-      initPassword: false
+      imageName: cloudnative-pg/postgresql:16.2
     values: {}
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
@@ -120,9 +117,7 @@ spec:
     s3ImageChartStorage:
       enabled: false
     cnpg:
-      mode: primary
-      exposed: false
-      initPassword: false # switch to true when only GitOps deployment remain
+      imageName: cloudnative-pg/postgresql:16.2
     values: {}
   keycloak:
     installEnabled: true
@@ -132,9 +127,7 @@ spec:
     postgresPvcSize: 1Gi
     pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.4/keycloak-theme-for-kc-26-and-above.jar
     cnpg:
-      mode: primary
-      exposed: false
-      initPassword: false
+      imageName: cloudnative-pg/postgresql:16.2
     values: {}
   keycloakInfra:
     installEnabled: false
@@ -144,8 +137,7 @@ spec:
     postgresPvcSize: 1Gi
     pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.4/keycloak-theme-for-kc-26-and-above.jar
     cnpg:
-      mode: primary
-      exposed: false
+      imageName: cloudnative-pg/postgresql:16.2
     values: {}
   kyverno:
     installEnabled: false
@@ -184,9 +176,7 @@ spec:
     helmRepoUrl: https://sonarsource.github.io/helm-chart-sonarqube
     postgresPvcSize: 5Gi
     cnpg:
-      mode: primary
-      exposed: false
-      initPassword: false
+      imageName: cloudnative-pg/postgresql:16.2
     values: {}
   vault:
     installEnabled: true

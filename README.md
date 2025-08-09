@@ -1542,7 +1542,6 @@ harbor:
     regionendpoint: <regionendpoint>
     secretkey: <secretkey>
 ```
-Conserver `dsc.harbor.cnpg.initPassword` à `false`.  
 Puis lancer le playbook d'insertion des secrets dans le Vault d'infrastructure. 
 ```shell
 ansible-playbook install-gitops.yaml -t vault-secrets

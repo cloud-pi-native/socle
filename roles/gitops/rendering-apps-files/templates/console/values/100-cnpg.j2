@@ -1,86 +1,60 @@
-cpn-cnpg:
+cluster:
   nameOverride: "pg-cluster-console"
-{% if dsc.console.cnpg.imageName is defined %}
-  imageName: "{{ dsc.console.cnpg.imageName }}"
-{% else %}
-  imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloudnative-pg/postgresql:16.1"
-{% endif %}
+  fullnameOverride: "pg-cluster-console"
+  cluster:
+    primaryUpdateMethod: restart
+    enablePDB: false
+    imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.console.cnpg.imageName }}"
 {% if use_image_pull_secrets %}
-  imagePullSecrets:
-  - name: dso-config-pull-secret
+    imagePullSecrets:
+    - name: dso-config-pull-secret
 {% endif %}
-  username: "dso"
-  dbName: "dso-console-db"
-  pvcSize:
-    data: {{ dsc.console.postgresPvcSize }}
+    initdb:
+      owner: "dso"
+      database: "dso-console-db"
+  
+    # Require 1Gi of space per instance using default storage class
+    storage:
+      size: {{ dsc.console.postgresPvcSize }}
 {% if dsc.console.postgresWalPvcSize is defined %}
-    wal: {{ dsc.console.postgresWalPvcSize }}
+    walStorage:
+      enabled: true
+      size: {{ dsc.console.postgresWalPvcSize }}
 {% endif %}
-  parameters:
-    max_worker_processes: "60"
+  
+    postgresql:
+      parameters:
+        max_worker_processes: "60"
 {% if dsc.console.postgresWalMaxSlotKeepSize is defined %}
-    max_slot_wal_keep_size: {{ dsc.console.postgresWalMaxSlotKeepSize }}
+        max_slot_wal_keep_size: {{ dsc.console.postgresWalMaxSlotKeepSize }}
 {% endif %}
+      pg_hba:
+        - host dso-console-db dso all md5
+        - host dso-console-db streaming_replica all md5
+
 {% if dsc.global.backup.velero.enabled %}
-  annotations:
-    pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d console > /var/lib/postgresql/data/app.dump-${index}"]'
-    pre.hook.backup.velero.io/container: postgres
-    pre.hook.backup.velero.io/on-error: Fail
-    pre.hook.backup.velero.io/timeout: 90s
+    annotations:
+      pre.hook.backup.velero.io/command: '["/bin/bash", "-c", "(( $(date +%d) %2 == 0 )) && index=0 || index=1; pg_dump -U postgres -Fc -d dso-console-db > /var/lib/postgresql/data/app.dump-${index}"]'
+      pre.hook.backup.velero.io/container: postgres
+      pre.hook.backup.velero.io/on-error: Fail
+      pre.hook.backup.velero.io/timeout: 90s
 {% endif %}
-{% if dsc.console.cnpg.exposed %}
-  exposed: true
-  nodePort: {{ dsc.console.cnpg.nodePort }}
-{% endif %}
-{% if dsc.console.cnpg.initPassword %}
-  initSecret:
-    enabled: true 
-    username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/console/values#cnpg | jsonPath  
-      {.username} | base64encode>
-    password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/console/values#cnpg | jsonPath
-      {.password} | base64encode>
-{% endif %}
-{% if dsc.console.cnpg.mode == "replica" %}
-{%- filter indent(width=4) %}
-{{ dsc.console.cnpg.connectionParameters }}
-{%- endfilter %}
-{% endif %}
-{% if dsc.console.cnpg.mode == "replica" %}
-  mode: "replica"
-{% endif %}
-  monitoring:
-    enabled: {{ dsc.global.metrics.enabled }}
-{% if dsc.global.metrics.additionalLabels is defined %}
-    podMonitorAdditionalLabels:
-{% for key, value in dsc.global.metrics.additionalLabels.items() %}
-      {{ key }}: {{ value }}
-{% endfor %}
-{% endif %}
-{% if dsc.global.backup.cnpg.enabled or dsc.console.cnpg.mode == "restore" %}
-  backup:
-    destinationPath: "s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/{{ dsc.global.backup.cnpg.pathPrefix | default('') }}"
-    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
-{% if dsc.global.backup.cnpg.enabled and dsc.console.cnpg.mode != "restore" %}
+
+    monitoring:
+      enabled: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled %}
+  backups:       
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
     enabled: true
-{% if dsc.global.backup.s3.endpointCA.key is defined %}
-    endpointCA:
-      create: true
-      name: "bundle-cnpg-s3"
-      key: "ca.pem"
-      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#cnpgS3CaPem>
-{% endif %}
-{% endif %}
-    s3Credentials:
-      create: true
-      secretName: pg-cluster-backup
-      accessKeyId:
-        key: {{ dsc.global.backup.s3.credentials.accessKeyId.key | default ('') }}
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
-      secretAccessKey:
-        key: {{ dsc.global.backup.s3.credentials.secretAccessKey.key | default('') }}
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
-{% if dsc.global.backup.cnpg.compression != 'none' %}
-    compression: "{{ dsc.global.backup.cnpg.compression }}"
-{% endif %}
-    retentionPolicy: "{{ dsc.global.backup.cnpg.retentionPolicy }}"
+    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
+    retentionPolicy: 14d
+    s3:          
+      accessKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
+      secretKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
+    scheduledBackups:
+    - name: pg-cluster-console
+      schedule: 0 0 */6 * * *                                                              
+      backupOwnerReference: self
+      method: barmanObjectStore
 {% endif %}

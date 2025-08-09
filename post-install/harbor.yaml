@@ -12,7 +12,6 @@
         name: socle-config
 
     - name: Get pg-cluster-harbor-app secret
-      when: not dsc.harbor.cnpg.initPassword
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.harbor.namespace }}"
         kind: Secret

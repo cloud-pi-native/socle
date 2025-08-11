@@ -1,0 +1,5 @@
+---
+global:
+  tenantId: console
+app:
+  namespacePrefix: "dso-"

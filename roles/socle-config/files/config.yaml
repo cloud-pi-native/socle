@@ -44,6 +44,8 @@ spec:
   cpnAnsibleJob:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
+  dashboard:
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
   gitlab:
     installEnabled: true
     namespace: dso-gitlab

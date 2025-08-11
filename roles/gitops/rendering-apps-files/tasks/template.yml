@@ -6,6 +6,20 @@
     state: directory
     mode: 0775
 
+# Files copy
+
+- name: Check if files path exists
+  ansible.builtin.stat:
+    path: "{{ role_path + '/templates/' + item.1.argocd_app + '/files' }}"
+  register: argocd_app_files_stat
+
+- name: Copy files if exists
+  when: argocd_app_files_stat.stat.exists
+  ansible.builtin.copy:
+    src: "{{ role_path + '/templates/' + item.1.argocd_app + '/files' }}"
+    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/"
+    mode: "0644"
+
 # Chart file rendering
 
 - name: Set path fact to chart file location
@@ -49,6 +63,7 @@
     path: "{{ role_path + '/templates/' + item.1.argocd_app + '/values' }}"
 
 - name: Compute "{{ item.1.argocd_app }}" Helm values
+  when: item.1.argocd_app != "dashboard"
   ansible.builtin.include_role:
     name: combine
   vars:
@@ -65,8 +80,16 @@
     combine_dest_var: "{{ item.1.argocd_app }}_values"
 
 - name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination
+  when: item.1.argocd_app != "dashboard"
   ansible.builtin.copy:
     content: "{{ lookup('vars', item.1.argocd_app ~ '_values') | to_nice_yaml(indent=2) }}"
+    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    mode: "0644"
+
+- name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination
+  when: item.1.argocd_app == "dashboard"
+  ansible.builtin.copy:
+    src: "{{ role_path + '/templates/' + item.1.argocd_app + '/values.yaml' }}"
     dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
     mode: "0644"
 

@@ -19,7 +19,7 @@ spec:
               repoURL: {{ dsc.global.gitOps.repo.url }}
               revision: {{ dsc.global.gitOps.repo.revision }}
               files:
-                - path: "{{ dsc.global.gitOps.repo.path }}/envs/*/*.json"
+                - path: "{{ dsc.global.gitOps.repo.path }}/envs/{{ dsc_name }}/{{ dsc_name }}.json"
               requeueAfterSeconds: 10 # Polling interval for health_status (seconds)
 {%- raw %}
           - list:

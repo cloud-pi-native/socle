@@ -61,6 +61,7 @@ spec:
   cloudnativepg: {}
   console: {}
   gitlab: {}
+  dashboard: {}
   glexporter: {}
   gitlabOperator: {}
   gitlabrunner: {}

@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: dashboard
+type: application
+version: 1.0.0 
+dependencies:
+- name: dso-observability
+  alias: dashboard
+  version: {{ dsc.dashboard.chartVersion | quote }}
+  repository: {{ dsc.dashboard.helmRepoUrl }}

@@ -354,6 +354,24 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
+                dashboard:
+                  description: Configuration for Socle dashboards.
+                  required:
+                    - installEnabled
+                  type: object
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: |
+                        Specifies whether we should install Socle dashboards.
+                        This is disable by default since the Loki and Mimir code is not yet opensource.
+                      type: boolean
+                    helmRepoUrl:
+                      description: Socle dashboards helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Socle dashboards helm chart version (e.g., "0.18.2").
+                      type: string
                 gitlab:
                   description: Configuration for GitLab.
                   properties:

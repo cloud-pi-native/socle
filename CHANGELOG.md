@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.15.0](https://github.com/cloud-pi-native/socle/compare/v3.14.0...v3.15.0) (2025-08-13)
+
+
+### Features
+
+* :sparkles: migration to official cnpg cluster chart ([bd25124](https://github.com/cloud-pi-native/socle/commit/bd25124fa6a1de1dd206b9f18f2f4da6381368b1))
+* :technologist: add default for namespacePrefix ([5a502ac](https://github.com/cloud-pi-native/socle/commit/5a502acc810f55bdb8d013daf85a7c6dc1e094a8))
+* **#664:** :sparkles: GitOps for Socle Dashboards ([adb31bb](https://github.com/cloud-pi-native/socle/commit/adb31bb49a5f4ab6faaddd5c77444d1952350f25))
+
+
+### Bug Fixes
+
+* :bug: avp plugin trigger and incorrect check condition ([5505cc6](https://github.com/cloud-pi-native/socle/commit/5505cc63f1e2094202399960e03f0e7ad579b975))
+* :bug: ensure directory existence ([7ad38b1](https://github.com/cloud-pi-native/socle/commit/7ad38b1cb0bcec2c50340bda93ab4fc7a59df7e4))
+
 ## [3.14.0](https://github.com/cloud-pi-native/socle/compare/v3.13.3...v3.14.0) (2025-08-06)
 
 

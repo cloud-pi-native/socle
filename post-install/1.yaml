@@ -1,0 +1,182 @@
+---
+- name: Harbor post-configuration
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+    argo_infra_ns_check:
+      failed: true
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Get pg-cluster-harbor-app secret
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.harbor.namespace }}"
+        kind: Secret
+        name: pg-cluster-harbor-app
+      register: pg_harbor_db_secret
+
+    - name: Get harbor_current_vault_values
+      block:
+        - name: Reset envs vars
+          ansible.builtin.set_fact:
+            envs: []
+
+        - name: Set minimal envs vars
+          ansible.builtin.set_fact:
+            envs:
+              - name: "{{ dsc_name }}"
+                apps:
+                  - argocd_app: harbor
+                    vault_values:
+                      global:
+                        harborAdminPassword: "itDoesNotMatterWhatWeWriteHere"
+
+        - name: Call vault-secrets role
+          ansible.builtin.import_role:
+            name: gitops/vault-secrets
+
+    - name: Initialize facts
+      ansible.builtin.set_fact:
+        quota_storage_mb: 102400  # 100 GB
+        harbor_projects: []
+        page: 1
+        page_size: 100
+        more_pages: true
+    
+    - name: Fetch Harbor quotas with pagination
+      ansible.builtin.uri:
+        url: "https://{{ harbor_domain }}/api/v2.0/quotas?page={{ page }}&page_size={{ page_size }}"
+        method: GET
+        user: admin
+        password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
+        force_basic_auth: true
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        status_code: [200]
+      register: quotas_result
+      until: quotas_result.json | length < page_size
+      retries: 100
+      delay: 0
+      # This updates facts each iteration
+      vars:
+        harbor_projects: "{{ harbor_projects + quotas_result.json }}"
+        page: "{{ page + 1 }}"
+
+    - name: Add quotas to the list (excluding dockerhub and library)
+      set_fact:
+        harbor_projects: >-
+          {{
+            harbor_projects
+            + (
+              quotas_result.json
+              | rejectattr('ref.name', 'equalto', 'dockerhub')
+              | rejectattr('ref.name', 'equalto', 'library')
+              | list
+            )
+          }}
+
+    - name: Update quota for each project
+      ansible.builtin.uri:
+        url: "https://{{ harbor_domain }}/api/v2.0/quotas/{{ item.id }}"
+        method: PUT
+        user: admin
+        password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
+        force_basic_auth: true
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        body_format: json
+        body: >
+          {
+            "hard": {
+              "storage": {{ quota_storage_mb | int * 1024 * 1024 }}
+            }
+          }
+        status_code: [200]
+      loop: "{{ harbor_projects }}"
+      loop_control:
+        label: "Project {{ item.ref.name }} (ID {{ item.id }})"
+
+    - name: Create tag retention policy for each project
+      ansible.builtin.uri:
+        url: "https://{{ harbor_domain }}/api/v2.0/retentions"
+        method: POST
+        user: admin
+        password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
+        force_basic_auth: true
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        body_format: json
+        body: >
+          {
+            "algorithm": "or",
+            "scope": {
+              "level": "project",
+              "ref": {{ item.id }}
+            },
+            "rules": [
+              {
+                "disabled": false,
+                "action": "retain",
+                "template": "nDaysSinceLastPull",
+                "params": { "nDaysSinceLastPull": 10 },
+                "tag_selectors": [
+                  { "kind": "doublestar", "decoration": "matches", "pattern": "**" }
+                ],
+                "scope_selectors": {
+                  "repository": [
+                    { "kind": "doublestar", "decoration": "repoMatches", "pattern": "**" }
+                  ]
+                }
+              }
+            ],
+            "trigger": {
+              "kind": "Schedule",
+              "settings": { "cron": "0 22 2 * * *" }
+            }
+          }
+        status_code: [201, 400]
+      loop: "{{ harbor_projects }}"
+      loop_control:
+        label: "Project {{ item.ref.name }} (ID {{ item.id }})"
+
+    - name: Update tag retention policy for each project
+      ansible.builtin.uri:
+        url: "https://{{ harbor_domain }}/api/v2.0/retentions/{{ item.id }}"
+        method: PUT
+        user: admin
+        password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
+        force_basic_auth: true
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        body_format: json
+        body: >
+          {
+            "algorithm": "or",
+            "scope": {
+              "level": "project",
+              "ref": {{ item.id }}
+            },
+            "rules": [
+              {
+                "disabled": false,
+                "action": "retain",
+                "template": "nDaysSinceLastPull",
+                "params": { "nDaysSinceLastPull": 10 },
+                "tag_selectors": [
+                  { "kind": "doublestar", "decoration": "matches", "pattern": "**" }
+                ],
+                "scope_selectors": {
+                  "repository": [
+                    { "kind": "doublestar", "decoration": "repoMatches", "pattern": "**" }
+                  ]
+                }
+              }
+            ],
+            "trigger": {
+              "kind": "Schedule",
+              "settings": { "cron": "0 22 2 * * *" }
+            }
+          }
+        status_code: [200]
+      loop: "{{ harbor_projects }}"
+      loop_control:
+        label: "Project {{ item.ref.name }} (ID {{ item.id }})"

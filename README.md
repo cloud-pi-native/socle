@@ -1184,7 +1184,7 @@ Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. 
   "env": "conf-dso",
   "provider": "self-hosted",
   "region": "fr-par",
-  "namespacePrefix": "dso-",
+  "customNamespacePrefix": "dso-",
   "destination": {
     "clusterName": ""
   },
@@ -1308,7 +1308,7 @@ Dans notre exemple, vous déployez Keycloak avec la dsc par défaut `conf-dso`. 
 
 Passez en revue les paramètres de ce fichier, et notamment :
 * `env` : doit correspondre au nom de l'environnement tel qu'indiqué dans le répertoire `gitops/envs/conf-dso` et dans lequel se trouve le fichier `conf-dso.json`, qui est-lui même nommé d'après le nom de ce même environnement. Ce nom doit également correspondre au nom de la `dsc` que vous utilisez (spécifié via le paramètre `metadata.name` de cette même dsc). Il y a donc **correspondance rigoureuse** entre le nom de l'environnement utilisé ici par le paramètre `env` et celui de la `dsc`. Ce même nom doit se retrouver impérativement dans le nom du répertoire de l'environnement (soit dans notre exemple `gitops/envs/conf-dso`) et celui du fichier de configuration JSON associé (`conf-dso.json`). Sans ces correspondances strictes, l'installation échouera.
-* `namespacePrefix` : Il s'agit ici du péfixe de vos namespaces. Ce préfixe doit impérativement se retrouver dans tous les paramètres `namespace` des outils spécifiés dans votre `dsc`, à l'exception des outils d'infrastructure vus précédemment et qui ne sont pas installés en mode GitOps.
+* `customNamespacePrefix` : Il s'agit ici du péfixe de vos namespaces. Ce préfixe doit impérativement se retrouver dans tous les paramètres `namespace` des outils spécifiés dans votre `dsc`, à l'exception des outils d'infrastructure vus précédemment et qui ne sont pas installés en mode GitOps.
 * `destination.clustername` : Si votre Argo CD d'infrastructure n'est pas installé dans le même cluster que le cluster de destination vers lequel vous déployez, préciser alors ici le nom du cluster de destination tel qu'il est connu par votre Argo CD d'infrastructure. S'il est installé dans le même cluster, vous pouvez indiquer "in-cluster".
 * `targetRevision` : Il s'agit du nom de la branche à partir de laquelle vous déployez et depuis laquelle votre instance Argo CD d'infrastructure va aller tirer les fichiers. Dans notre exemple, vous le modifierez et le remplacerez par "ma-branche". 
 * `apps` : Ce paramètre est un array qui contient lui-même des objets correspondant chacun à l'une des applications du Socle qui seront déployées, ainsi qu'aux paramètres de cette application lus par les applicationSets Argo CD (`gitops/dso-appset-wave-XX.yaml`). Nous voyons ici que la ligne correspondant à l'application keycloak comprend le paramètre `enabled` positionné à `true`. Ce paramètre est **très important** puisqu'il détermine si une application est installée (`true`) ou pas (`false`). Veuillez noter que si ce paramètre est positionné à `false` et que l'application en question est déjà installée et gérée par notre applicationSet, **alors elle est désinstallée**. Notons aussi la présence du paramètre `namespace`, qui indique le nom du namespace hors préfixe. Il en résulte qu'ici l'application keycloak sera finalement déployée dans le namespace "dso-keycloak", le préfixe venant s'ajouter au nom du namespace.
@@ -1320,7 +1320,7 @@ Compte-tenu des éléments que nous venons de vérifier, et si nous voulons bien
   "env": "conf-dso",
   "provider": "self-hosted",
   "region": "fr-par",
-  "namespacePrefix": "dso-",
+  "customNamespacePrefix": "dso-",
   "destination": {
     "clusterName": "in-cluster"
   },

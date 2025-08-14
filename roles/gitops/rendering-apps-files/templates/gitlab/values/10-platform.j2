@@ -1,11 +1,4 @@
 {% if dsc.global.platform == "openshift" %}
-keycloak:
-  podSecurityContext:
-    enabled: false
-  
-  containerSecurityContext:
-    enabled: false
-
 cpn-ansible-job:
   global:
     platform: openshift 

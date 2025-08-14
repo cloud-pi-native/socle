@@ -47,6 +47,7 @@ spec:
         path: gitops
       watchpointEnabled: true
       envName: sandbox
+      namespacePrefix: dso-
   argocd:
     admin:
       enabled: false

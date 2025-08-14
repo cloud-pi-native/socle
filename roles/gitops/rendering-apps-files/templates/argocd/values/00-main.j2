@@ -21,7 +21,7 @@ argocd:
       clusterResources: "true"
       url: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>"
       users.anonymous.enabled: "false"
-      admin.enabled: "{{ dsc.argocd.admin.enabled }}"
+      admin.enabled: "{{ dsc.argocd.admin.enabled | lower }}"
       kustomize.buildOptions: "--enable-helm"
 {% if dsc.global.environment == 'development' %}
       accounts.cpin-sa: apiKey

@@ -1,0 +1,15 @@
+nexus3:
+{% if dsc.global.platform == "kubernetes" %}
+  podSecurityContext:
+    fsGroup: 200
+    runAsNonRoot: true  # Force l'exécution en non-root
+
+  securityContext:
+    runAsNonRoot: true
+    runAsGroup: 200
+    runAsUser: 200
+{% elif dsc.global.platform == "openshift" %}
+  podSecurityContext: false
+
+  securityContext: false
+{% endif %}

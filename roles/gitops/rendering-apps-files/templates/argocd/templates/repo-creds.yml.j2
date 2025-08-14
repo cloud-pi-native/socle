@@ -27,5 +27,5 @@ stringData:
   username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#dockerAccount | jsonPath {.username}>
   password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#dockerAccount | jsonPath {.password}>
 {% if dsc.proxy.enabled %}
-  proxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}> 
+  proxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
 {% endif %}

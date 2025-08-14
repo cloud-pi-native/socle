@@ -2,6 +2,16 @@ cpn-ansible-job:
   job:
     name: "harbor"
     dscName: "{{ dsc_name }}"
+    image:
+      tag: "{{ dsc.cpnAnsibleJob.imageTag }}"
     extraEnv:
       - name: VAULT_INFRA_TOKEN
         value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#vault_infra_token>
+{% if dsc.proxy.enabled %}
+      - name: HTTP_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
+      - name: HTTPS_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
+      - name: NO_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
+{% endif %}

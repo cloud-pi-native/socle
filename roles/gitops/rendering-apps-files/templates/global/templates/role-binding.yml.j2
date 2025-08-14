@@ -31,26 +31,3 @@ subjects:
     name: cpn-ansible-job
     namespace: {{ dsc.gitlab.namespace }}
 {% endif %}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: bind-access-vault-infra-secret
-  namespace: {{ dsc.vaultInfra.namespace }} 
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: access-vault-infra-secret
-subjects:
-  - kind: ServiceAccount
-    name: cpn-ansible-job
-    namespace: {{ dsc.keycloak.namespace }}
-  - kind: ServiceAccount
-    name: cpn-ansible-job
-    namespace: {{ dsc.gitlab.namespace }}
-  - kind: ServiceAccount
-    name: cpn-ansible-job
-    namespace: {{ dsc.vault.namespace }}
-  - kind: ServiceAccount
-    name: cpn-ansible-job
-    namespace: {{ dsc.sonarqube.namespace }}

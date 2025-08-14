@@ -1,4 +1,3 @@
----
 nexus3:
   fullnameOverride: nexus
   config:
@@ -143,7 +142,7 @@ nexus3:
     enabled: true
     annotations: {}
     accessMode: ReadWriteOnce
-    size: 250Gi
+    size: {{ dsc.nexus.storageSize }}
     retainDeleted: true
     retainScaled: true
 
@@ -156,15 +155,6 @@ nexus3:
         containerPort: 5000
         hosts:
           - "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexusDockerProxy}>"
-  env:
-{% if dsc.proxy.enabled %}
-    - name: http_proxy
-      value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>"
-    - name: https_proxy
-      value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>"
-    - name: no_proxy
-      value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>"
-{% endif %}
 
   # Désactivation des métriques Nexus (sans ServiceMonitor interne)
 {% if dsc.global.metrics.enabled %}
@@ -175,15 +165,4 @@ nexus3:
 {% if dsc.global.metrics.additionalLabels is defined %}
       labels: {{ dsc.global.metrics.additionalLabels }} 
 {% endif %}
-{% endif %}
-
-{% if dsc.global.platform == "kubernetes" %}
-  podSecurityContext:
-    fsGroup: 200
-    runAsNonRoot: true  # Force l'exécution en non-root
-
-  securityContext:
-    runAsNonRoot: true
-    runAsGroup: 200
-    runAsUser: 200
 {% endif %}

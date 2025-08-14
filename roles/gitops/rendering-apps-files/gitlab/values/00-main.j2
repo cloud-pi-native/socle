@@ -104,8 +104,8 @@ global:
   psql:
     serviceName: pooler-pg-cluster-gitlab-rw
     port: 5432
-    database: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#cnpg | jsonPath {.database}>
-    username: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#cnpg | jsonPath {.username}>
+    database: gitlabhq_production
+    username: gitlab
     password:
       secret: pg-cluster-gitlab-app
       key: password

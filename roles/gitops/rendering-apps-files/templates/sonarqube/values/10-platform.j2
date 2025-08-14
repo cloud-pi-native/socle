@@ -22,9 +22,11 @@ sonarqube:
   account:
   #setAdminPassword:
     securityContext: {}
-{% endif %}
-  
-{% if dsc.global.platform == "kubernetes" %}
+
+cpn-ansible-job:
+  global:
+    platform: openshift 
+{% elif dsc.global.platform == "kubernetes" %}
   account:
   #setAdminPassword:
     securityContext:

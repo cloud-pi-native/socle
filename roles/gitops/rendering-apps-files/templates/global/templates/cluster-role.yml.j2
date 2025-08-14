@@ -7,6 +7,39 @@ rules:
   - apiGroups: ["cloud-pi-native.fr"]
     resources: ["dso-socle-configs"]
     verbs: ["list", "get"]
+{% if dsc.proxy.enabled %}
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["list", "get"]
+    resourceNames: ["kubernetes"]
+{% endif %}
+{% if dsc.exposedCA.type == 'configmap' %}
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["list", "get"]
+    resourceNames: ["{{ dsc.exposedCA.configmap.name }}"]
+{% endif %}
+{% if dsc.exposedCA.type == 'secret' %}
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "get"]
+    resourceNames: ["{{ dsc.exposedCA.secret.name }}"]
+{% endif %}
+{% if dsc.exposedCA.type == 'certmanager' %}
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "get"]
+    resourceNames: ["{{ dsc.ingress.tls.ca.secretName }}"]
+{% endif %}
+{% if dsc.global.backup.cnpg.enabled and 
+      dsc.global.backup.s3.endpointCA.namespace is defined and 
+      dsc.global.backup.s3.endpointCA.name is defined and 
+      dsc.global.backup.s3.endpointCA.key is defined %}
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "get"]
+    resourceNames: ["{{ dsc.global.backup.s3.endpointCA.name }}"]
+{% endif %}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

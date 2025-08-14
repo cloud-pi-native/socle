@@ -1,0 +1,8 @@
+{% if dsc.global.platform == "openshift" %}
+glexporter:
+  redis:
+    global:
+      compatibility:
+        openshift:
+          adaptSecurityContext: force
+{% endif %}

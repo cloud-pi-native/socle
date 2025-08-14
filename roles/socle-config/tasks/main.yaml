@@ -175,6 +175,10 @@
   ansible.builtin.set_fact:
     keycloak_reset_password: false
 
+- name: Import ca role
+  ansible.builtin.import_role:
+    name: ca
+
 - name: Set envs fact
   ansible.builtin.include_tasks:
     file: envs.yaml

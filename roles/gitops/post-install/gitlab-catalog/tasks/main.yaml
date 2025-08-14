@@ -22,6 +22,7 @@
   community.general.gitlab_protected_branch:
     api_url: https://{{ gitlab_domain }}
     api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
     name: main
     state: absent
@@ -39,6 +40,7 @@
   community.general.gitlab_protected_branch:
     api_url: https://{{ gitlab_domain }}
     api_token: "{{ gitlab_token }}"
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
     name: main
     push_access_level: nobody

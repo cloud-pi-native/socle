@@ -12,10 +12,6 @@
       tags:
         - always
 
-    - role: ca
-      tags:
-        - always
-
     - role: imagepullsecret
       tags:
         - always

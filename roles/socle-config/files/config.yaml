@@ -158,7 +158,6 @@ spec:
     values: {}
   nexus:
     installEnabled: true
-    chartVersion: 5.8.3
     helmRepoName: stevehipwell
     helmRepoUrl: oci://ghcr.io/stevehipwell/helm-charts
     chartReference: stevehipwell/nexus3

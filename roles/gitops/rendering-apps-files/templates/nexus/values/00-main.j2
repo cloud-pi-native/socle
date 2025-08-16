@@ -117,7 +117,7 @@ nexus3:
         repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/alpine/k8s"
         tag: 1.31.2
         pullPolicy: IfNotPresent
-      ttlSecondsAfterFinished: 600
+      ttlSecondsAfterFinished: "" 
 
   rootPassword:
     secret: admin-creds

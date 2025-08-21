@@ -14,7 +14,7 @@
 | grafana                   | 10.4.3           | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
 | grafanaOperator           | 5.10.0           | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                                                  |
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
-| keycloak                  | 26.1.3           | 24.4.11       | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |
+| keycloak                  | 26.3.3           | 25.2.0        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                                                      |
 | observatorium             | main-2025-02-10-1bcf722 | 0.5.2  | [observatorium](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/observatorium)                                                                   |
 | nexus                     | 3.83.1           | 5.13.1        | [nexus](https://artifacthub.io/packages/helm/stevehipwell/nexus3)                                                    |

@@ -1,4 +1,5 @@
 ---
+keycloak_auth_url: "http://{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local"
 keycloak_clients:
   - clientId: gitlab-client
     clientAuthenticatorType: client-secret

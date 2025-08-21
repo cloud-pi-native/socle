@@ -1,5 +1,5 @@
 keycloak:
-  fullnameOverride: keycloak 
+  fullnameOverride: {{ dsc.keycloak.subDomain }}
 
   auth:
     adminUser: "admin"
@@ -101,7 +101,23 @@ keycloak:
     tls: true
     selfSigned: false
     extraHosts: []
-    extraPaths: []
+{% if dsc.global.environment == "production" %}
+    extraPaths:
+    - path: /admin/
+      pathType: Prefix
+      backend:
+        service:
+          name: forbidden
+          port:
+            name: http
+    - path: /realms/{{ dsc.keycloak.managementRealm }}/
+      pathType: Prefix
+      backend:
+        service:
+          name: forbidden
+          port:
+            name: http
+{% endif %}
     secrets: []
     extraRules: []
 
@@ -141,8 +157,8 @@ keycloak:
       port: http
       endpoints:
         - path: '/metrics'
-        - path: '/realms/master/metrics'
-        - path: '/realms/dso/metrics'
+        - path: '/realms/{{ dsc.keycloak.managementRealm }}/metrics'
+        - path: '/realms/{{ dsc.keycloak.applicationRealm }}/metrics'
 {% if dsc.global.metrics.additionalLabels is defined %}
       labels: {{ dsc.global.metrics.additionalLabels }} 
 {% endif %}

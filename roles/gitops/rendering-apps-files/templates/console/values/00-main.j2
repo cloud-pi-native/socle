@@ -15,7 +15,7 @@ console:
       HARBOR_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.harbor}>/"
       KEYCLOAK_ADMIN: "dsoadmin"
       KEYCLOAK_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#auth| jsonPath {.adminPassword}>
-      KEYCLOAK_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.keycloak}>/"
+      KEYCLOAK_URL: "http://{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local/realms/{{ dsc.keycloak.applicationRealm }}/.well-known/openid-configuration"
       NEXUS_ADMIN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminUsername}>
       NEXUS_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminPassword}>
       NEXUS_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.nexus}>/"
@@ -27,9 +27,13 @@ console:
     env:
       NODE_ENV: "production"
     keycloak:
-      domain: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.keycloak}>"
-      realm: "dso"
-      protocol: "https"
+      domain:
+        backend: "{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local"
+        frontend: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.keycloak}>"
+      realm: {{ dsc.keycloak.applicationRealm }} 
+      protocol:
+        backend: "http"
+        frontend: "https"
       clientIds:
         backend: "console-backend"
         frontend: "console-frontend"

@@ -1,0 +1,60 @@
+---
+- name: Read CSV file with desired users
+  community.general.read_csv:
+    path: "/config/users.csv"
+    key: email
+  register: desired_users
+
+- name: Fail if CSV parsing failed or is empty
+  ansible.builtin.fail:
+    msg: "users.csv could not be read or is empty. Aborting to prevent mass user disable."
+  when: desired_users.dict is not defined or desired_users.dict | length == 0
+
+- name: Parse existing Keycloak users JSON
+  set_fact:
+    kc_dso_users_list: "{{ kc_dso_users.content | from_json }}"
+
+- name: Ensure listed users are present
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ keycloak_auth_url }}"
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    realm: "{{ dsc.keycloak.applicationRealm }}"
+    username: "{{ item.value.username }}"
+    firstName: "{{ item.value.name | capitalize }}"
+    lastName: "{{ item.value.surname | capitalize }}"
+    email: "{{ item.value.email }}"
+    enabled: "{{ item.value.status == 'active' }}"
+    emailVerified: true
+    credentials: >-
+      {{
+        omit
+        if item.value.email in (kc_dso_users_list | map(attribute='email') | list)
+        else [
+          {
+            'type': 'password',
+            'value': keycloak_current_vault_values.data.data.auth.userTmpPassword,
+            'temporary': true
+          }
+        ]
+      }}
+    state: present
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+  loop: "{{ desired_users.dict | dict2items }}"
+
+- name: Delete users not in CSV
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ keycloak_auth_url }}"
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    realm: "{{ dsc.keycloak.applicationRealm }}"
+    username: "{{ item.username }}"
+    state: absent
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+  loop: "{{ kc_dso_users_list }}"
+  when:
+    - desired_users.dict is defined
+    - desired_users.dict | length > 0
+    - item.email not in desired_users.dict.keys()

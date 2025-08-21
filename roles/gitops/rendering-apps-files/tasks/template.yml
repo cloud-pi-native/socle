@@ -44,10 +44,17 @@
     state: directory
     mode: 0775
 
+- name: Check if keycloak/templates/users.yaml exists
+  ansible.builtin.stat:
+    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/keycloak/templates/users.yaml"
+  register: keycloak_users_file_stat
+
 - name: Render "{{ item.1.argocd_app }}" templates and write yaml files to destination
   vars:
     rendered_content: "{{ lookup('ansible.builtin.template', my_template) }}"
-  when: rendered_content | trim != ''
+  when:
+    - rendered_content | trim != ''
+    - not (my_template | basename == 'users.yaml.j2' and keycloak_users_file_stat.stat.exists)
   ansible.builtin.copy:
     content: "{{ rendered_content }}"
     dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates/{{ my_template | basename | regex_replace('\\.j2', '') }}"

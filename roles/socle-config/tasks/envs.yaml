@@ -120,6 +120,7 @@
                          keycloak_admin_creds.resources[0].data['admin-password'] | length > 0)
                      else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
                   }}
+                userTmpPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
               initcontainers:
                 pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
           - argocd_app: gitlab

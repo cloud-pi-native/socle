@@ -3,12 +3,12 @@
   community.general.keycloak_client:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
-    auth_realm: master
+    auth_keycloak_url: "{{ keycloak_auth_url }}"
+    auth_realm: "{{ dsc.keycloak.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     state: present
-    realm: dso
+    realm: "{{ dsc.keycloak.applicationRealm }}"
     clientId: "{{ item.clientId }}"
     clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
     standardFlowEnabled: "{{ item.standardFlowEnabled }}"
@@ -23,11 +23,11 @@
   community.general.keycloak_clientsecret_info:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
-    auth_keycloak_url: https://{{ keycloak_domain }}
-    auth_realm: master
+    auth_keycloak_url: "{{ keycloak_auth_url }}"
+    auth_realm: "{{ dsc.keycloak.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
-    realm: dso
+    realm: "{{ dsc.keycloak.applicationRealm }}"
     clientId: "{{ item.clientId }}"
   register: kc_clients_secrets
 

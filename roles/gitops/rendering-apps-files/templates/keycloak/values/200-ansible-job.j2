@@ -15,3 +15,11 @@ cpn-ansible-job:
     - name: NO_PROXY
       value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
 {% endif %}
+    extraVolumes:
+    - name: users-csv
+      configMap:
+        name: keycloak-users
+    extraVolumeMounts:
+    - name: users-csv
+      mountPath: /config
+      readOnly: true

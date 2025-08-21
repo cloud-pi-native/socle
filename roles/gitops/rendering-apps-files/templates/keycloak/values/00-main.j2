@@ -1,5 +1,5 @@
 keycloak:
-  fullnameOverride: keycloak 
+  fullnameOverride: {{ dsc.keycloak.subDomain }}
 
   auth:
     adminUser: "admin"
@@ -101,7 +101,21 @@ keycloak:
     tls: true
     selfSigned: false
     extraHosts: []
-    extraPaths: []
+    extraPaths:
+    - path: /admin/
+      pathType: Prefix
+      backend:
+        service:
+          name: forbidden
+          port:
+            name: http
+    - path: /realms/master/
+      pathType: Prefix
+      backend:
+        service:
+          name: forbidden
+          port:
+            name: http
     secrets: []
     extraRules: []
 

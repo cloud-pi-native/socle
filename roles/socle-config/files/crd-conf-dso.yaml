@@ -989,6 +989,28 @@ spec:
                           description: The Docker account password.
                           type: string
                       type: object
+                    smtp:
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether we should enabled the use of a SMTP server.
+                          type: boolean
+                        host:
+                          description: The SMTP server host.
+                          type: string
+                        port:
+                          description: The SMTP server port.
+                          type: integer
+                        from:
+                          description: The email address used as the sender.
+                          type: string
+                        user:
+                          description: The SMTP account username.
+                          type: string
+                        password:
+                          description: The SMTP account password.
+                          type: string
+                      type: object
                   required:
                     - projectsRootDir
                     - rootDomain
@@ -999,6 +1021,7 @@ spec:
                     - offline
                     - gitOps
                     - dockerAccount
+                    - smtp
                   type: object
                 grafana:
                   description: Configuration for Grafana instance.
@@ -1314,6 +1337,12 @@ spec:
                       type: string
                     pluginDownloadUrl:
                       description: Plugins download Url.
+                      type: string
+                    managementRealm:
+                      description: Keycloak management realm.
+                      type: string
+                    applicationRealm:
+                      description: Keycloak application realm.
                       type: string
                     values:
                       description: |

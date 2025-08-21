@@ -57,7 +57,7 @@ values:
           kinds:
           - EphemeralReport
       oidc.config: |
-        issuer: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/dso
+        issuer: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
         requestedScopes: ["openid", "generic"]
         name: Keycloak
         clientID: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.argo.id}>

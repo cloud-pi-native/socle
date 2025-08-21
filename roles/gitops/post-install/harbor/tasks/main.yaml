@@ -28,7 +28,7 @@
       oidc_admin_group: /admin
       oidc_auto_onboard: true
       oidc_client_id: "{{ harbor_secret.resources[0].data.CLIENT_ID | b64decode }}"
-      oidc_endpoint: https://{{ keycloak_domain }}/realms/dso
+      oidc_endpoint: https://{{ keycloak_domain }}/realms/{{ dsc.keycloak.applicationRealm }}
       oidc_extra_redirect_parms: "{}"
       oidc_group_filter: ""
       oidc_groups_claim: groups

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-users
+  namespace: {{ dsc.keycloak.namespace }}
+data:
+  users.csv: |
+    username,surname,name,email,status
+    admin@example.com,Admin,Admin,admin@example.com,active

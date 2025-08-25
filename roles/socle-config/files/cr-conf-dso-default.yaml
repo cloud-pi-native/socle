@@ -48,6 +48,7 @@ spec:
       watchpointEnabled: true
       envName: sandbox
       namespacePrefix: dso-
+    smtp: {}
   argocd:
     admin:
       enabled: false

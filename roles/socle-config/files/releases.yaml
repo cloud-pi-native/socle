@@ -22,7 +22,7 @@ spec:
       chartVersion: "0.25.0"
   console:
     # https://github.com/cloud-pi-native/console/releases
-    chartVersion: 2.1.10
+    chartVersion: 2.1.11
   cpnAnsibleJob:
     # https://github.com/cloud-pi-native/helm-charts/releases
     chartVersion: ">=1.0.0 <2.0.0"

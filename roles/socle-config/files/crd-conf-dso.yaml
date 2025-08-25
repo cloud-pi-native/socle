@@ -293,7 +293,10 @@ spec:
                       description: The namespace for console.
                       type: string
                     release:
-                      description: Console version (e.g., "4.1.0").
+                      description: Console release version (e.g., "9.4.0").
+                      type: string
+                    chartVersion:
+                      description: Console helm chart version (e.g., "2.1.11").
                       type: string
                     subDomain:
                       description: The subdomain for console.

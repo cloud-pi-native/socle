@@ -88,10 +88,16 @@
 
 - name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination
   when: item.1.argocd_app == "dashboard"
-  ansible.builtin.copy:
-    src: "{{ role_path + '/templates/' + item.1.argocd_app + '/values.yaml' }}"
-    dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
-    mode: "0644"
+  block:
+    - name: Set path fact to values file location
+      ansible.builtin.set_fact:
+        path: "{{ role_path + '/templates/' + item.1.argocd_app + '/values.yaml.j2' }}"
+
+    - name: Render "{{ item.1.argocd_app }}" values template and write to destination
+      ansible.builtin.copy:
+        content: "{{ lookup('ansible.builtin.template', path) | from_yaml | to_nice_yaml(indent=2) }}"
+        dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/{{ path | basename | regex_replace('\\.j2', '') }}"
+        mode: "0644"
 
 - name: Special parsing for pipe after colon
   ansible.builtin.include_tasks: ./parsing.yml

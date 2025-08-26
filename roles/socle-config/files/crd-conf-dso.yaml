@@ -331,12 +331,6 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
-                        connectionParameters:
-                          description: |
-                            Connection parameters used for replication, it should contain
-                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
-                          type: string
                   required:
                     - installEnabled
                   type: object
@@ -461,12 +455,6 @@ spec:
                       properties:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
-                        connectionParameters:
-                          description: |
-                            Connection parameters used for replication, it should contain
-                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   required:
                     - installEnabled
@@ -1137,12 +1125,6 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
-                        connectionParameters:
-                          description: |
-                            Connection parameters used for replication, it should contain
-                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
-                          type: string
                   required:
                     - pvcRegistrySize
                     - installEnabled
@@ -1288,12 +1270,6 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
-                        connectionParameters:
-                          description: |
-                            Connection parameters used for replication, it should contain
-                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
-                          type: string
                   required:
                     - installEnabled
                   type: object
@@ -1346,11 +1322,8 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        connectionParameters:
-                          description: |
-                            Connection parameters used for replication, it should contain
-                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
                   required:
                     - installEnabled
@@ -1568,12 +1541,6 @@ spec:
                       properties:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
-                        connectionParameters:
-                          description: |
-                            Connection parameters used for replication, it should contain
-                            'connectionParameters', 'sslKey', 'sslCert', 'sslRootCert'
-                            https://cloudnative-pg.io/documentation/1.18/bootstrap/#bootstrap-from-a-live-cluster-pg_basebackup
                           type: string
                   required:
                     - installEnabled

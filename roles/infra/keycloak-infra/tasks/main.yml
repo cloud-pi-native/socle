@@ -67,7 +67,6 @@
   with_items:
     - pg-cluster-keycloak.yaml.j2
     - pg-cluster-keycloak-backup.yaml.j2
-    - pg-cluster-keycloak-nodeport.yaml.j2
 
 - name: Wait pg-cluster-keycloak-rw endpoint
   kubernetes.core.k8s_info:

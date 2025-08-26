@@ -15,7 +15,7 @@ observatorium:
             - /admin
             tenants:
               prod-dso: {}
-        projectName: console
+        projectName: dso
         projectRepository:
           path: observability
           url: https://github.com/cloud-pi-native/socle.git
@@ -66,8 +66,7 @@ observatorium:
       endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.metrics}>"
 grafana:
   grafanaNamespace: "{{ dsc.grafana.namespace }}"
-  default:
-    name: console
+  default: {}
   oauth:
     enabled: true
     url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/dso
@@ -100,7 +99,7 @@ grafana:
               - /admin
             tenants:
               prod-dso: {}
-        projectName: console
+        projectName: dso
         projectRepository:
           url: https://github.com/cloud-pi-native/socle.git
           path: observability

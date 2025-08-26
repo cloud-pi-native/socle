@@ -47,6 +47,7 @@ spec:
     values: {}
   dashboard:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    tenantId: hprod-dso
   gitlab:
     installEnabled: true
     namespace: dso-gitlab

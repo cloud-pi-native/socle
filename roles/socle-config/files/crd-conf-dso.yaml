@@ -380,6 +380,9 @@ spec:
                     chartVersion:
                       description: Socle dashboards helm chart version (e.g., "0.18.2").
                       type: string
+                    tenantId:
+                      description: Socle dashboards tenantId (e.g, "hprod-dso").
+                      type: string
                 gitlab:
                   description: Configuration for GitLab.
                   properties:

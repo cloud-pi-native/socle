@@ -141,7 +141,7 @@ spec:
     postgresPvcSize: 1Gi
     pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.4/keycloak-theme-for-kc-26-and-above.jar
     cnpg:
-      imageName: cloudnative-pg/postgresql:16.2
+      imageName: ghcr.io/cloudnative-pg/postgresql:16.1
     values: {}
   kyverno:
     installEnabled: false

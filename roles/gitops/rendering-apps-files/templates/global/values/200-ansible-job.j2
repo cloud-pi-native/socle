@@ -1,0 +1,21 @@
+{% if dsc.global.backup.cnpg.enabled %}
+cpn-ansible-job:
+  job:
+    name: "pgdump"
+    dscName: "{{ dsc_name }}"
+    image:
+      tag: "{{ dsc.cpnAnsibleJob.imageTag }}"
+    extraEnv:
+{% if dsc.proxy.enabled %}
+      - name: HTTP_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
+      - name: HTTPS_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
+      - name: NO_PROXY
+        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
+{% endif %}
+  cronJob:
+    create: true
+    name: "pgdump"
+    schedule: "7 1 * * *"
+{% endif %}

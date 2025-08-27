@@ -1,0 +1,36 @@
+---
+- name: Get primary pod for {{ item.name }}
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ item.namespace }}"
+    label_selectors:
+      - "cnpg.io/cluster=pg-cluster-{{ item.name }}"
+      - role=primary
+  register: cnpg_primary_pod
+
+- name: Run pg_dump for {{ item.name }}
+  kubernetes.core.k8s_exec:
+    container: postgres
+    pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+    namespace: "{{ item.namespace }}"
+    command: >
+      sh -c 'pg_dump -U postgres -Fc -d {{ item.db }} > /var/lib/postgresql/data/app.dump.tmp'
+
+- name: Copy dump from pod to control host for {{ item.name }}
+  kubernetes.core.k8s_cp:
+    state: from_pod
+    container: postgres
+    pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+    namespace: "{{ item.namespace }}"
+    remote_path: /var/lib/postgresql/data/app.dump.tmp
+    local_path: "/tmp/{{ item.name }}.dump.tmp"
+
+- name: Upload dump to S3 for {{ item.name }}
+  amazon.aws.s3_object:
+    endpoint_url: "{{ dsc.global.backup.s3.endpointURL }}"
+    bucket: "{{ dsc.global.backup.s3.bucketName }}"
+    object: "pgdump/{{ item.name }}/app.dump-{{ lookup('pipe', 'date +%d') | int % 10 }}"
+    mode: put
+    access_key: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
+    secret_key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+    src: "/tmp/{{ item.name }}.dump.tmp"

@@ -378,6 +378,7 @@ repoServer:
     name: cmp-plugin
   - name: custom-tools
     emptyDir: {}
+{% if dsc.global.dockerAccount.enabled %}
   - name: helm-custom-binary
     emptyDir: {}
   volumeMounts:
@@ -387,6 +388,7 @@ repoServer:
   - name: helm-custom-binary
     mountPath: /usr/local/bin/helm.bin
     subPath: helm.bin
+{% endif %}
 applicationSet:
   enabled: false
   replicas: 2

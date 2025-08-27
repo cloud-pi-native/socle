@@ -1,0 +1,5 @@
+---
+- name: Loop over services
+  when: dsc.global.backup.cnpg.enabled
+  ansible.builtin.include_tasks: ./dump.yml
+  loop: "{{ pgdump_cnpg_clusters }}"

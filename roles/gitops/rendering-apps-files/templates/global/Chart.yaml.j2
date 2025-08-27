@@ -3,4 +3,10 @@ apiVersion: v2
 name: global 
 type: application
 version: 1.0.0
-
+{% if dsc.global.backup.cnpg.enabled %}
+dependencies:
+- name: cpn-ansible-job
+  alias: cpn-ansible-job
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+{% endif %}

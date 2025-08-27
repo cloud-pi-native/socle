@@ -1,0 +1,14 @@
+---
+- name: CNPG pgdump with s3 push
+  hosts: localhost
+  gather_facts: false
+  vars:
+    post_conf_job: true
+  tasks:
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Import pgump role
+      ansible.builtin.import_role:
+        name: gitops/post-install/pgdump

@@ -158,6 +158,7 @@
     extra_kaniko_args: "{{ extra_kaniko_args | default('') }} --registry-mirror {{ harbor_domain | regex_replace('^https?://', '') }}/{{ item.name }}"
   loop: "{{ dsc.harbor.proxyCache }}"
   when: dsc.harbor.proxyCache is defined
+  no_log: true
 
 - name: Set or update insecure args variables
   community.general.gitlab_group_variable:

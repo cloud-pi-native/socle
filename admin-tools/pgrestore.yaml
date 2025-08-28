@@ -1,0 +1,154 @@
+---
+- name: Restore CNPG cluster from S3 dump
+  hosts: localhost
+  gather_facts: false
+
+  vars_prompt:
+    - name: app_name
+      prompt: "Enter application name (keycloak, gitlab, harbor, sonar, console)"
+      private: no
+    - name: backup_index
+      prompt: "Enter snapshot index (0-9)"
+      private: no
+    - name: confirm_restore
+      prompt: "This will DROP and overwrite the application database. Type 'yes' to continue"
+      private: no
+
+  vars:
+    pgdump_cnpg_clusters:
+      - name: "{{ dsc.keycloak.subDomain }}"
+        namespace: "{{ dsc.keycloak.namespace }}"
+        db: keycloak
+      - name: "{{ dsc.sonarqube.subDomain }}"
+        namespace: "{{ dsc.sonarqube.namespace }}"
+        db: sonardb
+      - name: "{{ dsc.gitlab.subDomain }}"
+        namespace: "{{ dsc.gitlab.namespace }}"
+        db: gitlabhq_production
+      - name: "{{ dsc.harbor.subDomain }}"
+        namespace: "{{ dsc.harbor.namespace }}"
+        db: registry
+      - name: "{{ dsc.console.subDomain }}"
+        namespace: "{{ dsc.console.namespace }}"
+        db: dso-console-db
+
+  tasks:
+    - name: Ensure confirmation
+      fail:
+        msg: "Restore cancelled."
+      when: confirm_restore != "yes"
+
+    - name: Import socle-config role
+      ansible.builtin.import_role:
+        name: socle-config
+
+    - name: Check socle_config_custom and exit if empty
+      when: (dsc_cr is defined) and (socle_config_custom.resources | length == 0)
+      block:
+        - name: Warning message
+          ansible.builtin.debug:
+            msg:
+              - "Attention ! Vous avez lancé le playbook avec l'option '-e dsc_cr={{ dsc_cr }}'"
+              - "mais la ressource dsc nommée '{{ dsc_cr }}' est vide ou inexistante côté cluster !"
+              - ""
+              - "Vérifiez que vous ne vous êtes pas trompé de nom et que la ressource existe bien, via la commande suivante :"
+              - ""
+              - " kubectl get dsc {{ dsc_cr }} "
+              - ""
+              - "Si elle n'est pas trouvée (not found), listez simplement les ressources dsc actuellement déclarées :"
+              - ""
+              - " kubectl get dsc "
+              - ""
+              - "Puis relancez le playbook avec une ressource dsc existante."
+              - ""
+              - "Rappel : le présent playbook lancé seul, sans extra vars, utilisera la configuration dsc par défaut (conf-dso)."
+              - "Il effectuera une restauration de la base de donnée du cluster CNPG de l'application choisie."
+
+    - name: Find cluster info for {{ app_name }}
+      set_fact:
+        target_cluster: "{{ item }}"
+      loop: "{{ pgdump_cnpg_clusters }}"
+      when: item.name == app_name
+
+    - name: Fail if cluster not found
+      fail:
+        msg: "Application '{{ app_name }}' not found in pgdump_cnpg_clusters!"
+      when: target_cluster is not defined
+
+    - name: Get primary pod for {{ app_name }}
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "{{ target_cluster.namespace }}"
+        label_selectors:
+          - "cnpg.io/cluster=pg-cluster-{{ target_cluster.name }}"
+          - role=primary
+      register: cnpg_primary_pod
+
+    - name: Download dump from S3 for {{ app_name }}
+      amazon.aws.s3_object:
+        endpoint_url: "{{ dsc.global.backup.s3.endpointURL }}"
+        bucket: "{{ dsc.global.backup.s3.bucketName }}"
+        object: "pgdump/{{ target_cluster.name }}/app.dump-{{ backup_index }}"
+        mode: get
+        access_key: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
+        secret_key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+        dest: "/tmp/{{ target_cluster.name }}.restore.tmp"
+
+    - name: Copy dump into pod
+      kubernetes.core.k8s_cp:
+        state: to_pod
+        container: postgres
+        pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+        namespace: "{{ target_cluster.namespace }}"
+        local_path: "/tmp/{{ target_cluster.name }}.restore.tmp"
+        remote_path: /var/lib/postgresql/data/app.restore.tmp
+
+    - name: Disallow new connections to {{ target_cluster.db }}
+      kubernetes.core.k8s_exec:
+        container: postgres
+        pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+        namespace: "{{ target_cluster.namespace }}"
+        command: >
+          sh -c "psql -U postgres -d postgres -c \"
+            UPDATE pg_database SET datallowconn = false WHERE datname = '{{ target_cluster.db }}';
+          \""
+
+    - name: Terminate all connections to {{ target_cluster.db }}
+      kubernetes.core.k8s_exec:
+        container: postgres
+        pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+        namespace: "{{ target_cluster.namespace }}"
+        command: >
+          sh -c "psql -U postgres -d postgres -c \"
+            SELECT pg_terminate_backend(pid)
+            FROM pg_stat_activity
+            WHERE datname = '{{ target_cluster.db }}'
+              AND pid <> pg_backend_pid();
+          \""
+
+    - name: Drop and recreate database {{ target_cluster.db }}
+      kubernetes.core.k8s_exec:
+        container: postgres
+        pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+        namespace: "{{ target_cluster.namespace }}"
+        command: >
+          sh -c 'dropdb -U postgres {{ target_cluster.db }} &&
+                 createdb -U postgres {{ target_cluster.db }}'
+
+    - name: Re-allow connections to {{ target_cluster.db }}
+      kubernetes.core.k8s_exec:
+        container: postgres
+        pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+        namespace: "{{ target_cluster.namespace }}"
+        command: >
+          sh -c "psql -U postgres -d postgres -c \"
+            UPDATE pg_database SET datallowconn = true WHERE datname = '{{ target_cluster.db }}';
+          \""
+
+    - name: Restore dump into database {{ target_cluster.db }}
+      kubernetes.core.k8s_exec:
+        container: postgres
+        pod: "{{ cnpg_primary_pod.resources[0].metadata.name }}"
+        namespace: "{{ target_cluster.namespace }}"
+        command: >
+          sh -c 'pg_restore -U postgres -d {{ target_cluster.db }} /var/lib/postgresql/data/app.restore.tmp'

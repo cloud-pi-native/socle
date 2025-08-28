@@ -1,0 +1,12 @@
+{% if dsc.exposedCA.type != 'none'  %}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+  name: bundle 
+  namespace: "{{ dsc.console.namespace }}"
+data:
+  ca.pem: |
+    <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#exposedCa>
+{% endif %}

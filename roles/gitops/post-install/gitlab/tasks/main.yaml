@@ -241,6 +241,7 @@
   block:
     - name: Retrieve GitLab values from infra Vault
       community.hashi_vault.vault_kv2_get:
+        validate_certs: "{{ vaultinfra_cert_valid }}"
         url: "https://{{ vaultinfra_domain }}"
         auth_method: token
         token: "{{ vault_infra_token }}"

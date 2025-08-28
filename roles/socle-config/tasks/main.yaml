@@ -150,6 +150,19 @@
   ansible.builtin.set_fact:
     vaultinfra_domain: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') }}"
 
+- name: Probe Vaultinfra domain cert validity
+  ansible.builtin.uri:
+    url: "https://{{ vaultinfra_domain }}"
+    method: GET
+    return_content: no
+    validate_certs: true
+  register: vaultinfra_probe
+  ignore_errors: true
+
+- name: Set vaultinfra_cert_valid fact
+  set_fact:
+    vaultinfra_cert_valid: "{{ vaultinfra_probe.failed is not defined or not vaultinfra_probe.failed }}"
+
 - name: Debug domains facts
   ansible.builtin.debug:
     msg:

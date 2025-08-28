@@ -11,7 +11,7 @@
     namespace: "{{ dsc.vaultInfra.namespace }}"
     engine_mount_point: "{{ vaultinfra_kv_name }}"
     path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
   register: current_vault_values
   ignore_errors: true
 
@@ -58,7 +58,7 @@
     engine_mount_point: "{{ vaultinfra_kv_name }}"
     path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
     data: "{{ current_vault_values_combined.stdout | from_json }}"
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
 
 - name: Set {{ item.1.argocd_app }}_current_vault_values
   ansible.builtin.set_fact:

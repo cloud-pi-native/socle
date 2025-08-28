@@ -39,7 +39,7 @@
 # Create kv engine
 - name: Get kv engines
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
     method: GET
     url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/{{ vaultinfra_kv_name }}"
     status_code: [200, 400]
@@ -50,7 +50,7 @@
 - name: Create default {{ vaultinfra_kv_name }} kv engine
   when: get_engines.status == 400
   ansible.builtin.uri:
-    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
     url: "https://{{ vaultinfra_domain }}/v1/sys/mounts/{{ vaultinfra_kv_name }}"
     method: POST
     status_code: [204]

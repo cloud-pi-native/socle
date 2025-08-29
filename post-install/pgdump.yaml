@@ -9,6 +9,6 @@
       ansible.builtin.import_role:
         name: socle-config
 
-    - name: Import pgump role
+    - name: Import pgdump role
       ansible.builtin.import_role:
         name: gitops/post-install/pgdump

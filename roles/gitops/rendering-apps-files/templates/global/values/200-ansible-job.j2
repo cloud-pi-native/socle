@@ -14,6 +14,18 @@ cpn-ansible-job:
       - name: NO_PROXY
         value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
 {% endif %}
+{% if dsc.global.backup.s3.endpointCA is defined %}
+      - name: AWS_CA_BUNDLE
+        value: /bundle-s3-dir/ca.pem
+    extraVolumes:
+    - name: bundle-s3
+      secret:
+        secretName: bundle-cnpg-s3
+    extraVolumeMounts:
+    - name: bundle-s3
+      mountPath: /bundle-s3-dir
+      readOnly: true
+{% endif %}
   cronJob:
     create: true
     name: "pgdump"

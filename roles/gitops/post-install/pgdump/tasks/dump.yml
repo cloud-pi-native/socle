@@ -31,6 +31,20 @@
     bucket: "{{ dsc.global.backup.s3.bucketName }}"
     object: "pgdump/{{ item.name }}/app.dump-{{ lookup('pipe', 'date +%d') | int % 10 }}"
     mode: put
+    overwrite: true
     access_key: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
     secret_key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
     src: "/tmp/{{ item.name }}.dump.tmp"
+  register: pgdump_s3_upload_result
+  ignore_errors: true
+
+- name: Upload dump to custom S3 using s3cmd
+  when: "'XAmzContentSHA256Mismatch' in pgdump_s3_upload_result.msg"
+  ansible.builtin.command: >
+    s3cmd put
+      /tmp/{{ item.name }}.dump.tmp
+      s3://backup-dso-integ/pgdump/{{ item.name }}/app.dump-{{ lookup('pipe', 'date +%d') | int % 10 }}
+  environment:
+    S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
+    S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+    S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"

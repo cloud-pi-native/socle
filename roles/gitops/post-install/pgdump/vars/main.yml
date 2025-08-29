@@ -1,16 +1,16 @@
 pgdump_cnpg_clusters:
-  - name: "{{ dsc.keycloak.subDomain }}"
+  - name: keycloak
     namespace: "{{ dsc.keycloak.namespace }}"
     db: keycloak
-  - name: "{{ dsc.sonarqube.subDomain }}"
+  - name: sonar
     namespace: "{{ dsc.sonarqube.namespace }}"
     db: sonardb
-  - name: "{{ dsc.gitlab.subDomain }}"
+  - name: gitlab
     namespace: "{{ dsc.gitlab.namespace }}"
     db: gitlabhq_production
-  - name: "{{ dsc.harbor.subDomain }}"
+  - name: harbor
     namespace: "{{ dsc.harbor.namespace }}"
     db: registry
-  - name: "{{ dsc.console.subDomain }}"
+  - name: console
     namespace: "{{ dsc.console.namespace }}"
     db: dso-console-db

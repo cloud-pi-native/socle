@@ -140,6 +140,7 @@ spec:
       imageName: cloudnative-pg/postgresql:16.2
     managementRealm: master
     applicationRealm: dso
+    usersGitOpsEnabled: false
     values: {}
   keycloakInfra:
     installEnabled: false

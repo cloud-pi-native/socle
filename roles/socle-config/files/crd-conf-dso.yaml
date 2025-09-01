@@ -1344,6 +1344,9 @@ spec:
                     applicationRealm:
                       description: Keycloak application realm.
                       type: string
+                    usersGitOpsEnabled:
+                      description: Specifies whether we should manage users with GitOps.
+                      type: boolean
                     values:
                       description: |
                         You can add custom values for keycloak, they will be merged with roles/keycloak/templates/values/

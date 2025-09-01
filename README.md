@@ -45,6 +45,7 @@
 - [Platform](#platform)
 - [Profile CIS](#profile-cis)
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
+- [Gestion des users Keycloak](#gestion-des-users-keycloak)
 - [Installation en mode GitOps](#installation-en-mode-gitops)
   - [Prérequis](#prérequis-1)
   - [Principe d'installation GitOps](#principe-dinstallation-gitops)
@@ -1027,6 +1028,15 @@ kubectl get secrets -A | egrep 'NAME|dso-config-pull-secret'
 ```
 
 Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
+
+## Gestion des users Keycloak
+
+Il est possible de gérer la création des users dans le realm applicatif (dso) en spécifiant le paramètre `dsc.keycloak.usersGitOpsEnabled` à `true`.  
+Pour migrer vers ce mode de gestion, il est possible d'extraire la liste des utilisateurs existant via un playbook, il suffit de lancer la commande suivante :
+```shell
+ansible-playbook admin-tools/keycloak-extract-users.yml
+```
+Vous pourrez ensuite mettre le contenu de l'extraction dans le fichier, du dépôt des values, généré à l'emplacement suivant `"{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/keycloak/templates/users.yaml"`.
 
 ## Installation en mode GitOps
 

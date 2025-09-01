@@ -112,6 +112,16 @@
 # Write Vault Infra secrets
 
 - name: Write secrets
+  when: >
+    (
+      item.1.argocd_app == "observability"
+      and dsc.observatorium.installEnabled
+    )
+    or
+    (
+      item.1.argocd_app != "observability"
+      and dsc[item.1.argocd_app].installEnabled
+    )
   ansible.builtin.include_tasks: write.yml
   loop: "{{ envs | subelements('apps') }}"
   loop_control:

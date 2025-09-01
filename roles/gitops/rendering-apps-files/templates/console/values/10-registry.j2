@@ -1,15 +1,14 @@
 console:
   server:
-    container:
-      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/console/server"
-      
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/console/server"
   client:
-    container:
-      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/console/client"
-
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/console/client"
   postgres:
-    container:
-      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/postgres:15.3"
+    image:
+      registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>"
+      repository: "postgres:15.3"
 
 {% if use_image_pull_secrets %}
   global:

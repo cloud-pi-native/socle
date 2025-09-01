@@ -408,5 +408,6 @@
               redirect_uri: https://{{ gitlab_domain }}/users/auth/openid_connect/callback
 
 - name: Reconcile keycloak users
+  when: dsc.keycloak.usersGitOpsEnabled
   ansible.builtin.include_tasks:
     file: sync_users.yml

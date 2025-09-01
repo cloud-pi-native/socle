@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.16.0](https://github.com/cloud-pi-native/socle/compare/v3.15.0...v3.16.0) (2025-09-01)
+
+
+### Features
+
+* :lock: disable master realm exposition ([ef35c68](https://github.com/cloud-pi-native/socle/commit/ef35c68287a007c2837fa82a7afa7dfc4c38958f))
+* :sparkles: introduce pgdump cronjob ([e178262](https://github.com/cloud-pi-native/socle/commit/e178262d95d9f172e059d3e63e4796a3ff1df551))
+* :sparkles: openshift compatibility and miscellaneous configurations ([3ee93be](https://github.com/cloud-pi-native/socle/commit/3ee93bee8a72e9967c0a317eed5e44d3fe81fb99))
+* :technologist: admin-tools pgrestore playbook ([7c8370d](https://github.com/cloud-pi-native/socle/commit/7c8370d1425380dcb2f9b93ffc6004d112eeda94))
+* gitops awx ([5451db5](https://github.com/cloud-pi-native/socle/commit/5451db5a2b841ed1b89b08beaf7a000bf1ced6a2))
+* Upgrade to Console version 9.4.0 (chart 2.1.11) ([771668e](https://github.com/cloud-pi-native/socle/commit/771668e01600fa1e63cb12f3156b15b0ce26a07b))
+
+
+### Bug Fixes
+
+* :bug: add missing dockerAcount.enabled condition ([d200c28](https://github.com/cloud-pi-native/socle/commit/d200c28e5a1a6a1f812c829cee90c05b0d24f961))
+* :bug: missing cnpg backup ca option ([d3aa9db](https://github.com/cloud-pi-native/socle/commit/d3aa9db3f529715bf5e8fc0a455099afb7f8cf68))
+* :bug: missing configmap for private ca ([7a0327e](https://github.com/cloud-pi-native/socle/commit/7a0327e5b02b171d07929540092eabb9f1af8f69))
+* :bug: Missing CRD parameter for Console DSO ([91b85fe](https://github.com/cloud-pi-native/socle/commit/91b85fe816e97016281ce48a13035d1187e9ee9e))
+* :bug: Vault Infra ca may be independent ([171952f](https://github.com/cloud-pi-native/socle/commit/171952fa3626812259e37aff13572246dc8cbcf5))
+* :lock: Add no_log parameter to sensitive task ([0c45090](https://github.com/cloud-pi-native/socle/commit/0c45090810910e788d807e591a2568a58ad36a91))
+* **#751:** :bug: nexus job config outofsync ([34750e6](https://github.com/cloud-pi-native/socle/commit/34750e63123a0e0c5826054e34aa8c85f8d1f8bd))
+* **#751:** :wrench: nexus job-config hook deletion ([23e4aed](https://github.com/cloud-pi-native/socle/commit/23e4aed80441101a43b346a8bd9df512d02eaa13))
+* **#768:** :bug: infra-keycloak cnpg deployment ([16ce599](https://github.com/cloud-pi-native/socle/commit/16ce59910eda97f9462a2b66858efd5bcdab0d2d))
+
 ## [3.15.0](https://github.com/cloud-pi-native/socle/compare/v3.14.0...v3.15.0) (2025-08-13)
 
 

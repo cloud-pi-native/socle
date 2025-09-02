@@ -1,0 +1,71 @@
+---
+- name: Get Keycloak admin password
+  kubernetes.core.k8s_info:
+    namespace: "{{ dsc.keycloak.namespace }}"
+    kind: Secret
+    name: keycloak
+  register: kc_adm_pass
+
+- name: Set Keycloak admin facts
+  ansible.builtin.set_fact:
+    keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password'] | b64decode }}"
+    keycloak_admin: admin
+
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
+  ignore_errors: true
+
+- name: Reset Keycloak admin fact
+  when: kc_token is failed
+  ansible.builtin.set_fact:
+    keycloak_admin: dsoadmin
+
+- name: Get Keycloak API token
+  ansible.builtin.uri:
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
+
+- name: Set kc_access_token fact
+  ansible.builtin.set_fact:
+    kc_access_token: "{{ kc_token.json.access_token }}"
+
+- name: Get keycloak dso realm users from API
+  ansible.builtin.uri:
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/users"
+    method: GET
+    status_code: [200, 202]
+    return_content: true
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    body_format: json
+    headers:
+      Authorization: bearer {{ kc_access_token }}
+  register: kc_dso_users
+
+- name: Force CONFIGURE_TOTP for all users except admin
+  ansible.builtin.uri:
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/users/{{ item.id }}"
+    method: PUT
+    status_code: [200, 204]
+    body_format: json
+    headers:
+      Authorization: bearer {{ kc_access_token }}
+    body: >-
+      {{
+        item | combine({
+          "requiredActions": ["CONFIGURE_TOTP"]
+        })
+      }}
+  loop: "{{ kc_dso_users.json }}"
+  when: item.email != 'admin@example.com'

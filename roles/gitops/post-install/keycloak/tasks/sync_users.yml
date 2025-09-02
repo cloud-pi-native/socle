@@ -27,6 +27,11 @@
     email: "{{ item.value.email }}"
     enabled: "{{ item.value.status == 'active' }}"
     emailVerified: true
+    required_actions: >- # This only works during creation
+      {{
+        [] if item.value.email == 'admin@example.com'
+        else ['CONFIGURE_TOTP']
+      }}
     credentials: >-
       {{
         omit

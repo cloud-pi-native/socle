@@ -49,6 +49,7 @@
 - [Profile CIS](#profile-cis)
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
 - [Gestion des users Keycloak](#gestion-des-users-keycloak)
+- [MFA pour les utilisateurs Keycloak](#mfa-pour-les-utilisateurs-keycloak)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1706,6 +1707,14 @@ Pour migrer vers ce mode de gestion, il est possible d'extraire la liste des uti
 ansible-playbook admin-tools/keycloak-extract-users.yml
 ```
 Vous pourrez ensuite mettre le contenu de l'extraction dans le fichier, du dépôt des values, généré à l'emplacement suivant `"{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/keycloak/templates/users.yaml"`.
+
+## MFA pour les utilisateurs Keycloak
+
+Le MFA est activé par défaut si le paramètre `dsc.keycloak.usersGitOpsEnabled` est positionné à `true`.  
+Il sera nécessaire pour activer le MFA sur les utilisateurs existants, de lancer en one-shot le playbook suivant :
+```shell
+ansible-playbook admin-tools/keycloak-enforce-mfa.yml
+```
 
 ## Contributions
 

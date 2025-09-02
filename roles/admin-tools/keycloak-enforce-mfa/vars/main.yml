@@ -1,0 +1,2 @@
+---
+keycloak_auth_url: "https://{{ keycloak_domain }}"

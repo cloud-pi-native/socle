@@ -208,13 +208,13 @@
     reset_password_allowed: true
     action_token_generated_by_user_lifespan: 900
     smtp_server:
-      host: "{{ dsc.global.smtp.host }}"
-      port: "{{ dsc.global.smtp.port }}"
-      from: "{{ dsc.global.smtp.from }}"
-      user: "{{ dsc.global.smtp.user }}"
-      password: "{{ dsc.global.smtp.password }}"
-      auth: true
-      starttls: true
+      host: "{{ (dsc.global.smtp | default({})).host | default(omit) }}"
+      port: "{{ (dsc.global.smtp | default({})).port | default(omit) }}"
+      from: "{{ (dsc.global.smtp | default({})).from | default(omit) }}"
+      user: "{{ (dsc.global.smtp.authentication | default({})).user | default(omit) }}"
+      password: "{{ (dsc.global.smtp.authentication | default({})).password | default(omit) }}"
+      auth: "{{ dsc.global.smtp.authentication.enabled }}"
+      starttls: "{{ dsc.global.smtp.starttlsEnabled }}"
 
 - name: Create base admins groups
   community.general.keycloak_group:

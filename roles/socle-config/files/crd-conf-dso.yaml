@@ -992,8 +992,7 @@ spec:
                     smtp:
                       properties:
                         enabled:
-                          default: false
-                          description: Specifies whether we should enabled the use of a SMTP server.
+                          description: Specifies whether we should enable the use of a SMTP server.
                           type: boolean
                         host:
                           description: The SMTP server host.
@@ -1004,12 +1003,21 @@ spec:
                         from:
                           description: The email address used as the sender.
                           type: string
-                        user:
-                          description: The SMTP account username.
-                          type: string
-                        password:
-                          description: The SMTP account password.
-                          type: string
+                        starttlsEnabled:
+                          description: Specifies whether we should enable tls encryption.
+                          type: boolean
+                        authentication:
+                          type: object
+                          properties:
+                            enabled:
+                              description: Specifies whether we should enable the authentication.
+                              type: boolean
+                            user:
+                              description: The SMTP account username.
+                              type: string
+                            password:
+                              description: The SMTP account password.
+                              type: string
                       type: object
                   required:
                     - projectsRootDir

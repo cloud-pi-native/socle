@@ -105,6 +105,11 @@ spec:
       watchpointEnabled: true
     dockerAccount:
       enabled: false
+    smtp:
+      enabled: false
+      authentication:
+        enabled: false
+      starttlsEnabled: false
   grafana:
     namespace: dso-grafana
     subDomain: grafana

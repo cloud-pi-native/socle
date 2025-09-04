@@ -67,7 +67,7 @@ spec:
     chartVersion: 3.1.4
   nexus:
     # https://hub.docker.com/r/sonatype/nexus3/
-    chartVersion: 5.13.1
+    chartVersion: 5.13.2
   observatorium:
     # https://github.com/cloud-pi-native/helm-charts/tags
     chartVersion: 0.5.2

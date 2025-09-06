@@ -1,6 +1,4 @@
 {% if dsc.global.platform == "openshift" %}
 cloudnativepg:
-  containerSecurityContext:
-    runAsUser: 1000957777 #null is not working with subchart
-    runAsGroup: 1000957777
+  containerSecurityContext: false
 {% endif %}

@@ -229,6 +229,8 @@ values:
 
     serverTelemetry: |
       serverTelemetry:
+        serviceMonitor:
+          enabled: {{ (dsc.global.metrics.enabled or dsc.global.alerting.enabled) | lower }}
         prometheusRules:
           enabled: {{ (dsc.global.metrics.enabled or dsc.global.alerting.enabled) | lower }}
           rules:

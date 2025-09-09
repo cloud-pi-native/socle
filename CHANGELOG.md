@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.17.0](https://github.com/cloud-pi-native/socle/compare/v3.16.0...v3.17.0) (2025-09-09)
+
+
+### Features
+
+* :sparkles: admin-tools role for keycloak users extraction ([9662da9](https://github.com/cloud-pi-native/socle/commit/9662da960a09e92d99085561c1568cdb5098c241))
+
+
+### Bug Fixes
+
+* :bug: allow non-authentication and no-tls ([456728b](https://github.com/cloud-pi-native/socle/commit/456728b4fa0df8a729591ab5a762e6ed7d592d6a))
+* :bug: Missing Vault serviceMonitor ([1612545](https://github.com/cloud-pi-native/socle/commit/161254583192c5a73af4bed9f8b3cbe0a27a5bcd))
+* :wrench: disable task if not installEnabled ([16eca3e](https://github.com/cloud-pi-native/socle/commit/16eca3e72a5993874489c3eb9be20d61443517ec))
+* Update image value paths to match correct usage ([7210d08](https://github.com/cloud-pi-native/socle/commit/7210d08e190c0b9d4d38c6b282fdfc0b795455a2))
+
 ## [3.16.0](https://github.com/cloud-pi-native/socle/compare/v3.15.0...v3.16.0) (2025-09-01)
 
 

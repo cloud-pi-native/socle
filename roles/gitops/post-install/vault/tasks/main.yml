@@ -508,23 +508,6 @@
       ansible.builtin.set_fact:
         service_monitors_names: "{{ service_monitors.resources | map(attribute='metadata.name') }}"
 
-    # bearerTokenSecret is not supported in Vault Helm Chart
-
-    - name: Patch ServiceMonitor
-      kubernetes.core.k8s:
-        api_version: monitoring.coreos.com/v1
-        kind: ServiceMonitor
-        namespace: "{{ dsc.vault.namespace }}"
-        name: "{{ item }}"
-        state: patched
-        definition:
-          spec:
-            endpoints:
-              - bearerTokenSecret:
-                  key: root_token
-                  name: "{{ dsc_name }}-vault-keys"
-      loop: "{{ service_monitors_names }}"
-
     # Label is not supported in Vault Helm Chart
 
     - name: Patch serviceMonitors

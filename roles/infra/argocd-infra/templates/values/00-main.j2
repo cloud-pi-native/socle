@@ -172,8 +172,8 @@ repoServer:
     runAsNonRoot: true
     runAsUser: 999
 {% endif %}
-{% if dsc.global.dockerAccount.enabled %}
   initContainers:
+{% if dsc.global.dockerAccount.enabled %}
   - name: helm-login
     image: quay.io/argoproj/argocd:{{ argo_app_version }}
     command: ["sh", "-c"]

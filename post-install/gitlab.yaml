@@ -11,10 +11,6 @@
       ansible.builtin.import_role:
         name: socle-config
 
-    - name: Import ca role
-      ansible.builtin.import_role:
-        name: ca
-
     - name: Get gitlab_current_vault_values
       block:
         - name: Reset envs vars

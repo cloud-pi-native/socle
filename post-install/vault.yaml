@@ -12,10 +12,6 @@
       ansible.builtin.import_role:
         name: socle-config
 
-    - name: Import ca role
-      ansible.builtin.import_role:
-        name: ca
-
     - name: Get vault_values
       ansible.builtin.include_role:
         name: gitops/rendering-apps-files

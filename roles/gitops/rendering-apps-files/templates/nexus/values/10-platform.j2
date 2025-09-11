@@ -9,7 +9,12 @@ nexus3:
     runAsGroup: 200
     runAsUser: 200
 {% elif dsc.global.platform == "openshift" %}
+  initNonRootSecurityContext: false
+  initRootSecurityContext: false
   podSecurityContext: false
-
   securityContext: false
+  config:
+    job:
+      podSecurityContext: false
+      securityContext: false
 {% endif %}

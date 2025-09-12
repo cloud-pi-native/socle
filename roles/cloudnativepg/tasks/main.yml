@@ -29,7 +29,7 @@
     - name: Add CloudNativePG helm repo
       kubernetes.core.helm_repository:
         name: cnpg
-        repo_url: "{{ dsc.cloudnativepg.helmRepoUrl }}"
+        repo_url: "{{ dsc.cloudnativepg.operator.helmRepoUrl }}"
         force_update: true
 
     - name: Set path fact
@@ -41,14 +41,14 @@
         name: combine
       vars:
         combine_path: "{{ path }}"
-        combine_user_values: "{{ dsc.cloudnativepg['values'] }}"
+        combine_user_values: "{{ dsc.cloudnativepg.operator['values'] }}"
         combine_dest_var: "cnpg_values"
 
     - name: Deploy CloudNativePG helm
       kubernetes.core.helm:
         name: cloudnative-pg
         chart_ref: cnpg/cloudnative-pg
-        chart_version: "{{ dsc.cloudnativepg.chartVersion }}"
+        chart_version: "{{ dsc.cloudnativepg.operator.chartVersion }}"
         release_namespace: "{{ dsc.cloudnativepg.namespace }}"
         values: "{{ cnpg_values }}"
 

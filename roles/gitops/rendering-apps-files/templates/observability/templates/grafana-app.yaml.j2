@@ -12,7 +12,7 @@ spec:
   sources:
   - chart: dso-grafana
     repoURL: {{ dsc.grafana.helmRepoUrl }}
-    targetRevision: {{ dsc.grafana.chartVersion }}
+    targetRevision: {{ dsc.grafana.chartVersion | quote }}
     helm:  
       values: {% raw %}|
         {{ .Values.grafana | toYaml | nindent 8 }}

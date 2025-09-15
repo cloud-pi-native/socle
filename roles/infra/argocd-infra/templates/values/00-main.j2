@@ -66,6 +66,15 @@ configs:
     users.anonymous.enabled: "false"
     admin.enabled: "{{ dsc.argocdInfra.admin.enabled }}"
     kustomize.buildOptions: "--enable-helm"
+    resource.customizations.health.grafana.integreatly.org_GrafanaDashboard: |
+      hs = {}
+      hs.status = "Progressing"
+      hs.message = ""
+      if obj.status ~= nil then
+        hs.status = "Healthy"
+        hs.message = "Assumed healthy"
+      end
+      return hs
     resource.customizations.health.apps.gitlab.com_GitLab: |
       health_status = {}
       health_status.status = "Progressing"

@@ -38,7 +38,7 @@ console:
         backend: "console-backend"
         frontend: "console-frontend"
       clientSecrets:
-        backend: ""
+        backend: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client| jsonPath {.consoleBackend.secret}>"
       redirectUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.console}>"
       sessionSecret: "a-very-strong-secret-with-more-than-32-char"
       devRealm: false
@@ -150,12 +150,13 @@ console:
     envFrom:
       - secretRef:
           name: dso-config
+{% if dsc.observatorium.installEnabled %}
     env:
-      - name: DB_URL
-        valueFrom:
-          secretKeyRef:
-            key: uri
-            name: pg-cluster-console-app
+      DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion }}
+      GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>
+    plugins:
+    - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/v1.1.3/build-artifact.zip
+{% endif %}
   postgresql:
     enabled: false
     nameOverride: "cpn-console-db"

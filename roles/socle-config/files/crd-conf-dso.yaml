@@ -1549,6 +1549,9 @@ spec:
                     chartVersion:
                       description: Observatorium helm chart version (e.g., "0.25.0").
                       type: string
+                    observabilityChartVersion:
+                      description: Dso-observability helm chart version (e.g., "0.1.8").
+                      type: string
                     apiConfig:
                       description: Observatorium global.api.config.
                       properties:

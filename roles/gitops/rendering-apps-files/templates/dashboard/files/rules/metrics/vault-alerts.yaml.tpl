@@ -15,7 +15,7 @@ groups:
           message: Vault {{`{{`}} $labels.pod {{`}}`}} pod in namespace {{`{{`}} $labels.namespace {{`}}`}} is not healthy (sealed?). Check its logs.
           summary: Vault instance is not healthy (sealed?)
         expr: |
-          up{job="(.*-)*vault-internal",pod=~"(.*-)*vault(-.*)*"} == 0
+          up{job="(.*-)*vault-active",pod=~"(.*-)*vault(-.*)*"} == 0
         for: 5m
         labels:
           severity: warning
@@ -57,7 +57,8 @@ groups:
           summary: Vault pod not healthy (container is not ready)
         expr: |
           kube_pod_container_status_ready{
-          pod!~"backup-utils-vault(-.*)*",
+          pod!~"(.*-)*backup-utils-vault(-.*)*",
+          pod!~"(.*-)*cpn-ansible-job(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}vault"} == 0
         for: 5m
         labels:

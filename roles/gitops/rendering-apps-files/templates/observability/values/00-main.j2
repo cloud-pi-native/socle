@@ -78,11 +78,21 @@ grafana:
   server:
     certManager:
       enabled: true
-    ingressClassName: nginx
+    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.grafana}>
   grafana:
-    isOpenShift: {{ dsc.global.platform == "openshift" | ternary(true, false) }}
+    adminPassword: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#grafana| jsonPath {.adminPassword}>
+    isOpenShift: {{ dsc.global.platform == "openshift" }}
     observatorium_url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
+{% if dsc.proxy.enabled %}
+    env:
+    - name: HTTP_PROXY
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
+    - name: HTTPS_PROXY
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
+    - name: NO_PROXY
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
+{% endif %}
   global:
     projects:
       console:

@@ -225,6 +225,8 @@
               endpoint:
                 logs: "{{ dsc.global.logs.endpoint | default('') }}"
                 metrics: "{{ dsc.global.metrics.endpoint | default('') }}"
+              grafana:
+                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           - argocd_app: nexus
             clusterName: ""
             nameSpace: "nexus"

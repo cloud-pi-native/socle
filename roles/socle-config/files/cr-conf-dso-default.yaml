@@ -43,7 +43,7 @@ spec:
     gitOps:
       repo:
         url: https://github.com/cloud-pi-native/socle.git
-        revision: develop
+        revision: main
         path: gitops
       watchpointEnabled: true
       envName: sandbox

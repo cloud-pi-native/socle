@@ -2,10 +2,10 @@
 - name: AWX post-configuration
   hosts: localhost
   gather_facts: false
-  # vars:
-  #   post_conf_job: true
-  #   argo_infra_ns_check:
-  #     failed: true
+  vars:
+    post_conf_job: true
+    argo_infra_ns_check:
+      failed: true
   tasks:
     - name: Import socle-config role
       ansible.builtin.import_role:

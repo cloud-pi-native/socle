@@ -17,7 +17,7 @@
   "destination": {
     "clusterName": dsc.global.gitOps.envName | default("")
   },
-  "targetRevision": "main",
+  "targetRevision": dsc.global.gitOps.repo.revision | default("main"),
   "apps": apps
 } %}
 {{ json_data | to_json }}

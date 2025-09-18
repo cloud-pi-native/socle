@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.17.1](https://github.com/cloud-pi-native/socle/compare/v3.17.0...v3.17.1) (2025-09-18)
+
+
+### Bug Fixes
+
+* :bug: Adapt some alerting rules ([0f2013d](https://github.com/cloud-pi-native/socle/commit/0f2013dc8475e33760b432549fba3a867b0dd08a))
+* :bug: Alert rules files path ([ad5828d](https://github.com/cloud-pi-native/socle/commit/ad5828da0e5ec7f04966f8e06199845b1d26325b))
+* :bug: Infra Argo CD configmap for grafana dashboards ([a4ee0e1](https://github.com/cloud-pi-native/socle/commit/a4ee0e16840435d55a92e44a5deed3b6f20f1fe7))
+* :bug: nexus openshift compatibility ([e81d563](https://github.com/cloud-pi-native/socle/commit/e81d563c30b3b73c26e91fbb5ff4648928b6c644))
+* :bug: vault no-proxy ([ce5557a](https://github.com/cloud-pi-native/socle/commit/ce5557a55deef34b34a66d2e734b5be0142f6db6))
+* :bug: Vault post-install serviceMonitors patching ([b6adece](https://github.com/cloud-pi-native/socle/commit/b6adece237bdd8b83a4091fd8956dd5bc3d7238c))
+* :bug: Vault ServiceMonitor and telemetry value ([d8c16e9](https://github.com/cloud-pi-native/socle/commit/d8c16e976cda1c7bea7e69d702965f669e2d2625))
+* :wrench: duplicate ca role call ([9618782](https://github.com/cloud-pi-native/socle/commit/9618782e3128449100b772693c72b7c8909221f5))
+* :wrench: miscellaneous values ([516676d](https://github.com/cloud-pi-native/socle/commit/516676ddf10cd2d0bfa8ccb7939b11fbf839a9b6))
+* activating post conf mode for awx post conf job ([53dbaa9](https://github.com/cloud-pi-native/socle/commit/53dbaa9713134c026c7d11ed5f2a2bd260302c98))
+* argocd-infra initContainers ([4012e8f](https://github.com/cloud-pi-native/socle/commit/4012e8f7ccf2f437943b2d568fd12946272f7007))
+* changing targetRevision from main to dsc configured value ([467e154](https://github.com/cloud-pi-native/socle/commit/467e15485b6046c1d454fb55a9a7965d1cc7dada))
+* missing quotes on version range ([f1c4bca](https://github.com/cloud-pi-native/socle/commit/f1c4bcaf56f57656f6037de7728bd0c614d339b5))
+
 ## [3.17.0](https://github.com/cloud-pi-native/socle/compare/v3.16.0...v3.17.0) (2025-09-09)
 
 

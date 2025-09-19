@@ -39,9 +39,14 @@ spec:
                         default: kube-root-ca.crt
                         description: CA Resource name.
                         type: string
+                      namespace:
+                        default: dso-global
+                        description: CA Resource namespace.
+                        type: string
                     required:
                       - kind
                       - name
+                      - namespace
                     type: object
                   type: array
                 exposedCA:
@@ -131,6 +136,9 @@ spec:
                     subDomain:
                       description: The subdomain for ArgoCD.
                       type: string
+                    domain:
+                      description: The domain for ArgoCD.
+                      type: string
                     helmRepoUrl:
                       description: ArgoCD helm repository url.
                       type: string
@@ -163,6 +171,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for AWX.
+                      type: string
+                    domain:
+                      description: The domain for AWX.
                       type: string
                     chartVersion:
                       description: AWX Operator helm chart version (e.g., "2.19.1").
@@ -234,7 +245,10 @@ spec:
                       description: The namespace for Argo CD infrastructure instance.
                       type: string
                     subDomain:
-                      description: The subdomain for Argo CD infrastructure instance .
+                      description: The subdomain for Argo CD infrastructure instance.
+                      type: string
+                    domain:
+                      description: The domain for Argo CD infrastructure instance.
                       type: string
                     helmRepoUrl:
                       description: Argo CD community maintained helm repository url.
@@ -360,6 +374,9 @@ spec:
                     subDomain:
                       description: The subdomain for console.
                       type: string
+                    domain:
+                      description: The domain for console.
+                      type: string
                     helmRepoUrl:
                       description: Console helm repository url.
                       type: string
@@ -448,6 +465,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for GitLab.
+                      type: string
+                    domain:
+                      description: The domain for GitLab.
                       type: string
                     chartVersion:
                       description: GitLab chart version (e.g., "6.11.10").
@@ -1040,6 +1060,9 @@ spec:
                     subDomain:
                       description: The subdomain for Grafana instance.
                       type: string
+                    domain:
+                      description: The domain for Grafana instance.
+                      type: string
                     grafanaPvcSize:
                       description: Size for grafana persistent volume.
                       type: string
@@ -1098,6 +1121,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for Harbor.
+                      type: string
+                    domain:
+                      description: The domain for Harbor.
                       type: string
                     helmRepoUrl:
                       description: Harbor helm repository url.
@@ -1321,6 +1347,9 @@ spec:
                     subDomain:
                       description: The subdomain for Keycloak.
                       type: string
+                    domain:
+                      description: The domain for Keycloak.
+                      type: string
                     helmRepoUrl:
                       description: Keycloak Bitnami helm repository url.
                       type: string
@@ -1384,6 +1413,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for Keycloak infrastructure instance.
+                      type: string
+                    domain:
+                      description: The domain for Keycloak infrastructure instance.
                       type: string
                     helmRepoUrl:
                       description: Keycloak Bitnami helm repository url.
@@ -1488,6 +1520,9 @@ spec:
                     subDomain:
                       description: The subdomain for Nexus.
                       type: string
+                    domain:
+                      description: The domain for Nexus.
+                      type: string
                     storageSize:
                       description: Size for nexus persistent volume.
                       type: string
@@ -1542,6 +1577,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for Observatorium.
+                      type: string
+                    domain:
+                      description: The domain for Observatorium.
                       type: string
                     helmRepoUrl:
                       description: Observatorium helm repository url.
@@ -1602,6 +1640,9 @@ spec:
                     subDomain:
                       description: The subdomain for SonarQube.
                       type: string
+                    domain:
+                      description: The domain for SonarQube.
+                      type: string
                     helmRepoUrl:
                       description: SonarQube helm repository url.
                       type: string
@@ -1660,6 +1701,9 @@ spec:
                     subDomain:
                       description: The subdomain for Vault.
                       type: string
+                    domain:
+                      description: The domain for Vault.
+                      type: string
                     helmRepoUrl:
                       description: Hashicorp Vault helm repository url.
                       type: string
@@ -1691,6 +1735,9 @@ spec:
                       type: string
                     subDomain:
                       description: The subdomain for Vault infrastructure instance.
+                      type: string
+                    domain:
+                      description: The domain for Vault infrastructure instance.
                       type: string
                     helmRepoUrl:
                       description: Hashicorp Vault helm repository url.

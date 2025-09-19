@@ -127,24 +127,24 @@
 
 - name: Set tools domains facts
   ansible.builtin.set_fact:
-    argocd_domain: "{{ dsc.argocd.subDomain }}{{ root_domain }}"
-    awx_domain: "{{ dsc.awx.subDomain }}{{ root_domain }}"
-    argocdinfra_domain: "{{ dsc.argocdInfra.subDomain }}{{ infra_root_domain }}"
-    console_domain: "{{ dsc.console.subDomain }}{{ root_domain }}"
-    gitlab_domain: "{{ dsc.gitlab.subDomain }}{{ root_domain }}"
-    grafana_domain: "{{ dsc.grafana.subDomain }}{{ root_domain }}"
-    harbor_domain: "{{ dsc.harbor.subDomain }}{{ root_domain }}"
-    keycloak_domain: "{{ dsc.keycloak.subDomain }}{{ root_domain }}"
-    keycloakinfra_domain: "{{ dsc.keycloakInfra.subDomain }}{{ infra_root_domain }}"
-    nexus_domain: "{{ dsc.nexus.subDomain }}{{ root_domain }}"
-    observatorium_domain: "{{ dsc.observatorium.subDomain }}{{ root_domain }}"
-    sonar_domain: "{{ dsc.sonarqube.subDomain }}{{ root_domain }}"
-    vault_domain: "{{ dsc.vault.subDomain }}{{ root_domain }}"
+    argocd_domain: "{{ dsc.argocd.domain | default(dsc.argocd.subDomain ~ root_domain) }}"
+    awx_domain: "{{ dsc.awx.domain | default(dsc.awx.subDomain ~ root_domain) }}"
+    argocdinfra_domain: "{{ dsc.argocdInfra.domain | default(dsc.argocdInfra.subDomain ~ infra_root_domain) }}"
+    console_domain: "{{ dsc.console.domain | default(dsc.console.subDomain ~ root_domain) }}"
+    gitlab_domain: "{{ dsc.gitlab.domain | default(dsc.gitlab.subDomain ~ root_domain) }}"
+    grafana_domain: "{{ dsc.grafana.domain | default(dsc.grafana.subDomain ~ root_domain) }}"
+    harbor_domain: "{{ dsc.harbor.domain | default(dsc.harbor.subDomain ~ root_domain) }}"
+    keycloak_domain: "{{ dsc.keycloak.domain | default(dsc.keycloak.subDomain ~ root_domain) }}"
+    keycloakinfra_domain: "{{ dsc.keycloakInfra.domain | default(dsc.keycloakInfra.subDomain ~ infra_root_domain) }}"
+    nexus_domain: "{{ dsc.nexus.domain | default(dsc.nexus.subDomain ~ root_domain) }}"
+    observatorium_domain: "{{ dsc.observatorium.domain | default(dsc.observatorium.subDomain ~ root_domain) }}"
+    sonar_domain: "{{ dsc.sonarqube.domain | default(dsc.sonarqube.subDomain ~ root_domain) }}"
+    vault_domain: "{{ dsc.vault.domain | default(dsc.vault.subDomain ~ root_domain) }}"
 
 - name: Set Vault infra domain fact
   when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') == ''
   ansible.builtin.set_fact:
-    vaultinfra_domain: "{{ dsc.vaultInfra.subDomain }}{{ infra_root_domain }}"
+    vaultinfra_domain: "{{ dsc.vaultInfra.domain | default(dsc.vaultInfra.subDomain ~ infra_root_domain) }}"
 
 - name: Set Vault infra domain fact
   when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') != ''

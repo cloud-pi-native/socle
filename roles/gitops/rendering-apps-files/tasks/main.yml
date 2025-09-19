@@ -8,16 +8,6 @@
   ansible.builtin.include_tasks: ./generate_dsc_json.yml
 
 - name: Loop over services to render templates
-  when: >
-    (
-      item.1.argocd_app == "observability"
-      and dsc.observatorium.installEnabled
-    )
-    or
-    (
-      item.1.argocd_app != "observability"
-      and dsc[item.1.argocd_app].installEnabled
-    )
   ansible.builtin.include_tasks: ./template.yml
   loop: "{{ envs | subelements('apps') }}"
   loop_control:

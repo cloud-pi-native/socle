@@ -1,65 +1,82 @@
 ---
-- name: Reset current vault values
+- name: Message
+  ansible.builtin.debug:
+    msg: "Traitement des Vault secrets de l'app {{ item.1.argocd_app }}"
+
+- name: Set install_enabled fact when not observability
+  when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app != "observability")
   ansible.builtin.set_fact:
-    current_vault_values:
+    install_enabled: "{{ dsc[item.1.argocd_app].installEnabled }}"
 
-- name: Retrieve current vault secret
-  community.hashi_vault.vault_kv2_get:
-    url: "https://{{ vaultinfra_domain }}"
-    auth_method: token
-    token: "{{ vault_infra_token }}"
-    namespace: "{{ dsc.vaultInfra.namespace }}"
-    engine_mount_point: "{{ vaultinfra_kv_name }}"
-    path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
-    validate_certs: "{{ vaultinfra_cert_valid }}"
-  register: current_vault_values
-  ignore_errors: true
-
-- name: Get current non null values
-  when: not vault_secrets_post_install
-  ansible.builtin.shell:
-    cmd: |
-      echo '{
-        "old": {{ current_vault_values.secret | default({}) | to_json }},
-        "new": {{ item.1.vault_values | default({}) | to_json }}
-      }' | yq -p=json -o=json -I=0 '.old *n .new'
-  register: current_vault_values_combined_pre
-  changed_when: false
-
-- name: Get current and post install non null values
-  when: vault_secrets_post_install
-  ansible.builtin.shell:
-    cmd: |
-      echo '{
-        "old": {{ current_vault_values.secret | default({}) | to_json }},
-        "new": {{ item.1.vault_values | default({}) | to_json }}
-      }' | yq -p=json -o=json -I=0 '(.new |= with_entries(select(.value != null))) | .old * .new'
-  register: current_vault_values_combined_post
-
-- name: Set unified current_vault_values_combined
-  set_fact:
-    current_vault_values_combined: "{{ current_vault_values_combined_pre if not vault_secrets_post_install else current_vault_values_combined_post }}"
-
-- name: Compare vault values
-  ansible.utils.fact_diff:
-    before: "{{ current_vault_values.secret | default({}) | to_nice_json }}"
-    after: "{{ current_vault_values_combined.stdout | from_json | to_nice_json }}"
-  register: json_comparison_result
-
-- name: Update vault secret
-  when:
-    - json_comparison_result.changed
-    - post_conf_job is not defined or post_vault_update is defined
-  community.hashi_vault.vault_kv2_write:
-    url: "https://{{ vaultinfra_domain }}"
-    auth_method: token
-    token: "{{ vault_infra_token }}"
-    namespace: "{{ dsc.vaultInfra.namespace }}"
-    engine_mount_point: "{{ vaultinfra_kv_name }}"
-    path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
-    data: "{{ current_vault_values_combined.stdout | from_json }}"
-    validate_certs: "{{ vaultinfra_cert_valid }}"
-
-- name: Set {{ item.1.argocd_app }}_current_vault_values
+- name: Set install_enabled fact when observability
+  when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app == "observability")
   ansible.builtin.set_fact:
-    "{{ item.1.argocd_app }}_current_vault_values": "{{ current_vault_values }}"
+    install_enabled: "{{ dsc.observatorium.installEnabled }}"
+
+- name: Write Vault secrets
+  when: install_enabled
+  block:
+    - name: Reset current vault values
+      ansible.builtin.set_fact:
+        current_vault_values:
+
+    - name: Retrieve current vault secret
+      community.hashi_vault.vault_kv2_get:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
+        validate_certs: "{{ vaultinfra_cert_valid }}"
+      register: current_vault_values
+      ignore_errors: true
+
+    - name: Get current non null values
+      when: not vault_secrets_post_install
+      ansible.builtin.shell:
+        cmd: |
+          echo '{
+            "old": {{ current_vault_values.secret | default({}) | to_json }},
+            "new": {{ item.1.vault_values | default({}) | to_json }}
+          }' | yq -p=json -o=json -I=0 '.old *n .new'
+      register: current_vault_values_combined_pre
+      changed_when: false
+
+    - name: Get current and post install non null values
+      when: vault_secrets_post_install
+      ansible.builtin.shell:
+        cmd: |
+          echo '{
+            "old": {{ current_vault_values.secret | default({}) | to_json }},
+            "new": {{ item.1.vault_values | default({}) | to_json }}
+          }' | yq -p=json -o=json -I=0 '(.new |= with_entries(select(.value != null))) | .old * .new'
+      register: current_vault_values_combined_post
+
+    - name: Set unified current_vault_values_combined
+      ansible.builtin.set_fact:
+        current_vault_values_combined: "{{ current_vault_values_combined_pre if not vault_secrets_post_install else current_vault_values_combined_post }}"
+
+    - name: Compare vault values
+      ansible.utils.fact_diff:
+        before: "{{ current_vault_values.secret | default({}) | to_nice_json }}"
+        after: "{{ current_vault_values_combined.stdout | from_json | to_nice_json }}"
+      register: json_comparison_result
+
+    - name: Update vault secret
+      when:
+        - json_comparison_result.changed
+        - post_conf_job is not defined or post_vault_update is defined
+      community.hashi_vault.vault_kv2_write:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
+        data: "{{ current_vault_values_combined.stdout | from_json }}"
+        validate_certs: "{{ vaultinfra_cert_valid }}"
+
+    - name: Set {{ item.1.argocd_app }}_current_vault_values
+      ansible.builtin.set_fact:
+        "{{ item.1.argocd_app }}_current_vault_values": "{{ current_vault_values }}"

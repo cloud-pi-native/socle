@@ -32,6 +32,15 @@ harbor:
     resourcePolicy: keep
 {% if dsc.harbor.s3ImageChartStorage.enabled %}
     imageChartStorage:
+{% if dsc.exposedCA.type != 'none' %}
+      caBundleSecretName: {{ dsc.additionalsCA
+                               | selectattr('kind', 'equalto', 'Secret')
+                               | selectattr('namespace', 'equalto', dsc.harbor.namespace)
+                               | map(attribute='name')
+                               | list
+                               | first }}
+      disableredirect: true
+{% endif %}
       s3:
         bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.bucket}>
         region: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.s3ImageChartStorage.region}>

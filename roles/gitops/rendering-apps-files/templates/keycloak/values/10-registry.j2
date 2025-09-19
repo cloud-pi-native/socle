@@ -4,6 +4,7 @@ keycloak:
       allowInsecureImages: true
   image:
     registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>
+    repository: bitnamilegacy/keycloak
     pullPolicy: "IfNotPresent"
 
 {% if use_image_pull_secrets %}

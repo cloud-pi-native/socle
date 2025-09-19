@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.18.0](https://github.com/cloud-pi-native/socle/compare/v3.17.1...v3.18.0) (2025-09-19)
+
+
+### Features
+
+* :sparkles: allow specific domain naming ([25aace9](https://github.com/cloud-pi-native/socle/commit/25aace9b2434f308c849388c1f7f5f6225a3b3dc))
+
+
+### Bug Fixes
+
+* :bug: add missing rbac for custom ca ([a1bb397](https://github.com/cloud-pi-native/socle/commit/a1bb397f509aaa9abd1b6deda3bc17ba7278fd60))
+* :bug: imagePullSecrets key ([b09298b](https://github.com/cloud-pi-native/socle/commit/b09298be452e2c3d6b8135beaa3736d74f2f3268))
+* :bug: missing harbor s3ImageChartStorage custom CA ([01fd6c0](https://github.com/cloud-pi-native/socle/commit/01fd6c09e8a1478906cdfbf5d7ed865edb4ff431))
+
 ## [3.17.1](https://github.com/cloud-pi-native/socle/compare/v3.17.0...v3.17.1) (2025-09-18)
 
 

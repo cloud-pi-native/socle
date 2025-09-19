@@ -31,6 +31,17 @@ rules:
     verbs: ["list", "get"]
     resourceNames: ["{{ dsc.ingress.tls.ca.secretName }}"]
 {% endif %}
+{% if dsc.additionalsCA is defined %}
+{% for kind in dsc.additionalsCA | map(attribute="kind") | unique %}
+  - apiGroups: [""]
+    resources: ["{{ kind | lower }}s"]
+    verbs: ["list", "get"]
+    resourceNames:
+{% for ca in dsc.additionalsCA if ca.kind == kind %}
+      - "{{ ca.name }}"
+{% endfor %}
+{% endfor %}
+{% endif %}
 {% if dsc.global.backup.cnpg.enabled and 
       dsc.global.backup.s3.endpointCA.namespace is defined and 
       dsc.global.backup.s3.endpointCA.name is defined and 

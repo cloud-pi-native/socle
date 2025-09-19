@@ -1,7 +1,7 @@
 ---
 - name: Get CA cert
   kubernetes.core.k8s_info:
-    namespace: default
+    namespace: "{{ ca_namespace }}"
     kind: "{{ ca_kind }}"
     name: "{{ ca_name }}"
   register: ca_cert

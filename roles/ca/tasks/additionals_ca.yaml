@@ -10,6 +10,7 @@
   vars:
     ca_kind: "{{ item.kind }}"
     ca_name: "{{ item.name }}"
+    ca_namespace: "{{ item.namespace }}"
     key: "{{ item.key | default('') }}"
 
 - name: Set empty ca fact

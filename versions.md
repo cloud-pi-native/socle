@@ -12,7 +12,6 @@
 | gitlabOperator            | 2.1.2           | 2.1.2        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
 | gitlabrunner              | 18.1.1          | 0.78.1        | [gitlabrunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)                                            |
 | grafana                   | 10.4.3           | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
-| grafanaOperator           | 5.10.0           | 5.4.2         | [grafanaOperator](https://github.com/grafana/grafana-operator/tags)                                                  |
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
 | keycloak                  | 26.3.3           | 25.2.0        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                                                      |

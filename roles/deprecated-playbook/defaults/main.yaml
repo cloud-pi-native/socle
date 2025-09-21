@@ -1,1 +1,0 @@
-dso_allow_deprecated: "{{ lookup('env', 'DSO_ALLOW_DEPRECATED') | default('false') | bool }}"

@@ -50,9 +50,6 @@ spec:
     imageVersion: "10.4.3"
     # https://github.com/cloud-pi-native/helm-charts/tags
     chartVersion: ">=1.0.0 <2.0.0"
-  grafanaOperator:
-    # https://github.com/grafana/grafana-operator/tags
-    chartVersion: "v5.10.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.16.0

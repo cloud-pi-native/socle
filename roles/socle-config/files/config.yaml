@@ -115,10 +115,6 @@ spec:
     subDomain: grafana
     grafanaPvcSize: 5Gi
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
-  grafanaOperator:
-    namespace: dso-grafana-operator
-    ociChartUrl: oci://ghcr.io/grafana/helm-charts
-    values: {}
   harbor:
     installEnabled: true
     namespace: dso-harbor

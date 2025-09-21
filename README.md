@@ -959,7 +959,6 @@ En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devron
   - `pluginDownloadUrl` et `prometheusJavaagentVersion`
 - `dsc.gitlabCatalog.catalogRepoUrl`
 - `dsc.argocd.privateGitlabDomain`
-- `dsc.grafanaOperator.ociChartUrl`
 - `helmRepoUrl` pour chaque service à savoir :
   - `argocd`, `certmanager`, `cloudnativepg`, `console`, `glexporter`, `gitlabOperator`, `gitlabrunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
 

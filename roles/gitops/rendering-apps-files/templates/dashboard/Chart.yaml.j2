@@ -6,5 +6,5 @@ version: 1.0.0
 dependencies:
 - name: dso-observability
   alias: dashboard
-  version: {{ dsc.dashboard.chartVersion | quote }}
-  repository: {{ dsc.dashboard.helmRepoUrl }}
+  version: ">=0.0.0 <1.0.0"
+  repository: https://cloud-pi-native.github.io/helm-charts

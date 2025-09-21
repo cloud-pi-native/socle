@@ -1,7 +1,0 @@
-{% if dsc.ingress.tls.type != 'none' and (dsc.ingress.tls.type == 'tlsSecret' or dsc.ingress.tls.type == 'acme') %}
-ingress:
-  tls:
-    - secretName: {{ dsc.ingress.tls.tlsSecret.name | default('tls-secret') }}
-      hosts:
-        - {{ console_domain }}
-{% endif %}

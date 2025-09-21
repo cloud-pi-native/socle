@@ -77,8 +77,6 @@ spec:
   #        memory: "6Gi"
   #        cpu: "2"
   grafana: {}
-  grafanaDatasource: {}
-  grafanaOperator: {}
   harbor:
     adminPassword: anotherGreatPassword
     pvcRegistrySize: 50Gi

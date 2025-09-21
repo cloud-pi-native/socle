@@ -25,7 +25,6 @@
           - "harbor"
           - "console (or console-dso)"
           - "grafana"
-          - "grafanaOperator (or grafana-operator)"
       tags:
         - always
 
@@ -512,47 +511,3 @@
             msg:
               - "Version de Grafana : {{ grafana_instance.resources[0].spec.deployment.spec.template.spec.containers[0].image
                 | regex_search('\\:(.+)', '\\1') | first }}"
-
-    - name: Get Grafana Operator app and chart versions
-      tags:
-        - grafanaOperator
-        - grafana-operator
-      block:
-        - name: Get Grafana Operator namespace
-          kubernetes.core.k8s_info:
-            kind: Namespace
-            name: "{{ dsc.grafanaOperator.namespace }}"
-          register: gop_ns
-
-        - name: Warning message
-          when: gop_ns.resources | length == 0
-          ansible.builtin.debug:
-            msg:
-              - "Le namespace {{ dsc.grafanaOperator.namespace }} n'existe pas."
-              - "Cela signifie que l'opérateur Grafana est absent ou installé dans un namespace indépendant du Socle."
-
-        - name: Retrieve Grafana Operator infos
-          when: gop_ns.resources | length > 0
-          kubernetes.core.helm_info:
-            name: grafana-operator
-            namespace: "{{ dsc.grafanaOperator.namespace }}"
-          register: gop_infos
-
-        - name: Warning message
-          when: >
-            gop_ns.resources | length > 0 and
-            gop_infos.status is not defined
-          ansible.builtin.debug:
-            msg:
-              - "L'opérateur Grafana n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
-              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
-              - "Nous ne pouvons en déterminer la version de manière fiable."
-
-        - name: Display Grafana Operator version
-          when: >
-            gop_ns.resources | length > 0 and
-            gop_infos.status is defined
-          ansible.builtin.debug:
-            msg:
-              - "Version de l'opérateur Grafana : {{ gop_infos.status.app_version }}"
-              - "Version de chart Helm de l'opérateur Grafana : {{ gop_infos.status.chart }}"

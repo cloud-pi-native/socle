@@ -12,6 +12,11 @@
       tags:
         - always
 
+    - role: cluster-offline
+      tags:
+        - always
+      when: dsc.global.offline
+
     - role: imagepullsecret
       tags:
         - always

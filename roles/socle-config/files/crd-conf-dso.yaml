@@ -444,15 +444,6 @@ spec:
                         Specifies whether we should install Socle dashboards.
                         This is disable by default since the Loki and Mimir code is not yet opensource.
                       type: boolean
-                    helmRepoUrl:
-                      description: Socle dashboards helm repository url.
-                      type: string
-                    chartVersion:
-                      description: Socle dashboards helm chart version (e.g., "0.18.2").
-                      type: string
-                    tenantId:
-                      description: Socle dashboards tenantId (e.g, "hprod-dso").
-                      type: string
                 gitlab:
                   description: Configuration for GitLab.
                   properties:

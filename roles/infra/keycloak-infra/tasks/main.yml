@@ -458,6 +458,20 @@
             state: present
 #        force: true  ## Ne fontionne pas quand user supprimé via la GUI et tâche relancée.
 
+- name: Get a New Keycloak API token
+  ansible.builtin.uri:
+    url: https://{{ keycloakinfra_domain }}/realms/master/protocol/openid-connect/token
+    method: POST
+    status_code: [200, 202]
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    return_content: true
+    body: username={{ keycloak_admin }}&password={{ keycloak_admin_password }}&grant_type=password&client_id=admin-cli
+  register: kc_token
+
+- name: Set kc_access_token fact
+  ansible.builtin.set_fact:
+    kc_access_token: "{{ kc_token.json.access_token }}"
+
 - name: Get infra keycloak client scopes from API
   ansible.builtin.uri:
     url: https://{{ keycloakinfra_domain }}/admin/realms/infra/client-scopes

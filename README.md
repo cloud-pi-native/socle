@@ -12,7 +12,6 @@
   - [Exemple de déploiement GitOps](#exemple-de-déploiement-gitops)
 - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
   - [Harbor GitOps](#harbor-gitops)
-  - [Vault GitOps](#vault-gitops)
   - [Nexus GitOps](#nexus-gitops)
 - [Déploiement de plusieurs forges DSO dans un même cluster](#déploiement-de-plusieurs-forges-dso-dans-un-même-cluster)
 - [Récupération des secrets](#récupération-des-secrets)
@@ -682,6 +681,8 @@ Celui-ci peut être relancé autant de fois que souhaité, en cliquant sur le bo
 
 ## Migration vers le déploiement GitOps
 
+:warning: Assurez-vous de ne pas perdre le mot de passe admin de Nexus avant d'effectuer la synchronisation Argocd.
+
 Après la synchronisation Argocd, pour tous les services, il sera nécessaire de supprimer les deployments, statefulsets et jobs parce qu'il y a nécessité de modification des champs immuables `spec.selector.matchLabels` lors de la prise d'ownership d'Argocd.  
 Ceci peut être fait avec la commande suivante en se positionnant sur les namespaces concernés.
 ```shell
@@ -721,19 +722,42 @@ Puis lancer le playbook d'insertion des secrets dans le Vault d'infrastructure.
 ansible-playbook install-gitops.yaml -t vault-secrets
 ```
 
-### Vault GitOps
-
-Puis lancer le playbook de post-installation pour dé-sceller le vault.
-```shell
-ansible-playbook install-gitops.yaml -t post-install-vault
-```
-
 ### Nexus GitOps
 
-Lancer le playbook de post-installation pour mettre à jour le mot de passe Nexus dans le secret `dso-config`.
-```shell
-ansible-playbook install-gitops.yaml -t post-install-nexus
+Il y a une migration de données à faire. Pour cela, il faut modifier le Statefulset Nexus de la manière suivante (désactiver l'auto-sync sur Argocd si nécessaire) :
+- monter l'ancien volume existant,
+- modifier l'image du Statefulset et ajouter la commande de `sleep infinity` pour maintenir le conteneur en vie sans que Nexus ne s'exécute.
+```yaml
+spec:
+  template:
+    spec:
+      [...]
+      containers:
+        image: busybox
+        command: ["sleep", "infinity"]
+        [...]
+        volumeMounts:
+        - mountPath: /nexus-data-claim
+          name: nexus-data-claim
+      [...]
+      volumes:
+      - name: nexus-data-claim
+        persistentVolumeClaim:
+          claimName: nexus-data-claim
 ```
+Une fois le pod en `running 3/4`, il faudra exec dans le pod et faire la copie des répertoires suivants.
+```
+cp -rp /nexus-data-claim/blobs /nexus-data/
+cp -rp /nexus-data-claim/db /nexus-data/
+cp -rp /nexus-data-claim/etc /nexus-data/
+cp -rp /nexus-data-claim/keystores /nexus-data/
+
+# Optionnel:
+cp -rp /nexus-data-claim/log /nexus-data/
+cp -rp /nexus-data-claim/cache /nexus-data/
+cp -rp /nexus-data-claim/elasticsearch /nexus-data/
+```
+Synchroniser l'application Argocd pour que Nexus démarre avec les données migrées et supprimer l'ancien pvc (assurez-vous que le mot de passe Admin sur Vault soit bien celui d'avant migration).
 
 ## Déploiement de plusieurs forges DSO dans un même cluster
 

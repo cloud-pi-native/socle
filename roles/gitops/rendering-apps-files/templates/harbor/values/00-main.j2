@@ -87,6 +87,8 @@ harbor:
   redis:
     internal:
       serviceAccountName: harbor-sa
+  exporter:
+    serviceAccountName: harbor-sa
   database:
     type: external
     external:

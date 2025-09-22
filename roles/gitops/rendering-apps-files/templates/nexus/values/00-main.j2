@@ -34,12 +34,6 @@ nexus3:
         softQuota:
           type: spaceRemainingQuota
           limit: 1073741824
-      - name: data-claim
-        type: file
-        path: /nexus-data-claim/blobs/default
-        softQuota:
-          type: spaceRemainingQuota
-          limit: 1073741824
     repos:
 {% if dsc.nexus.proxyEnabled | default(false) %}
       - name: dso-dockerhub-proxy
@@ -130,14 +124,9 @@ nexus3:
     - name: nexus-data-proxy-cache
       persistentVolumeClaim:
         claimName: nexus-data-proxy-cache
-    - name: nexus-data-claim
-      persistentVolumeClaim:
-        claimName: nexus-data-claim
   extraVolumeMounts:
     - name: nexus-data-proxy-cache
       mountPath: /nexus-data-docker
-    - name: nexus-data-claim
-      mountPath: /nexus-data-claim
 
   persistence:
     enabled: true

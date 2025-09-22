@@ -54,7 +54,7 @@ spec:
 {% endraw %}
       synchronize: true # Cascading deletion form the parent
       cloneList:
-        namespace: default
+        namespace: "{{ dsc.global.namespace }}"
         kinds:
           - v1/Secret
           - v1/ConfigMap

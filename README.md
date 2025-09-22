@@ -857,7 +857,7 @@ Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que 
 
 Kyverno est installé en GitOps. Il est utilisé pour déployer une ClusterPolicy qui automatise la réplication des secrets et configmaps portant le label `ns.kyverno.io/all-sync: ""` dans tous les namespaces de la chaîne DSO.
 
-Pour l'instant, seuls les secrets et configmaps présents dans le namespace `default` et portant ce label sont ainsi répliqués.
+Pour l'instant, seuls les secrets et configmaps présents dans le namespace `{{ dsc.global.namespace }}` et portant ce label sont ainsi répliqués.
 
 ### Prometheus
 

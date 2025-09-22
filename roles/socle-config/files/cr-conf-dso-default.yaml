@@ -11,7 +11,7 @@ spec:
     type: none
   #  type: configmap
   #  configmap:
-  #    namespace: default
+  #    namespace: dso-global
   #    name: ca-cert
   #    key: ingress.crt
   global:

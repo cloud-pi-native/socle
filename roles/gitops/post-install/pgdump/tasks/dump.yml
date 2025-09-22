@@ -35,6 +35,9 @@
     access_key: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
     secret_key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
     src: "/tmp/{{ item.name }}.dump.tmp"
+  environment:
+    AWS_REQUEST_CHECKSUM_CALCULATION: "when_required"
+    AWS_RESPONSE_CHECKSUM_VALIDATION: "when_required"
   register: pgdump_s3_upload_result
   ignore_errors: true
 
@@ -44,7 +47,8 @@
     s3cmd put
       /tmp/{{ item.name }}.dump.tmp
       s3://backup-dso-integ/pgdump/{{ item.name }}/app.dump-{{ lookup('pipe', 'date +%d') | int % 10 }}
-  environment:
-    S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
-    S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
-    S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
+      --access_key={{ dsc.global.backup.s3.credentials.accessKeyId.value }}
+      --secret_key={{ dsc.global.backup.s3.credentials.secretAccessKey.value }}
+      --host={{ dsc.global.backup.s3.endpointURL }}
+      --host-bucket="{{ dsc.global.backup.s3.endpointURL | regex_replace('https?://', '') }}/%(bucket)s"
+      --ca-certs=/bundle-s3-dir/ca.pem

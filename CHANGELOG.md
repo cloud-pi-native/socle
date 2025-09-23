@@ -1,5 +1,29 @@
 # Changelog
 
+## [4.0.0](https://github.com/cloud-pi-native/socle/compare/v3.18.0...v4.0.0) (2025-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove legacy installation : [documentation for migrating to GitOps deployment mode](https://github.com/cloud-pi-native/socle/tree/main?tab=readme-ov-file#migration-vers-le-d%C3%A9ploiement-gitops)
+
+### Features
+
+* :boom: remove legacy code ([ca16404](https://github.com/cloud-pi-native/socle/commit/ca16404881a33afa45fd0ebf4bfac886c030bb9a))
+* **795:** Override default keycloak image to the legacy one ([d3f6330](https://github.com/cloud-pi-native/socle/commit/d3f633026a85734e6db8f5d824fbfe260ffe7085))
+
+
+### Bug Fixes
+
+* :ambulance: ClusterRoleBindings names for dual install ([df9e254](https://github.com/cloud-pi-native/socle/commit/df9e25416278c077974ce667b6b7d748800abb2b))
+* :ambulance: Secrets and templates generation ([36589c2](https://github.com/cloud-pi-native/socle/commit/36589c290677c34bad4569f502dbc2385ff5505d))
+* :bug: harbor-exporter missing service account ([6e16bac](https://github.com/cloud-pi-native/socle/commit/6e16bac8c2ab3abf4ed6dbf2c0de2bb5520f241b))
+* :bug: Request a new keycloak token before the expiration of the first one ([ae305a7](https://github.com/cloud-pi-native/socle/commit/ae305a7eaab516092677a08a5975b369c43a56cf))
+* :bug: s3cmd put command ([a46159b](https://github.com/cloud-pi-native/socle/commit/a46159baef6ad2bb402c27f4486e55618503bc8a))
+* :bug: setup cnpg for gitops mode to be used by keycloak ([d6216a7](https://github.com/cloud-pi-native/socle/commit/d6216a7090b14d47f94e5858476f0532a6fe2022))
+* :coffin: remove nexus orphan volume ([2dd8045](https://github.com/cloud-pi-native/socle/commit/2dd804549531d332aa3a9efd3d3898b261a685a3))
+* :wrench: switch kyverno copy policy from default to global namespace ([3d9b0f2](https://github.com/cloud-pi-native/socle/commit/3d9b0f232ffea504bd4cf682d9e3cdc8cdeeb5a5))
+
 ## [3.18.0](https://github.com/cloud-pi-native/socle/compare/v3.17.1...v3.18.0) (2025-09-19)
 
 

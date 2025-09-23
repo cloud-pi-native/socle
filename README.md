@@ -266,6 +266,12 @@ Notons que chacune des trois applications d'infrastructure ci-dessus dispose d'u
 
 Si vous souhaitez les installer une première fois, il faut donc positionner lors de cette première installation le paramètre `installEnabled` sur la valeur `true`.
 
+Si vous souhaitez installer **keyclock**, pensez à installer cloudnativepg s'il existe pas dans votre cluster
+
+```shell
+ansible-playbook install-gitops.yaml -t cloudnativepg
+```
+
 Autre point important, le mot de passe admin d'Argo CD (`argocd_admin_password` dans notre exemple ci-dessus) doit être un hash salé que vous pouvez générer à l'aide de la commande suivante :
 
 ```shell

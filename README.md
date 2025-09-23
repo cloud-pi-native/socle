@@ -278,6 +278,50 @@ Autre point important, le mot de passe admin d'Argo CD (`argocd_admin_password` 
 htpasswd -nbBC 10 "" votre_mot_de_passe_ici | tr -d ':\n' | sed 's/$2y/$2a/'
 ```
 
+#### Configuration du domaine et certificat TLS pour l’Ingress
+
+Les applications **d'infrastructure** doivent être exposées via le **domaine configuré** dans la ressource `conf-dso`.
+Le cluster doit disposer d’un **Ingress** configuré avec un certificat TLS valide (fourni par une autorité de certification reconnue).
+
+##### Cas 1 : certificat signé par une autorité valide
+Aucune configuration supplémentaire n’est nécessaire, l’Ingress est directement utilisable.
+
+##### Cas 2 : certificat auto-signé
+Si vous utilisez un certificat auto-signé, vous devez exposer la **CA racine** pour que les autres composants puissent valider ce certificat.
+Pour cela, ajoutez la CA racine dans un `Secret` ou un `ConfigMap`, puis référencez-le dans le champ `exposedCA` de la ressource `DSC`.
+
+Exemple avec un Secret :
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: root-ca
+  namespace: ingress-nginx
+type: Opaque
+stringData:
+  ca: |
+    -----BEGIN CERTIFICATE-----
+    MIID...
+    -----END CERTIFICATE-----
+```
+
+Et puis dans la configuration `dsc`:
+
+```yaml
+apiVersion: dso.cloud-pi-native.io/v1alpha1
+kind: DSC
+metadata:
+  name: conf-dso
+spec:
+  exposedCA:
+    type: secret
+    secret:
+      namespace: ingress-nginx
+      name: root-ca
+      key: ca
+```
+
 Vous pourrez alors installer les trois instances requises de vos outils d'infrastructure à l'aide du playbook `install-gitops.yaml`.
 
 Si vous avez adapté la configuration `dsc` par défaut (nommée `conf-dso`), la commande sera la suivante :

@@ -1,0 +1,124 @@
+{% if dsc.global.metrics.enabled %}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ dsc_name }}-argocd-application-controller
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  endpoints:
+  - honorLabels: false
+    interval: 30s
+    path: /metrics
+    port: http-metrics
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.argocd.namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: application-controller
+      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.argocd.namespace }}
+      app.kubernetes.io/name: argocd-metrics
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ dsc_name }}-argocd-applicationset-controller
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  endpoints:
+  - honorLabels: false
+    interval: 30s
+    path: /metrics
+    port: http-metrics
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.argocd.namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: applicationset-controller
+      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.argocd.namespace }}
+      app.kubernetes.io/name: argocd-metrics
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ dsc_name }}-argocd-repo-server
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  endpoints:
+  - honorLabels: false
+    interval: 30s
+    path: /metrics
+    port: http-metrics
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.argocd.namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: repo-server
+      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.argocd.namespace }}
+      app.kubernetes.io/name: argocd-repo-server-metrics
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ dsc_name }}-argocd-server
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  endpoints:
+  - honorLabels: false
+    interval: 30s
+    path: /metrics
+    port: http-metrics
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.argocd.namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.argocd.namespace }}
+      app.kubernetes.io/name: argocd-server-metrics
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ dsc_name }}-redis-ha
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  endpoints:
+  - targetPort: 9121
+  jobLabel: conf-cedric-argo-infra-redis-ha
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.argocd.namespace }}
+  selector:
+    matchLabels:
+      app: redis-ha
+      exporter: enabled
+      release: {{ dsc.global.gitOps.envName }}-{{ dsc.argocd.namespace }}
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ dsc_name }}-redis-ha-haproxy
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  endpoints:
+  - targetPort: 9101
+  jobLabel: conf-cedric-argo-infra-redis-ha-haproxy
+  namespaceSelector:
+    matchNames:
+    - {{ dsc.argocd.namespace }}
+  selector:
+    matchLabels:
+      app: redis-ha
+      component: {{ dsc_name }}-redis-ha-haproxy
+      release: {{ dsc.global.gitOps.envName }}-{{ dsc.argocd.namespace }}
+
+{% endif %}

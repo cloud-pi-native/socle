@@ -6,6 +6,7 @@
 - [Prérequis](#prérequis)
 - [Configuration](#configuration)
   - [Utilisation de vos propres values](#utilisation-de-vos-propres-values)
+- [Architecture](#architecture)
 - [Installation en mode GitOps](#installation-en-mode-gitops)
   - [Prérequis](#prérequis-1)
   - [Principe d'installation GitOps](#principe-dinstallation-gitops)
@@ -202,6 +203,199 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
 S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.
+
+## Architecture
+
+```mermaid
+%%{init: {
+  "flowchart": {
+    "curve": "linear",
+    "nodeSpacing": 60,
+    "rankSpacing": 120,
+    "htmlLabels": true,
+    "dagre": { "ranker": "tight-tree" }
+  },
+  "theme": "dark"
+}}%%
+flowchart LR
+    %% --- helpers / styles ---
+    classDef ghost stroke-width:0px,fill-opacity:0,stroke-opacity:0;
+
+    %% =========================
+    %% Infra Cluster
+    %% =========================
+    subgraph InfraCluster["Kubernetes Cluster (Infra)"]
+      direction TB
+      subgraph infra-certmanager["Ns: infra-certmanager"]
+        Infra_CM["Cert-Manager"]
+      end
+      subgraph infra-argocd["Ns: infra-argocd"]
+        Infra_ArgoCD["ArgoCD (Infra)"]
+      end
+      subgraph infra-cnpg["Ns: infra-cnpg"]
+        Infra_CNPG["CNPG Operator"]
+      end
+      subgraph infra-keycloak["Ns: infra-keycloak"]
+        Infra_Keycloak["Keycloak"]
+        Infra_CNPG_cluster_keycloak["CNPG cluster"]
+      end
+      subgraph infra-vault["Ns: infra-vault"]
+        Infra_Vault["Vault"]
+      end
+      subgraph infra-other["Ns: infra-*"]
+        Infra_Other["Other Infra Tools"]
+      end
+    end
+
+    %% =========================
+    %% Socle Cluster
+    %% =========================
+    subgraph SocleCluster["Kubernetes Cluster (Socle)"]
+      direction TB
+
+      %% socle ops / operators
+      subgraph dso-certmanager["Ns: cert-manager"]
+        Socle_CM["Cert-Manager"]
+      end
+      subgraph dso-cnpg["Ns: dso-cloudnativepg"]
+        Socle_CNPG["CNPG Operator"]
+      end
+      subgraph dso-global["Ns: dso-global"]
+        Socle_Global["Global resources"]
+      end
+
+      %% console
+      subgraph dso-console["Ns: dso-console"]
+        Socle_Console_Client["Console - Client"]
+        Socle_Console_Server["Console - Server"]
+        Socle_CNPG_cluster_console["CNPG cluster"]
+      end
+
+      %% apps hub (pour réduire les croisements)
+      Socle_Apps_Hub[("Apps Hub")]
+
+      %% apps
+      subgraph Socle_Apps["Apps Namespaces"]
+        direction TB
+        subgraph dso-keycloak["Ns: dso-keycloak"]
+          Socle_Keycloak["Keycloak"]
+          Socle_CNPG_cluster_keycloak["CNPG cluster"]
+        end
+        subgraph dso-vault["Ns: dso-vault"]
+          Socle_Vault["Vault"]
+        end
+        subgraph dso-argocd["Ns: dso-argocd"]
+          Socle_ArgoCD["ArgoCD"]
+        end
+        subgraph dso-gitlab["Ns: dso-gitlab"]
+          direction TB
+          Socle_Gitlab["GitLab"]
+          Socle_CNPG_cluster_gitlab["CNPG cluster"]
+          Socle_Gitlab_Runner["GitLab Runner"]
+          Socle_Gitlab_CI_Exporter["GitLab CI Exporter"]
+        end
+        subgraph dso-sonarqube["Ns: dso-sonarqube"]
+          Socle_SonarQube["SonarQube"]
+          Socle_CNPG_cluster_sonarqube["CNPG cluster"]
+        end
+        subgraph dso-harbor["Ns: dso-harbor"]
+          Socle_Harbor["Harbor"]
+          Socle_CNPG_cluster_harbor["CNPG cluster"]
+        end
+        subgraph dso-nexus["Ns: dso-nexus"]
+          Socle_Nexus["Nexus"]
+        end
+        subgraph dso-observatorium["Ns: dso-observatorium"]
+          Socle_Observatorium["Observatorium"]
+        end
+        subgraph dso-observability["Ns: dso-grafana"]
+          Graf_console["console"]
+          Graf_prod_dso["prod-dso"]
+          Graf_hprod_dso["hprod-dso"]
+          Graf_prod_console["prod-console"]
+          Graf_hprod_console["hprod-console"]
+          Graf_hprod_project1["hprod-project1"]
+          Graf_hprod_project2["hprod-project2"]
+          Graf_prod_project1["prod-project1"]
+        end
+      end
+    end
+
+    %% ---------- liens "fantômes" d’ordonnancement (indices 0..3) ----------
+    Socle_Apps_Hub -.-> Socle_ArgoCD
+    Socle_Apps_Hub -.-> Socle_Vault
+    Socle_Apps_Hub -.-> Socle_Harbor
+    Socle_Apps_Hub -.-> Socle_Gitlab
+
+    %% Masquer visuellement ces 4 liens
+    linkStyle 0 stroke:transparent,stroke-width:0px,opacity:0;
+    linkStyle 1 stroke:transparent,stroke-width:0px,opacity:0;
+    linkStyle 2 stroke:transparent,stroke-width:0px,opacity:0;
+    linkStyle 3 stroke:transparent,stroke-width:0px,opacity:0;
+
+    %% =========================
+    %% Management / Relations
+    %% =========================
+
+    %% Infra ArgoCD gère les Apps du Socle → hub
+    Infra_ArgoCD -->|Manages Apps in Socle| Socle_Apps_Hub
+
+    %% CNPG operators → clusters PG
+    Infra_CNPG -->|Manages| Infra_CNPG_cluster_keycloak
+    Socle_CNPG -->|Manages| Socle_CNPG_cluster_keycloak
+    Socle_CNPG -->|Manages| Socle_CNPG_cluster_gitlab
+    Socle_CNPG -->|Manages| Socle_CNPG_cluster_sonarqube
+    Socle_CNPG -->|Manages| Socle_CNPG_cluster_harbor
+    Socle_CNPG -->|Manages| Socle_CNPG_cluster_console
+
+    %% Console
+    Socle_Console_Client -->|Interact| Socle_Console_Server
+    Socle_Console_Server -->|R/W| Socle_CNPG_cluster_console
+    Socle_Console_Server --> Socle_Apps_Hub
+
+    %% Observabilité
+    Socle_Observatorium -->|Scrapes/Reads| Graf_console
+    Socle_Observatorium --> Graf_prod_dso
+    Socle_Observatorium --> Graf_hprod_dso
+    Socle_Observatorium --> Graf_prod_console
+    Socle_Observatorium --> Graf_hprod_console
+    Socle_Observatorium --> Graf_hprod_project1
+    Socle_Observatorium --> Graf_hprod_project2
+    Socle_Observatorium --> Graf_prod_project1
+
+    %% GitLab interactions (via hub quand pertinent)
+    Socle_Gitlab -->|Triggers/Pipelines| Socle_Apps_Hub
+    Socle_Gitlab --> Socle_ArgoCD
+    Socle_Gitlab --> Socle_SonarQube
+    Socle_Gitlab --> Socle_Harbor
+    Socle_Gitlab --> Socle_Vault
+    Socle_Gitlab --> Socle_Nexus
+    Socle_Gitlab --> Socle_Gitlab_Runner
+    Socle_Gitlab --> Socle_Gitlab_CI_Exporter
+
+    %% ArgoCD ↔ autres
+    Socle_ArgoCD --> Socle_Vault
+    Socle_ArgoCD --> Socle_Harbor
+
+    %% SSO + R/W Postgres
+    Socle_Keycloak -->|SSO| Socle_Console_Client
+    Socle_Keycloak -->|SSO| Socle_Vault
+    Socle_Keycloak -->|SSO| Socle_Gitlab
+    Socle_Keycloak -->|SSO| Socle_ArgoCD
+    Socle_Keycloak -->|SSO| Graf_console
+    Socle_Keycloak -->|SSO| Graf_prod_dso
+    Socle_Keycloak -->|SSO| Graf_hprod_dso
+    Socle_Keycloak -->|SSO| Graf_prod_console
+    Socle_Keycloak -->|SSO| Graf_hprod_console
+    Socle_Keycloak -->|SSO| Graf_hprod_project1
+    Socle_Keycloak -->|SSO| Graf_hprod_project2
+    Socle_Keycloak -->|SSO| Graf_prod_project1
+
+    Socle_Keycloak -->|R/W| Socle_CNPG_cluster_keycloak
+    Socle_SonarQube -->|R/W| Socle_CNPG_cluster_sonarqube
+    Socle_Harbor -->|R/W| Socle_CNPG_cluster_harbor
+    Socle_Gitlab -->|R/W| Socle_CNPG_cluster_gitlab
+```
 
 ## Installation en mode GitOps
 

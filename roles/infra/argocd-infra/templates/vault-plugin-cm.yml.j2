@@ -49,8 +49,13 @@ data:
           - bash
           - "-c"
           - |
+{% if dsc.global.metrics.enabled %}
+            helm template $ARGOCD_APP_NAME --api-versions "monitoring.coreos.com/v1" --include-crds -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
+            argocd-vault-plugin generate --verbose-sensitive-output -
+{% else %}
             helm template $ARGOCD_APP_NAME --include-crds -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
             argocd-vault-plugin generate --verbose-sensitive-output -
+{% endif %}
       lockRepo: false
   avp-kustomize.yaml: |
     ---

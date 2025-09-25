@@ -1,11 +1,12 @@
 {% if dsc.global.metrics.enabled %}
 argocd:
-  global:
-    addPrometheusAnnotations: true
   redis-ha:
     exporter:
       enabled: true
       image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/oliver006/redis_exporter
+      serviceMonitor:
+        enabled: true
+        namespace: "{{ dsc.argocd.namespace }}"
 {% if dsc.global.metrics.additionalLabels is defined %}
         labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
@@ -14,36 +15,53 @@ argocd:
         repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/library/haproxy
       metrics:
         enabled: true
+        serviceMonitor:
+          enabled: true
+          namespace: "{{ dsc.argocd.namespace }}"
 {% if dsc.global.metrics.additionalLabels is defined %}
           labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
   redis:
     metrics:
       enabled: false
+      serviceMonitor:
+        enabled: false
 {% if dsc.global.metrics.additionalLabels is defined %}
         labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
   server:
     metrics:
       enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: "{{ dsc.argocd.namespace }}"
 {% if dsc.global.metrics.additionalLabels is defined %}
         labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
   repoServer:
     metrics:
       enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: "{{ dsc.argocd.namespace }}"
 {% if dsc.global.metrics.additionalLabels is defined %}
         labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
   applicationSet:
     metrics:
       enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: "{{ dsc.argocd.namespace }}"
 {% if dsc.global.metrics.additionalLabels is defined %}
         labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
   notifications:
     metrics:
       enabled: true
+      serviceMonitor:
+        enabled: true
+        namespace: "{{ dsc.argocd.namespace }}"
 {% if dsc.global.metrics.additionalLabels is defined %}
         labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}

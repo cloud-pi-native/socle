@@ -1,6 +1,17 @@
 vault:
   fullnameOverride: "{{ dsc_name }}-vault"
 {% if dsc.global.metrics.enabled %}
+  serverTelemetry:
+    serviceMonitor:
+      enabled: true
+      authorization:
+        credentials:
+          name: {{ dsc_name }}-vault-keys
+          key: root_token
+{% if dsc.global.metrics.additionalLabels is defined %}
+      selectors:
+        labels: {{ dsc.global.metrics.additionalLabels }}
+{% endif %}
   global:
     serverTelemetry:
       prometheusOperator: true

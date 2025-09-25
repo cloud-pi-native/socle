@@ -4,6 +4,15 @@ vault:
   global:
     serverTelemetry:
       prometheusOperator: true
+      serviceMonitor:
+{% if dsc.global.metrics.additionalLabels is defined %}
+        selectors:
+          labels: {{ dsc.global.metrics.additionalLabels }} 
+{% endif %}
+        authorization:
+          credentials:
+            name: {{ dsc_name }}-vault-keys
+            key: root_token
 {% endif %}
   injector:
 {% if dsc.global.metrics.enabled %}

@@ -5,10 +5,10 @@ metadata:
 spec:
   argocd:
     # https://artifacthub.io/packages/helm/argo/argo-cd
-    chartVersion: 7.9.0
+    chartVersion: 8.5.6
   argocdInfra:
     # https://artifacthub.io/packages/helm/argo/argo-cd
-    chartVersion: 7.9.0
+    chartVersion: 8.5.6
     vaultPluginVersion: 1.18.1
   awx:
     # https://artifacthub.io/packages/helm/awx-operator-helm/awx-operator

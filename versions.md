@@ -1,6 +1,6 @@
 | Outil                     | Version          | Chart version | Source                                                                                                               |
 | ------------------------- | ---------------- | ------------- | -------------------------------------------------------------------------------------------------------------------- |
-| argocd                    | 2.14.1           | 7.9.0         | [argocd](https://artifacthub.io/packages/helm/argo/argo-cd)                                                          |
+| argocd                    | 3.1.7            | 8.5.6         | [argocd](https://artifacthub.io/packages/helm/argo/argo-cd)                                                          |
 | awx                       | 24.6.1           | 2.19.1        | [awx](https://artifacthub.io/packages/helm/awx-operator-helm/awx-operator)                                           |
 | certmanager               | 1.14.3           | 1.14.3        | [certmanager](https://github.com/cert-manager/cert-manager/releases)                                                 |
 | cloudnativepg.cluster     | N/A              | 0.3.1         | [cluster](https://artifacthub.io/packages/helm/cloudnative-pg/cluster)                                               |

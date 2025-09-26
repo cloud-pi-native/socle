@@ -110,50 +110,50 @@ spec:
                         - certmanager
                       default: none
                 argocd:
-                  description: Configuration for ArgoCD.
+                  description: Configuration for Argo CD.
                   properties:
                     installEnabled:
                       default: true
                       description: Specifies whether we should install Argo CD instance.
                       type: boolean
                     admin:
-                      description: Configuration for the ArgoCD admin user.
+                      description: Configuration for the Argo CD admin user.
                       properties:
                         # TO DO
                         enabled:
                           default: false
-                          description: Specifies whether the ArgoCD admin user is enabled.
+                          description: Specifies whether the Argo CD admin user is enabled.
                           type: boolean
                         password:
-                          description: The password for the ArgoCD admin user.
+                          description: The password for the Argo CD admin user.
                           type: string
                       required:
                         - enabled
                       type: object
                     namespace:
-                      description: The namespace for ArgoCD.
+                      description: The namespace for Argo CD.
                       type: string
                     subDomain:
-                      description: The subdomain for ArgoCD.
+                      description: The subdomain for Argo CD.
                       type: string
                     domain:
-                      description: The domain for ArgoCD.
+                      description: The domain for Argo CD.
                       type: string
                     helmRepoUrl:
-                      description: ArgoCD helm repository url.
+                      description: Argo CD helm repository url.
                       type: string
                     chartVersion:
-                      description: ArgoCD helm chart version (e.g., "4.7.13").
+                      description: Argo CD helm chart version (e.g., "4.7.13").
                       type: string
                     values:
                       description: |
-                        You can add custom values for argocd, they will be merged with roles/argocd/templates/values/
+                        You can add custom values for Argo CD, they will be merged with roles/argocd/templates/values/
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:
-                      description: Private Gitlab repository for argocd to access.
+                      description: Private Gitlab repository for Argo CD to access.
                       type: string
                   required:
                     - admin
@@ -179,7 +179,8 @@ spec:
                       description: AWX Operator helm chart version (e.g., "2.19.1").
                       type: string
                     defaultAwxVersion:
-                      description: AWX default version related to chartVersion is required only
+                      description: |
+                        AWX default version related to chartVersion is required only
                         when use_private_registry is true (e.g., "24.6.1").
                       type: string
                     values:
@@ -232,7 +233,6 @@ spec:
                       description: Configuration for the Argo CD infrastructure instance admin user.
                       properties:
                         enabled:
-                          default: false
                           description: Specifies whether the Argo CD infrastructure instance admin user is enabled.
                           type: boolean
                         password:
@@ -258,13 +258,13 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for argocdInfra, they will be merged with roles/infra/argocd-infra/templates/values/
+                        You can add custom values for Argo CD infrastructure instance, they will be merged with roles/infra/argocd-infra/templates/values/
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:
-                      description: Private Gitlab repository for argocd to access.
+                      description: Private Gitlab repository for Argo CD to access.
                       type: string
                     vaultPluginVersion:
                       description: |
@@ -274,6 +274,7 @@ spec:
                     projectName:
                       type: string
                       description: AppProject name to use when creating Applications
+                      default: default
                   required:
                     - admin
                     - installEnabled
@@ -479,7 +480,8 @@ spec:
                         Configuring tools in pipelines container is not an easy job.
                       type: boolean
                     extraCIVars:
-                      description: A key value object to inject additional variables into gitlab root group for
+                      description: |
+                        A key value object to inject additional variables into gitlab root group for
                         CI/CD pipelines.
                       type: array
                       default: []
@@ -715,13 +717,15 @@ spec:
                       minItems: 1
                       type: array
                     rootDomain:
-                      description: The top level of your domain. To expose Argo as "argo.example.com",
+                      description: |
+                        The top level of your domain. To expose Argo as "argo.example.com",
                         the value should be ".example.com" (notice the leading dot).
                       type: string
                       default: .example.com
                       pattern: "^\\..*$"
                     infraRootDomain:
-                      description: The top level of your domain for infrastructure tools. To expose Argo as "argo.example.com",
+                      description: |
+                        The top level of your domain for infrastructure tools. To expose Argo as "argo.example.com",
                         the value should be ".example.com" (notice the leading dot).
                       type: string
                       default: .infra.example.com
@@ -737,6 +741,7 @@ spec:
                           description: Endpoint where logs are aggregated for this environment.
                           type: string
                       type: object
+                      default: {}
                     metrics:
                       description: Configuration for metrics feature.
                       properties:
@@ -804,7 +809,8 @@ spec:
                             endpointCA:
                               properties:
                                 namespace:
-                                  description: Defines the namespace in which the secret containing cnpg backups' CA bundle
+                                  description: |
+                                    Defines the namespace in which the secret containing cnpg backups' CA bundle
                                     is located. This secret will be copied into each namespace which uses cnpg.
                                   type: string
                                 name:
@@ -934,7 +940,8 @@ spec:
                       type: object
                     platform:
                       default: openshift
-                      description: Cluster platform, either the Openshift family (Openshift, OKD), or the rest
+                      description: |
+                        Cluster platform, either the Openshift family (Openshift, OKD), or the rest
                         (Kubernetes Vanilla, K3s, RKE2, EKS, GKE...).
                       enum:
                         - openshift
@@ -985,13 +992,14 @@ spec:
                           type: string
                           description: Prefix for all namespaces in the current environment.
                       required:
+                        - envName
                         - namespacePrefix
                       type: object
                     dockerAccount:
                       properties:
                         enabled:
                           default: false
-                          description: Specifies whether we should enabled the use of a Docker account for Argocd.
+                          description: Specifies whether we should enabled the use of a Docker account for Argo CD.
                           type: boolean
                         username:
                           description: The Docker account username.
@@ -1497,7 +1505,8 @@ spec:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
                     ingressAnnotations:
-                      description: Custom annotations for nexus ingress, they will be pushed into the nexus
+                      description: |
+                        Custom annotations for nexus ingress, they will be pushed into the nexus
                         ingress rule combined to `dsc.ingress.annotations`.
                       type: object
                       x-kubernetes-preserve-unknown-fields: true

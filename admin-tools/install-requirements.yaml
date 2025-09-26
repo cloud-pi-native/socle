@@ -19,10 +19,12 @@
       - helm
       - k9s
       - kubectl
-      - yq
+      - yq # Go version, i.e. https://github.com/mikefarah/yq
+    ansible_modules:
+      - kubernetes.core # ansible 2.19+ requires kubernetes.core >= 5.3
+      - community.hashi_vault
 
   tasks:
-
     - name: "Install some required packages"
       become: true
       ansible.builtin.package:
@@ -36,15 +38,12 @@
         state: present
       loop: "{{ python_modules }}"
 
-    - name: "Install collection kubernetes.core"
+    - name: "Install ansible modules"
       community.general.ansible_galaxy_install:
         type: collection
-        name: kubernetes.core
-
-    - name: "Install collection community.hashi_vault"
-      community.general.ansible_galaxy_install:
-        type: collection
-        name: community.hashi_vault
+        name: "{{ item }}"
+        force: true # allow updates (to install latest version)
+      loop: "{{ ansible_modules }}"
 
     - name: "Check if Homebrew is already installed"
       ansible.builtin.stat:
@@ -57,7 +56,7 @@
         executable: /bin/bash
         cmd: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-    - name: Get Homebrew shellenv
+    - name: "Get Homebrew shellenv"
       ansible.builtin.shell:
         cmd: "/home/linuxbrew/.linuxbrew/bin/brew shellenv"
       register: homebrew_shellenv

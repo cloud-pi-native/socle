@@ -15,7 +15,7 @@ subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
     namespace: {{ dsc.sonarqube.namespace }}
-{% if dsc.global.backup.s3.endpointCA.namespace is defined %}
+{% if (dsc.global.backup.s3.endpointCA | default({})).namespace is defined %}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

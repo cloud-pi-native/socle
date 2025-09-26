@@ -7,9 +7,12 @@ vars.yaml
 # node modules
 node_modules
 
-.venv/
-.vscode/
+.venv/**
+.vscode/**
 pyvenv.cfg
 
 **/Chart.lock
 **/charts/*
+
+.ansible/**
+.env

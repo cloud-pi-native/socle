@@ -2,7 +2,7 @@
 console:
   ingress:
     tls:
-      - secretName: {{ dsc.ingress.tls.tlsSecret.name | default('tls-secret') }}
+      - secretName: {{ (dsc.ingress.tls.tlsSecret | default({})).name | default('tls-secret') }}
         hosts:
           - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.console}>
 {% endif %}

@@ -1,0 +1,19 @@
+playwright:
+  job:
+    name: "playwright"
+    dscName: "{{ dsc_name }}"
+    image:
+      repository: "{{ dsc.cpnPlaywrightJob.imageRepository }}"
+      tag: "{{ dsc.cpnPlaywrightJob.imageTag }}"
+    command:
+    - /bin/sh
+    - -c
+    - pnpm run playwright:test -- playwright/e2e-tests/keycloak.spec.ts
+    extraVolumes:
+    - name: playwright-secret-vol
+      configMap:
+        name: playwright-secret
+    extraVolumeMounts:
+    - name: playwright-secret-vol
+      mountPath: /secrets
+      readOnly: true

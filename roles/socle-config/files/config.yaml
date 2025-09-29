@@ -51,6 +51,11 @@ spec:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     imageTag: 1
     values: {}
+  cpnPlaywrightJob:
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    imageRepository: ghcr.io/cloud-pi-native/playwright
+    imageTag: 1
+    values: {}
   dashboard: {}
   gitlab:
     installEnabled: true

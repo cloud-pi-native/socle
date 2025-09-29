@@ -1,6 +1,7 @@
 {% if use_private_registry %}
 image:
   registry: "{{ dsc.global.registry }}"
+  repository: bitnamilegacy/keycloak
 {% endif %}
 
 {% if use_image_pull_secrets %}

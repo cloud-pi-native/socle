@@ -16,3 +16,9 @@ dependencies:
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
   repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+{% if dsc.global.playwright.enabled %}
+- name: cpn-job
+  alias: playwright
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+{% endif %}

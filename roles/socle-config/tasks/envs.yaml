@@ -83,6 +83,11 @@
                   mcExtraArgs: "{{ dsc.global.backup.gitlab.mcExtraArgs | default('') }}"
                   pathPrefix: "{{ dsc.global.backup.gitlab.pathPrefix | default('') }}"
                   retentionPolicy: "{{ dsc.global.backup.gitlab.retentionPolicy | default('') }}"
+              playwright:
+                mattermost:
+                  url: "{{ dsc.global.playwright.mattermost.url | default('') }}"
+                  channelId: "{{ dsc.global.playwright.mattermost.channelId | default('') }}"
+                  botToken: "{{ dsc.global.playwright.mattermost.botToken | default('') }}"
           - argocd_app: awx
             clusterName: "in-cluster"
             nameSpace: "awx"

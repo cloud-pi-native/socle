@@ -30,6 +30,9 @@ spec:
   cpnAnsibleJob:
     # https://github.com/cloud-pi-native/helm-charts/releases
     chartVersion: ">=1.0.0 <2.0.0"
+  cpnIntegrationTestJob:
+    # https://github.com/cloud-pi-native/helm-charts/releases
+    chartVersion: ">=1.0.0 <2.0.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "9.4.1"

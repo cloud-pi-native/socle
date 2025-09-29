@@ -50,6 +50,9 @@ spec:
   cpnAnsibleJob:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
+  cpnIntegrationTestJob:
+    helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
+    values: {}
   dashboard: {}
   gitlab:
     installEnabled: true
@@ -101,6 +104,8 @@ spec:
       namespacePrefix: dso-
       watchpointEnabled: true
     dockerAccount:
+      enabled: false
+    playwright:
       enabled: false
     smtp:
       enabled: false

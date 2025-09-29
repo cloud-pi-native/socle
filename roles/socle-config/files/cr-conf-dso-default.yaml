@@ -63,8 +63,10 @@ spec:
   certmanager: {}
   cloudnativepg: {}
   console: {}
-  gitlab: {}
+  cpnAnsibleJob: {}
+  cpnIntegrationTestJob: {}
   dashboard: {}
+  gitlab: {}
   glexporter: {}
   gitlabOperator: {}
   gitlabrunner: {}

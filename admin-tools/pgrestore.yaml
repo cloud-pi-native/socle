@@ -6,13 +6,13 @@
   vars_prompt:
     - name: app_name
       prompt: "Enter application name (keycloak, gitlab, harbor, sonar, console)"
-      private: no
+      private: false
     - name: backup_index
       prompt: "Enter snapshot index (0-9)"
-      private: no
+      private: false
     - name: confirm_restore
       prompt: "This will DROP and overwrite the application database. Type 'yes' to continue"
-      private: no
+      private: false
 
   vars:
     pgdump_cnpg_clusters:
@@ -34,7 +34,7 @@
 
   tasks:
     - name: Ensure confirmation
-      fail:
+      ansible.builtin.fail:
         msg: "Restore cancelled."
       when: confirm_restore != "yes"
 
@@ -65,13 +65,13 @@
               - "Il effectuera une restauration de la base de donnée du cluster CNPG de l'application choisie."
 
     - name: Find cluster info for {{ app_name }}
-      set_fact:
+      ansible.builtin.set_fact:
         target_cluster: "{{ item }}"
       loop: "{{ pgdump_cnpg_clusters }}"
       when: item.name == app_name
 
     - name: Fail if cluster not found
-      fail:
+      ansible.builtin.fail:
         msg: "Application '{{ app_name }}' not found in pgdump_cnpg_clusters!"
       when: target_cluster is not defined
 

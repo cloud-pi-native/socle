@@ -173,7 +173,8 @@
             syncWave: 50
             vault_values:
               global:
-                harborAdminPassword: "{{ dsc.harbor.adminPassword | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+                harborAdminPassword: |
+                  "{{ dsc.harbor.adminPassword | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
                 s3ImageChartStorage:
                   bucket: "{{ dsc.harbor.s3ImageChartStorage.bucket | default('') }}"
                   region: "{{ dsc.harbor.s3ImageChartStorage.region | default('') }}"
@@ -186,7 +187,8 @@
             customNamespacePrefix: ""
             syncWave: 50
             vault_values:
-              argocdServerAdminPassword: "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+              argocdServerAdminPassword: |
+                "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
           - argocd_app: sonarqube
             clusterName: ""
             nameSpace: "sonarqube"

@@ -9,6 +9,9 @@
 - [Architecture](#architecture)
 - [Installation en mode GitOps](#installation-en-mode-gitops)
   - [Prérequis](#prérequis-1)
+    - [Configuration du domaine et certificat TLS pour l’Ingress](#configuration-du-domaine-et-certificat-tls-pour-lingress)
+      - [Cas 1 : certificat signé par une autorité valide](#cas-1--certificat-signé-par-une-autorité-valide)
+      - [Cas 2 : certificat auto-signé](#cas-2--certificat-auto-signé)
   - [Principe d'installation GitOps](#principe-dinstallation-gitops)
   - [Exemple de déploiement GitOps](#exemple-de-déploiement-gitops)
 - [Migration vers le déploiement GitOps](#migration-vers-le-déploiement-gitops)
@@ -29,7 +32,7 @@
   - [Gel des versions d'images](#gel-des-versions-dimages)
     - [Argo CD](#argo-cd)
     - [Cert-manager](#cert-manager-1)
-    - [CloudNativePG](#cloudnativepg-1)
+    - [CloudNativePG](#cloudnativepg)
     - [Console Cloud π Native](#console-cloud-π-native)
     - [GitLab](#gitlab)
     - [GitLab CI pipelines exporter](#gitlab-ci-pipelines-exporter)
@@ -172,7 +175,7 @@ Pour vous aider à démarrer, le fichier [cr-conf-dso-default.yaml](roles/socle-
 * de l'activation ou non des métriques,
 * du proxy si besoin ainsi que des sections CA et ingress.
 
-Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec ArgoCD :
+Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec Argo CD :
 
 ```shell
 kubectl explain dsc.spec.argocd
@@ -408,7 +411,7 @@ Toutes les applications de la chaîne DSO sont désormais gérées en mode GitOp
 Le mode de déploiement GitOps fait encore appel pour partie à Ansible et nécessite donc les prérequis déjà spécifiés plus haut.
 
 Quatre prérequis supplémentaires sont toutefois à prendre en compte :
-* Disposer de **votre propre dépôt Git** dans lequel seront déposés les fichiers utiles à ArgoCD. Ce peut-être dans votre propre espace sur GitHub.
+* Disposer de **votre propre dépôt Git** dans lequel seront déposés les fichiers utiles à Argo CD. Ce peut-être dans votre propre espace sur GitHub.
 * Une instance **Vault d'infrastructure**. Elle sert à stocker les secrets des applications du Socle (mots de passe, URLs, etc.).
 * Une instance **Argo CD d'infrastructure**, disposant du [plugin Vault](https://argocd-vault-plugin.readthedocs.io/en/stable/) paramétré pour communiquer avec l'instance Vault d'infrastructure. C'est cette instance d'Argo CD qui utilise l'applicationSet pour déployer les applications du Socle dans le cluster cible.
 * Une instance **Keycloak d'infrastructure**, utilisée pour la connexion aux deux outils précédents. Optionnelle mais recommandée en termes de sécurité et de contrôles d'accès.
@@ -538,7 +541,7 @@ Ce playbook, après avoir réalisé des tâches de pré-configuration, fait nota
 * `vault-secrets` : sert à peupler le Vault d'infrastructure avec les values de secrets pour notre environnement et les applications associées.
 * `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `gitops/envs/nom_de_notre_environnement/apps` du clone local de votre dépôt Git. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
 * `watchpoint` : sert à arrêter le playbook suite à la génération des fichiers de charts, afin de permettre un passage en revue par l'utilisateur avant que ce-dernier n'effectue si besoin un `git push` des changements. Affiche un message en ce sens. Il s'agit du comportement par défaut, contôlé par le paramètre `spec.global.gitOps.watchpointEnabled` de la dsc (positionné à `true` par défaut).
-* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `roles/gitops/dso-app/templates/dso-app.yaml.j2`. La création de cette Application dans ArgoCD viendra consommer les applicationSets générés à l'aide du template `roles/gitops/dso-app/templates/dso-appset.yaml.j2` et déposés dans votre dépôt Git utilisé pour le déploiement GitOps. Ceci permet notamment de rendre les applicationSets visibles dans la web UI d'Argo CD. Ce sont ensuite ces mêmes applicationSets qui déploient par vagues les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
+* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `roles/gitops/dso-app/templates/dso-app.yaml.j2`. La création de cette Application dans Argo CD viendra consommer les applicationSets générés à l'aide du template `roles/gitops/dso-app/templates/dso-appset.yaml.j2` et déposés dans votre dépôt Git utilisé pour le déploiement GitOps. Ceci permet notamment de rendre les applicationSets visibles dans la web UI d'Argo CD. Ce sont ensuite ces mêmes applicationSets qui déploient par vagues les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
 
 Vous constaterez aussi la présence de roles situés dans le répertoire `./roles/gitops/post-install` et qui servent à lancer des tasks de post installation pour les outils concernés. Ces roles sont lus et exécutés à l'aide de jobs Argo CD de post-install, générés pour chacun des outils qui le nécessitent. Les jobs exécutent le chart Helm [cpn-ansible-job](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-ansible-job), positionné en tant que dépendance de chart des outils en question dans votre dépôt Git.
 
@@ -925,9 +928,9 @@ Celui-ci peut être relancé autant de fois que souhaité, en cliquant sur le bo
 
 ## Migration vers le déploiement GitOps
 
-:warning: Assurez-vous de ne pas perdre le mot de passe admin de Nexus avant d'effectuer la synchronisation Argocd.
+:warning: Assurez-vous de ne pas perdre le mot de passe admin de Nexus avant d'effectuer la synchronisation Argo CD.
 
-Après la synchronisation Argocd, pour tous les services, il sera nécessaire de supprimer les deployments, statefulsets et jobs parce qu'il y a nécessité de modification des champs immuables `spec.selector.matchLabels` lors de la prise d'ownership d'Argocd.  
+Après la synchronisation Argo CD, pour tous les services, il sera nécessaire de supprimer les deployments, statefulsets et jobs parce qu'il y a nécessité de modification des champs immuables `spec.selector.matchLabels` lors de la prise d'ownership d'Argo CD.
 Ceci peut être fait avec la commande suivante en se positionnant sur les namespaces concernés.
 ```shell
 kubectl config set-context --current --namespace=<namespace>
@@ -968,7 +971,7 @@ ansible-playbook install-gitops.yaml -t vault-secrets
 
 ### Nexus GitOps
 
-Il y a une migration de données à faire. Pour cela, il faut modifier le Statefulset Nexus de la manière suivante (désactiver l'auto-sync sur Argocd si nécessaire) :
+Il y a une migration de données à faire. Pour cela, il faut modifier le Statefulset Nexus de la manière suivante (désactiver l'auto-sync sur Argo CD si nécessaire) :
 - monter l'ancien volume existant,
 - modifier l'image du Statefulset et ajouter la commande de `sleep infinity` pour maintenir le conteneur en vie sans que Nexus ne s'exécute.
 ```yaml
@@ -1001,7 +1004,7 @@ cp -rp /nexus-data-claim/log /nexus-data/
 cp -rp /nexus-data-claim/cache /nexus-data/
 cp -rp /nexus-data-claim/elasticsearch /nexus-data/
 ```
-Synchroniser l'application Argocd pour que Nexus démarre avec les données migrées et supprimer l'ancien pvc (assurez-vous que le mot de passe Admin sur Vault soit bien celui d'avant migration).
+Synchroniser l'application Argo CD pour que Nexus démarre avec les données migrées et supprimer l'ancien pvc (assurez-vous que le mot de passe Admin sur Vault soit bien celui d'avant migration).
 
 ## Déploiement de plusieurs forges DSO dans un même cluster
 
@@ -1201,7 +1204,7 @@ Le playbook de désinstallation peut aussi être utilisé pour supprimer un ou p
 
 L'idée est de faciliter leur réinstallation complète, en utilisant ensuite le playbook d'installation (voir la sous-section [Réinstallation](#réinstallation) de la section Debug).
 
-Par exemple, pour désinstaller uniquement les outils Keycloak et ArgoCD configurés avec la `dsc` par défaut (`conf-dso`), la commande sera la suivante :
+Par exemple, pour désinstaller uniquement les outils Keycloak et Argo CD configurés avec la `dsc` par défaut (`conf-dso`), la commande sera la suivante :
 
 ```bash
 ansible-playbook uninstall.yaml -t keycloak,argocd

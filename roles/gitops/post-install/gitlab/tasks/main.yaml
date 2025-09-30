@@ -213,7 +213,7 @@
     - name: Get Vault Infra secrets
       kubernetes.core.k8s_info:
         kubeconfig: "{{ kubeconfig_infra }}"
-        proxy: "{{ kubeconfig_proxy_infra | default('')}}"
+        proxy: "{{ kubeconfig_proxy_infra | default('') }}"
         namespace: "{{ dsc.vaultInfra.namespace }}"
         kind: Secret
       register: vault_infra_secrets
@@ -227,7 +227,7 @@
     - name: Get Vault Infra keys
       kubernetes.core.k8s_info:
         kubeconfig: "{{ kubeconfig_infra }}"
-        proxy: "{{ kubeconfig_proxy_infra | default('')}}"
+        proxy: "{{ kubeconfig_proxy_infra | default('') }}"
         namespace: "{{ dsc.vaultInfra.namespace }}"
         kind: Secret
         name: "{{ vault_infra_keys_secret_name }}"

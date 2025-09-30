@@ -50,13 +50,13 @@ awx:
       - name: NO_PROXY
         value: {{ dsc.proxy.no_proxy }}
 {% endif %}
-    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name}}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx"
+    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx"
     image_version: "{{ dsc.awx.defaultAwxVersion }}"
     ee_images:
       - name: "AWX EE ({{ dsc.awx.defaultAwxVersion }})"
-        image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name}}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
-    redis_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name}}/apps/global/values#image | jsonPath {.repository.quay}>/redis"
+        image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
+    redis_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/redis"
     redis_image_version: "7"
-    control_plane_ee_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name}}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
-    init_container_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name}}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee"
+    control_plane_ee_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
+    init_container_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee"
     init_container_image_version: "{{ dsc.awx.defaultAwxVersion }}"

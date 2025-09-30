@@ -9,7 +9,7 @@ values:
           p, role:admin, *, *, */*, allow
           p, role:nada, applicationsets, *, */*, deny
           p, role:nada, applications, *, */*, deny
-          p, role:nada, logs, *, */*, deny
+          p, role:nada, logs, get, */*, allow
           p, role:nada, exec, *, */*, deny
           p, role:nada, certificates, *, *, deny
           p, role:nada, accounts, *, *, deny

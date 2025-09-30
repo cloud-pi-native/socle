@@ -70,7 +70,7 @@
   ansible.builtin.file:
     path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/gitlab/templates"
     state: directory
-    mode: 0775
+    mode: "0775"
 
 - name: Render gitlab instance file into GitOps local repo
   ansible.builtin.copy:

@@ -17,7 +17,7 @@
   ansible.builtin.file:
     path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
     state: directory
-    mode: 0775
+    mode: "0775"
 
 # Files copy
 
@@ -64,7 +64,7 @@
       ansible.builtin.file:
         path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates"
         state: directory
-        mode: 0775
+        mode: "0775"
 
     - name: Check if keycloak/templates/users.yaml exists
       ansible.builtin.stat:

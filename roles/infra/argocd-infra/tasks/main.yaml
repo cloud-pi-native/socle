@@ -103,7 +103,7 @@
     - vault-plugin-secret.yml.j2
 
 - name: Deploy registry secret
-  when: "{{ dsc.global.dockerAccount.enabled }}"
+  when: dsc.global.dockerAccount.enabled
   kubernetes.core.k8s:
     template: "{{ item }}"
     state: present
@@ -124,7 +124,7 @@
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
 
-- name: Compute ArgoCD Helm values
+- name: Compute Argo CD Helm values
   ansible.builtin.include_role:
     name: combine
   vars:
@@ -178,6 +178,5 @@
         name: "{{ item }}"
         definition:
           metadata:
-            labels:
-              "{{ dsc.global.metrics.additionalLabels }}"
+            labels: "{{ dsc.global.metrics.additionalLabels }}"
       loop: "{{ service_monitors_names }}"

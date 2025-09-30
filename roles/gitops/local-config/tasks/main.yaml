@@ -1,40 +1,45 @@
 - name: Check GitOps repository local clone
   when: lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') == ''
   block:
-    - ansible.builtin.debug:
+    - name: Missing "GITOPS_REPO_PATH" environment variable
+      ansible.builtin.debug:
         msg:
           - "La variable d'environnement GITOPS_REPO_PATH n'est pas définie."
           - "Veuillez la définir avec le chemin absolu vers votre clone local du dépôt GitOps à utiliser."
           - "Les fichiers générés y seront déposés."
-    - ansible.builtin.meta: end_play
+
+    - name: Exit playbook
+      ansible.builtin.meta: end_play
 
 - name: "Déclaration du clone GitOps local"
-  when: lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') != ''
   ansible.builtin.set_fact:
     gitops_local_repo: "{{ lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') }}"
 
 - name: Check infrastructure cluster access
   when: lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') == ''
   block:
-    - ansible.builtin.debug:
+    - name: Missing "KUBECONFIG_INFRA" environment variable
+      ansible.builtin.debug:
         msg:
           - "La variable d'environnement KUBECONFIG_INFRA n'est pas définie."
-          - "Veuillez la définir avec le chemin absolu vers votre kubeconfig pour accéder au cluster d'admnistration (ArgoCD et Vault d'infra)."
-    - ansible.builtin.meta: end_play
+          - "Veuillez la définir avec le chemin absolu vers votre kubeconfig pour accéder au cluster d'admnistration (Argo CD et Vault d'infra)."
+
+    - name: Exit playbook
+      ansible.builtin.meta: end_play
 
 - name: "Déclaration du kubeconfig infra"
-  when: lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') != ''
   ansible.builtin.set_fact:
     kubeconfig_infra: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') }}"
 
 - name: Check infrastructure cluster access
   when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') == ''
   block:
-    - ansible.builtin.debug:
+    - name: Undefined "KUBECONFIG_PROXY_INFRA" environment variable
+      ansible.builtin.debug:
         msg:
           - "La variable d'environnement KUBECONFIG_PROXY_INFRA n'est pas définie."
           - "Elle est nécessaire en cas d'utilisation de tsh proxy kube."
-          - "Dans ce cas, veuillez la définir avec la valeur requises pour accéder au cluster d'admnistration (ArgoCD et Vault d'infra)."
+          - "Dans ce cas, veuillez la définir avec la valeur requises pour accéder au cluster d'admnistration (Argo CD et Vault d'infra)."
 
 - name: "Déclaration du kubeconfig proxy infra"
   when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') != ''

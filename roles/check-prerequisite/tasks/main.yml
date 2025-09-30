@@ -1,7 +1,7 @@
 ---
 - name: Check Argo CD infra namespace
   kubernetes.core.k8s_info:
-    kubeconfig: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_INFRA' ) }}"
+    kubeconfig: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') }}"
     proxy: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA', default='') }}"
     name: "{{ dsc.argocdInfra.namespace }}"
     kind: Namespace

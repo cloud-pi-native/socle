@@ -7,6 +7,7 @@ spec:
   additionalsCA: []
   #  - kind: ConfigMap
   #    name: kube-root-ca.crt
+  #    namespace: default
   exposedCA:
     type: none
   #  type: configmap

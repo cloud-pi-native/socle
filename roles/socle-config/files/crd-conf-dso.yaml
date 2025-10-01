@@ -1582,12 +1582,6 @@ spec:
                     namespace:
                       description: The namespace for Observatorium.
                       type: string
-                    subDomain:
-                      description: The subdomain for Observatorium.
-                      type: string
-                    domain:
-                      description: The domain for Observatorium.
-                      type: string
                     helmRepoUrl:
                       description: Observatorium helm repository url.
                       type: string

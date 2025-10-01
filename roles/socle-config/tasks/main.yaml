@@ -137,7 +137,6 @@
     keycloak_domain: "{{ dsc.keycloak.domain | default(dsc.keycloak.subDomain ~ root_domain) }}"
     keycloakinfra_domain: "{{ dsc.keycloakInfra.domain | default(dsc.keycloakInfra.subDomain ~ infra_root_domain) }}"
     nexus_domain: "{{ dsc.nexus.domain | default(dsc.nexus.subDomain ~ root_domain) }}"
-    observatorium_domain: "{{ dsc.observatorium.domain | default(dsc.observatorium.subDomain ~ root_domain) }}"
     sonar_domain: "{{ dsc.sonarqube.domain | default(dsc.sonarqube.subDomain ~ root_domain) }}"
     vault_domain: "{{ dsc.vault.domain | default(dsc.vault.subDomain ~ root_domain) }}"
 
@@ -177,7 +176,6 @@
       - "keycloak_domain: {{ keycloak_domain }}"
       - "keycloakinfra_domain: {{ keycloakinfra_domain }}"
       - "nexus_domain: {{ nexus_domain }}"
-      - "observatorium_domain: {{ observatorium_domain }}"
       - "sonar_domain: {{ sonar_domain }}"
       - "vault_domain: {{ vault_domain }}"
       - "vaultinfra_domain: {{ vaultinfra_domain }}"

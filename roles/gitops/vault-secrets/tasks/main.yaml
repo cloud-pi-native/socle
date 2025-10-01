@@ -88,13 +88,6 @@
         name: pg-cluster-console-app
       register: pg_console_db_secret
 
-    - name: Get kubernetes service
-      kubernetes.core.k8s_info:
-        namespace: default
-        kind: Service
-        name: kubernetes
-      register: kubernetes_service_clusterip
-
     - name: Get pg-cluster-gitlab-app secret
       kubernetes.core.k8s_info:
         namespace: "{{ dsc.gitlab.namespace }}"

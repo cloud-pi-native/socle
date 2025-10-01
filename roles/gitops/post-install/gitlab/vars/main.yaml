@@ -1,0 +1,2 @@
+---
+gitlab_auth_url: "http://{{ dsc.gitlab.subDomain }}-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8181"

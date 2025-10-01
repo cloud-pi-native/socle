@@ -20,23 +20,7 @@ observatorium:
           path: roles/gitops/rendering-apps-files/templates/dashboard
           url: https://github.com/cloud-pi-native/socle.git
   ingress:
-    enabled: true
-    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
-    hosts:
-      - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-{% if dsc.ingress.tls.type != 'none' %}
-    tls:
-      - hosts:
-          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
-{% if dsc.ingress.tls.type == 'tlsSecret' %}
-        secretName: {{ dsc.ingress.tls.tlsSecret.name }}
-{% else %}
-        secretName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>-tls
-{% endif %}
-{% endif %}
+    enabled: false
   api:
     loglevel: info
     config:
@@ -100,7 +84,7 @@ grafana:
   grafana:
     adminPassword: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#grafana| jsonPath {.adminPassword}>
     isOpenShift: {{ dsc.global.platform == "openshift" }}
-    observatorium_url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
+    observatorium_url: http://{{ dsc.global.gitOps.envName }}-{{ dsc.observatorium.namespace }}-api.{{ dsc.observatorium.namespace }}.svc.cluster.local:8080
 {% if dsc.proxy.enabled %}
     env:
     - name: HTTP_PROXY

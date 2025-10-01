@@ -5,7 +5,7 @@
 
 - name: Create group {{ group_name }}
   community.general.gitlab_group:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     name: "{{ group_name }}"

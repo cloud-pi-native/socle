@@ -9,7 +9,7 @@
   when: set_token_inv.skipped is not defined
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ gitlab_domain }}/api/v4/admin/ci/variables
+    url: "{{ gitlab_auth_url }}/api/v4/admin/ci/variables"
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
   register: test_token
@@ -48,7 +48,7 @@
 - name: Get settings
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ gitlab_domain }}/api/v4/application/settings
+    url: "{{ gitlab_auth_url }}/api/v4/application/settings"
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
   register: get_settings
@@ -57,7 +57,7 @@
 - name: Set some parameters
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ gitlab_domain }}/api/v4/application/settings
+    url: "{{ gitlab_auth_url }}/api/v4/application/settings"
     method: PUT
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
@@ -81,7 +81,7 @@
 
 - name: Set or update some CI/CD variables
   community.general.gitlab_group_variable:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
@@ -96,17 +96,17 @@
       - name: PROJECTS_ROOT_DIR
         value: "{{ dsc.global.projectsRootDir | join('/') }}"
       - name: NEXUS_HOST_URL
-        value: https://{{ nexus_domain }}
+        value: "http://{{ dsc.nexus.subDomain }}.{{ dsc.nexus.namespace }}.svc.cluster.local:8081"
       - name: NEXUS_HOSTNAME
         value: "{{ nexus_domain }}"
       - name: SONAR_HOST_URL
-        value: https://{{ sonar_domain }}
+        value: "http://{{ dsc.sonarqube.subDomain }}-sonarqube.{{ dsc.sonarqube.namespace }}.svc.cluster.local:9000"
       - name: VAULT_AUTH_PATH
         value: "{{ vault_auth_path }}"
       - name: VAULT_AUTH_ROLE
         value: "{{ vault_auth_role }}"
       - name: VAULT_SERVER_URL
-        value: https://{{ vault_domain }}
+        value: "http://{{ dsc_name }}-{{ dsc.vault.subDomain }}-active.{{ dsc.vault.namespace }}.svc.cluster.local:8200"
       - name: MVN_CONFIG_FILE
         variable_type: file
         value: "{{ mvn_config_file }}"
@@ -116,7 +116,7 @@
 
 - name: Set or update proxy CI/CD variables
   community.general.gitlab_group_variable:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
@@ -142,7 +142,7 @@
 
 - name: Set or update CA_BUNDLE variable
   community.general.gitlab_group_variable:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
@@ -162,7 +162,7 @@
 
 - name: Set or update insecure args variables
   community.general.gitlab_group_variable:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
@@ -178,7 +178,7 @@
 
 - name: Set or update additional CI/CD variables
   community.general.gitlab_group_variable:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     group: "{{ dsc.global.projectsRootDir | join('/') }}"
@@ -273,7 +273,7 @@
 - name: Get GitLab online admin runners
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ gitlab_domain }}/api/v4/runners/all?status=online
+    url: "{{ gitlab_auth_url }}/api/v4/runners/all?status=online"
     method: GET
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
@@ -293,7 +293,7 @@
     (not grunner_installed)
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ gitlab_domain }}/api/v4/user/runners
+    url: "{{ gitlab_auth_url }}/api/v4/user/runners"
     method: POST
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
@@ -315,7 +315,7 @@
     - name: Get all GitLab admin runners
       ansible.builtin.uri:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        url: https://{{ gitlab_domain }}/api/v4/runners/all
+        url: "{{ gitlab_auth_url }}/api/v4/runners/all"
         method: GET
         headers:
           PRIVATE-TOKEN: "{{ gitlab_token }}"
@@ -331,7 +331,7 @@
       when: old_admin_runners | length > 0
       ansible.builtin.uri:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        url: "https://{{ gitlab_domain }}/api/v4/runners/{{ item }}"
+        url: "{{ gitlab_auth_url }}/api/v4/runners/{{ item }}"
         method: DELETE
         headers:
           PRIVATE-TOKEN: "{{ gitlab_token }}"
@@ -345,7 +345,7 @@
     dso_runner is defined
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ gitlab_domain }}/api/v4/runners/{{ dso_runner.id }}"
+    url: "{{ gitlab_auth_url }}/api/v4/runners/{{ dso_runner.id }}"
     method: DELETE
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"

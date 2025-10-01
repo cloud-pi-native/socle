@@ -195,7 +195,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    url: "https://{{ vault_domain }}/v1/sys/mounts/forge-dso"
+    url: "{{ vault_auth_url }}/v1/sys/mounts/forge-dso"
     status_code: [200, 400]
     headers:
       "X-Vault-Token": "{{ vault_token }}"
@@ -205,7 +205,7 @@
   when: get_engines.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/mounts/forge-dso"
+    url: "{{ vault_auth_url }}/v1/sys/mounts/forge-dso"
     method: POST
     status_code: [204]
     headers:
@@ -220,7 +220,7 @@
 - name: Config - get auth method"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ vault_domain }}/v1/sys/auth/jwt
+    url: "{{ vault_auth_url }}/v1/sys/auth/jwt"
     status_code: [200, 400]
     headers:
       X-Vault-Token: "{{ vault_token }}"
@@ -231,7 +231,7 @@
   when: jwt_state.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ vault_domain }}/v1/sys/auth/jwt
+    url: "{{ vault_auth_url }}/v1/sys/auth/jwt"
     method: POST
     status_code: [204]
     headers:
@@ -244,7 +244,7 @@
 - name: Config - add role default-ci
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ vault_domain }}/v1/auth/jwt/role/default-ci
+    url: "{{ vault_auth_url }}/v1/auth/jwt/role/default-ci"
     method: POST
     status_code: [204]
     headers:
@@ -258,7 +258,7 @@
       bound_claims_type: glob
       user_claim: user_email
       bound_audiences:
-        - https://{{ vault_domain }}
+        - "{{ vault_auth_url }}"
       bound_claims:
         iss:
           - "https://{{ gitlab_domain }}"
@@ -273,7 +273,7 @@
 - name: Config - set jwt config
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ vault_domain }}/v1/auth/jwt/config
+    url: "{{ vault_auth_url }}/v1/auth/jwt/config"
     method: POST
     status_code: [204]
     headers:
@@ -289,7 +289,7 @@
 - name: Config - get accessor jwt config
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ vault_domain }}/v1/sys/auth/jwt
+    url: "{{ vault_auth_url }}/v1/sys/auth/jwt"
     status_code: [200]
     headers:
       X-Vault-Token: "{{ vault_token }}"
@@ -298,7 +298,7 @@
 - name: Config - create policy
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ vault_domain }}/v1/sys/policy/default-ci
+    url: "{{ vault_auth_url }}/v1/sys/policy/default-ci"
     method: POST
     status_code: [204]
     headers:
@@ -324,7 +324,7 @@
 - name: Get auth methods
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/oidc"
+    url: "{{ vault_auth_url }}/v1/sys/auth/oidc"
     method: GET
     status_code: [200, 400]
     headers:
@@ -335,7 +335,7 @@
   when: get_auth_method.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/oidc"
+    url: "{{ vault_auth_url }}/v1/sys/auth/oidc"
     method: POST
     status_code: [200, 204]
     headers:
@@ -355,7 +355,7 @@
 - name: Configure oidc auth method
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/auth/oidc/config"
+    url: "{{ vault_auth_url }}/v1/auth/oidc/config"
     method: POST
     status_code: [200, 204]
     headers:
@@ -375,7 +375,7 @@
 - name: Create oidc role
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/auth/oidc/role/default"
+    url: "{{ vault_auth_url }}/v1/auth/oidc/role/default"
     method: POST
     status_code: [200, 204]
     headers:
@@ -401,7 +401,7 @@
 - name: Create admin access policy
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/policies/acl/admin"
+    url: "{{ vault_auth_url }}/v1/sys/policies/acl/admin"
     method: POST
     status_code: [200, 204]
     headers:
@@ -412,7 +412,7 @@
 - name: Create admin group
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/identity/group"
+    url: "{{ vault_auth_url }}/v1/identity/group"
     method: POST
     status_code: [200, 204]
     headers:
@@ -427,7 +427,7 @@
 - name: Get oidc accessor
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth"
+    url: "{{ vault_auth_url }}/v1/sys/auth"
     method: GET
     status_code: [200, 204]
     headers:
@@ -437,7 +437,7 @@
 - name: Get admin group id
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/identity/group/name/admin"
+    url: "{{ vault_auth_url }}/v1/identity/group/name/admin"
     method: GET
     status_code: [200, 204]
     headers:
@@ -447,7 +447,7 @@
 - name: Create admin group alias
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/identity/group-alias"
+    url: "{{ vault_auth_url }}/v1/identity/group-alias"
     method: POST
     status_code: [200, 400]
     headers:
@@ -461,7 +461,7 @@
 - name: Set oidc method as default
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/oidc/tune"
+    url: "{{ vault_auth_url }}/v1/sys/auth/oidc/tune"
     method: POST
     status_code: [204]
     headers:
@@ -474,7 +474,7 @@
 - name: Get auth methods
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/approle"
+    url: "{{ vault_auth_url }}/v1/sys/auth/approle"
     method: GET
     status_code: [200, 400]
     headers:
@@ -485,7 +485,7 @@
   when: get_auth_method.status == 400
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: "https://{{ vault_domain }}/v1/sys/auth/approle"
+    url: "{{ vault_auth_url }}/v1/sys/auth/approle"
     method: POST
     status_code: [200, 204]
     headers:

@@ -7,7 +7,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
+    url: "{{ harbor_auth_url }}/api/v2.0/registries?q=name={{ proxy_cache.name }}"
     password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
@@ -43,7 +43,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: "{{ method }}"
-    url: https://{{ harbor_domain }}/api/v2.0/registries/{{ url_id_param }}
+    url: "{{ harbor_auth_url }}/api/v2.0/registries/{{ url_id_param }}"
     password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
@@ -55,7 +55,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    url: https://{{ harbor_domain }}/api/v2.0/registries?q=name={{ proxy_cache.name }}
+    url: "{{ harbor_auth_url }}/api/v2.0/registries?q=name={{ proxy_cache.name }}"
     password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
@@ -67,7 +67,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: GET
-    url: https://{{ harbor_domain }}/api/v2.0/projects?q=name={{ proxy_cache.name }}
+    url: "{{ harbor_auth_url }}/api/v2.0/projects?q=name={{ proxy_cache.name }}"
     password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true
@@ -84,7 +84,7 @@
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     method: "{{ method }}"
-    url: https://{{ harbor_domain }}/api/v2.0/projects/{{ url_id_param }}
+    url: "{{ harbor_auth_url }}/api/v2.0/projects/{{ url_id_param }}"
     password: "{{ harbor_current_vault_values.data.data.global.harborAdminPassword }}"
     user: admin
     force_basic_auth: true

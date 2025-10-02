@@ -12,7 +12,13 @@ dependencies:
   alias: keycloak
   version: {{ dsc.keycloak.chartVersion }}
   repository: "{{ dsc.keycloak.helmRepoUrl if 'oci://' in dsc.keycloak.helmRepoUrl else dsc.keycloak.helmRepoUrl ~ '/keycloak' }}"
-- name: cpn-ansible-job
+- name: cpn-job
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
   repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+{% if dsc.global.environment == 'development' %}
+- name: cpn-job
+  alias: playwright
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+{% endif %}

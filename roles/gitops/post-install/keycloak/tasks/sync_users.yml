@@ -11,7 +11,7 @@
   when: desired_users.dict is not defined or desired_users.dict | length == 0
 
 - name: Parse existing Keycloak users JSON
-  set_fact:
+  ansible.builtin.set_fact:
     kc_dso_users_list: "{{ kc_dso_users.content | from_json }}"
 
 - name: Ensure listed users are present

@@ -234,7 +234,6 @@
             syncWave: 60
             vault_values:
               auth:
-                adminUsername: "admin"
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           - argocd_app: dashboard
             clusterName: ""

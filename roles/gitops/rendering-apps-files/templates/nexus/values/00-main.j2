@@ -152,7 +152,15 @@ nexus3:
     enabled: {{ dsc.global.metrics.enabled }}
     serviceMonitor:
       enabled: {{ dsc.global.metrics.enabled }}
+      endpointConfig:
+        basicAuth:
+          username:
+            name: admin-creds
+            key: username
+          password:
+            name: admin-creds
+            key: password
 {% if dsc.global.metrics.additionalLabels is defined %}
-      labels: {{ dsc.global.metrics.additionalLabels }} 
+      labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
 {% endif %}

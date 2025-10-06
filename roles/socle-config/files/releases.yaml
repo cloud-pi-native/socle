@@ -38,10 +38,10 @@ spec:
     chartVersion: "0.3.5"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "2.1.2"
+    chartVersion: "2.4.1"
   gitlabrunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.78.1"
+    chartVersion: "0.81.0"
   grafana:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"

@@ -145,27 +145,14 @@ keycloak:
 
   metrics:
     enabled: {{ dsc.global.metrics.enabled }}
-    service:
-      ports:
-        http: 8080
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
-      extraPorts: []
     serviceMonitor:
-      enabled: true
-      port: http
-      endpoints:
-        - path: '/metrics'
-        - path: '/realms/{{ dsc.keycloak.managementRealm }}/metrics'
-        - path: '/realms/{{ dsc.keycloak.applicationRealm }}/metrics'
+      enabled: {{ dsc.global.metrics.enabled }}
 {% if dsc.global.metrics.additionalLabels is defined %}
       labels: {{ dsc.global.metrics.additionalLabels }} 
 {% endif %}
     prometheusRule:
       enabled: {{ dsc.global.alerting.enabled }}
       namespace: {{ dsc.keycloak.namespace }}
-      labels: {}
 
   keycloakConfigCli:
     enabled: false

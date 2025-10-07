@@ -1,23 +1,27 @@
 cpn-ansible-job:
   job:
-    name: "gitlab"
-    dscName: "{{ dsc_name }}"
     image:
-      tag: "{{ dsc.cpnAnsibleJob.imageTag }}"
-    extraEnv:
-      - name: VAULT_INFRA_TOKEN
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#vault_infra_token>
-{% if dsc.proxy.enabled %}
-      - name: HTTP_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
-      - name: HTTPS_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
-      - name: NO_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
-{% endif %}
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/git-ansible"
+      tag: "1"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      git clone https://github.com/cloud-pi-native/socle.git && \
+      cd socle && \
+      ansible-playbook post-install/gitlab.yaml
+    extraEnvFrom:
+    - secretRef: 
+        name: ansible-secret
   # Wait longer enough for GitLab instance to be ready
     activeDeadlineSeconds: 1800
     backoffLimit: 60
   cronJob:
     create: true
-    name: "gitlab-ci-catalog"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      git clone https://github.com/cloud-pi-native/socle.git && \
+      cd socle && \
+      ansible-playbook post-install/gitlab-ci-catalog.yaml

@@ -6,7 +6,7 @@
 | cloudnativepg.cluster     | N/A              | 0.3.1         | [cluster](https://artifacthub.io/packages/helm/cloudnative-pg/cluster)                                               |
 | cloudnativepg.operator    | 1.26.1           | 0.25.0        | [cloudnative-pg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                 |
 | console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
-| cpn-ansible-job           | 1.\*.\*            | 1.\*.\*         | [cpn-ansible-job](https://github.com/cloud-pi-native/helm-charts)                                                    |
+| cpn-job                   | 1.\*.\*          | 1.\*.\*       | [cpn-job](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | gitlab                    | 18.4.1         | 9.4.1       | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
 | glexporter | 0.5.10           | 0.3.5         | [glexporter](https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter) |
 | gitlabOperator            | 2.4.1           | 2.4.1        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |

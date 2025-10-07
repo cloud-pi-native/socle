@@ -420,11 +420,6 @@ spec:
                     chartVersion:
                       description: Cloud-Pi-Native helm chart version (e.g., "1.0.0").
                       type: string
-                    imageTag:
-                      description: |
-                        Git-ansible image tag (e.g., "1.1.0").
-                        https://github.com/cloud-pi-native/Dockerfile/blob/main/docker/git-ansible/Dockerfile
-                      type: string
                     values:
                       description: |
                         You can add custom values for cpn-ansible-job, they will be merged with roles/gitops/rendering-apps-files/

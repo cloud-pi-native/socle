@@ -16,3 +16,7 @@ glexporter:
         path: /metrics
   redis:
     fullnameOverride: "glexporter-redis"
+    global:
+      imageRegistry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>"
+    image:
+      repository: bitnamilegacy/redis

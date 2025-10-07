@@ -14,7 +14,7 @@ dependencies:
   version: {{ dsc.global.backup.vault.chartVersion }}
   repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
 {% endif %}
-- name: cpn-ansible-job
+- name: cpn-job
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
   repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}

@@ -1,26 +1,31 @@
 {% if dsc.global.backup.cnpg.enabled %}
 cpn-ansible-job:
   job:
-    name: "pgdump"
-    dscName: "{{ dsc_name }}"
     image:
-      tag: "{{ dsc.cpnAnsibleJob.imageTag }}"
-    extraEnv:
-{% if dsc.proxy.enabled %}
-      - name: HTTP_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
-      - name: HTTPS_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
-      - name: NO_PROXY
-        value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
-{% endif %}
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/git-ansible"
+      tag: "1"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      git clone https://github.com/cloud-pi-native/socle.git && \
+      cd socle && \
+      ansible-playbook post-install/pgdump.yaml
 {% if dsc.global.backup.s3.endpointCA is defined %}
+    extraEnv:
       - name: AWS_CA_BUNDLE
         value: /bundle-s3-dir/ca.pem
+{% endif %}
+{% if dsc.proxy.enabled %}
+    extraEnvFrom:
+    - secretRef: 
+        name: ansible-secret
+{% endif %}
+{% if dsc.global.backup.s3.endpointCA is defined %} 
     extraVolumes:
     - name: bundle-s3
       secret:
-        secretName: bundle-cnpg-s3
+        secretName: ansible-secret
     extraVolumeMounts:
     - name: bundle-s3
       mountPath: /bundle-s3-dir
@@ -28,6 +33,5 @@ cpn-ansible-job:
 {% endif %}
   cronJob:
     create: true
-    name: "pgdump"
     schedule: "7 1 * * *"
 {% endif %}

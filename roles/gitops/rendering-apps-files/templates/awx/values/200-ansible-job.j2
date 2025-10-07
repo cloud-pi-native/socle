@@ -1,19 +1,20 @@
 cpn-ansible-job:
   job:
-    name: "awx-oidc"
-    dscName: "{{ dsc_name }}"
-{% if use_private_registry %}
     image:
-      repository: "{{ dsc.global.registry }}/cloud-pi-native/git-ansible"
-{% endif %}
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/git-ansible"
+      tag: "1"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      git clone https://github.com/cloud-pi-native/socle.git && \
+      cd socle && \
+      ansible-playbook post-install/awx-oidc.yaml
+    extraEnvFrom:
+    - secretRef: 
+        name: ansible-secret
 {% if dsc.proxy.enabled %}
     extraEnv:
-    - name: http_proxy
-      value: "{{ dsc.proxy.http_proxy }}"
-    - name: https_proxy
-      value: "{{ dsc.proxy.https_proxy }}"
-    - name: no_proxy
-      value: "{{ dsc.proxy.no_proxy }}"
     - name: GIT_HTTP_PROXY_AUTHMETHOD
       value: basic
 {% endif %}

@@ -12,7 +12,7 @@ dependencies:
   alias: sonarqube
   version: {{ dsc.sonarqube.chartVersion }}
   repository: "{{ dsc.sonarqube.helmRepoUrl }}"
-- name: cpn-ansible-job
+- name: cpn-job
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
   repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}

@@ -49,7 +49,6 @@ spec:
     values: {}
   cpnAnsibleJob:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
-    imageTag: 1
     values: {}
   dashboard: {}
   gitlab:

@@ -231,6 +231,11 @@ values:
       serverTelemetry:
         serviceMonitor:
           enabled: {{ (dsc.global.metrics.enabled or dsc.global.alerting.enabled) | lower }}
+          authorization:
+            credentials:
+              name: {{ dsc_name }}-vault-keys
+              key: root_token
+          selectors: {{ dsc.global.metrics.additionalLabels | default ('{}', true) }}
         prometheusRules:
           enabled: {{ (dsc.global.metrics.enabled or dsc.global.alerting.enabled) | lower }}
           rules:

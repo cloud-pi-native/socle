@@ -10,6 +10,45 @@ awx:
         - hostname: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.awx}>
       ingress_annotations: | 
         - {{ dsc.ingress.annotations }}
+      extra_settings:
+        - setting: CSRF_TRUSTED_ORIGINS
+          value: '["https://{{ dsc.awx.subDomain }}{{ dsc.global.rootDomain }}"]'
+{% if dsc.exposedCA.type != 'none' %}
+        - setting: AWX_TASK_ENV['GIT_SSL_NO_VERIFY']
+          value: "True"
+{% endif %}
+{% if dsc.proxy.enabled %}
+        - setting: AWX_TASK_ENV['HTTP_PROXY']
+          value: "'{{ dsc.proxy.http_proxy }}'"
+        - setting: AWX_TASK_ENV['HTTPS_PROXY']
+          value: "'{{ dsc.proxy.https_proxy }}'"
+        - setting: AWX_TASK_ENV['NO_PROXY']
+          value: "'{{ dsc.proxy.no_proxy }}'"
+      task_extra_env: |
+        - name: HTTP_PROXY
+          value: {{ dsc.proxy.http_proxy }}
+        - name: HTTPS_PROXY
+          value: {{ dsc.proxy.https_proxy }}
+        - name: NO_PROXY
+          value: {{ dsc.proxy.no_proxy }}
+      web_extra_env: |
+        - name: HTTP_PROXY
+          value: {{ dsc.proxy.http_proxy }}
+        - name: HTTPS_PROXY
+          value: {{ dsc.proxy.https_proxy }}
+        - name: NO_PROXY
+          value: {{ dsc.proxy.no_proxy }}
+{% endif %}
+      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx"
+      image_version: "{{ dsc.awx.defaultAwxVersion }}"
+      ee_images:
+        - name: "AWX EE ({{ dsc.awx.defaultAwxVersion }})"
+          image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
+      redis_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/redis"
+      redis_image_version: "7"
+      control_plane_ee_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
+      init_container_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee"
+      init_container_image_version: "{{ dsc.awx.defaultAwxVersion }}"
     postgres:
       enabled: true
       host: "pg-cluster-awx-rw"
@@ -21,42 +60,3 @@ awx:
       type: unmanaged
     rbac:
       create: true
-    extra_settings:
-{% if dsc.exposedCA.type != 'none' %}
-      - setting: AWX_TASK_ENV['GIT_SSL_NO_VERIFY']
-        value: "True"
-{% endif %}
-{% if dsc.proxy.enabled %}
-      - setting: AWX_TASK_ENV['HTTP_PROXY']
-        value: "'{{ dsc.proxy.http_proxy }}'"
-      - setting: AWX_TASK_ENV['HTTPS_PROXY']
-        value: "'{{ dsc.proxy.https_proxy }}'"
-      - setting: AWX_TASK_ENV['NO_PROXY']
-        value: "'{{ dsc.proxy.no_proxy }}'"
-{% endif %}
-{% if dsc.proxy.enabled %}
-    task_extra_env:
-      - name: HTTP_PROXY
-        value: {{ dsc.proxy.http_proxy }}
-      - name: HTTPS_PROXY
-        value: {{ dsc.proxy.https_proxy }}
-      - name: NO_PROXY
-        value: {{ dsc.proxy.no_proxy }}
-    web_extra_env:
-      - name: HTTP_PROXY
-        value: {{ dsc.proxy.http_proxy }}
-      - name: HTTPS_PROXY
-        value: {{ dsc.proxy.https_proxy }}
-      - name: NO_PROXY
-        value: {{ dsc.proxy.no_proxy }}
-{% endif %}
-    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx"
-    image_version: "{{ dsc.awx.defaultAwxVersion }}"
-    ee_images:
-      - name: "AWX EE ({{ dsc.awx.defaultAwxVersion }})"
-        image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
-    redis_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/redis"
-    redis_image_version: "7"
-    control_plane_ee_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee:{{ dsc.awx.defaultAwxVersion }}"
-    init_container_image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/ansible/awx-ee"
-    init_container_image_version: "{{ dsc.awx.defaultAwxVersion }}"

@@ -220,7 +220,7 @@ keycloak:
         - sh
       args:
         - -c
-        - curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}>
+        - mkdir -p /emptydir/app-providers-dir && curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}>
       volumeMounts:
         - name: empty-dir
           mountPath: /emptydir

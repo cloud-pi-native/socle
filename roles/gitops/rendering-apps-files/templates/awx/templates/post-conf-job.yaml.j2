@@ -1,0 +1,57 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awx-oidc-post-conf
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - keycloak-client-secret-awx-client
+  resources:
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: awx-oidc-post-conf
+  namespace: {{ dsc.awx.namespace }}
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - awx-operator-admin-password
+  resources:
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: awx-oidc-post-conf-rb
+  namespace: {{ dsc.keycloak.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awx-oidc-post-conf
+subjects:
+- kind: ServiceAccount
+  name: cpn-ansible-job
+  namespace: {{ dsc.awx.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: awx-oidc-post-conf-rb
+  namespace: {{ dsc.awx.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: awx-oidc-post-conf
+subjects:
+- kind: ServiceAccount
+  name: cpn-ansible-job
+  namespace: {{ dsc.awx.namespace }}

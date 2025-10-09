@@ -1,45 +1,12 @@
 {
   "__inputs": [
     {
-      "name": "DS_PROMETHEUS",
+      "name": "PROMETHEUS_DS",
       "label": "Prometheus",
       "description": "your prom metrics endpoint",
       "type": "datasource",
       "pluginId": "prometheus",
       "pluginName": "Prometheus"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "9.5.1"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "text",
-      "name": "Text",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
     }
   ],
   "annotations": {
@@ -54,6 +21,12 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
@@ -70,7 +43,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "gridPos": {
         "h": 1,
@@ -85,7 +58,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "refId": "A"
         }
@@ -96,7 +69,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "gridPos": {
         "h": 5,
@@ -119,7 +92,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "refId": "A"
         }
@@ -130,7 +103,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "description": "",
       "fieldConfig": {
@@ -191,7 +164,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "expr": "gitlab_runner_version_info{app=~\"^$app$\"}",
           "format": "table",
@@ -209,7 +182,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -269,7 +242,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -303,7 +276,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "description": "",
       "fieldConfig": {
@@ -364,7 +337,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -385,7 +358,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "description": "",
       "fieldConfig": {
@@ -445,7 +418,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -466,7 +439,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "description": "",
       "fieldConfig": {
@@ -527,7 +500,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -549,7 +522,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "gridPos": {
         "h": 1,
@@ -563,7 +536,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "refId": "A"
         }
@@ -574,7 +547,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -663,7 +636,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -684,7 +657,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -774,7 +747,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -795,7 +768,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -884,7 +857,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -905,7 +878,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -994,7 +967,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "expr": "sum(delta(gitlab_runner_errors_total{app=~\"^$app$\"} [1m])) by (app,level)",
@@ -1013,7 +986,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -1101,7 +1074,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1122,7 +1095,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "gridPos": {
         "h": 1,
@@ -1136,7 +1109,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "refId": "A"
         }
@@ -1147,7 +1120,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -1232,7 +1205,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "expr": "gitlab_runner_request_concurrency{app=~\"^$app$\"}",
           "format": "time_series",
@@ -1249,7 +1222,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -1334,7 +1307,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "expr": "delta(gitlab_runner_request_concurrency_exceeded_total{app=~\"^$app$\"} [2m])",
           "format": "time_series",
@@ -1352,7 +1325,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "gridPos": {
         "h": 1,
@@ -1366,7 +1339,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "refId": "A"
         }
@@ -1377,7 +1350,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "description": "(user and system)",
       "fieldConfig": {
@@ -1462,7 +1435,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "editorMode": "code",
           "expr": "rate(process_cpu_seconds_total{app=~\"^$app$\"} [1m]) * 100",
@@ -1481,7 +1454,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -1565,7 +1538,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "expr": "process_open_fds{app=~\"^$app$\"}",
           "format": "time_series",
@@ -1582,7 +1555,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -1666,7 +1639,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "expr": "process_virtual_memory_bytes{app=~\"^$app$\"}",
           "format": "time_series",
@@ -1683,7 +1656,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "$PROMETHEUS_DS"
       },
       "fieldConfig": {
         "defaults": {
@@ -1767,7 +1740,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "$PROMETHEUS_DS"
           },
           "expr": "process_resident_memory_bytes{app=~\"^$app$\"}",
           "format": "time_series",
@@ -1783,11 +1756,29 @@
     }
   ],
   "refresh": "1m",
-  "schemaVersion": 38,
+  "schemaVersion": 39,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "prometheus",
+          "value": "prometheus"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "data source",
+        "multi": false,
+        "name": "PROMETHEUS_DS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
       {
         "current": {
           "isNone": true,
@@ -1797,7 +1788,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid:": "${DS_PROMETHEUS}"
+          "uid": "$PROMETHEUS_DS"
         },
         "definition": "label_values(gitlab_runner_api_request_statuses_total, app)",
         "hide": 0,

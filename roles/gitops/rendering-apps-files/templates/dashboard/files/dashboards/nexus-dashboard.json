@@ -1,30 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "your prom metrics endpoint",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "annotations": {
-    "list": [
-      {
-        "builtIn": 1,
-        "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
-        },
-        "enable": true,
-        "hide": true,
-        "iconColor": "rgba(0, 211, 255, 1)",
-        "name": "Annotations & Alerts",
-        "type": "dashboard"
-      }
-    ]
-  },
   "description": "Nexus Dashboard by KL",
   "editable": true,
   "fiscalYearStartMonth": 0,
@@ -37,7 +11,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -86,10 +60,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_vm_uptime{job=\"nexus\"}",
+          "expr": "jvm_vm_uptime",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -104,7 +78,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -155,10 +129,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_heap_usage{job=\"nexus\"}",
+          "expr": "jvm_memory_heap_usage",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -173,7 +147,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -224,10 +198,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "builder",
-          "expr": "jvm_fd_usage{job=\"nexus\"}",
+          "expr": "jvm_fd_usage",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -242,7 +216,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -303,10 +277,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "builder",
-          "expr": "readonly_enabled{job=\"nexus\"}",
+          "expr": "readonly_enabled",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -322,7 +296,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "gridPos": {
         "h": 1,
@@ -336,7 +310,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "refId": "A"
         }
@@ -351,7 +325,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -394,10 +368,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "copy - p50",
           "range": true,
@@ -406,10 +380,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_copy_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "copy - p99",
           "range": true,
@@ -418,10 +392,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "deleteHard - p50",
           "range": true,
@@ -430,10 +404,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_deleteHard_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "deleteHard - p99",
           "range": true,
@@ -442,10 +416,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "get - p50",
           "range": true,
@@ -454,10 +428,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_get_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "get - p99",
           "range": true,
@@ -466,10 +440,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "delete - p50",
           "range": true,
@@ -478,10 +452,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_delete_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "delete - p99",
           "range": true,
@@ -490,10 +464,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "create - p50",
           "range": true,
@@ -502,10 +476,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_blobstore_file_FileBlobStore_create_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "create - p99",
           "range": true,
@@ -551,7 +525,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -594,10 +568,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "getBrowseableFormats - p50",
           "range": true,
@@ -606,10 +580,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_getBrowseableFormats_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "getBrowseableFormats - p99",
           "range": true,
@@ -618,10 +592,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "readReferences - p50",
           "range": true,
@@ -630,10 +604,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_readReferences_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "readReferences - p99",
           "range": true,
@@ -642,10 +616,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "read - p50",
           "range": true,
@@ -654,10 +628,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_RepositoryComponent_read_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "read - p99",
           "range": true,
@@ -703,7 +677,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -746,10 +720,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "getPermissions - p50",
           "range": true,
@@ -758,10 +732,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getPermissions_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "getPermissions - p99",
           "range": true,
@@ -770,10 +744,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "getUser - p50",
           "range": true,
@@ -782,10 +756,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_rapture_internal_security_SecurityComponent_getUser_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "getUser - p99",
           "range": true,
@@ -831,7 +805,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -874,10 +848,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "readSources - p50",
           "range": true,
@@ -886,10 +860,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_UserComponent_readSources_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "readSources - p99",
           "range": true,
@@ -898,10 +872,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "read - p50",
           "range": true,
@@ -910,10 +884,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_UserComponent_read_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "read - p99",
           "range": true,
@@ -959,7 +933,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1002,10 +976,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "verifyLogin - p50",
           "range": true,
@@ -1014,10 +988,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "verifyLogin - p99",
           "range": true,
@@ -1026,10 +1000,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_update_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_update_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "update - p50",
           "range": true,
@@ -1038,7 +1012,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_update_timer{quantile=\"0.99\"}",
           "interval": "",
@@ -1048,7 +1022,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_read_timer{quantile=\"0.5\"}",
           "interval": "",
@@ -1058,7 +1032,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "expr": "org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_read_timer{quantile=\"0.99\"}",
           "interval": "",
@@ -1105,7 +1079,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1148,10 +1122,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "read - p50",
           "range": true,
@@ -1160,10 +1134,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_BrowseComponent_read_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "read - p99",
           "range": true,
@@ -1209,7 +1183,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1252,10 +1226,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "p50",
           "range": true,
@@ -1264,10 +1238,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_sonatype_nexus_coreui_SearchComponent_read_timer{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "p99",
           "range": true,
@@ -1313,7 +1287,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1356,10 +1330,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_BlobStoreComponent_readGroups_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_BlobStoreComponent_readGroups_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "BlobStoreComponent",
           "range": true,
@@ -1368,10 +1342,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_blobstore_s3_internal_ui_S3Component_signertypes_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_blobstore_s3_internal_ui_S3Component_signertypes_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "S3Component",
           "range": true,
@@ -1380,10 +1354,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_TaskComponent_update_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_TaskComponent_update_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "TaskComponent",
           "range": true,
@@ -1392,10 +1366,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_rapture_internal_state_StateComponent_getState_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_rapture_internal_state_StateComponent_getState_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "StateComponent",
           "range": true,
@@ -1404,10 +1378,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_cancel_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_cancel_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "AssistantComponent-Cancel",
           "range": true,
@@ -1416,10 +1390,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_abort_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(com_sonatype_nexus_migration_ui_AssistantComponent_abort_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "AssistantComponent-Abort",
           "range": true,
@@ -1428,10 +1402,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_update_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_update_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "FreezeComponent-Update",
           "range": true,
@@ -1440,10 +1414,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_read_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_FreezeComponent_read_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "FreezeComponent-Read",
           "range": true,
@@ -1452,10 +1426,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_SelectorComponent_readReferences_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_SelectorComponent_readReferences_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "SelectorComponent",
           "range": true,
@@ -1464,10 +1438,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_rebuildIndex_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_rebuildIndex_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "RepositoryComponent",
           "range": true,
@@ -1476,10 +1450,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_verifyLogin_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "LdapServerComponent",
           "range": true,
@@ -1488,10 +1462,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_BrowseComponent_read_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_BrowseComponent_read_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "BrowseComponent",
           "range": true,
@@ -1500,10 +1474,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(com_sonatype_nexus_clm_internal_ui_ClmComponent_readApplications_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(com_sonatype_nexus_clm_internal_ui_ClmComponent_readApplications_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "ClmComponent-Read",
           "range": true,
@@ -1512,10 +1486,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_internal_capability_CapabilityComponent_remove_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_internal_capability_CapabilityComponent_remove_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "CapabilityComponent-Remove",
           "range": true,
@@ -1524,10 +1498,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(com_sonatype_nexus_ssl_plugin_internal_ui_CertificateComponent_details_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(com_sonatype_nexus_ssl_plugin_internal_ui_CertificateComponent_details_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "CertificateComponent-Details",
           "range": true,
@@ -1536,10 +1510,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_SearchComponent_read_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_SearchComponent_read_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "SearchComponent-Read",
           "range": true,
@@ -1548,10 +1522,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_rapture_internal_security_SecurityComponent_authenticate_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_rapture_internal_security_SecurityComponent_authenticate_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "SecurityComponent-Authenticate",
           "range": true,
@@ -1560,10 +1534,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_changeOrder_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_changeOrder_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "LdapServerComponent-ChangeOrder",
           "range": true,
@@ -1572,10 +1546,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_remove_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_coreui_RepositoryComponent_remove_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "RepositoryComponent-Remove",
           "range": true,
@@ -1584,10 +1558,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_readReferences_exceptions_total{job=\"nexus\"}[5m])",
+          "expr": "rate(org_sonatype_nexus_ldap_internal_ui_LdapServerComponent_readReferences_exceptions_total[5m])",
           "interval": "",
           "legendFormat": "LdapServerComponent-Read",
           "range": true,
@@ -1630,7 +1604,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "gridPos": {
         "h": 1,
@@ -1644,7 +1618,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "refId": "A"
         }
@@ -1659,7 +1633,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1702,10 +1676,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_1xx_responses_total{job=\"nexus\"}[1m])",
+          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_1xx_responses_total[1m])",
           "interval": "",
           "legendFormat": "1xx",
           "range": true,
@@ -1714,10 +1688,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_2xx_responses_total{job=\"nexus\"}[1m])",
+          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_2xx_responses_total[1m])",
           "interval": "",
           "legendFormat": "2xx",
           "range": true,
@@ -1726,10 +1700,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_5xx_responses_total{job=\"nexus\"}[1m])",
+          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_5xx_responses_total[1m])",
           "interval": "",
           "legendFormat": "5xx",
           "range": true,
@@ -1738,10 +1712,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_4xx_responses_total{job=\"nexus\"}[1m])",
+          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_4xx_responses_total[1m])",
           "interval": "",
           "legendFormat": "4xx",
           "range": true,
@@ -1750,10 +1724,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_3xx_responses_total{job=\"nexus\"}[1m])",
+          "expr": "rate(org_eclipse_jetty_webapp_WebAppContext_3xx_responses_total[1m])",
           "interval": "",
           "legendFormat": "3xx",
           "range": true,
@@ -1799,7 +1773,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1842,10 +1816,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.5\", job=\"nexus\"}",
+          "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.5\"}",
           "interval": "",
           "legendFormat": "p50",
           "range": true,
@@ -1854,10 +1828,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.99\", job=\"nexus\"}",
+          "expr": "org_eclipse_jetty_webapp_WebAppContext_requests{quantile=\"0.99\"}",
           "interval": "",
           "legendFormat": "p99",
           "range": true,
@@ -1903,7 +1877,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1946,7 +1920,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
           "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp612364006_jobs",
@@ -1958,7 +1932,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
           "expr": "org_eclipse_jetty_util_thread_QueuedThreadPool_qtp612364006_size",
@@ -2004,7 +1978,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "gridPos": {
         "h": 1,
@@ -2018,7 +1992,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "refId": "A"
         }
@@ -2033,7 +2007,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2070,10 +2044,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_count{job=\"nexus\"}[1m])",
+          "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_count[1m])",
           "hide": false,
           "interval": "",
           "legendFormat": "major GC(marksweep)",
@@ -2083,10 +2057,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_garbage_collectors_PS_Scavenge_count{job=\"nexus\"}[1m])",
+          "expr": "rate(jvm_garbage_collectors_PS_Scavenge_count[1m])",
           "interval": "",
           "legendFormat": "minor GC(scavenge)",
           "range": true,
@@ -2132,7 +2106,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2169,10 +2143,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_time{job=\"nexus\"}[5m]) / rate(jvm_garbage_collectors_MarkSweepCompact_count{job=\"nexus\"}[5m])",
+          "expr": "rate(jvm_garbage_collectors_MarkSweepCompact_time[5m]) / rate(jvm_garbage_collectors_MarkSweepCompact_count[5m])",
           "hide": false,
           "interval": "",
           "legendFormat": "major GC(marksweep)",
@@ -2182,10 +2156,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "rate(jvm_garbage_collectors_PS_Scavenge_time{job=\"nexus\"}[5m])/rate(jvm_garbage_collectors_PS_Scavenge_count{job=\"nexus\"}[5m])",
+          "expr": "rate(jvm_garbage_collectors_PS_Scavenge_time[5m])/rate(jvm_garbage_collectors_PS_Scavenge_count[5m])",
           "interval": "",
           "legendFormat": "minor GC(scavenge)",
           "range": true,
@@ -2228,7 +2202,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "gridPos": {
         "h": 1,
@@ -2242,7 +2216,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "refId": "A"
         }
@@ -2257,7 +2231,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -2302,10 +2276,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_heap_max{job=\"nexus\"}",
+          "expr": "jvm_memory_heap_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -2314,10 +2288,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_heap_used{job=\"nexus\"}",
+          "expr": "jvm_memory_heap_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -2326,10 +2300,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_heap_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_heap_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -2338,10 +2312,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_heap_init{job=\"nexus\"}",
+          "expr": "jvm_memory_heap_init",
           "hide": true,
           "instant": false,
           "interval": "",
@@ -2388,7 +2362,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -2433,10 +2407,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_non_heap_max{job=\"nexus\"}",
+          "expr": "jvm_memory_non_heap_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -2445,10 +2419,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_non_heap_used{job=\"nexus\"}",
+          "expr": "jvm_memory_non_heap_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -2457,10 +2431,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_non_heap_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_non_heap_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -2469,10 +2443,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_heap_init{job=\"nexus\"}",
+          "expr": "jvm_memory_heap_init",
           "hide": true,
           "instant": false,
           "interval": "",
@@ -2519,7 +2493,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -2564,10 +2538,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_total_max{job=\"nexus\"}",
+          "expr": "jvm_memory_total_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -2576,10 +2550,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_total_used{job=\"nexus\"}",
+          "expr": "jvm_memory_total_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -2588,10 +2562,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_total_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_total_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -2600,10 +2574,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_total_init{job=\"nexus\"}",
+          "expr": "jvm_memory_total_init",
           "hide": true,
           "interval": "",
           "legendFormat": "init",
@@ -2647,7 +2621,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "gridPos": {
         "h": 1,
@@ -2661,7 +2635,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "refId": "A"
         }
@@ -2676,7 +2650,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2713,10 +2687,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Eden_Space_init{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Eden_Space_init",
           "hide": true,
           "interval": "",
           "legendFormat": "init",
@@ -2726,10 +2700,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Eden_Space_used{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Eden_Space_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -2738,10 +2712,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Eden_Space_max{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Eden_Space_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -2750,10 +2724,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Eden_Space_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Eden_Space_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -2762,10 +2736,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Eden_Space_used_after_gc{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Eden_Space_used_after_gc",
           "hide": true,
           "interval": "",
           "legendFormat": "used_after_gc",
@@ -2812,7 +2786,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2849,10 +2823,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Tenured_Gen_Space_init{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Tenured_Gen_Space_init",
           "hide": true,
           "interval": "",
           "legendFormat": "init",
@@ -2862,10 +2836,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Tenured_Gen_used{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Tenured_Gen_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -2874,10 +2848,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Tenured_Gen_max{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Tenured_Gen_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -2886,10 +2860,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Tenured_Gen_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Tenured_Gen_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -2898,7 +2872,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "expr": "jvm_memory_pools_Tenured_Gen_used_after_gc",
           "hide": true,
@@ -2946,7 +2920,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -2983,10 +2957,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Survivor_Space_init{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Survivor_Space_init",
           "hide": true,
           "interval": "",
           "legendFormat": "init",
@@ -2996,10 +2970,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Survivor_Space_used{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Survivor_Space_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -3008,10 +2982,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Survivor_Space_max{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Survivor_Space_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -3020,10 +2994,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Survivor_Space_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Survivor_Space_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -3032,10 +3006,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Survivor_Space_used_after_gc{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Survivor_Space_used_after_gc",
           "hide": true,
           "interval": "",
           "legendFormat": "used_after_gc",
@@ -3079,7 +3053,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "gridPos": {
         "h": 1,
@@ -3093,7 +3067,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "refId": "A"
         }
@@ -3108,7 +3082,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -3145,10 +3119,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Metaspace_init{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Metaspace_init",
           "hide": true,
           "interval": "",
           "legendFormat": "init",
@@ -3158,10 +3132,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Metaspace_used{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Metaspace_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -3170,10 +3144,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Metaspace_max{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Metaspace_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -3182,10 +3156,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Metaspace_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Metaspace_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -3231,7 +3205,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -3268,10 +3242,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Compressed_Class_Space_used{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Compressed_Class_Space_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -3280,10 +3254,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Compressed_Class_Space_max{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Compressed_Class_Space_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -3292,10 +3266,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Compressed_Class_Space_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Compressed_Class_Space_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -3341,7 +3315,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -3378,10 +3352,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Code_Cache_used{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Code_Cache_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -3390,10 +3364,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Code_Cache_max{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Code_Cache_max",
           "interval": "",
           "legendFormat": "max",
           "range": true,
@@ -3402,10 +3376,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_memory_pools_Code_Cache_committed{job=\"nexus\"}",
+          "expr": "jvm_memory_pools_Code_Cache_committed",
           "interval": "",
           "legendFormat": "committed",
           "range": true,
@@ -3448,7 +3422,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "gridPos": {
         "h": 1,
@@ -3462,7 +3436,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "refId": "A"
         }
@@ -3477,7 +3451,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3520,10 +3494,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_buffers_direct_count{job=\"nexus\"}",
+          "expr": "jvm_buffers_direct_count",
           "interval": "",
           "legendFormat": "count",
           "range": true,
@@ -3569,7 +3543,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3613,10 +3587,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_buffers_direct_used{job=\"nexus\"}",
+          "expr": "jvm_buffers_direct_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -3625,10 +3599,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_buffers_direct_capacity{job=\"nexus\"}",
+          "expr": "jvm_buffers_direct_capacity",
           "interval": "",
           "legendFormat": "capacity",
           "range": true,
@@ -3674,7 +3648,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3717,10 +3691,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_buffers_mapped_count{job=\"nexus\"}",
+          "expr": "jvm_buffers_mapped_count",
           "interval": "",
           "legendFormat": "count",
           "range": true,
@@ -3766,7 +3740,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3810,10 +3784,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_buffers_mapped_used{job=\"nexus\"}",
+          "expr": "jvm_buffers_mapped_used",
           "interval": "",
           "legendFormat": "used",
           "range": true,
@@ -3822,10 +3796,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_buffers_mapped_capacity{job=\"nexus\"}",
+          "expr": "jvm_buffers_mapped_capacity",
           "interval": "",
           "legendFormat": "capacity",
           "range": true,
@@ -3871,7 +3845,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -3914,10 +3888,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_daemon_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_daemon_count",
           "interval": "",
           "legendFormat": "daemon",
           "range": true,
@@ -3926,10 +3900,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_terminated_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_terminated_count",
           "interval": "",
           "legendFormat": "terminated",
           "range": true,
@@ -3938,10 +3912,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_count",
           "interval": "",
           "legendFormat": "total",
           "range": true,
@@ -3987,7 +3961,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${PROMETHEUS_DS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -4030,10 +4004,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_new_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_new_count",
           "interval": "",
           "legendFormat": "new",
           "range": true,
@@ -4042,10 +4016,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_runnable_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_runnable_count",
           "interval": "",
           "legendFormat": "runnable",
           "range": true,
@@ -4054,10 +4028,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_blocked_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_blocked_count",
           "interval": "",
           "legendFormat": "blocked",
           "range": true,
@@ -4066,10 +4040,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_deadlock_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_deadlock_count",
           "interval": "",
           "legendFormat": "deadlock",
           "range": true,
@@ -4078,10 +4052,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_timed_waiting_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_timed_waiting_count",
           "interval": "",
           "legendFormat": "timed_waiting",
           "range": true,
@@ -4090,10 +4064,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${PROMETHEUS_DS}"
           },
           "editorMode": "code",
-          "expr": "jvm_thread_states_waiting_count{job=\"nexus\"}",
+          "expr": "jvm_thread_states_waiting_count",
           "interval": "",
           "legendFormat": "waiting",
           "range": true,
@@ -4140,7 +4114,26 @@
     "nexus"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "prometheus",
+          "value": "prometheus"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "data source",
+        "multi": false,
+        "name": "PROMETHEUS_DS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
   },
   "timepicker": {
     "refresh_intervals": [

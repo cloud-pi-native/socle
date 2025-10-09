@@ -19,6 +19,14 @@
       register: awx_secret
       failed_when: awx_secret.resources | length == 0
 
+    - name: Get awx admin password secret
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: "{{ dsc.awx.namespace }}"
+        name: awx-operator-admin-password
+      register: awx_admin_password
+      failed_when: awx_admin_password.resources | length == 0
+
     - name: Configure oidc auth method
       ansible.builtin.uri:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"

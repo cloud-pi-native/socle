@@ -23,6 +23,9 @@ subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
     namespace: {{ dsc.sonarqube.namespace }}
+  - kind: ServiceAccount
+    name: cpn-ansible-job
+    namespace: {{ dsc.awx.namespace }}
 {% if dsc.global.backup.cnpg.enabled %}
   - kind: ServiceAccount
     name: cpn-ansible-job

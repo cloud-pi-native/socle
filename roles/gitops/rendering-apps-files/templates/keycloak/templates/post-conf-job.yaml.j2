@@ -17,7 +17,7 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list", "update", "patch"]
-    resourceNames: ["dso-admin-user-secret", "keycloak-client-secret-argo-client", "keycloak-client-secret-console-backend", "keycloak-client-secret-console-frontend", "keycloak-client-secret-gitlab-client", "keycloak-client-secret-grafana-projects", "keycloak-client-secret-harbor-client", "keycloak-client-secret-portail-client", "keycloak-client-secret-sonar-client", "keycloak-client-secret-vault-client"]
+    resourceNames: ["dso-admin-user-secret", "keycloak-client-secret-argo-client", "keycloak-client-secret-console-backend", "keycloak-client-secret-console-frontend", "keycloak-client-secret-gitlab-client", "keycloak-client-secret-grafana-projects", "keycloak-client-secret-harbor-client", "keycloak-client-secret-portail-client", "keycloak-client-secret-sonar-client", "keycloak-client-secret-vault-client", "keycloak-client-secret-awx-client"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

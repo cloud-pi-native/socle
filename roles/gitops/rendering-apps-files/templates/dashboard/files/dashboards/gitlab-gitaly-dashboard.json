@@ -1,47 +1,11 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "5.3.2"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": "5.0.0"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "5.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "singlestat",
-      "name": "Singlestat",
-      "version": "5.0.0"
-    }
-  ],
   "annotations": {
     "list": [
       {
         "builtIn": 1,
         "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
+          "type": "grafana",
+          "uid": "-- Grafana --"
         },
         "enable": true,
         "hide": true,
@@ -67,7 +31,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -105,14 +69,16 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "expr": "rate(process_cpu_seconds_total{job=\"gitlab-gitaly\"}[$__interval])",
           "format": "time_series",
           "interval": "1m",
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
-          "refId": "A"
+          "range": true,
+          "refId": "A",
+          "useBackend": false
         }
       ],
       "thresholds": [],
@@ -149,7 +115,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -208,10 +174,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "gitlab_build_info",
+          "expr": "gitlab_build_info{job=\"gitlab-gitaly\"}",
           "format": "table",
           "instant": true,
           "intervalFactor": 1,
@@ -229,7 +195,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -267,7 +233,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "expr": "go_goroutines{job=\"gitlab-gitaly\"}",
           "format": "time_series",
@@ -278,7 +244,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "expr": "process_open_fds{job=\"gitlab-gitaly\"}",
           "format": "time_series",
@@ -321,7 +287,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -388,7 +354,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "expr": "avg(avg_over_time(up{job=\"gitlab-gitaly\"}[$__interval]))",
           "format": "time_series",
@@ -408,7 +374,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -446,7 +412,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "expr": "process_resident_memory_bytes{job=\"gitlab-gitaly\"}",
           "format": "time_series",
@@ -457,7 +423,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "expr": "go_memstats_next_gc_bytes{job=\"gitlab-gitaly\"}",
           "format": "time_series",
@@ -504,7 +470,7 @@
       "dashes": false,
       "datasource": {
         "type": "prometheus",
-        "uid:": "${DS_PROMETHEUS}"
+        "uid": "${datasource}"
       },
       "fill": 1,
       "fillGradient": 0,
@@ -542,7 +508,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid:": "${DS_PROMETHEUS}"
+            "uid": "${datasource}"
           },
           "expr": "sum without (grpc_method,grpc_service,grpc_type) (\n  rate(grpc_server_started_total{job=\"gitlab-gitaly\"}[$__interval])\n)",
           "format": "time_series",
@@ -589,7 +555,26 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "prometheus",
+          "value": "prometheus"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "data source",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
   },
   "time": {
     "from": "now-24h",

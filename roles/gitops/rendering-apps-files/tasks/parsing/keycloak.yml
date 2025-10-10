@@ -1,8 +1,0 @@
----
-- name: Inject groups under prometheusRule
-  when: dsc.global.alerting.enabled
-  ansible.builtin.blockinfile:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
-    insertafter: '^    prometheusRule:\s*$'
-    block: "{{ values.keycloak.prometheusRule | indent(6, true) }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: groups"

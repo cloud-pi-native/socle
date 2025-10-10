@@ -7,8 +7,8 @@ groups:
           summary: GitLab Operator {{`{{`}} $labels.pod {{`}}`}} pod not healthy (container {{`{{`}} $labels.container {{`}}`}} is not ready)
         expr: |
           kube_pod_container_status_ready{
-          pod=~"gitlab-controller-manager(-.*)*",
-          namespace="{{ .Values.app.namespacePrefix }}gitlab-operator"} == 0
+          pod=~"(.*-)*controller-manager(-.*)*",
+          namespace="{{ .Values.app.namespacePrefix }}gitlab"} == 0
         for: 5m
         labels:
           severity: critical

@@ -7,7 +7,7 @@ groups:
           summary: Harbor core down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"harbor-core-.*",
+          pod=~"harbor-core(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
         for: 5m
@@ -19,7 +19,7 @@ groups:
           summary: Harbor exporter down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"harbor-exporter-.*",
+          pod=~"harbor-exporter(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
         for: 5m
@@ -31,7 +31,7 @@ groups:
           summary: Harbor jobservice down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"harbor-jobservice-.*",
+          pod=~"harbor-jobservice(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
         for: 5m
@@ -43,7 +43,7 @@ groups:
           summary: Harbor portal down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"harbor-portal-.*",
+          pod=~"harbor-portal(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
         for: 5m
@@ -55,7 +55,7 @@ groups:
           summary: Harbor redis down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"harbor-redis-.*",
+          pod=~"harbor-redis(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
         for: 5m
@@ -67,7 +67,7 @@ groups:
           summary: Harbor registry down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"harbor-registry-.*",
+          pod=~"harbor-registry(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
         for: 5m
@@ -79,7 +79,7 @@ groups:
           summary: Harbor trivy down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"harbor-trivy-.*",
+          pod=~"harbor-trivy(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor",
           condition="true"}) == 0
         for: 5m
@@ -91,7 +91,7 @@ groups:
           summary: Harbor {{`{{`}} $labels.pod {{`}}`}} pod not healthy (container {{`{{`}} $labels.container {{`}}`}} is not ready)
         expr: |
           kube_pod_container_status_ready{
-          pod=~"harbor-.*",
+          pod=~"harbor(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}harbor"} == 0
         for: 5m
         labels:

@@ -11,7 +11,7 @@ groups:
           container="nexus3",
           namespace="{{ .Values.app.namespacePrefix }}nexus"}) == 1)
           or sum(kube_pod_container_status_ready{
-          pod=~"nexus-.*",
+          pod=~"nexus(-.*)*",
           container="nexus3",
           namespace="{{ .Values.app.namespacePrefix }}nexus"}) == 0
         for: 5m
@@ -24,10 +24,10 @@ groups:
         expr: |
           round(
           kubelet_volume_stats_available_bytes{
-          persistentvolumeclaim=~"nexus-data-.*",
+          persistentvolumeclaim=~"(.*-)*nexus(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}nexus"}
           / kubelet_volume_stats_capacity_bytes{
-          persistentvolumeclaim=~"nexus-data-.*",
+          persistentvolumeclaim=~"(.*-)*nexus(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}nexus"} * 100, 0.01) < 20 > 10
         for: 1m
         labels:
@@ -39,10 +39,10 @@ groups:
         expr: |
           round(
           kubelet_volume_stats_available_bytes{
-          persistentvolumeclaim=~"nexus-data-.*",
+          persistentvolumeclaim=~"(.*-)*nexus(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}nexus"}
           / kubelet_volume_stats_capacity_bytes{
-          persistentvolumeclaim=~"nexus-data-.*",
+          persistentvolumeclaim=~"(.*-)*nexus(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}nexus"} * 100, 0.01) < 10 > 0
         for: 1m
         labels:
@@ -53,7 +53,7 @@ groups:
           summary: Nexus PVC out of disk space in namespace {{`{{`}} $labels.namespace {{`}}`}}
         expr: |
           kubelet_volume_stats_available_bytes{
-          persistentvolumeclaim=~"nexus-data-.*",
+          persistentvolumeclaim=~"(.*-)*nexus(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}nexus"} == 0
         for: 1m
         labels:

@@ -25,11 +25,11 @@ groups:
           summary: Vault is down (no ready container)
         expr: |
           (absent(kube_pod_container_status_ready{
-          pod=~"(.*-)*vault(-.*)*",
+          pod=~"(.*-)*vault-\\d+",
           container="vault",
           namespace="{{ .Values.app.namespacePrefix }}vault"}) == 1)
           or sum(kube_pod_container_status_ready{
-          pod=~"(.*-)*vault(-.*)*",
+          pod=~"(.*-)*vault\\d+",
           container="vault",
           namespace="{{ .Values.app.namespacePrefix }}vault"}) == 0
         for: 5m
@@ -41,11 +41,11 @@ groups:
           summary: Vault agent injector is down (no ready container)
         expr: |
           (absent(kube_pod_container_status_ready{
-          pod=~"(.*-)*vault(-.*)*",
+          pod=~"(.*-)*vault-agent-injector(-.*)*",
           container="sidecar-injector",
           namespace="{{ .Values.app.namespacePrefix }}vault"}) == 1)
           or sum(kube_pod_container_status_ready{
-          pod=~"(.*-)*vault(-.*)*",
+          pod=~"(.*-)*vault-agent-injector(-.*)*",
           container="sidecar-injector",
           namespace="{{ .Values.app.namespacePrefix }}vault"}) == 0
         for: 5m

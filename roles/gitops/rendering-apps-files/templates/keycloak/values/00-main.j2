@@ -150,9 +150,6 @@ keycloak:
 {% if dsc.global.metrics.additionalLabels is defined %}
       labels: {{ dsc.global.metrics.additionalLabels }} 
 {% endif %}
-    prometheusRule:
-      enabled: {{ dsc.global.alerting.enabled }}
-      namespace: {{ dsc.keycloak.namespace }}
 
   keycloakConfigCli:
     enabled: false

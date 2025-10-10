@@ -15,20 +15,6 @@
     block: "{{ values.vault.raft_standalone_config | indent(6, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: config"
 
-- name: Conditionally add metrics and/or alerts enabled rules
-  ansible.builtin.set_fact:
-    values: >-
-      {{
-        values | combine({
-          'vault': values.vault | combine({
-            'serverTelemetry':
-              values.vault.serverTelemetry
-              + (values.vault.metrics_enabled_rules | indent(6, true) if dsc.global.metrics.enabled else '')
-              + (values.vault.alerts_enabled_rules | indent(6, true) if dsc.global.alerting.enabled else '')
-          })
-        }, recursive=True)
-      }}
-
 - name: Inject serverTelemetry under vault
   when: dsc.global.metrics.enabled
   ansible.builtin.blockinfile:

@@ -7,7 +7,7 @@ groups:
           summary: GitLab webservice down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-webservice-.*",
+          pod=~"gitlab-webservice(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -19,7 +19,7 @@ groups:
           summary: GitLab toolbox down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-toolbox-.*",
+          pod=~"gitlab-toolbox(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -31,7 +31,7 @@ groups:
           summary: GitLab sidekiq down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-sidekiq-.*",
+          pod=~"gitlab-sidekiq(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -43,7 +43,7 @@ groups:
           summary: GitLab runner down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-runner-.*",
+          pod=~"gitlab-runner(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -55,7 +55,7 @@ groups:
           summary: GitLab redis down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-redis-.*",
+          pod=~"gitlab-redis(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -67,7 +67,7 @@ groups:
           summary: GitLab minio down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-minio-.*",
+          pod=~"gitlab-minio(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -79,7 +79,7 @@ groups:
           summary: GitLab kas down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-kas-.*",
+          pod=~"gitlab-kas(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -91,7 +91,7 @@ groups:
           summary: GitLab shell down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-gitlab-shell-.*",
+          pod=~"gitlab-gitlab-shell(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -103,7 +103,7 @@ groups:
           summary: GitLab exporter down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-gitlab-exporter-.*",
+          pod=~"gitlab-gitlab-exporter(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -115,7 +115,7 @@ groups:
           summary: GitLab gitaly down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-gitaly-.*",
+          pod=~"gitlab-gitaly(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -127,7 +127,7 @@ groups:
           summary: GitLab ci-pipelines-exporter down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"gitlab-ci-pipelines-exporter-.*",
+          pod=~"glexporter(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}gitlab",
           condition="true"}) == 0
         for: 5m
@@ -139,7 +139,7 @@ groups:
           summary: GitLab {{`{{`}} $labels.pod {{`}}`}} pod not healthy (container {{`{{`}} $labels.container {{`}}`}} is not ready)
         expr: |
           kube_pod_container_status_ready{
-          pod=~"gitlab-.*",
+          pod=~"gitlab(-.*)*|glexporter(-.*)*",
           container!~"gitlab|kubectl|minio-mc|migrations", namespace="{{ .Values.app.namespacePrefix }}gitlab"} == 0
         for: 5m
         labels:

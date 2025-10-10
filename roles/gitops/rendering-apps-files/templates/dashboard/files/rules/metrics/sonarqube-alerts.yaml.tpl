@@ -11,7 +11,7 @@ groups:
           container="sonarqube",
           namespace="{{ .Values.app.namespacePrefix }}sonarqube"}) == 1)
           or sum(kube_pod_container_status_ready{
-          pod=~"sonarqube-.*",
+          pod=~"sonarqube(-.*)*",
           container="sonarqube",
           namespace="{{ .Values.app.namespacePrefix }}sonarqube"}) == 0
         for: 5m

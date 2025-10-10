@@ -19,7 +19,7 @@ groups:
           summary: DSO Console server down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"dso-cpn-console-server-.*",
+          pod=~"dso-cpn-console-server(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}console",
           condition="true"}) == 0
         for: 5m
@@ -31,7 +31,7 @@ groups:
           summary: DSO Console {{`{{`}} $labels.pod {{`}}`}} pod not healthy (container {{`{{`}} $labels.container {{`}}`}} is not ready)
         expr: |
           kube_pod_container_status_ready{
-          pod=~"dso-cpn-console-.*",
+          pod=~"dso-cpn-console(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}console"} == 0
         for: 5m
         labels:

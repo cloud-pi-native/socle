@@ -31,7 +31,7 @@ groups:
           summary: Argo CD Redis HA down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"(.*-)*argo-redis-ha-server-.*",
+          pod=~"(.*-)*redis-ha-server(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
         for: 5m
@@ -43,7 +43,7 @@ groups:
           summary: Argo CD Redis HA Haproxy down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"(.*-)*argo-redis-ha-haproxy-.*",
+          pod=~"(.*-)*redis-ha-haproxy(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
         for: 5m
@@ -55,7 +55,7 @@ groups:
           summary: Argo CD Server down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"(.*-)*argo-argocd-server-.*",
+          pod=~"(.*-)*argocd-server(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
         for: 5m
@@ -67,7 +67,7 @@ groups:
           summary: Argo CD Repo Server down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"(.*-)*argo-argocd-repo-server-.*",
+          pod=~"(.*-)*argocd-repo-server(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
         for: 5m
@@ -79,7 +79,7 @@ groups:
           summary: Argo CD Applicationset Controller down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"(.*-)*argocd-applicationset-controller-.*",
+          pod=~"(.*-)*argocd-applicationset-controller(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
         for: 5m
@@ -91,7 +91,7 @@ groups:
           summary: Argo CD Application Controller down (no ready pod)"
         expr: |
           sum by(namespace) (kube_pod_status_ready{
-          pod=~"(.*-)*argocd-application-controller-.*",
+          pod=~"(.*-)*argocd-application-controller(-.*)*",
           namespace="{{ .Values.app.namespacePrefix }}argocd",
           condition="true"}) == 0
         for: 5m

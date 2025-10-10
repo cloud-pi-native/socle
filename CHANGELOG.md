@@ -1,5 +1,29 @@
 # Changelog
 
+## [4.1.0](https://github.com/cloud-pi-native/socle/compare/v4.0.0...v4.1.0) (2025-10-10)
+
+
+### Features
+
+* :arrow_up: Upgrading  Argo CD to 8.5.6 Helm chart version ([0f1751b](https://github.com/cloud-pi-native/socle/commit/0f1751b9fa8ee92494928a6a6cae109ca1c5642b))
+* :art: Update dashboards ([f5ba284](https://github.com/cloud-pi-native/socle/commit/f5ba2843f7a29f0ecbc9391052d3995401eed899))
+* :sparkles: introduce playwright job ([7e4d411](https://github.com/cloud-pi-native/socle/commit/7e4d4112a35305f45c305b5b3f9b00471288bd72))
+
+
+### Bug Fixes
+
+* :ambulance: Argo CD infra plugin config ([5732c37](https://github.com/cloud-pi-native/socle/commit/5732c378bb472fb880b6ba03c51364620ca6eb3d))
+* :art: Argo CD logs RBAC ([da3e611](https://github.com/cloud-pi-native/socle/commit/da3e61110289f15122a537174a060c0d6a8a859d))
+* :art: Vault serverTelemetry values ([438ea4f](https://github.com/cloud-pi-native/socle/commit/438ea4f9cc9700bd6c0ad79a27c6c9e30e460139))
+* :bug: Ansible stdout format ([448ab44](https://github.com/cloud-pi-native/socle/commit/448ab4401eeb3559c1fe4dbc4ccbcad73ba53e24))
+* :bug: Argo CD metrics scraping ([abf2c6e](https://github.com/cloud-pi-native/socle/commit/abf2c6e55aaab980047e340ffc01d37a0f9fabd1))
+* :bug: force update ansible modules in install requirements ([9f23c2d](https://github.com/cloud-pi-native/socle/commit/9f23c2d3879224df38c6b0daa39febd86afa9dcb))
+* :bug: Keycloak metrics and ServiceMonitor ([9271dc7](https://github.com/cloud-pi-native/socle/commit/9271dc73b86bcdd07c5f172940a5dab72c9fc30a))
+* :bug: missing default values ([8c59a19](https://github.com/cloud-pi-native/socle/commit/8c59a199fdc49628d87435012df7f75f4aca5304))
+* :bug: Nexus ServiceMonitor ([900050f](https://github.com/cloud-pi-native/socle/commit/900050f45b7cd8df3a79291f9cd98c30813df0be))
+* **#746:** :wrench: remove vault patch tasks ([43ab4eb](https://github.com/cloud-pi-native/socle/commit/43ab4ebfb66042530beb8cb0d8c66f96f48b6fa3))
+* awx post install ([11f4d7c](https://github.com/cloud-pi-native/socle/commit/11f4d7c871517c442b20903cd74b80e9f7dd2c07))
+
 ## [4.0.0](https://github.com/cloud-pi-native/socle/compare/v3.18.0...v4.0.0) (2025-09-23)
 
 

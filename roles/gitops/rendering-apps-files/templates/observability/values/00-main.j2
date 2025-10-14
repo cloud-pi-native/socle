@@ -43,6 +43,11 @@ observatorium:
       issuerURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
       usernameClaim: "preferred_username"
       groupClaim: "groups"
+{% if dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret" %}
+      customCA:
+        enabled: true
+        cert:  <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#exposedCa | base64encode>
+{% endif %}
   logs:
     enabled: {{ dsc.global.logs.enabled | lower | default('') }}
     read:

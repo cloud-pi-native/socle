@@ -27,10 +27,16 @@ observatorium:
         paths:
           - path: /
             pathType: ImplementationSpecific
+{% if dsc.ingress.tls.type != 'none' %}
     tls:
       - hosts:
           - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+        secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
         secretName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.observatorium}>-tls
+{% endif %}
+{% endif %}
   api:
     loglevel: info
     config:

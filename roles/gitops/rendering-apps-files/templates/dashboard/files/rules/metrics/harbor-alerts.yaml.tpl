@@ -1,6 +1,119 @@
 groups:
-  - name: DSO_Harbor
+  - name: DSO_Harbor_records
     rules:
+      - record: harbor:registry:v2:req_rate5m
+        expr: |
+          sum by (instance) (
+            rate(registry_http_requests_total{handler="base"}[5m])
+          )
+      - record: harbor:registry:push_requests:rate5m
+        expr: |
+          sum by (instance) (
+            rate(registry_http_requests_total{
+              handler=~"blob_upload|blob_upload_chunk|manifest",
+              method=~"post|put|patch"
+            }[5m])
+          )
+      - record: harbor:registry:push_errors_5xx:rate5m
+        expr: |
+          sum by (instance) (
+            rate(registry_http_requests_total{
+              handler=~"blob_upload|blob_upload_chunk|manifest",
+              method=~"post|put|patch",
+              code=~"5.."
+            }[5m])
+          )
+      - record: harbor:registry:push_latency_seconds:p99
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum by (le) (
+              rate(registry_http_request_duration_seconds_bucket{
+                handler=~"blob_upload|blob_upload_chunk|manifest",
+                method=~"post|put|patch"
+              }[5m])
+            )
+          )
+      - record: harbor:project:quota_used_ratio
+        expr: |
+          (harbor_project_quota_usage_byte)
+          /
+          clamp_max(harbor_project_quota_byte, 1e15)
+  - name: DSO_Harbor_alerts
+    rules:
+      - alert: Harbor registry down
+        annotations:
+          description: "Harbor registry in namespace {{`{{`}} $labels.namespace {{`}}`}} has been reported down for the last 5 minutes."
+          summary: "Harbor registry down"
+        expr: max by (instance) (harbor_up{component="registry"}) == 0
+        for: 5m
+        labels:
+          severity: critical
+      - alert: HarborRegistryV2NoSuccessWithTraffic
+        annotations:
+          summary: "Harbor /v2/ not available despite existing traffic"
+          description: >
+            No HTTP success (2xx/401/403) on /v2/ (handler=base) for 5 min,
+            despite significant traffic and Harbor registry up.
+        expr: |
+          (max by (instance) (harbor_up{component="registry"}) == 1)
+          and (harbor:registry:v2:req_rate5m > 0.05)
+          and (
+            sum by (instance) (
+              rate(registry_http_requests_total{
+                handler="base",
+                code=~"2..|401|403"
+              }[5m])
+            ) == 0
+          )
+        for: 5m
+        labels:
+          severity: critical
+      - alert: HarborRegistryPushErrorRateHigh
+        annotations:
+          summary: "High 5xx errors rate detected on Harbor pushes"
+          description: >
+            5xx errors exceeding 5% on push endpoints
+            (blob_upload|blob_upload_chunk|manifest) for the last 10 min, despite registry up.
+        expr: |
+          (max by (instance) (harbor_up{component="registry"}) == 1)
+          and (harbor:registry:push_requests:rate5m > 0.1)
+          and (
+            harbor:registry:push_errors_5xx:rate5m
+            / ignoring(instance)
+            harbor:registry:push_requests:rate5m
+          ) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+      - alert: HarborRegistryPushErrorsBurst
+        annotations:
+          summary: "5xx errors burst on Harbor pushes"
+          description: "Several 5xx/s errors (5 min average) on push endpoints."
+        expr: |
+          (max by (instance) (harbor_up{component="registry"}) == 1)
+          and (harbor:registry:push_errors_5xx:rate5m > 1)
+        for: 5m
+        labels:
+          severity: critical
+      - alert: HarborRegistryPushLatencyHigh
+        annotations:
+          summary: "High p99 latency on Harbor pushes"
+          description: "p99 > 10s on pushes (uploads/manifests) for the last 10 min."
+        expr: |
+          (max by (instance) (harbor_up{component="registry"}) == 1)
+          and (harbor:registry:push_latency_seconds:p99 > 10)
+        for: 10m
+        labels:
+          severity: warning
+      - alert: HarborProjectQuotaNearFull
+        annotations:
+          summary: "Harbor project quota > 90%"
+          description: "One Harbor project quota is exceeding 90%. Pushes might fail."
+        expr: harbor:project:quota_used_ratio > 0.9
+        for: 15m
+        labels:
+          severity: critical
       - alert: Harbor core not available
         annotations:
           message: Harbor core in namespace {{`{{`}} $labels.namespace {{`}}`}} has not been available for the last 5 minutes.

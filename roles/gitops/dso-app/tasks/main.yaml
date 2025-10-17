@@ -3,7 +3,7 @@
   when: argo_infra_ns_check.resources is defined and not (argo_infra_ns_check.resources | length == 0)
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
-    proxy: "{{ kubeconfig_proxy_infra | default('') }}"
+    proxy: "{{ kubeconfig_proxy_infra | default(omit) }}"
     namespace: "{{ dsc.argocdInfra.namespace }}"
     definition: "{{ lookup('ansible.builtin.template', role_path + '/templates/dso-app.yaml.j2') | from_yaml }}"
     state: present

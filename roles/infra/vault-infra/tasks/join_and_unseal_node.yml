@@ -1,0 +1,31 @@
+---
+- name: "Process node {{ vault_node_index }}"
+  vars:
+    vault_pod: "{{ dsc_name }}-vault-infra-{{ vault_node_index }}"
+  block:
+    # Join node to Vault cluster
+    - name: "Check vault-{{ vault_node_index }} status"
+      ansible.builtin.include_tasks: check.yml
+
+    - name: "Join vault-{{ vault_node_index }} node to cluster"
+      when: vault_status == 'not init'
+      kubernetes.core.k8s_exec:
+        container: vault
+        pod: "{{ vault_pod }}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        command: vault operator raft join http://"{{ dsc_name }}"-vault-infra-0."{{ dsc_name }}"-vault-infra-internal:8200
+      register: "node_join_state_{{ vault_node_index }}"
+      retries: 3
+      delay: 20
+
+    # Unseal node
+    - name: "Check vault-{{ vault_node_index }} status again"
+      ansible.builtin.include_tasks: check.yml
+
+    - name: Set seal count
+      ansible.builtin.set_fact:
+        unseal_key_index: "0"
+
+    - name: "Unseal vault node {{ vault_node_index }}"
+      when: vault_status == 'not init' or vault_status == 'sealed'
+      ansible.builtin.include_tasks: unseal.yml

@@ -93,23 +93,24 @@
   ansible.builtin.set_fact:
     dsc: "{{ socle_config.resources[0] }}"
 
-- name: Set some instance name
+- name: Set instance name fact
   ansible.builtin.set_fact:
     instance_name: "{{ dsc.metadata.name }}"
 
-- name: Set some facts
+- name: Set default config and releases facts
   ansible.builtin.set_fact:
     dsc_default_config: "{{ lookup('ansible.builtin.file', 'config.yaml') | from_yaml }}"
     dsc_default_releases: "{{ lookup('ansible.builtin.file', 'releases.yaml') | from_yaml }}"
 
-- name: Set some facts
+- name: Combine and merge DSC fact
   ansible.builtin.set_fact:
     dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
-- name: Set some facts
+
+- name: Set dsc spec fact
   ansible.builtin.set_fact:
     dsc: "{{ dsc.spec }}"
 
-- name: Set private registry
+- name: Set private registry fact
   ansible.builtin.set_fact:
     use_private_registry: "{{ dsc.global.registry is defined and dsc.global.registry | length > 0 | bool }}"
 
@@ -117,15 +118,15 @@
   ansible.builtin.set_fact:
     use_image_pull_secrets: "{{ dsc.global.imagePullSecretsData is defined and dsc.global.imagePullSecretsData | length > 0 | bool }}"
 
-- name: Set root_domain fact
+- name: Set root_domain fact from dsc global config
   ansible.builtin.set_fact:
     root_domain: "{{ dsc.global.rootDomain }}"
 
-- name: Set infra_root_domain fact
+- name: Set infra_root_domain fact from dsc global config
   ansible.builtin.set_fact:
     infra_root_domain: "{{ dsc.global.infraRootDomain }}"
 
-- name: Set tools domains facts
+- name: Set tools domains facts from dsc config
   ansible.builtin.set_fact:
     argocd_domain: "{{ dsc.argocd.domain | default(dsc.argocd.subDomain ~ root_domain) }}"
     awx_domain: "{{ dsc.awx.domain | default(dsc.awx.subDomain ~ root_domain) }}"
@@ -140,17 +141,67 @@
     sonar_domain: "{{ dsc.sonarqube.domain | default(dsc.sonarqube.subDomain ~ root_domain) }}"
     vault_domain: "{{ dsc.vault.domain | default(dsc.vault.subDomain ~ root_domain) }}"
 
-- name: Set Vault infra domain fact
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') == ''
-  ansible.builtin.set_fact:
-    vaultinfra_domain: "{{ dsc.vaultInfra.domain | default(dsc.vaultInfra.subDomain ~ infra_root_domain) }}"
-
-- name: Set Vault infra domain fact
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') != ''
+- name: Set Vault infra domain fact from environment variable
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') | length > 0
   ansible.builtin.set_fact:
     vaultinfra_domain: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') }}"
 
-- name: Probe Vaultinfra domain cert validity
+- name: Set Vault infra domain fact from dsc config when environment variable not set
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') | length == 0
+  ansible.builtin.set_fact:
+    vaultinfra_domain: "{{ dsc.vaultInfra.domain | default(dsc.vaultInfra.subDomain ~ infra_root_domain) }}"
+
+- name: Set Vault infra token fact from environment variable
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') | length > 0
+  ansible.builtin.set_fact:
+    vault_infra_token: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') }}"
+
+- name: Set Vault infra token fact from Kubernetes secret when environment variable not set
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') | length == 0
+  block:
+    - name: Check Vault infra pods
+      kubernetes.core.k8s_info:
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Pod
+        label_selectors:
+          - app.kubernetes.io/name = vault
+      register: vault_infra_pods
+
+    - name: Fetch Vault infra keys and token from infra Kubernetes cluster
+      when: vault_infra_pods.resources | length > 0
+      block:
+        - name: Retrieve all secrets in the Vault infra namespace
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.vaultInfra.namespace }}"
+            kind: Secret
+          register: vault_infra_secrets
+
+        - name: Extract the name of the Vault keys secret
+          ansible.builtin.set_fact:
+            vault_infra_keys_secret_name: "{{ vault_infra_secrets.resources
+              | selectattr('metadata.name', 'contains', 'vault-keys')
+              | map(attribute='metadata.name')
+              | first | default('') }}"
+
+        - name: Fail if Vault infra keys secret not found (unless vault-infra role is executed)
+          when: vault_infra_keys_secret_name | length == 0 and 'vault-infra' not in ansible_run_tags or not dsc.vaultInfra.installEnabled
+          ansible.builtin.fail:
+            msg: "Vault infra keys secret not found. Please ensure Vault infra is initialized and unsealed."
+
+        - name: Fetch the Vault infra keys secret
+          when: vault_infra_keys_secret_name | length > 0
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.vaultInfra.namespace }}"
+            kind: Secret
+            name: "{{ vault_infra_keys_secret_name }}"
+          register: vault_infra_keys
+
+        - name: Decode and set the Vault infra token
+          when: vault_infra_keys_secret_name | length > 0
+          ansible.builtin.set_fact:
+            vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
+
+- name: Probe Vault infra domain cert validity
   ansible.builtin.uri:
     url: "https://{{ vaultinfra_domain }}"
     method: GET
@@ -159,7 +210,7 @@
   register: vaultinfra_probe
   ignore_errors: true
 
-- name: Set vaultinfra_cert_valid fact
+- name: Set Vault infra certificate validity fact based on domain probe result
   ansible.builtin.set_fact:
     vaultinfra_cert_valid: "{{ vaultinfra_probe.failed is not defined or not vaultinfra_probe.failed }}"
 

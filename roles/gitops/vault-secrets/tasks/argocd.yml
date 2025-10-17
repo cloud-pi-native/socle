@@ -2,7 +2,7 @@
 - name: Hard refresh argocd applications
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
-    proxy: "{{ kubeconfig_proxy_infra | default('') }}"
+    proxy: "{{ kubeconfig_proxy_infra | default(omit) }}"
     kind: Application
     api_version: argoproj.io/v1alpha1
     name: "{{ item }}"
@@ -16,7 +16,7 @@
 - name: Sync argocd applications
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig_infra }}"
-    proxy: "{{ kubeconfig_proxy_infra | default('') }}"
+    proxy: "{{ kubeconfig_proxy_infra | default(omit) }}"
     kind: Application
     api_version: argoproj.io/v1alpha1
     name: "{{ item }}"

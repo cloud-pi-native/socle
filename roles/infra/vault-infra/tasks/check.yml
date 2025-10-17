@@ -1,6 +1,5 @@
 ---
 - name: Get vault status
-  changed_when: false
   kubernetes.core.k8s_exec:
     container: vault
     pod: "{{ vault_pod }}"
@@ -9,6 +8,7 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
   register: vault_status
   ignore_errors: true
+  changed_when: false
 
 - name: Set vault_initialized fact
   ansible.builtin.set_fact:

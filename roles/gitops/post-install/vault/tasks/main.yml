@@ -1,11 +1,10 @@
 ---
-# Find Vault keys
 - name: Find vault keys
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
     name: "{{ dsc_name }}-vault-keys"
-  register: vaut_keys
+  register: vault_keys
 
 # Check Vault status - node 1
 - name: Check vault status - node 1
@@ -16,11 +15,17 @@
 - name: Check if vault is coherent
   ansible.builtin.assert:
     that:
-      - ((vault_status in ['sealed', 'OK']) and (vaut_keys.resources | length > 0)) or ((vault_status == 'not init') and (vaut_keys.resources | length == 0))
+      - (vault_status in ['sealed', 'OK']) and (vault_keys.resources | length > 0)
     fail_msg:
-      - Attention ! Soit le vault n'est pas initialisé mais vous avez un secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}
+      - Attention ! Vault n'est pas initialisé mais vous avez un secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}
       - Veuillez le supprimer et relancer si vous souhaitez lancer une initialisation
-      - Soit le vault est initialisé mais vous n'avez pas de secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}, et c'est inquiétant !
+
+- name: Check if vault is coherent
+  ansible.builtin.assert:
+    that:
+      - (vault_status == 'not init') and (vault_keys.resources | length == 0)
+    fail_msg:
+      - Attention ! Vault est initialisé mais vous n'avez pas de secret {{ dsc_name }}-vault-keys dans {{ dsc.vault.namespace }}. C'est inquiétant !
 
 # Init Vault - node 1
 - name: Init vault node - node 1
@@ -57,7 +62,7 @@
       | map(attribute='value') | first }}"
 
 - name: Store vault keys and token
-  when: vaut_keys.resources | length == 0
+  when: vault_keys.resources | length == 0
   kubernetes.core.k8s:
     definition:
       kind: Secret
@@ -71,115 +76,8 @@
         root_token: "{{ root_token | b64encode }}"
         init_config: "{{ init.stdout | from_json | b64encode }}"
 
-# Unseal Vault - node 1
-- name: Set seal count - node 1
-  ansible.builtin.set_fact:
-    vault_pod: "{{ dsc_name }}-vault-0"
-    unseal_key_index: "0"
-
 - name: Get vault keys
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.vault.namespace }}"
-    kind: Secret
-    name: "{{ dsc_name }}-vault-keys"
-  register: vault_keys
-
-- name: Unseal vault primary - node 1
-  when: vault_status == 'not init' or vault_status == 'sealed'
-  ansible.builtin.include_tasks: unseal.yml
-  vars:
-    vault_pod: "{{ dsc_name }}-vault-0"
-
-- name: Join and unseal node 2
-  when: vault_values.vault.server.ha.enabled
-  block:
-    # Join node 2 to Vault cluster
-    - name: Check vault-1 status - node 2
-      ansible.builtin.include_tasks: check.yml
-      vars:
-        vault_pod: "{{ dsc_name }}-vault-1"
-
-    - name: Join vault-1 node to cluster - node 2
-      when: vault_status == 'not init'
-      kubernetes.core.k8s_exec:
-        container: vault
-        pod: "{{ dsc_name }}-vault-1"
-        namespace: "{{ dsc.vault.namespace }}"
-        command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
-      register: node2_join_state
-      retries: 3
-      delay: 20
-
-    # Unseal node 2
-    - name: Check vault-1 status - node 2
-      ansible.builtin.include_tasks: check.yml
-      vars:
-        vault_pod: "{{ dsc_name }}-vault-1"
-
-    - name: Set seal count - node 2
-      ansible.builtin.set_fact:
-        vault_pod: "{{ dsc_name }}-vault-1"
-        unseal_key_index: "0"
-
-    - name: Get vault keys
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.vault.namespace }}"
-        kind: Secret
-        name: "{{ dsc_name }}-vault-keys"
-      register: vault_keys
-
-    - name: Unseal vault node - node 2
-      when: vault_status == 'not init' or vault_status == 'sealed'
-      ansible.builtin.include_tasks: unseal.yml
-      vars:
-        vault_pod: "{{ dsc_name }}-vault-1"
-
-- name: Join and unseal node 3
-  when: vault_values.vault.server.ha.enabled
-  block:
-    # Join node 3 to Vault cluster
-    - name: Check vault-2 status - node 3
-      ansible.builtin.include_tasks: check.yml
-      vars:
-        vault_pod: "{{ dsc_name }}-vault-2"
-
-    - name: Join vault-2 to cluster - node 3
-      when: vault_status == 'not init'
-      kubernetes.core.k8s_exec:
-        container: vault
-        pod: "{{ dsc_name }}-vault-2"
-        namespace: "{{ dsc.vault.namespace }}"
-        command: vault operator raft join http://"{{ dsc_name }}"-vault-0."{{ dsc_name }}"-vault-internal:8200
-      register: node3_join_state
-      retries: 3
-      delay: 20
-
-    # Unseal node 3
-    - name: Check vault-2 status - node 3
-      ansible.builtin.include_tasks: check.yml
-      vars:
-        vault_pod: "{{ dsc_name }}-vault-2"
-
-    - name: Set seal count - node 3
-      ansible.builtin.set_fact:
-        vault_pod: "{{ dsc_name }}-vault-2"
-        unseal_key_index: "0"
-
-    - name: Get vault keys
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.vault.namespace }}"
-        kind: Secret
-        name: "{{ dsc_name }}-vault-keys"
-      register: vault_keys
-
-    - name: Unseal vault node - node 3
-      when: vault_status == 'not init' or vault_status == 'sealed'
-      ansible.builtin.include_tasks: unseal.yml
-      vars:
-        vault_pod: "{{ dsc_name }}-vault-2"
-
-# Retrieve Vault token
-- name: Get Vault keys
+  when: vault_keys.resources | length == 0
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vault.namespace }}"
     kind: Secret
@@ -189,6 +87,21 @@
 - name: Get Vault token
   ansible.builtin.set_fact:
     vault_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
+
+# Unseal Vault
+- name: Unseal vault primary - node 1
+  when: vault_status == 'not init' or vault_status == 'sealed'
+  ansible.builtin.include_tasks: unseal.yml
+  vars:
+    vault_pod: "{{ dsc_name }}-vault-0"
+    unseal_key_index: "0"
+
+- name: Join and unseal other nodes
+  when: vault_values.vault.server.ha.enabled
+  ansible.builtin.include_tasks: join_and_unseal_node.yml
+  loop: "{{ range(1, 3) | list }}"
+  loop_control:
+    loop_var: vault_node_index
 
 # Create kv engine
 - name: Get kv engines

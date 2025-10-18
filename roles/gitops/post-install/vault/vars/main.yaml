@@ -1,0 +1,2 @@
+---
+vault_auth_url: "http://{{ dsc.vault.subDomain }}.{{ dsc.vault.namespace }}.svc.cluster.local"

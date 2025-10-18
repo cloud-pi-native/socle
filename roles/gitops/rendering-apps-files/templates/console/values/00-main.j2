@@ -7,22 +7,22 @@ console:
     projectsRootDir: "{{ dsc.global.projectsRootDir | flatten | join ('/') }}"
     secrets:
       ARGO_NAMESPACE: {{ dsc.argocd.namespace }}
-      ARGOCD_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.argocd}>/"
+      ARGOCD_URL: "http://{{ dsc.argocd.subDomain }}.{{ dsc.argocd.namespace }}.svc.cluster.local/"
       GITLAB_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
-      GITLAB_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.gitlab}>/"
+      GITLAB_URL: "http://{{ dsc.gitlab.subDomain }}.{{ dsc.gitlab.namespace }}.svc.cluster.local/"
       HARBOR_ADMIN: admin
       HARBOR_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global| jsonPath {.harborAdminPassword}>
-      HARBOR_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.harbor}>/"
+      HARBOR_URL: "http://{{ dsc.harbor.subDomain }}.{{ dsc.harbor.namespace }}.svc.cluster.local/"
       KEYCLOAK_ADMIN: "dsoadmin"
       KEYCLOAK_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#auth| jsonPath {.adminPassword}>
       KEYCLOAK_URL: "http://{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local/realms/{{ dsc.keycloak.applicationRealm }}/.well-known/openid-configuration"
       NEXUS_ADMIN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminUsername}>
       NEXUS_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminPassword}>
-      NEXUS_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.nexus}>/"
+      NEXUS_URL: "http://{{ dsc.nexus.subDomain }}.{{ dsc.nexus.namespace }}.svc.cluster.local/"
       SONAR_API_TOKEN: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/sonarqube/values#auth| jsonPath {.sonarApiToken}>"
-      SONARQUBE_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.sonarqube}>/"
+      SONARQUBE_URL: "http://{{ dsc.sonarqube.subDomain }}.{{ dsc.sonarqube.namespace }}.svc.cluster.local/"
       VAULT_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vault/values#vaultToken>
-      VAULT_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.vault}>/"
+      VAULT_URL: "http://{{ dsc.vault.subDomain }}.{{ dsc.vault.namespace }}.svc.cluster.local/"
   global:
     env:
       NODE_ENV: "production"
@@ -153,7 +153,7 @@ console:
 {% if dsc.observatorium.installEnabled %}
     env:
       DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion }}
-      GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>
+      GRAFANA_URL: "http://{{ dsc.grafana.subDomain }}.{{ dsc.grafana.namespace }}.svc.cluster.local"
     plugins:
     - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/v1.1.3/build-artifact.zip
 {% endif %}

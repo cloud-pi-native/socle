@@ -55,43 +55,6 @@
   retries: 45
   delay: 5
 
-# Retrieve Vault Infra token
-
-- name: Get Vault Infra token
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') != ''
-  ansible.builtin.set_fact:
-    vault_infra_token: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') }}"
-
-- name: Get Vault Infra keys and token
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') == ''
-  block:
-    - name: Get Vault Infra secrets
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ kubeconfig_infra }}"
-        proxy: "{{ kubeconfig_proxy_infra | default('') }}"
-        namespace: "{{ dsc.vaultInfra.namespace }}"
-        kind: Secret
-      register: vault_infra_secrets
-
-    - name: Set vault_infra_keys_secret_name
-      ansible.builtin.set_fact:
-        vault_infra_keys_secret_name: "{{ vault_infra_secrets.resources
-          | selectattr('metadata.name', 'contains', 'vault-keys')
-          | map(attribute='metadata.name') | first }}"
-
-    - name: Get Vault Infra keys
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ kubeconfig_infra }}"
-        proxy: "{{ kubeconfig_proxy_infra | default('') }}"
-        namespace: "{{ dsc.vaultInfra.namespace }}"
-        kind: Secret
-        name: "{{ vault_infra_keys_secret_name }}"
-      register: vault_infra_keys
-
-    - name: Get Vault Infra token
-      ansible.builtin.set_fact:
-        vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
-
 - name: Get sonarApiToken from infra Vault
   block:
     - name: Retrieve SonarQube values from infra Vault

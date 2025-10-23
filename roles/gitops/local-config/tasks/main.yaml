@@ -1,5 +1,5 @@
 - name: Check GitOps repository local clone
-  when: lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') == ''
+  when: lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') | length == 0
   block:
     - name: Missing "GITOPS_REPO_PATH" environment variable
       ansible.builtin.debug:
@@ -16,7 +16,7 @@
     gitops_local_repo: "{{ lookup('ansible.builtin.env', 'GITOPS_REPO_PATH') }}"
 
 - name: Check infrastructure cluster access
-  when: lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') == ''
+  when: lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') | length == 0
   block:
     - name: Missing "KUBECONFIG_INFRA" environment variable
       ansible.builtin.debug:
@@ -32,7 +32,7 @@
     kubeconfig_infra: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_INFRA') }}"
 
 - name: Check infrastructure cluster access
-  when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') == ''
+  when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') | length == 0
   block:
     - name: Undefined "KUBECONFIG_PROXY_INFRA" environment variable
       ansible.builtin.debug:
@@ -42,6 +42,6 @@
           - "Dans ce cas, veuillez la définir avec la valeur requises pour accéder au cluster d'admnistration (Argo CD et Vault d'infra)."
 
 - name: "Déclaration du kubeconfig proxy infra"
-  when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') != ''
+  when: lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') | length > 0
   ansible.builtin.set_fact:
     kubeconfig_proxy_infra: "{{ lookup('ansible.builtin.env', 'KUBECONFIG_PROXY_INFRA') }}"

@@ -232,6 +232,9 @@
               endpoint:
                 logs: "{{ dsc.global.logs.endpoint | default('') }}"
                 metrics: "{{ dsc.global.metrics.endpoint | default('') }}"
+              reverseProxyEndpoint:
+                logs: "{{ dsc.observatorium.reverseProxy.logsHost | default('') }}"
+                metrics: "{{ dsc.observatorium.reverseProxy.metricsHost | default('') }}"
               grafana:
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           - argocd_app: nexus

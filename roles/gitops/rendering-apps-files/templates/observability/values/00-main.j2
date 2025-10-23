@@ -75,6 +75,12 @@ observatorium:
       endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.metrics}>"
     rules:
       endpoint: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#endpoint | jsonPath {.metrics}>"
+{% if dsc.observatorium.reverseProxy.enabled %}
+  reverseProxy:
+    enabled: true
+    metricsHost: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#reverseProxyEndpoint | jsonPath {.metrics}>"
+    logsHost: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/observability/values#reverseProxyEndpoint | jsonPath {.logs}>"
+{% endif %}
 grafana:
   grafanaNamespace: "{{ dsc.grafana.namespace }}"
   default: {}

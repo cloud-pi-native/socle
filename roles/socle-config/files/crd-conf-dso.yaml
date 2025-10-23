@@ -1599,6 +1599,23 @@ spec:
                         name:
                           type: string
                       type: object
+                    reverseProxy:
+                      description: |
+                        Configuration for reverse proxy between Observatorium and metrics/logs datasource.
+                        This is needed until bug is solved: https://github.com/observatorium/api/issues/739
+                      type: object
+                      properties:
+                        enabled:
+                          default: false
+                          description: Enable or disable reverse proxy configuration.
+                          type: boolean
+                        logsHost:
+                          description: Host where logs are aggregated for this environment.
+                          type: string
+                        metricsHost:
+                          description: Host where metrics are aggregated for this environment.
+                          type: string
+                    cnpg:
                   required:
                     - installEnabled
                   type: object

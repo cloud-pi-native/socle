@@ -12,7 +12,7 @@ spec:
   sources:
   - chart: observatorium
     repoURL: {{ dsc.observatorium.helmRepoUrl }}
-    targetRevision: {{ dsc.observatorium.chartVersion }}
+    targetRevision: {{ dsc.observatorium.chartVersion | quote }}
     helm:  
       values: {% raw %}|
         {{ .Values.observatorium | toYaml | nindent 8 }}

@@ -169,6 +169,8 @@ spec:
     apiConfig:
       id: prod-infra
       name: prod-infra
+    reverseProxy:
+      enabled: false
     values: {}
   nexus:
     installEnabled: true

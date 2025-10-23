@@ -1,0 +1,44 @@
+---
+- name: Check Vault infra pods
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_infra }}"
+    proxy: "{{ kubeconfig_proxy_infra | default(omit) }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name = vault
+  register: vault_infra_pods
+
+- name: Fetch Vault infra keys and token from infra Kubernetes cluster
+  when: vault_infra_pods.resources | length > 0
+  block:
+    - name: Retrieve all secrets in the Vault infra namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_infra }}"
+        proxy: "{{ kubeconfig_proxy_infra | default(omit) }}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+      register: vault_infra_secrets
+
+    - name: Extract the name of the Vault keys secret
+      ansible.builtin.set_fact:
+        vault_infra_keys_secret_name: "{{ vault_infra_secrets.resources
+          | selectattr('metadata.name', 'contains', 'vault-keys')
+          | map(attribute='metadata.name')
+          | first | default('') }}"
+
+    - name: Fail when Vault infra keys secret not found (unless vault-infra role is executed)
+      when: vault_infra_keys_secret_name | length == 0 and (get_credentials_playbook | default(false) or 'vault-infra' not in ansible_run_tags or not dsc.vaultInfra.installEnabled)
+      ansible.builtin.fail:
+        msg: "Vault infra keys secret not found. Please ensure Vault infra is initialized and unsealed."
+      ignore_errors: "{{ get_credentials_playbook | default(omit) }}" # needed to display error and continue playbook execution if secret is not found
+
+    - name: Fetch the Vault infra keys secret
+      when: vault_infra_keys_secret_name | length > 0
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_infra }}"
+        proxy: "{{ kubeconfig_proxy_infra | default(omit) }}"
+        namespace: "{{ dsc.vaultInfra.namespace }}"
+        kind: Secret
+        name: "{{ vault_infra_keys_secret_name }}"
+      register: vault_infra_keys

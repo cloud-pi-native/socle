@@ -151,55 +151,11 @@
   ansible.builtin.set_fact:
     vaultinfra_domain: "{{ dsc.vaultInfra.domain | default(dsc.vaultInfra.subDomain ~ infra_root_domain) }}"
 
-- name: Set Vault infra token fact from environment variable
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') | length > 0
-  ansible.builtin.set_fact:
-    vault_infra_token: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') }}"
-
-- name: Set Vault infra token fact from Kubernetes secret when environment variable not set
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') | length == 0
-  block:
-    - name: Check Vault infra pods
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.vaultInfra.namespace }}"
-        kind: Pod
-        label_selectors:
-          - app.kubernetes.io/name = vault
-      register: vault_infra_pods
-
-    - name: Fetch Vault infra keys and token from infra Kubernetes cluster
-      when: vault_infra_pods.resources | length > 0
-      block:
-        - name: Retrieve all secrets in the Vault infra namespace
-          kubernetes.core.k8s_info:
-            namespace: "{{ dsc.vaultInfra.namespace }}"
-            kind: Secret
-          register: vault_infra_secrets
-
-        - name: Extract the name of the Vault keys secret
-          ansible.builtin.set_fact:
-            vault_infra_keys_secret_name: "{{ vault_infra_secrets.resources
-              | selectattr('metadata.name', 'contains', 'vault-keys')
-              | map(attribute='metadata.name')
-              | first | default('') }}"
-
-        - name: Fail if Vault infra keys secret not found (unless vault-infra role is executed)
-          when: vault_infra_keys_secret_name | length == 0 and 'vault-infra' not in ansible_run_tags or not dsc.vaultInfra.installEnabled
-          ansible.builtin.fail:
-            msg: "Vault infra keys secret not found. Please ensure Vault infra is initialized and unsealed."
-
-        - name: Fetch the Vault infra keys secret
-          when: vault_infra_keys_secret_name | length > 0
-          kubernetes.core.k8s_info:
-            namespace: "{{ dsc.vaultInfra.namespace }}"
-            kind: Secret
-            name: "{{ vault_infra_keys_secret_name }}"
-          register: vault_infra_keys
-
-        - name: Decode and set the Vault infra token
-          when: vault_infra_keys_secret_name | length > 0
-          ansible.builtin.set_fact:
-            vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
+- name: Set Vault infra token fact
+  ansible.builtin.include_role:
+    name: shared_tasks
+  vars:
+    shared_tasks_run: vault-infra-token.yaml
 
 - name: Probe Vault infra domain cert validity
   ansible.builtin.uri:

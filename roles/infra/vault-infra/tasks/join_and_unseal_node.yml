@@ -14,7 +14,6 @@
         pod: "{{ vault_pod }}"
         namespace: "{{ dsc.vaultInfra.namespace }}"
         command: vault operator raft join http://"{{ dsc_name }}"-vault-infra-0."{{ dsc_name }}"-vault-infra-internal:8200
-      register: "node_join_state_{{ vault_node_index }}"
       retries: 3
       delay: 20
 

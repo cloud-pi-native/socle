@@ -1,5 +1,25 @@
 # Changelog
 
+## [4.2.0](https://github.com/cloud-pi-native/socle/compare/v4.1.0...v4.2.0) (2025-10-23)
+
+
+### Features
+
+* :sparkles: Enhance Harbor alerting ([31e68bd](https://github.com/cloud-pi-native/socle/commit/31e68bdbfb2fbaa0493e007730aa97893e25dbe5))
+
+
+### Bug Fixes
+
+* :art: Alerting rules ([15ddb21](https://github.com/cloud-pi-native/socle/commit/15ddb21c40f1a221de7c68e083b8097457c367c9))
+* :art: ansible lint ([f1c525a](https://github.com/cloud-pi-native/socle/commit/f1c525a4de0b02e34978ca472b7bd5e6b190b668))
+* :bug: add configuration for observatorium reverse proxy bug workaround ([1fb2380](https://github.com/cloud-pi-native/socle/commit/1fb238067f88798d770e0ac296401905716442c6))
+* :bug: add customCA for observatorium ([8b4e7fa](https://github.com/cloud-pi-native/socle/commit/8b4e7fa88e194bc208845b40a6b756c670cb9e33))
+* :bug: add missing cert-manager installation ([4fe29f9](https://github.com/cloud-pi-native/socle/commit/4fe29f96d102e9923bf15a6eb34b44515a79a20e))
+* :bug: avoid empty yaml key ([2faca9c](https://github.com/cloud-pi-native/socle/commit/2faca9c35f953a92438efe5fc68a73b723bcdf0a))
+* :wrench: add missing config for certificate validation ([105f948](https://github.com/cloud-pi-native/socle/commit/105f948f93e53f86a1c71c4531ae82ff3a100197))
+* :wrench: fix tls secretName for Observatorium ([35b7769](https://github.com/cloud-pi-native/socle/commit/35b77695902480ceef49fa97a9756a2b892b7c30))
+* :wrench: openshfit config ([ae9c57d](https://github.com/cloud-pi-native/socle/commit/ae9c57da12c6cfec2ffc4568673a617804b192c2))
+
 ## [4.1.0](https://github.com/cloud-pi-native/socle/compare/v4.0.0...v4.1.0) (2025-10-10)
 
 

@@ -101,6 +101,7 @@
         token: "{{ vault_infra_token }}"
         engine_mount_point: "{{ vaultinfra_kv_name }}"
         path: "env/{{ dsc_name }}/apps/sonarqube/values"
+        validate_certs: "{{ vaultinfra_cert_valid }}"
       register: sonar_vault_values
       ignore_errors: true
 

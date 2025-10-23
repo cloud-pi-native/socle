@@ -1,0 +1,9 @@
+- name: Include task file
+  ansible.builtin.include_tasks: "{{ shared_tasks_run }}"
+#
+# Example usage:
+# - name: Run dynamic task from shared_tasks role
+#   include_role:
+#     name: shared_tasks
+#   vars:
+#     shared_tasks_run: example_task.yaml

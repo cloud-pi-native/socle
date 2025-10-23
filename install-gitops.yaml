@@ -4,6 +4,10 @@
   gather_facts: false
 
   roles:
+    - role: gitops/local-config
+      tags:
+        - always
+
     - role: socle-config
       tags:
         - always
@@ -57,13 +61,6 @@
         - argocd-infra
         - argo-infra
       when: dsc.argocdInfra.installEnabled
-
-    - role: gitops/local-config
-      tags:
-        - rendering-apps-files
-        - apps-files
-        - dso-app
-        - vault-secrets
 
     - role: gitops/vault-secrets
       tags:

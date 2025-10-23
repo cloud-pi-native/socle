@@ -22,20 +22,18 @@
   vars:
     vault_pod: "{{ dsc_name }}-vault-infra-0"
 
-- name: Check if vault is coherent
+- name: Check if Vault infra is coherent
   ansible.builtin.assert:
     that:
-      - (vault_status in ['sealed', 'OK']) and (vault_keys.resources | length > 0)
-    fail_msg:
-      - Attention ! Vault n'est pas initialisé mais vous avez un secret {{ dsc_name }}-vault-keys dans {{ dsc.vaultInfra.namespace }}
-      - Veuillez le supprimer et relancer si vous souhaitez lancer une initialisation
-
-- name: Check if vault is coherent
-  ansible.builtin.assert:
-    that:
-      - (vault_status == 'not init') and (vault_keys.resources | length == 0)
-    fail_msg:
-      - Attention ! Vault est initialisé mais vous n'avez pas de secret {{ dsc_name }}-vault-keys dans {{ dsc.vaultInfra.namespace }}. C'est inquiétant !
+      - ((vault_status in ['sealed', 'OK']) and (vault_keys.resources | length > 0)) or ((vault_status == 'not init') and (vault_keys.resources | length == 0))
+    fail_msg: >
+      {% if vault_status == 'not init' %}
+      Attention ! Le Vault d'infra n'est pas initialisé mais vous avez un secret {{ dsc_name }}-vault-keys dans le namespace : {{ dsc.vaultInfra.namespace }}
+      Veuillez le supprimer et relancer si vous souhaitez lancer une initialisation
+      {% else %}
+      Attention ! Le Vault d'infra est initialisé mais vous n'avez pas de secret {{ dsc_name }}-vault-keys dans le namespace : {{ dsc.vaultInfra.namespace }}
+      C'est inquiétant !
+      {% endif %}
 
 # Init Vault - node 1
 - name: Init vault node - node 1
@@ -87,7 +85,6 @@
         init_config: "{{ init.stdout | from_json | b64encode }}"
 
 - name: Get vault keys
-  when: vault_keys.resources | length == 0
   kubernetes.core.k8s_info:
     namespace: "{{ dsc.vaultInfra.namespace }}"
     kind: Secret
@@ -97,6 +94,7 @@
 - name: Get Vault token
   ansible.builtin.set_fact:
     vault_token: "{{ vault_keys.resources[0].data.root_token | b64decode }}"
+    unseal_key_index: "0" # will not increment if defined in "vars" of unseal task
 
 # Unseal Vault
 - name: Unseal vault primary - node 1
@@ -104,12 +102,11 @@
   ansible.builtin.include_tasks: unseal.yml
   vars:
     vault_pod: "{{ dsc_name }}-vault-infra-0"
-    unseal_key_index: "0"
 
 - name: Join and unseal other nodes
   when: vault_values.server.ha.enabled
   ansible.builtin.include_tasks: join_and_unseal_node.yml
-  loop: "{{ range(1, 3) | list }}"
+  loop: "{{ range(1, 3) | list }}" # nodes index 1 and 2
   loop_control:
     loop_var: vault_node_index
 
@@ -123,6 +120,8 @@
     headers:
       "X-Vault-Token": "{{ vault_token }}"
   register: get_engines
+  retries: 3
+  delay: 5
 
 - name: Create default {{ vaultinfra_kv_name }} kv engine
   when: get_engines.status == 400

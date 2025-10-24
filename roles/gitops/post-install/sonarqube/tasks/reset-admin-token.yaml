@@ -3,20 +3,24 @@
   ansible.builtin.debug:
     msg: Impossible de retrouver le TOKEN du compte admin, initialisation en cours …
 
-- name: Get Sonarqube admin password secret
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.sonarqube.namespace }}"
-    kind: Secret
-    name: "sonarqube"
-  register: sonarqube_pwd
-
 - name: Remove old admin token
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ sonar_domain }}/api/user_tokens/revoke?name=DSO
+    url: "{{ sonar_auth_url }}/api/user_tokens/revoke?name=DSO"
     user: "admin"
     password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
     force_basic_auth: true
     method: post
     status_code: [200, 204, 404]
   register: current_tokens
+
+- name: Generate new SonarQube DSO admin token
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "{{ sonar_auth_url }}/api/user_tokens/generate?name=DSO"
+    user: "admin"
+    password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
+    force_basic_auth: true
+    method: POST
+    status_code: [200, 204]
+  register: retrieved_token_pass

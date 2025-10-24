@@ -1,0 +1,2 @@
+---
+sonar_auth_url: "http://{{ dsc.sonarqube.subDomain }}-sonarqube.{{ dsc.sonarqube.namespace }}.svc.cluster.local:9000"

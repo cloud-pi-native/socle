@@ -1,0 +1,2 @@
+---
+harbor_auth_url: "http://harbor-core.{{ dsc.harbor.namespace }}.svc.cluster.local"

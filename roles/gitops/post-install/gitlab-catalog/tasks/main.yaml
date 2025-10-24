@@ -1,7 +1,7 @@
 ---
 - name: Update Catalog visibility and path
   community.general.gitlab_project:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     import_url: "{{ dsc.gitlabCatalog.catalogRepoUrl }}"
@@ -20,7 +20,7 @@
 
 - name: Remove branch protection
   community.general.gitlab_protected_branch:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"
@@ -32,13 +32,13 @@
   ansible.builtin.shell: |
     set -e
     git config --add http.sslVerify false
-    git push --mirror "https://admin:{{ gitlab_token }}@{{ gitlab_domain }}/{{ dsc.global.projectsRootDir | join('/') }}/catalog"
+    git push --mirror "http://admin:{{ gitlab_token }}@{{ gitlab_auth_url | replace('http://', '') }}/{{ dsc.global.projectsRootDir | join('/') }}/catalog"
   args:
     chdir: /tmp/test
 
 - name: Apply branch protection
   community.general.gitlab_protected_branch:
-    api_url: https://{{ gitlab_domain }}
+    api_url: "{{ gitlab_auth_url }}"
     api_token: "{{ gitlab_token }}"
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     project: "{{ dsc.global.projectsRootDir | join('/') }}/catalog"

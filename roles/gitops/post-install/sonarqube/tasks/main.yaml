@@ -9,7 +9,7 @@
 - name: Get SonarQube migration status
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ sonar_domain }}/api/v2/system/migrations-status
+    url: "{{ sonar_auth_url }}/api/v2/system/migrations-status"
     user: "admin"
     password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
     force_basic_auth: true
@@ -22,7 +22,7 @@
   when: "'Database migration is required' in sonar_migration_status.json.message"
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ sonar_domain }}/api/system/migrate_db
+    url: "{{ sonar_auth_url }}/api/system/migrate_db"
     user: "admin"
     password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
     force_basic_auth: true
@@ -32,7 +32,7 @@
 - name: Wait SonarQube status to be UP
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ sonar_domain }}/api/system/status
+    url: "{{ sonar_auth_url }}/api/system/status"
     user: "admin"
     password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
     force_basic_auth: true
@@ -114,22 +114,15 @@
             else ''
           }}
 
-- name: Reset Admin Password procedure
+- name: Reset Admin Token procedure
   when: retrieved_token_pass | length == 0
   ansible.builtin.include_tasks:
-    file: reset-admin-password.yaml
-
-- name: Get Sonarqube admin password secret
-  kubernetes.core.k8s_info:
-    namespace: "{{ dsc.sonarqube.namespace }}"
-    kind: Secret
-    name: "sonarqube"
-  register: sonarqube_pwd
+    file: reset-admin-token.yaml
 
 - name: Remove permissions for sonar-users
   ansible.builtin.uri:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    url: https://{{ sonar_domain }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}
+    url: "{{ sonar_auth_url }}/api/permissions/remove_group?groupName=sonar-users&permission={{ item }}"
     user: "admin"
     password: "{{ sonarqube_pwd.resources[0].data.password | b64decode }}"
     force_basic_auth: true

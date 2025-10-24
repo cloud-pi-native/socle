@@ -11,6 +11,7 @@ spec:
     subDomain: argocd
     helmRepoUrl: https://argoproj.github.io/argo-helm
     values: {}
+    zoneName: default
   argocdInfra:
     installEnabled: false
     namespace: infra-argocd

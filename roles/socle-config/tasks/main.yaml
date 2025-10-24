@@ -200,5 +200,6 @@
     name: ca
 
 - name: Set envs fact
+  when: post_conf_job is not defined
   ansible.builtin.include_tasks:
     file: envs.yaml

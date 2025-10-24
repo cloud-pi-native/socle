@@ -10,10 +10,10 @@ cpn-ansible-job:
       git clone https://github.com/cloud-pi-native/socle.git && \
       cd socle && \
       ansible-playbook post-install/awx-oidc.yaml
+{% if dsc.proxy.enabled %}
     extraEnvFrom:
     - secretRef: 
         name: ansible-secret
-{% if dsc.proxy.enabled %}
     extraEnv:
     - name: GIT_HTTP_PROXY_AUTHMETHOD
       value: basic

@@ -155,6 +155,12 @@ spec:
                     privateGitlabDomain:
                       description: Private Gitlab repository for Argo CD to access.
                       type: string
+                    zoneName:
+                      description: Name of the zone (multiple clusters) managed by this Argo CD instance.
+                      type: string
+                    zoneChartVersion:
+                      description: Version of the Helm Chart to use to manage zone objects. See https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
+                      type: string
                   required:
                     - admin
                     - installEnabled

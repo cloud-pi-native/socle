@@ -1,0 +1,49 @@
+{% set dsoZoneRepo = 'https://' + gitlab_domain + '/' + dsc.global.projectsRootDir | join('/') + '/infra/' + dsc.argocd.zoneName + '.git' %}
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: zone-{{ dsc.argocd.zoneName }}-project
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  description: "Projet contenant l'Application responsable de tous les déploiements par zone"
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+    - https://cloud-pi-native.github.io/helm-charts
+    - {{ dsoZoneRepo }}
+  destinations:
+    - namespace: {{ dsc.argocd.namespace }}
+      server: "https://kubernetes.default.svc"
+
+---      
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: zone-{{ dsc.argocd.zoneName }}-app
+  namespace: {{ dsc.argocd.namespace }}
+spec:
+  destination:
+    namespace: {{ dsc.argocd.namespace }}
+    server: https://kubernetes.default.svc
+  project: zone-{{ dsc.argocd.zoneName }}-project
+  sources:
+  - chart: dso-argocd-zone
+    targetRevision: {{ dsc.argocd.zoneChartVersion | quote }}
+    repoURL: https://cloud-pi-native.github.io/helm-charts
+    helm:
+      valueFiles:
+      - ./values.yaml
+      - $argocdValues/argocd-values.yaml
+      values: |
+        dsoZoneRepo: {{ dsoZoneRepo }}
+  - repoURL: {{ dsoZoneRepo }}
+    targetRevision: HEAD
+    ref: argocdValues
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true

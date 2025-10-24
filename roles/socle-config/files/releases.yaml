@@ -6,6 +6,8 @@ spec:
   argocd:
     # https://artifacthub.io/packages/helm/argo/argo-cd
     chartVersion: 8.5.6
+    # https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
+    zoneChartVersion: ">=1.0.0 <2.0.0"
   argocdInfra:
     # https://artifacthub.io/packages/helm/argo/argo-cd
     chartVersion: 8.5.6

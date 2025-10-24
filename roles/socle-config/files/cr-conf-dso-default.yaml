@@ -53,13 +53,12 @@ spec:
   argocd:
     admin:
       enabled: false
-  #    password: WeAreThePasswords
+    zoneName: default
   argocdInfra:
     admin:
       enabled: false
     namespace: infra-argocd
     projectName: default
-  #    password: WeAreThePasswords
   awx: {}
   certmanager: {}
   cloudnativepg: {}

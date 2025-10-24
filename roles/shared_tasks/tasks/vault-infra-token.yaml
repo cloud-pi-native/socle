@@ -6,10 +6,17 @@
 
 - name: Set Vault infra token fact from Kubernetes secret when environment variable not set
   when: lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN') | length == 0
-  ansible.builtin.include_tasks:
-    file: fetch-vault-infra-keys.yaml
+  block:
+    - name: Set empty Vault infra token
+      ansible.builtin.set_fact:
+        vault_infra_token: ""
 
-- name: Decode and set the Vault infra token
-  when: vault_infra_keys is defined and vault_infra_keys | length > 0
-  ansible.builtin.set_fact:
-    vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
+    - name: Fetch Vault infra keys
+      when: kubeconfig_infra is defined
+      ansible.builtin.include_tasks:
+        file: fetch-vault-infra-keys.yaml
+
+    - name: Decode and set the Vault infra token
+      when: vault_infra_keys is defined and vault_infra_keys.resources is defined and vault_infra_keys.resources[0].data.root_token | length > 0
+      ansible.builtin.set_fact:
+        vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"

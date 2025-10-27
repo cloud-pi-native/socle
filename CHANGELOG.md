@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.0](https://github.com/cloud-pi-native/socle/compare/v4.2.0...v4.3.0) (2025-10-27)
+
+
+### Features
+
+* :sparkles: add the root application to deploy applications as driven by the Console gitlab repository ([acb8898](https://github.com/cloud-pi-native/socle/commit/acb8898e8bc360f176ee52a06706de6492336d69))
+
 ## [4.2.0](https://github.com/cloud-pi-native/socle/compare/v4.1.0...v4.2.0) (2025-10-23)
 
 

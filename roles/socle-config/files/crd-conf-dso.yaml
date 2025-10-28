@@ -1609,7 +1609,6 @@ spec:
                         metricsHost:
                           description: Host where metrics are aggregated for this environment.
                           type: string
-                    cnpg:
                   required:
                     - installEnabled
                   type: object

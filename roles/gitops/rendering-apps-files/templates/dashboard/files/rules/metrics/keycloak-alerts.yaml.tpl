@@ -7,11 +7,11 @@ groups:
           summary: Keycloak instance down (no ready container)
         expr: |
           (absent(kube_pod_container_status_ready{
-          pod=~"keycloak-\\d+",
+          pod!~"pg-cluster.*",
           container="keycloak",
           namespace="{{ .Values.app.namespacePrefix }}keycloak"}) == 1)
           or sum(kube_pod_container_status_ready{
-          pod=~"keycloak-\\d+",
+          pod!~"pg-cluster.*",
           container="keycloak",
           namespace="{{ .Values.app.namespacePrefix }}keycloak"}) == 0
         for: 5m
@@ -23,7 +23,7 @@ groups:
           summary: Keycloak pod not healthy (container is not ready)
         expr: |
           kube_pod_container_status_ready{
-          pod=~"keycloak-\\d+",
+          pod!~"pg-cluster.*",
           container="keycloak",
           namespace="{{ .Values.app.namespacePrefix }}keycloak"} == 0
         for: 5m

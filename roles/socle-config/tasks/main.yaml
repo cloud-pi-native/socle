@@ -93,23 +93,24 @@
   ansible.builtin.set_fact:
     dsc: "{{ socle_config.resources[0] }}"
 
-- name: Set some instance name
+- name: Set instance name fact
   ansible.builtin.set_fact:
     instance_name: "{{ dsc.metadata.name }}"
 
-- name: Set some facts
+- name: Set default config and releases facts
   ansible.builtin.set_fact:
     dsc_default_config: "{{ lookup('ansible.builtin.file', 'config.yaml') | from_yaml }}"
     dsc_default_releases: "{{ lookup('ansible.builtin.file', 'releases.yaml') | from_yaml }}"
 
-- name: Set some facts
+- name: Combine and merge DSC fact
   ansible.builtin.set_fact:
     dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
-- name: Set some facts
+
+- name: Set dsc spec fact
   ansible.builtin.set_fact:
     dsc: "{{ dsc.spec }}"
 
-- name: Set private registry
+- name: Set private registry fact
   ansible.builtin.set_fact:
     use_private_registry: "{{ dsc.global.registry is defined and dsc.global.registry | length > 0 | bool }}"
 
@@ -117,15 +118,15 @@
   ansible.builtin.set_fact:
     use_image_pull_secrets: "{{ dsc.global.imagePullSecretsData is defined and dsc.global.imagePullSecretsData | length > 0 | bool }}"
 
-- name: Set root_domain fact
+- name: Set root_domain fact from dsc global config
   ansible.builtin.set_fact:
     root_domain: "{{ dsc.global.rootDomain }}"
 
-- name: Set infra_root_domain fact
+- name: Set infra_root_domain fact from dsc global config
   ansible.builtin.set_fact:
     infra_root_domain: "{{ dsc.global.infraRootDomain }}"
 
-- name: Set tools domains facts
+- name: Set tools domains facts from dsc config
   ansible.builtin.set_fact:
     argocd_domain: "{{ dsc.argocd.domain | default(dsc.argocd.subDomain ~ root_domain) }}"
     awx_domain: "{{ dsc.awx.domain | default(dsc.awx.subDomain ~ root_domain) }}"
@@ -140,17 +141,23 @@
     sonar_domain: "{{ dsc.sonarqube.domain | default(dsc.sonarqube.subDomain ~ root_domain) }}"
     vault_domain: "{{ dsc.vault.domain | default(dsc.vault.subDomain ~ root_domain) }}"
 
-- name: Set Vault infra domain fact
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') == ''
-  ansible.builtin.set_fact:
-    vaultinfra_domain: "{{ dsc.vaultInfra.domain | default(dsc.vaultInfra.subDomain ~ infra_root_domain) }}"
-
-- name: Set Vault infra domain fact
-  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') != ''
+- name: Set Vault infra domain fact from environment variable
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') | length > 0
   ansible.builtin.set_fact:
     vaultinfra_domain: "{{ lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') }}"
 
-- name: Probe Vaultinfra domain cert validity
+- name: Set Vault infra domain fact from dsc config when environment variable not set
+  when: lookup('ansible.builtin.env', 'VAULT_INFRA_DOMAIN') | length == 0
+  ansible.builtin.set_fact:
+    vaultinfra_domain: "{{ dsc.vaultInfra.domain | default(dsc.vaultInfra.subDomain ~ infra_root_domain) }}"
+
+- name: Set Vault infra token fact
+  ansible.builtin.include_role:
+    name: shared_tasks
+  vars:
+    shared_tasks_run: vault-infra-token.yaml
+
+- name: Probe Vault infra domain cert validity
   ansible.builtin.uri:
     url: "https://{{ vaultinfra_domain }}"
     method: GET
@@ -159,7 +166,7 @@
   register: vaultinfra_probe
   ignore_errors: true
 
-- name: Set vaultinfra_cert_valid fact
+- name: Set Vault infra certificate validity fact based on domain probe result
   ansible.builtin.set_fact:
     vaultinfra_cert_valid: "{{ vaultinfra_probe.failed is not defined or not vaultinfra_probe.failed }}"
 

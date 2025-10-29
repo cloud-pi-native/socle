@@ -28,7 +28,7 @@
             customNamespacePrefix: ""
             syncWave: 10
             vault_values:
-              vault_infra_token: "{{ vault_infra_token | default(lookup('ansible.builtin.env', 'VAULT_INFRA_TOKEN')) }}"
+              vault_infra_token: "{{ vault_infra_token }}"
               image:
                 repository:
                   docker: "{{ dsc.global.registry | default('docker.io') }}"

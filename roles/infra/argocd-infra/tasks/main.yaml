@@ -1,12 +1,12 @@
 ---
-- name: Create Argo CD Infra namespace
+- name: Create Argo CD infra namespace
   kubernetes.core.k8s:
     name: "{{ dsc.argocdInfra.namespace }}"
     api_version: v1
     kind: Namespace
     state: present
 
-- name: Get argo client secret
+- name: Get Argo CD client secret
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: "{{ dsc.keycloakInfra.namespace }}"
@@ -45,17 +45,17 @@
           namespace: "{{ dsc.argocdInfra.namespace }}"
           name: "{{ dsc_name }}-argo-infra-redis-ha-haproxy"
 
+- name: Add Argo CD helm repo
+  changed_when: false
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
+    force_update: true
+
 # Vault plugin setup
 
-- name: Get Argo CD Infra app version
+- name: Get Argo CD infra app version
   block:
-    - name: Add Argo CD helm repo
-      changed_when: false
-      kubernetes.core.helm_repository:
-        name: argo
-        repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
-        force_update: true
-
     - name: Retrieve Argo CD Helm infos
       changed_when: false
       ansible.builtin.shell:
@@ -69,32 +69,7 @@
       ansible.builtin.set_fact:
         argo_app_version: "{{ argo_infos.stdout | regex_search('v([0-9]*\\.)+([0-9]+)') }}"
 
-- name: Retrieve Vault infra token
-  block:
-    - name: Get Vault infra secrets
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.vaultInfra.namespace }}"
-        kind: Secret
-      register: vault_infra_secrets
-
-    - name: Get Vault infra keys secret name
-      ansible.builtin.set_fact:
-        vault_infra_keys_secret: "{{ vault_infra_secrets.resources
-          | map(attribute='metadata.name')
-          | select('contains', 'vault-keys') | first }}"
-
-    - name: Find Vault infra keys
-      kubernetes.core.k8s_info:
-        namespace: "{{ dsc.vaultInfra.namespace }}"
-        kind: Secret
-        name: "{{ vault_infra_keys_secret }}"
-      register: vault_infra_keys
-
-    - name: Set fact for Vault infra secrets
-      ansible.builtin.set_fact:
-        vault_infra_token: "{{ vault_infra_keys.resources[0].data.root_token | b64decode }}"
-
-- name: Deploy Argo CD Infra Vault plugin config
+- name: Deploy Argo CD infra Vault plugin config
   kubernetes.core.k8s:
     template: "{{ item }}"
     state: present
@@ -111,14 +86,7 @@
     - helm-docker-registry-secret.yml.j2
     - repo-creds.yml.j2
 
-# Argo CD Infra installation
-
-- name: Add helm repo
-  changed_when: false
-  kubernetes.core.helm_repository:
-    name: argo
-    repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
-    force_update: true
+# Argo CD infra installation
 
 - name: Set path fact
   ansible.builtin.set_fact:

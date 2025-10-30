@@ -11,4 +11,5 @@ playwright:
     extraEnvFrom:
     - secretRef: 
         name: playwright-secret
+    backoffLimit: 1
 {% endif %}

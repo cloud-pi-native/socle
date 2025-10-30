@@ -125,4 +125,6 @@ keycloak_clients:
     defaultClientScopes:
       - basic
       - generic
+      - email
+      - profile
     publicClient: false

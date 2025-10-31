@@ -56,6 +56,16 @@ values:
           - '*'
           kinds:
           - EphemeralReport
+      resource.customizations.health.grafana.integreatly.org_GrafanaDashboard: |
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = ""
+        if obj.status ~= nil then
+          hs.status = "Healthy"
+          hs.message = "Assumed healthy"
+        end
+        return hs
+      # We need this to be last so rootCA_block will be a sublevel of oidc.config
       oidc.config: |
         issuer: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
         requestedScopes: ["openid", "generic"]

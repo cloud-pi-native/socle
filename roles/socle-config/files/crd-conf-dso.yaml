@@ -1591,6 +1591,11 @@ spec:
                     observabilityChartVersion:
                       description: Dso-observability helm chart version (e.g., "0.1.8").
                       type: string
+                    observabilityPluginVersion:
+                      description: |
+                        Console-plugin-observability release version (e.g., "v1.1.4").
+                        https://github.com/cloud-pi-native/console-plugin-observability
+                      type: string
                     apiConfig:
                       description: Observatorium global.api.config.
                       properties:

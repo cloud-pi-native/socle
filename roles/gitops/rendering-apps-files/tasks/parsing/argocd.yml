@@ -47,7 +47,7 @@
     path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
     insertafter: '^    cm:\s*$'
     block: "{{ values.argocd.cm | indent(6, true) }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK: resource.exclusions and oidc.config"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: resource.exclusions, oidc.config and resource.customizations"
 
 - name: Inject controller_metrics under controller
   ansible.builtin.blockinfile:

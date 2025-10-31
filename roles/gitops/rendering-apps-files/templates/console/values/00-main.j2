@@ -24,7 +24,7 @@ console:
       NEXUS_INTERNAL_URL: "http://{{ dsc.nexus.subDomain }}.{{ dsc.nexus.namespace }}.svc.cluster.local:8081/"
       SONAR_API_TOKEN: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/sonarqube/values#auth| jsonPath {.sonarApiToken}>"
       SONARQUBE_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.sonarqube}>/"
-      SONARQUBE_INTERNAL_URL: "http://{{ dsc.sonarqube.subDomain }}-sonarqube.{{ dsc.sonarqube.namespace }}.svc.cluster.local:9000/"
+      SONARQUBE_INTERNAL_URL: "http://sonarqube-sonarqube.{{ dsc.sonarqube.namespace }}.svc.cluster.local:9000/"
       VAULT_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vault/values#vaultToken>
       VAULT_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.vault}>/"
       VAULT_INTERNAL_URL: "http://{{ dsc_name }}-{{ dsc.vault.subDomain }}-active.{{ dsc.vault.namespace }}.svc.cluster.local:8200/"
@@ -160,7 +160,7 @@ console:
       DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion | quote }}
       GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>
     plugins:
-    - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/v1.1.3/build-artifact.zip
+    - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/{{ dsc.observatorium.observabilityPluginVersion }}/build-artifact.zip
 {% endif %}
   postgresql:
     enabled: false

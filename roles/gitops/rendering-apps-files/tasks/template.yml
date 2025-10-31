@@ -75,7 +75,7 @@
       vars:
         rendered_content: "{{ lookup('ansible.builtin.template', my_template) }}"
       when:
-        - rendered_content | trim != ''
+        - rendered_content | trim != 'None'
         - not (my_template | basename == 'users.yaml.j2' and keycloak_users_file_stat.stat.exists)
       ansible.builtin.copy:
         content: "{{ rendered_content }}"

@@ -30,6 +30,6 @@
           - >
             cm_api == 'absent' or
             cm_mwhc.resources | length == 0 or
-            dsc.certmanager.forcedInstall
+            dsc.certmanager.forcedInstall is truthy
         fail_msg: " Certmanager is already installed in your cluster"
       ignore_errors: true

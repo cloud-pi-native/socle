@@ -160,7 +160,7 @@ console:
       DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion | quote }}
       GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>
     plugins:
-    - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/v1.1.3/build-artifact.zip
+    - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/{{ dsc.observatorium.observabilityPluginVersion }}/build-artifact.zip
 {% endif %}
   postgresql:
     enabled: false

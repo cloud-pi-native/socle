@@ -1,15 +1,19 @@
 ---
-- name: Validate dsc.sonarqube.pluginDownloadUrl is not empty
+- name: Validate dsc.sonarqube.pluginDownloadUrl is defined and not empty
   ansible.builtin.assert:
     that:
-      - dsc.sonarqube.pluginDownloadUrl != ""
-    fail_msg: "'dsc.sonarqube.pluginDownloadUrl' must not be empty"
+      - >
+        dsc.sonarqube.pluginDownloadUrl is defined and
+        dsc.sonarqube.pluginDownloadUrl != ""
+    fail_msg: "'dsc.sonarqube.pluginDownloadUrl' must be set and not be empty"
 
-- name: Validate dsc.sonarqube.prometheusJavaagentVersion is not empty
+- name: Validate dsc.sonarqube.prometheusJavaagentVersion is defined and not empty
   ansible.builtin.assert:
     that:
-      - dsc.sonarqube.prometheusJavaagentVersion != ""
-    fail_msg: "'dsc.sonarqube.prometheusJavaagentVersion' must not be empty"
+      - >
+        dsc.sonarqube.prometheusJavaagentVersion is defined and
+        dsc.sonarqube.prometheusJavaagentVersion != ""
+    fail_msg: "'dsc.sonarqube.prometheusJavaagentVersion' must be set and not be empty"
 
 - name: Validate dsc.gitlabCatalog.catalogRepoUrl is different than default
   ansible.builtin.assert:
@@ -23,8 +27,10 @@
       - dsc.console.helmRepoUrl != "https://cloud-pi-native.github.io/helm-charts"
     fail_msg: "'dsc.console.helmRepoUrl' is same as 'https://cloud-pi-native.github.io/helm-charts'"
 
-- name: Validate dsc.argocd.privateGitlabDomain is not empty
+- name: Validate dsc.argocd.privateGitlabDomain is defined and not empty
   ansible.builtin.assert:
     that:
-      - dsc.argocd.privateGitlabDomain != ""
-    fail_msg: "'dsc.argocd.privateGitlabDomain' is empty"
+      - >
+        dsc.argocd.privateGitlabDomain is defined and
+        dsc.argocd.privateGitlabDomain != ""
+    fail_msg: "'dsc.argocd.privateGitlabDomain' must be set and not be empty"

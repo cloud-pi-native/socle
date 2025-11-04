@@ -552,7 +552,7 @@ Nous allons déployer l'instance Keycloak de la chaîne DSO, à l'aide de la dsc
 Comme vu précédemment, vous devez disposer de votre propre dépot Git, dans lequel vous aurez copié les fichiers de la branche main du présent dépôt.
 
 Pour cela :
-* Créez préalablement votre dépôt à vide dans votre instance GitHub (ou GitLab). Vous pouvez le nommer `socle`, ou tout autre nom à votre convenance.
+* Créez préalablement votre dépôt à vide dans votre instance GitHub (ou GitLab). Vous pouvez le nommer `mon-repo-gitops`, ou tout autre nom à votre convenance.
 * Clonez votre dépôt vide localement.
 * Positionnez-vous dans le répertoire `socle` de votre dépôt (ou tout autre nom que vous avez choisi) et vérifiez l'existence de la branche `main` via la commande `git branch`.
 * Positionnez-vous dans un répertoire distinct de votre dépôt local. Ce peut être par exemple votre répertoire habituel de téléchargement.
@@ -591,7 +591,7 @@ Rappel : Assurez-vous préalablement que votre CRD est à jour pour la définiti
 kubectl apply -f roles/socle-config/files/crd-conf-dso.yaml
 ```
 
-Passez en revue la ressource dsc de configuration `conf-dso` pour paramétrer le déploiement, en particulier la section `spec.keycloak`.
+Passez en revue la ressource dsc de configuration `conf-dso` pour paramétrer le déploiement, en particulier la section `spec.keycloak` puisque c'est cette application du Socle que nous déployons ici à titre d'exemple.
 
 Vérifiez aussi que le paramètre `spec.global.gitOps.watchpointenabled` est bien positionné à `true`. 
 
@@ -862,7 +862,7 @@ Compte-tenu des éléments que nous venons de vérifier, et si nous voulons bien
 }
 ```
 
-Finalement, nous lançons une première fois notre installation en GitOps de l'application Keycloak s'appuyant sur la dsc `conf-dso` (configuration par défaut) via la commande suivante :
+Finalement, nous lançons une première fois notre installation en GitOps de l'application Keycloak, s'appuyant sur la dsc `conf-dso` (configuration par défaut) via la commande suivante :
 
 ```shell
 ansible-playbook install-gitops.yaml
@@ -894,7 +894,7 @@ ok: [localhost] => {
 }
 ```
 
-Suivre les indications fournies, notamment les étapes de vérification, puis pousser les changements sur notre branche "ma-branche" :
+Suivre les indications fournies, notamment les étapes de vérification, et pousser les changements sur notre branche "ma-branche" :
 
 ```shell
 git ls-files --modified | xargs git add
@@ -907,6 +907,24 @@ git commit -m "chore: adapt gitops conf-dso files"
 ```shell
 git push --set-upstream origin ma-branche
 ```
+
+---
+
+**Remarque**
+
+Avant de poursuivre, assurez-vous d'avoir configuré dans l'Argo CD d'infrastructure votre dépôt GitOps (`mon-repo-gitops` ou tout autre nom que vous aurez choisi), lequel est très probablement un dépôt privé. Sinon l'application `dso-install-manager` remontera l'erreur suivante :
+
+```
+Failed to load target state: failed to generate manifest for source 1 of 1: rpc error: code = Unknown desc = failed to list refs: repository not found: Repository not found.
+```
+
+La configuration d'un dépôt privé peut s'effectuer avec l'interface web d'Argo CD, via le menu `Settings` puis `Repositories` (bouton `+ CONNECT REPO`).
+
+En principe, pour une connexion de type `via HTTP\HTTPS`, spécifier uniquement le `Repository URL` et les credentials approprés sera suffisant.
+
+Référez-vous à la [documentation officielle d'Argo CD](https://argo-cd.readthedocs.io/en/stable/user-guide/private-repositories/) sur le sujet.
+
+---
 
 Puis lancer la suite de l'installation gitOps à l'aide du tag `-t dso-app` :
 

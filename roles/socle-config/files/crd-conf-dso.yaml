@@ -461,7 +461,7 @@ spec:
                       default: false
                       description: |
                         Specifies whether we should install Socle dashboards.
-                        This is disable by default since the Loki and Mimir code is not yet opensource.
+                        This is disabled by default since the Loki and Mimir code is not yet opensource.
                       type: boolean
                 gitlab:
                   description: Configuration for GitLab.
@@ -1781,29 +1781,8 @@ spec:
                     - installEnabled
                   type: object
               required:
-                - additionalsCA
-                - argocd
-                - argocdInfra
-                - certmanager
-                - cloudnativepg
-                - console
-                - exposedCA
-                - gitlab
-                - glexporter
-                - gitlabOperator
-                - gitlabrunner
                 - global
-                - grafana
-                - harbor
                 - ingress
-                - keycloak
-                - keycloakInfra
-                - kyverno
-                - nexus
-                - proxy
-                - sonarqube
-                - vault
-                - vaultInfra
               type: object
           required:
             - spec

@@ -190,16 +190,6 @@
         protected: "{{ item.protected }}"
   with_items: "{{ dsc.gitlab.extraCIVars }}"
 
-- name: Wait gitlab-webservice-default endpoint
-  kubernetes.core.k8s_info:
-    kind: Endpoints
-    namespace: "{{ dsc.gitlab.namespace }}"
-    name: gitlab-webservice-default
-  register: endpoint
-  until: endpoint.resources[0].subsets[0].addresses[0] is defined
-  retries: 15
-  delay: 5
-
 # Retrieve Vault Infra token
 
 - name: Get Vault Infra token

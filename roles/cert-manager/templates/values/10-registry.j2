@@ -1,20 +1,20 @@
 {% if use_private_registry %}
 image:
-  repository: "{{ dsc.global.registry }}/cert-manager-controller"
+  repository: "{{ dsc.global.registry }}/jetstack/cert-manager-controller"
 
 webhook:
   image:
-    repository: "{{ dsc.global.registry }}/cert-manager-webhook"
+    repository: "{{ dsc.global.registry }}/jetstack/cert-manager-webhook"
 
 cainjector:
   image:
-    repository: "{{ dsc.global.registry }}/cert-manager-cainjector"
+    repository: "{{ dsc.global.registry }}/jetstack/cert-manager-cainjector"
 
 acmesolver:
   image:
-    repository: "{{ dsc.global.registry }}/cert-manager-acmesolver"
+    repository: "{{ dsc.global.registry }}/jetstack/cert-manager-acmesolver"
 
 startupapicheck:
   image:
-    repository: "{{ dsc.global.registry }}/cert-manager-startupapicheck"
+    repository: "{{ dsc.global.registry }}/jetstack/cert-manager-startupapicheck"
 {% endif %}

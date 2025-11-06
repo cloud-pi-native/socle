@@ -96,17 +96,17 @@
       - name: PROJECTS_ROOT_DIR
         value: "{{ dsc.global.projectsRootDir | join('/') }}"
       - name: NEXUS_HOST_URL
-        value: "http://{{ dsc.nexus.subDomain }}.{{ dsc.nexus.namespace }}.svc.cluster.local:8081"
+        value: "http://nexus.{{ dsc.nexus.namespace }}.svc.cluster.local:8081"
       - name: NEXUS_HOSTNAME
         value: "{{ nexus_domain }}"
       - name: SONAR_HOST_URL
-        value: "http://{{ dsc.sonarqube.subDomain }}-sonarqube.{{ dsc.sonarqube.namespace }}.svc.cluster.local:9000"
+        value: "http://sonarqube-sonarqube.{{ dsc.sonarqube.namespace }}.svc.cluster.local:9000"
       - name: VAULT_AUTH_PATH
         value: "{{ vault_auth_path }}"
       - name: VAULT_AUTH_ROLE
         value: "{{ vault_auth_role }}"
       - name: VAULT_SERVER_URL
-        value: "http://{{ dsc_name }}-{{ dsc.vault.subDomain }}-active.{{ dsc.vault.namespace }}.svc.cluster.local:8200"
+        value: "http://{{ dsc_name }}-vault-active.{{ dsc.vault.namespace }}.svc.cluster.local:8200"
       - name: MVN_CONFIG_FILE
         variable_type: file
         value: "{{ mvn_config_file }}"

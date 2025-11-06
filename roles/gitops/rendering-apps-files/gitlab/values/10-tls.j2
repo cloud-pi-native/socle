@@ -21,7 +21,8 @@ global:
 {% endif %}
 {% endif %}
 
-{% if dsc.ingress.tls.type != 'tlsSecret' %}
+{% if dsc.ingress.tls.type != 'tlsSecret' and
+dsc.ingress.tls.type != 'none' %}
 gitlab:
   webservice:
     ingress:

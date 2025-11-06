@@ -10,7 +10,7 @@ console:
       ARGOCD_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.argocd}>/"
       GITLAB_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
       GITLAB_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.gitlab}>/"
-      GITLAB_INTERNAL_URL: "http://{{ dsc.gitlab.subDomain }}-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8181/"
+      GITLAB_INTERNAL_URL: "http://gitlab-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8181/"
       HARBOR_ADMIN: admin
       HARBOR_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global| jsonPath {.harborAdminPassword}>
       HARBOR_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.harbor}>/"
@@ -21,13 +21,13 @@ console:
       NEXUS_ADMIN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminUsername}>
       NEXUS_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminPassword}>
       NEXUS_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.nexus}>/"
-      NEXUS_INTERNAL_URL: "http://{{ dsc.nexus.subDomain }}.{{ dsc.nexus.namespace }}.svc.cluster.local:8081/"
+      NEXUS_INTERNAL_URL: "http://nexus.{{ dsc.nexus.namespace }}.svc.cluster.local:8081/"
       SONAR_API_TOKEN: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/sonarqube/values#auth| jsonPath {.sonarApiToken}>"
       SONARQUBE_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.sonarqube}>/"
       SONARQUBE_INTERNAL_URL: "http://sonarqube-sonarqube.{{ dsc.sonarqube.namespace }}.svc.cluster.local:9000/"
       VAULT_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vault/values#vaultToken>
       VAULT_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.vault}>/"
-      VAULT_INTERNAL_URL: "http://{{ dsc_name }}-{{ dsc.vault.subDomain }}-active.{{ dsc.vault.namespace }}.svc.cluster.local:8200/"
+      VAULT_INTERNAL_URL: "http://{{ dsc_name }}-vault-active.{{ dsc.vault.namespace }}.svc.cluster.local:8200/"
   global:
     env:
       NODE_ENV: "production"

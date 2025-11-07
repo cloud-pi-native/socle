@@ -35,6 +35,7 @@
     access_key: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
     secret_key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
     src: "/tmp/{{ item.name }}.dump.tmp"
+    encrypt: false
   environment:
     AWS_REQUEST_CHECKSUM_CALCULATION: "when_required"
     AWS_RESPONSE_CHECKSUM_VALIDATION: "when_required"
@@ -52,3 +53,4 @@
       --host={{ dsc.global.backup.s3.endpointURL }}
       --host-bucket="{{ dsc.global.backup.s3.endpointURL | regex_replace('https?://', '') }}/%(bucket)s"
       --ca-certs=/bundle-s3-dir/ca.pem
+      --no-encrypt

@@ -221,7 +221,7 @@
     permanent_admin_present: false
 
 - name: Update admin_present fact
-  when: kc_master_users.json | selectattr('username', 'equalto', 'admininfra')
+  when: (kc_master_users.json | selectattr('username', 'equalto', 'admininfra') | length) > 0
   ansible.builtin.set_fact:
     permanent_admin_present: true
 
@@ -285,7 +285,7 @@
     temporary_admin_present: false
 
 - name: Update temporary_admin_present fact
-  when: kc_master_users.json | selectattr('username', 'equalto', 'admin')
+  when: (kc_master_users.json | selectattr('username', 'equalto', 'admin') | length) > 0
   ansible.builtin.set_fact:
     temporary_admin_present: true
 
@@ -378,6 +378,8 @@
   with_items:
     - admin
     - ArgoCDAdmins
+  retries: 3 # Contournement temporaire - Problème de probes/loadbalancing Keycloak
+  delay: 5 # Issue ouverte : https://github.com/cloud-pi-native/socle/issues/876
 
 - name: Get keycloak infra realm users from API
   ansible.builtin.uri:
@@ -405,7 +407,7 @@
   block:
     - name: Generate admin user password
       ansible.builtin.set_fact:
-        admin_user_password: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+        admin_user_password: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, min_special=1, min_numeric=1, override_special='!#$%&()*+,-./:;<=>?@[/]^_`{|}~') }}" # exclude " and ' which pose problem with Keycloak
 
     - name: Create infra secret
       kubernetes.core.k8s:
@@ -559,8 +561,7 @@
         name: "{{ item }}"
         definition:
           metadata:
-            labels:
-              "{{ dsc.global.metrics.additionalLabels }}"
+            labels: "{{ dsc.global.metrics.additionalLabels }}"
       loop: "{{ service_monitors_names }}"
 
 - name: Patch podMonitors
@@ -587,6 +588,5 @@
         name: "{{ item }}"
         definition:
           metadata:
-            labels:
-              "{{ dsc.global.metrics.additionalLabels }}"
+            labels: "{{ dsc.global.metrics.additionalLabels }}"
       loop: "{{ pod_monitors_names }}"

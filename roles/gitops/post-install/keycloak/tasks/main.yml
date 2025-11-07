@@ -62,7 +62,7 @@
     permanent_admin_present: false
 
 - name: Update admin_present fact
-  when: kc_master_users.json | selectattr('username', 'equalto', 'dsoadmin')
+  when: (kc_master_users.json | selectattr('username', 'equalto', 'dsoadmin') | length) > 0
   ansible.builtin.set_fact:
     permanent_admin_present: true
 
@@ -126,7 +126,7 @@
     temporary_admin_present: false
 
 - name: Update temporary_admin_present fact
-  when: kc_master_users.json | selectattr('username', 'equalto', 'admin')
+  when: (kc_master_users.json | selectattr('username', 'equalto', 'admin') | length) > 0
   ansible.builtin.set_fact:
     temporary_admin_present: true
 
@@ -254,7 +254,7 @@
   block:
     - name: Generate admin user password
       ansible.builtin.set_fact:
-        admin_user_password: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}"
+        admin_user_password: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, min_special=1, min_numeric=1, override_special='!#$%&()*+,-./:;<=>?@[/]^_`{|}~') }}" # exclude " and ' which pose problem with Keycloak
 
     - name: Create dso secret
       kubernetes.core.k8s:

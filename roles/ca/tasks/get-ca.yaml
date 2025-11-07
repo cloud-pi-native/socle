@@ -6,6 +6,12 @@
     name: "{{ ca_name }}"
   register: ca_cert
 
+- name: Verify that the ressource exists
+  ansible.builtin.assert:
+    that: ca_cert.resources | length > 0
+    fail_msg: "The Kubernetes resource (Kind: {{ ca_kind }}, Name: {{ ca_name }}) in namespace '{{ ca_namespace }}' does not exist or could not be retrieved."
+    success_msg: "Successfully verified existence of {{ ca_kind }} '{{ ca_name }}' in namespace '{{ ca_namespace }}'."
+
 - name: Set ca fact (cm)
   ansible.builtin.set_fact:
     additionals_ca_pem_array: "{{ additionals_ca_pem_array + [ca_cert.resources[0].data[key]] }}"

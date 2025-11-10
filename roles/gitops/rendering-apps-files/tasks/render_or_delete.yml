@@ -1,0 +1,12 @@
+- name: Write {{ dest_filename }} with rendered content
+  when: rendered_content | trim != 'None'
+  ansible.builtin.copy:
+    content: "{{ rendered_content }}"
+    dest: "{{ dest_path }}/templates/{{ dest_filename }}"
+    mode: "0644"
+
+- name: Delete {{ dest_filename }} from destination if rendered content is empty
+  when: rendered_content | trim == 'None'
+  ansible.builtin.file:
+    state: absent
+    dest: "{{ dest_path }}/templates/{{ dest_filename }}"

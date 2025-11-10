@@ -37,21 +37,21 @@
 
 - name: Inject rbac block under configs
   ansible.builtin.blockinfile:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    path: "{{ dest_path }}/values.yaml"
     insertafter: '^  configs:\s*$'
     block: "{{ values.argocd.configs | indent(4, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: rbac"
 
 - name: Inject resource.exclusions and oidc.config block under cm
   ansible.builtin.blockinfile:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    path: "{{ dest_path }}/values.yaml"
     insertafter: '^    cm:\s*$'
     block: "{{ values.argocd.cm | indent(6, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: resource.exclusions, oidc.config and resource.customizations"
 
 - name: Inject controller_metrics under controller
   ansible.builtin.blockinfile:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    path: "{{ dest_path }}/values.yaml"
     insertafter: '^  controller:\s*$'
     block: "{{ values.argocd.controller_metrics | indent(4, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: controller_metrics"

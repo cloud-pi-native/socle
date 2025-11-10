@@ -32,6 +32,11 @@
         - prom
       when: dsc.prometheus.crd.type == 'managed'
 
+    - role: kyverno
+      tags:
+        - kyverno
+        - never
+
     - role: cloudnativepg
       tags:
         - cloudnativepg

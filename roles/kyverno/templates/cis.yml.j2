@@ -66,6 +66,68 @@ spec:
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
+  name: security-context-dso-awx
+  annotations:
+    policies.kyverno.io/title: Enforce cis profile
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet, Job
+spec:
+  validationFailureAction: Enforce
+  rules:
+  - name: enforce-security-context
+    match:
+      resources:
+        kinds:
+        - Deployment
+        - StatefulSet
+        - Job
+        namespaces:
+        - "{{ dsc.awx.namespace }}"
+    exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          namespaces:
+          - "{{ dsc.awx.namespace }}"
+          names:
+          - "pg-cluster-*"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              securityContext:
+                +(runAsNonRoot): true
+                +(runAsUser): 1001
+              containers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 1001
+                  +(seccompProfile):
+                    type: RuntimeDefault
+              initContainers:
+              - name: '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 1001
+                  +(seccompProfile):
+                    type: RuntimeDefault
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
   name: security-context-dso-keycloak
   annotations:
     policies.kyverno.io/title: Enforce cis profile
@@ -96,6 +158,7 @@ spec:
           - "{{ dsc.keycloakInfra.namespace }}"
           names:
           - "pg-cluster-*"
+          - "*cpn-ansible-job*"
     mutate:
       patchStrategicMerge:
         spec:
@@ -537,3 +600,90 @@ spec:
                 env:
                 - name: HOME
                   value: "/tmp"
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+  name: security-context-infra
+spec:
+  admission: true
+  background: true
+  rules:
+  - match:
+      resources:
+        kinds:
+        - StatefulSet
+        - Deployment
+        namespaces:
+        - "{{ dsc.vaultInfra.namespace }}"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          template:
+            spec:
+              containers:
+              - (name): '*'
+                securityContext:
+                  +(allowPrivilegeEscalation): false
+                  +(capabilities):
+                    +(drop):
+                    - ALL
+                  +(runAsNonRoot): true
+                  +(runAsUser): 1001
+                  +(seccompProfile):
+                    type: RuntimeDefault
+    name: enforce-security-context-infra-vault
+    skipBackgroundRequests: true
+  validationFailureAction: Enforce
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: none
+    policies.kyverno.io/category: Prod
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/title: Enforce cis profile
+  name: non-root-security-context-awx-automation-job
+spec:
+  admission: true
+  background: true
+  rules:
+  - exclude:
+      all:
+      - resources:
+          kinds:
+          - Job
+          - Pod
+          names:
+          - pg-cluster-*
+          namespaces:
+          - dso-*
+    match:
+      resources:
+        kinds:
+        - Pod
+        namespaces:
+        - "{{ dsc.awx.namespace }}"
+    mutate:
+      patchStrategicMerge:
+        spec:
+          containers:
+          - (name): '*'
+            +(securityContext):
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              runAsNonRoot: true
+              runAsUser: 1000
+              seccompProfile:
+                type: RuntimeDefault
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+    name: enforce-security-context
+    skipBackgroundRequests: true
+  validationFailureAction: Enforce

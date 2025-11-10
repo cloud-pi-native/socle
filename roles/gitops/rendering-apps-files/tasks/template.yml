@@ -3,6 +3,11 @@
   ansible.builtin.debug:
     msg: "Traitement du templating de l'app {{ item.1.argocd_app }}"
 
+- name: Set source and destination path facts
+  ansible.builtin.set_fact:
+    source_path: "{{ role_path }}/templates/{{ item.1.argocd_app }}"
+    dest_path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
+
 - name: Set install_enabled fact when not observability
   when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app != "observability")
   ansible.builtin.set_fact:
@@ -15,7 +20,7 @@
 
 - name: Create chart and values destination dir
   ansible.builtin.file:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
+    path: "{{ dest_path }}"
     state: directory
     mode: "0775"
 
@@ -26,80 +31,79 @@
   block:
     - name: Check if files path exists
       ansible.builtin.stat:
-        path: "{{ role_path + '/templates/' + item.1.argocd_app + '/files' }}"
+        path: "{{ source_path }}/files"
       register: argocd_app_files_stat
 
     - name: Copy files if exists
       when: argocd_app_files_stat.stat.exists
       ansible.builtin.copy:
-        src: "{{ role_path + '/templates/' + item.1.argocd_app + '/files' }}"
-        dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/"
+        src: "{{ source_path }}/files"
+        dest: "{{ dest_path }}/"
         mode: "0644"
 
 # Chart file rendering
 
-- name: Chart file rendering
+- name: Render "{{ item.1.argocd_app }}" Chart template file and write to destination
   when: install_enabled
-  block:
-    - name: Set path fact to chart file location
-      ansible.builtin.set_fact:
-        path: "{{ role_path + '/templates/' + item.1.argocd_app + '/Chart.yaml.j2' }}"
-
-    - name: Render "{{ item.1.argocd_app }}" chart template and write to destination
-      ansible.builtin.copy:
-        content: "{{ lookup('ansible.builtin.template', path) | from_yaml | to_nice_yaml(indent=2) }}"
-        dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/{{ path | basename | regex_replace('\\.j2', '') }}"
-        mode: "0644"
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.template', source_path + '/Chart.yaml.j2') | from_yaml | to_nice_yaml(indent=2) }}"
+    dest: "{{ dest_path }}/Chart.yaml"
+    mode: "0644"
 
 # Templates rendering
 
 - name: Templates rendering
   when: install_enabled
   block:
-    - name: Set path fact to templates location
-      ansible.builtin.set_fact:
-        path: "{{ role_path + '/templates/' + item.1.argocd_app + '/templates' }}"
-
     - name: Create templates destination dir
       ansible.builtin.file:
-        path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates"
+        path: "{{ dest_path }}/templates"
         state: directory
         mode: "0775"
 
     - name: Check if keycloak/templates/users.yaml exists
       ansible.builtin.stat:
-        path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/keycloak/templates/users.yaml"
+        path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/keycloak/templates/users.yaml"
       register: keycloak_users_file_stat
 
     - name: Render "{{ item.1.argocd_app }}" templates and write yaml files to destination
+      when: not (my_template | basename == 'users.yaml.j2' and keycloak_users_file_stat.stat.exists)
       vars:
         rendered_content: "{{ lookup('ansible.builtin.template', my_template) }}"
-      when:
-        - rendered_content | trim != 'None'
-        - not (my_template | basename == 'users.yaml.j2' and keycloak_users_file_stat.stat.exists)
-      ansible.builtin.copy:
-        content: "{{ rendered_content }}"
-        dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/templates/{{ my_template | basename | regex_replace('\\.j2', '') }}"
-        mode: "0644"
-      with_fileglob: "{{ path }}/*"
+        dest_filename: "{{ my_template | basename | regex_replace('\\.j2$', '') }}"
+      ansible.builtin.include_tasks: render_or_delete.yml
+      with_fileglob: "{{ source_path }}/templates/*"
       loop_control:
         loop_var: my_template
+
+    - name: Delete stale files in destination not present in template source
+      ansible.builtin.file:
+        state: absent
+        dest: "{{ dest_path }}/templates/{{ item }}"
+      with_items: >-
+        {{
+          (lookup('fileglob', gitops_local_repo + '/*', wantlist=True)
+          | map('basename')
+          | list)
+          | difference(
+              lookup('fileglob', source_path + '/templates/*', wantlist=True)
+              | map('basename')
+              | map('regex_replace', '\\.j2$', '')
+              | list
+            )
+        }}
 
 # Values rendering
 
 - name: Values rendering
   when: install_enabled
   block:
-    - name: Set path fact to values location
-      ansible.builtin.set_fact:
-        path: "{{ role_path + '/templates/' + item.1.argocd_app + '/values' }}"
-
     - name: Compute "{{ item.1.argocd_app }}" Helm values
       when: item.1.argocd_app != "dashboard"
       ansible.builtin.include_role:
         name: combine
       vars:
-        combine_path: "{{ path }}"
+        combine_path: "{{ source_path }}/values"
         combine_user_values: >-
           {%- set app_name = item.1.argocd_app -%}
           {%- if app_name == 'gitlab' -%}
@@ -115,21 +119,15 @@
       when: item.1.argocd_app != "dashboard"
       ansible.builtin.copy:
         content: "{{ lookup('vars', item.1.argocd_app ~ '_values') | to_nice_yaml(indent=2) }}"
-        dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+        dest: "{{ dest_path }}/values.yaml"
         mode: "0644"
 
-    - name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination
+    - name: Render "{{ item.1.argocd_app }}" values template file and write to destination
       when: item.1.argocd_app == "dashboard"
-      block:
-        - name: Set path fact to values file location
-          ansible.builtin.set_fact:
-            path: "{{ role_path + '/templates/' + item.1.argocd_app + '/values.yaml.j2' }}"
-
-        - name: Render "{{ item.1.argocd_app }}" values template and write to destination
-          ansible.builtin.copy:
-            content: "{{ lookup('ansible.builtin.template', path) | from_yaml | to_nice_yaml(indent=2) }}"
-            dest: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/{{ path | basename | regex_replace('\\.j2', '') }}"
-            mode: "0644"
+      ansible.builtin.copy:
+        content: "{{ lookup('ansible.builtin.template', source_path + '/values.yaml.j2') | from_yaml | to_nice_yaml(indent=2) }}"
+        dest: "{{ dest_path }}/values.yaml"
+        mode: "0644"
 
     - name: Special parsing for pipe after colon
       ansible.builtin.include_tasks: ./parsing.yml

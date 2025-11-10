@@ -2,7 +2,7 @@
 - name: Inject config under raft if ha
   when: dsc.global.metrics.enabled and vault_values.vault.server.ha.raft.enabled
   ansible.builtin.blockinfile:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    path: "{{ dest_path }}/values.yaml"
     insertafter: '^      raft:\s*$'
     block: "{{ values.vault.raft_standalone_config | indent(8, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: config"
@@ -10,7 +10,7 @@
 - name: Inject config under standalone
   when: dsc.global.metrics.enabled and vault_values.vault.server.standalone.enabled
   ansible.builtin.blockinfile:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    path: "{{ dest_path }}/values.yaml"
     insertafter: '^    standalone:\s*$'
     block: "{{ values.vault.raft_standalone_config | indent(6, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: config"
@@ -18,7 +18,7 @@
 - name: Inject serverTelemetry under vault
   when: dsc.global.metrics.enabled
   ansible.builtin.blockinfile:
-    path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values.yaml"
+    path: "{{ dest_path }}/values.yaml"
     insertafter: '^vault:\s*$'
     block: "{{ values.vault.serverTelemetry | indent(2, true) }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK: serverTelemetry"

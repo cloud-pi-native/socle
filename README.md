@@ -121,6 +121,10 @@ ansible-playbook -K admin-tools/install-requirements.yaml
 
 Pour information, le playbook `install-requirements.yaml` vous installera les éléments suivants **sur l'environnement de déploiement** :
 
+- Le paquet requis pour bénéficier de la commande `htpasswd` (utilisée pour encrypter le mot de passe d'Argo CD), soit :
+  - apache2-utils (distributions Debian et dérivées)
+  - httpd-tools (distributions Red Hat et dérivées)
+
 - Paquet requis pour l'installation des modules python :
   - python3-pip
 
@@ -187,7 +191,7 @@ Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à lanc
 Par ailleurs, les valeurs des helm charts peuvent être surchargées en ajoutant le paramètre `values` au service concerné. Ces `values` dépendent de la [version du helm chart](versions.md) et peuvent être consultées avec la commande `helm show values`. Exemple avec l'opérateur GitLab :
 
 ```shell
-helm show values gitlab-operator/gitlab-operator --version 1.10.2
+helm show values gitlab-operator/gitlab-operator --version 2.4.1
 ```
 
 ### Utilisation de vos propres values
@@ -424,7 +428,7 @@ Il faudra préalablement que votre CRD soit à jour pour la ressource de type ds
 ```shell
 kubectl apply -f roles/socle-config/files/crd-conf-dso.yaml
 ```
-Et que votre resource de configuration `dsc` soit correctement paramétrée pour installer ces éléments. Exemple (à adapter) :
+Et que votre resource de configuration `dsc` soit correctement paramétrée pour installer ces éléments d'infrastructure. Exemple (à adapter) :
 
 ```yaml
 spec:
@@ -459,7 +463,7 @@ spec:
     values: {}
 ```
 
-Notons que chacune des trois applications d'infrastructure ci-dessus dispose d'un paramètre `installEnabled` qui permet d'indiquer si elle doit être installée ou non. Elles ne le sont pas par défaut (le paramètre `installEnabled` étant positionné à `false`), afin notamment de laisser à nos utilisateurs la liberté de les installer eux-mêmes dans le cluster de leur choix, à l'aide des rôles que nous proposons.
+Notons que chacune des trois applications d'infrastructure ci-dessus dispose d'un paramètre `installEnabled` qui permet d'indiquer si elle doit être installée ou non. Elles ne le sont pas par défaut (le paramètre `installEnabled` étant positionné à `false`), afin notamment de laisser à nos utilisateurs la liberté de les installer eux-mêmes dans le cluster de leur choix, à l'aide des rôles que nous proposons ou bien de leur propre code de déploiement.
 
 Si vous souhaitez les installer une première fois, il faut donc positionner lors de cette première installation le paramètre `installEnabled` sur la valeur `true`.
 
@@ -537,7 +541,7 @@ ansible-playbook install-gitops.yaml -t keycloak-infra,vault-infra,argocd-infra 
 
 L'installation en mode GitOps est à lancer à l'aide du playbook `install-gitops.yaml`.
 
-Ce playbook, après avoir réalisé des tâches de pré-configuration, fait notamment appel aux roles suivants, situés dans `roles/gitops` :
+Ce playbook fait notamment appel aux roles suivants, situés dans `roles/gitops` :
 * `local-config` : s'assure que vous avez bien déclaré les variables d'environnement nécessaires à l'exécution de l'installation. Il vous prévient si ce n'est pas le cas, et positionne également les facts associés qui seront utilisés au cours de l'installation.
 * `vault-secrets` : sert à peupler le Vault d'infrastructure avec les values de secrets pour notre environnement et les applications associées.
 * `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `gitops/envs/nom_de_notre_environnement/apps` du clone local de votre dépôt Git. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
@@ -546,13 +550,19 @@ Ce playbook, après avoir réalisé des tâches de pré-configuration, fait nota
 
 Vous constaterez aussi la présence de roles situés dans le répertoire `./roles/gitops/post-install` et qui servent à lancer des tasks de post installation pour les outils concernés. Ces roles sont lus et exécutés à l'aide de jobs Argo CD de post-install, générés pour chacun des outils qui le nécessitent. Les jobs exécutent le chart Helm [cpn-ansible-job](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-ansible-job), positionné en tant que dépendance de chart des outils en question dans votre dépôt Git.
 
+Notez également que la crd et la dsc sont systématiquement poussées dans l'application `global`, et se trouveront donc par défaut aux emplacements suivants dans votre dépôt local GitOps :
+- `./gitops/envs/conf-dso/apps/global/crds/dsc-crd.yaml`
+- `./gitops/envs/conf-dso/apps/global/templates/dsc.yaml`
+
+Ainsi, suite à une première installation réussie, ces deux éléments peuvent être gérés directement en mode GitOps (par édition des fichiers puis push) et sont de fait versionnés.
+
 ### Exemple de déploiement GitOps
 
 Nous allons déployer l'instance Keycloak de la chaîne DSO, à l'aide de la dsc `conf-dso` et du code de déploiement GitOps.
 
-Comme vu précédemment, vous devez disposer de votre propre dépot Git, dans lequel vous aurez copié les fichiers de la branche main du présent dépôt.
+Comme vu dans les prérequis, vous devez disposer de votre propre dépot Git.
 
-Pour cela :
+Pour déployer :
 * Créez préalablement votre dépôt à vide dans votre instance GitHub (ou GitLab). Vous pouvez le nommer `mon-repo-gitops`, ou tout autre nom à votre convenance.
 * Clonez votre dépôt vide localement.
 * Positionnez-vous dans le répertoire `socle` de votre dépôt (ou tout autre nom que vous avez choisi) et vérifiez l'existence de la branche `main` via la commande `git branch`.
@@ -562,8 +572,8 @@ Pour cela :
 * Créez une variable d'environnement avec `export GITOPS_REPO_PATH=/chemin/absolu/vers/votre/dépôt`.
 * Créez une variable d'environnement avec `export KUBECONFIG_INFRA=/chemin/absolu/vers/votre/kubeconfig-infra` pour configurer les accès au cluster d'infrastructure.
 * (Optionnel) Créez une variable d'environnement avec `export KUBECONFIG_PROXY_INFRA=http://127.0.0.1:<port>` en cas d'utilisation de `tsh proxy kube --port <port>`.
-* (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_DOMAIN=<nom de domaine du vault d'infrastructure>` en cas de permissions restreinte sur le cluster d'infrastructure.
-* (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_TOKEN=<token du vault d'infrastructure>` en cas de permissions restreinte sur le cluster d'infrastructure.
+* (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_DOMAIN=<nom de domaine du vault d'infrastructure>` en cas de permissions restreintes sur le cluster d'infrastructure.
+* (Optionnel) Créez une variable d'environnement avec `export VAULT_INFRA_TOKEN=<token du vault d'infrastructure>` en cas de permissions restreintes sur le cluster d'infrastructure.
 * Lancez le playbook `install-gitops.yaml` pour peupler votre clone local : `ansible-playbook install-gitops.yaml`.
 * Effectuez votre premier commit sur la branche main de votre dépôt, exemple : `git commit -am "feat: first-commit"`
 * Poussez vos changements sur la branche main distante : `git push`
@@ -883,7 +893,7 @@ ok: [localhost] => {
         "afin d'y ajuster les paramètres souhaités. Se référer à la documentation README à ce sujet.",
         "",
         "Assurez-vous également de la cohérence des secrets qui ont été générés dans votre instance Vault d'infrastructure,",
-        "au niveau du secret engine 'dso-<dsc.gitOps.envName>', pour l'environnement 'conf-dso'.",
+        "au niveau du secret engine 'dso-<dsc.global.gitOps.envName>', pour l'environnement 'conf-dso'.",
         "",
         "Une fois ces vérifications et ajustements réalisés, poussez les fichiers modifiés dans votre dépôt Git (via 'git push').",
         "",
@@ -895,7 +905,71 @@ ok: [localhost] => {
 }
 ```
 
-Suivre les indications fournies, notamment les étapes de vérification, et pousser les changements sur notre branche "ma-branche" :
+Suivre les indications fournies.
+
+Vous devrez prêter une **attention particulière** à l'étape de vérification des secrets dans votre instance Vault d'infrastructure.
+
+En effet, plusieurs secrets auront été générés à vide car il s'agit d'informations externes à la solution, et que vous êtes seul(e) en capacité de fournir.
+
+Il s'agit des secrets suivants qui se situent par défaut dans le secret engine `dso-<dsc.global.gitOps.envName>/env/conf-dso/apps` (chemin dans lequel `dsc.global.gitOps.envName` est à substituer avec l'`envName` qui se trouve dans votre `dsc`).
+
+`global/values` :
+
+```
+{
+  "backup": {
+    "s3AccessKey": "",
+    "s3SecretKey": ""
+  },
+  "dockerAccount": {
+    "password": "",
+    "username": ""
+  },
+  "smtp": {
+    "authentication": {
+      "password": "",
+      "user": ""
+    }
+  },
+…
+}
+```
+
+`harbor/values` :
+
+```
+{
+  "global": {
+     "proxyCache": [
+      {
+        "name": "dockerhub",
+        "registry": {
+          "credential": {
+            "accessKey": "",
+            "accessSecret": "",
+          },
+…
+        }
+      }
+    ],
+    "s3ImageChartStorage": {
+      "accesskey": "",
+      "secretkey": ""
+    }
+  }
+}
+```
+
+En résumé, il vous faudra renseigner si besoin, et en complément de ce que vous aurez déjà indiqué dans votre `dsc` :
+- Pour l'app `global`, vos credentials :
+  - Stockage S3
+  - Docker Hub
+  - SMTP
+- Pour l'app `harbor`, vos credentials :
+  - Stockage S3
+  - Docker Hub
+
+Lorsque vous avez terminé les vérifications requises, pousser les changements sur votre branche "ma-branche" :
 
 ```shell
 git ls-files --modified | xargs git add

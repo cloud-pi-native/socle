@@ -177,6 +177,37 @@
 
 # Create and setup dso realm
 
+- name: Get SMTP user and password from infra Vault
+  block:
+    - name: Retrieve global values from infra Vault
+      community.hashi_vault.vault_kv2_get:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ dsc_name }}/apps/global/values"
+        validate_certs: "{{ vaultinfra_cert_valid }}"
+      register: global_vault_values
+      ignore_errors: true
+
+    - name: Set retrieved_smtp_user fact
+      ansible.builtin.set_fact:
+        retrieved_smtp_user: >-
+          {{
+            (global_vault_values.data.data.smtp.authentication.user)if global_vault_values.data.data.smtp.authentication.user is defined and
+            global_vault_values.data.data.smtp.authentication.user | length > 0
+            else ''
+          }}
+
+    - name: Set retrieved_smtp_user_password fact
+      ansible.builtin.set_fact:
+        retrieved_smtp_user_password: >-
+          {{
+            (global_vault_values.data.data.smtp.authentication.password)if global_vault_values.data.data.smtp.authentication.password is defined and
+            global_vault_values.data.data.smtp.authentication.password | length > 0
+            else ''
+          }}
+
 - name: Create dso realm
   community.general.keycloak_realm:
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -211,8 +242,8 @@
       host: "{{ (dsc.global.smtp | default({})).host | default(omit) }}"
       port: "{{ (dsc.global.smtp | default({})).port | default(omit) }}"
       from: "{{ (dsc.global.smtp | default({})).from | default(omit) }}"
-      user: "{{ (dsc.global.smtp.authentication | default({})).user | default(omit) }}"
-      password: "{{ (dsc.global.smtp.authentication | default({})).password | default(omit) }}"
+      user: "{{ retrieved_smtp_user | default(omit, true) }}"
+      password: "{{ retrieved_smtp_user_password | default(omit, true) }}"
       auth: "{{ dsc.global.smtp.authentication.enabled }}"
       starttls: "{{ dsc.global.smtp.starttlsEnabled }}"
 

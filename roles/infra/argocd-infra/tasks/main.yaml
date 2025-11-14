@@ -6,6 +6,57 @@
     kind: Namespace
     state: present
 
+- name: Check admin password
+  when: dsc.argocdInfra.admin.enabled
+  block:
+    - name: Get argocd-secret
+      kubernetes.core.k8s_info:
+        name: argocd-secret
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+        kind: Secret
+      register: argocd_secret
+
+    - name: Warning message
+      when: |
+        (argocd_secret.resources | length == 0) and
+        argoinfra_admin_password is not defined
+      ansible.builtin.debug:
+        msg: |
+          "Attention ! Le déploiement de l'instance d'infra d'Argo CD nécessite le
+          mot de passe admin lorsque le paramètre argocdInfra.admin.enabled
+          est positionné sur true dans votre ressource de configuration dsc et que le
+          secret argocd-secret est absent du namespace.
+
+          Veuillez relancer l'installation en utilisant l'extra variable argoinfra_admin_password
+          pour spécifier le mot de passe qui sera ensuite injecté dans le secret, exemple :
+
+          ansible-playbook install-gitops.yaml -t argo-infra -e argoinfra_admin_password="mot_de_passe_ici"
+
+          Pensez à noter ce mot de passe dans une applicaton sécurisée.
+          "
+
+    - name: Stop installation
+      when: |
+        (argocd_secret.resources | length == 0) and
+        argoinfra_admin_password is not defined
+      ansible.builtin.meta: end_play
+
+- name: Set encrypted password
+  when: dsc.argocdInfra.admin.enabled
+  block:
+    - name: Encrypt password
+      changed_when: false
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          htpasswd -nbBC 10 "" "{{ argoinfra_admin_password }}" | tr -d ':\n' | sed 's/$2y/$2a/'
+        executable: /bin/bash
+      register: password_encryption
+
+    - name: Set encrypted_password fact
+      ansible.builtin.set_fact:
+        encrypted_password: "{{ password_encryption.stdout }}"
+
 - name: Get Argo CD client secret
   kubernetes.core.k8s_info:
     kind: Secret
@@ -77,8 +128,63 @@
     - vault-plugin-cm.yml.j2
     - vault-plugin-secret.yml.j2
 
-- name: Deploy registry secret
+# Registry setup
+
+- name: Check registry secrets
   when: dsc.global.dockerAccount.enabled
+  block:
+    - name: Get helm-docker-registry-secret
+      kubernetes.core.k8s_info:
+        name: helm-docker-registry-secret
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+        kind: Secret
+      register: helm_docker_registry_secret
+
+    - name: Get oci-dockerhub-creds secret
+      kubernetes.core.k8s_info:
+        name: oci-dockerhub-creds
+        namespace: "{{ dsc.argocdInfra.namespace }}"
+        kind: Secret
+      register: oci_dockerhub_creds
+
+    - name: Set missing_secret fact
+      ansible.builtin.set_fact:
+        missing_secret: false
+
+    - name: Update missing_secret fact
+      when:
+        (helm_docker_registry_secret.resources | length == 0) or
+        (oci_dockerhub_creds.resources | length == 0)
+      ansible.builtin.set_fact:
+        missing_secret: true
+
+    - name: Warning message
+      when: |
+        (missing_secret is truthy and dockeruser is not defined) or
+        (missing_secret is truthy and dockerpass is not defined)
+      ansible.builtin.debug:
+        msg: |
+          "Attention ! Le déploiement de l'instance d'infra d'Argo CD nécessite les
+          identifiants du compte docker lorsque le paramètre global.dockerAccount.enabled
+          est positionné sur true dans votre ressource de configuration dsc et que l'un des
+          secrets helm-docker-registry-secret ou oci_dockerhub_creds est absent du namespace.
+
+          Veuillez relancer l'installation en utilisant les extra variables dockeruser et dockerpass
+          pour spécifier les identifiants et générer les secrets, exemple :
+
+          ansible-playbook install-gitops.yaml -t argo-infra -e dockeruser="utilisateur_ici" -e dockerpass="mot_de_passe_ici"
+          "
+
+    - name: Stop installation
+      when: |
+        (missing_secret is truthy and dockeruser is not defined) or
+        (missing_secret is truthy and dockerpass is not defined)
+      ansible.builtin.meta: end_play
+
+- name: Deploy registry secrets
+  when: |
+    dsc.global.dockerAccount.enabled and
+    missing_secret is truthy
   kubernetes.core.k8s:
     template: "{{ item }}"
     state: present
@@ -87,6 +193,17 @@
     - repo-creds.yml.j2
 
 # Argo CD infra installation
+
+- name: Find argo crd existence
+  kubernetes.core.k8s_info:
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: applications.argoproj.io
+  register: argocd_crd
+
+- name: Set argocd_crd_present fact
+  ansible.builtin.set_fact:
+    argocd_crd_present: "{{ argocd_crd.resources | length > 0 | bool }}"
 
 - name: Set path fact
   ansible.builtin.set_fact:

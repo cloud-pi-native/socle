@@ -56,13 +56,25 @@
   ansible.builtin.include_tasks: post-install.yml
 
 - name: Add backup utils Helm repo and deploy
-  when: dsc.global.backup.vault.enabled
+  when: dsc.global.backup.vaultInfra.enabled
   block:
     - name: Add Helm repo
       kubernetes.core.helm_repository:
         name: dso
         repo_url: "{{ dsc.global.backup.vault.helmRepoUrl }}"
         force_update: true
+
+    - name: Get s3 backup secret from Keycloak infra namespace
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.s3.credentials.name }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+        kind: Secret
+      register: s3_backup_secret
+
+    - name: Set s3 credentials facts
+      ansible.builtin.set_fact:
+        s3_access_key: "{{ s3_backup_secret.resources[0].data.accessKeyId | b64decode }}"
+        s3_secret_key: "{{ s3_backup_secret.resources[0].data.secretAccessKey | b64decode }}"
 
     - name: Deploy Helm chart
       kubernetes.core.helm:
@@ -79,8 +91,8 @@
               S3_ENDPOINT: "{{ dsc.global.backup.s3.endpointURL }}"
               VAULT_ADDR: "http://{{ dsc_name }}-vault-infra-active:8200"
               VAULT_TOKEN: "{{ vault_token }}"
-              S3_ACCESS_KEY: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
-              S3_SECRET_KEY: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+              S3_ACCESS_KEY: "{{ s3_access_key }}"
+              S3_SECRET_KEY: "{{ s3_secret_key }}"
             env:
               RETENTION: "{{ dsc.global.backup.vaultInfra.retentionPolicy }}"
               MC_EXTRA_ARGS: "{{ dsc.global.backup.vaultInfra.mcExtraArgs }}"

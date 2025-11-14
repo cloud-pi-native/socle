@@ -35,10 +35,8 @@ spec:
     namespace: dso-cloudnativepg
     cluster:
       helmRepoUrl: https://cloudnative-pg.io/charts
-      values: {}
     operator:
       helmRepoUrl: https://cloudnative-pg.io/charts
-      forcedInstall: false
       values: {}
   console:
     installEnabled: true
@@ -71,7 +69,6 @@ spec:
     helmRepoUrl: https://charts.visonneau.fr
     values: {}
   gitlabOperator:
-    namespace: dso-gitlab
     helmRepoUrl: https://gitlab.com/api/v4/projects/18899486/packages/helm/stable
     values: {}
   gitlabrunner:
@@ -93,8 +90,10 @@ spec:
         enabled: false
       vault:
         enabled: false
+        mcExtraArgs: ""
       vaultInfra:
         enabled: false
+        mcExtraArgs: ""
       gitlab:
         enabled: false
     metrics:
@@ -165,14 +164,12 @@ spec:
   observatorium:
     installEnabled: false
     namespace: dso-observatorium
-    subDomain: observatorium
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     apiConfig:
       id: prod-infra
       name: prod-infra
     reverseProxy:
       enabled: false
-    values: {}
   nexus:
     installEnabled: true
     helmRepoName: stevehipwell

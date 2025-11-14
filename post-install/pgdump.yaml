@@ -9,6 +9,19 @@
       ansible.builtin.import_role:
         name: socle-config
 
+    - name: Set vault_infra_token from ansible-secret
+      block:
+        - name: Retrieve ansible-secret
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.global.namespace }}"
+            kind: Secret
+            name: ansible-secret
+          register: ansible_secret
+
+        - name: Set vault_infra_token
+          ansible.builtin.set_fact:
+            vault_infra_token: "{{ ansible_secret.resources[0].data.VAULT_INFRA_TOKEN | b64decode }}"
+
     - name: Import pgdump role
       ansible.builtin.import_role:
         name: gitops/post-install/pgdump

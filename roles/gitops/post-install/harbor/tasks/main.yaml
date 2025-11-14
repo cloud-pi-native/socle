@@ -94,13 +94,35 @@
         "cron": "0 0 0 * * *"
   when: get_trivy_schedule_config.json is undefined
 
+- name: Get Harbor proxyCache from infra Vault
+  block:
+    - name: Retrieve Harbor values from infra Vault
+      community.hashi_vault.vault_kv2_get:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ dsc_name }}/apps/harbor/values"
+        validate_certs: "{{ vaultinfra_cert_valid }}"
+      register: harbor_vault_values
+      ignore_errors: true
+
+    - name: Set retrieved_harbor_proxyCache fact
+      ansible.builtin.set_fact:
+        retrieved_harbor_proxyCache: >-
+          {{
+            (harbor_vault_values.data.data.global.proxyCache)if harbor_vault_values.data.data.global.proxyCache is defined and
+            harbor_vault_values.data.data.global.proxyCache | length > 0
+            else []
+          }}
+
 - name: Activate proxy cache
-  when: dsc.harbor.proxyCache is defined
+  when: retrieved_harbor_proxyCache | length > 0
   block:
     - name: Enable proxy cache for another registry loop
       ansible.builtin.include_tasks:
         file: create_proxy_cache.yaml
-      loop: "{{ dsc.harbor.proxyCache }}"
+      loop: "{{ retrieved_harbor_proxyCache }}"
       loop_control:
         loop_var: proxy_cache
         label: "{{ proxy_cache.name }}"

@@ -60,7 +60,7 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["list", "get"]
-    resourceNames: ["dso-config"]
+    resourceNames: ["dso-config", "ansible-secret"]
 {% if (dsc.global.backup.s3.endpointCA | default({})).name is defined %}
 ---
 apiVersion: rbac.authorization.k8s.io/v1

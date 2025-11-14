@@ -153,11 +153,33 @@
         value: "{{ [additionals_ca_pem, exposed_ca_pem] | join('\n') }}"
         variable_type: file
 
+- name: Get Harbor proxyCache from infra Vault
+  block:
+    - name: Retrieve Harbor values from infra Vault
+      community.hashi_vault.vault_kv2_get:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ dsc_name }}/apps/harbor/values"
+        validate_certs: "{{ vaultinfra_cert_valid }}"
+      register: harbor_vault_values
+      ignore_errors: true
+
+    - name: Set retrieved_harbor_proxyCache fact
+      ansible.builtin.set_fact:
+        retrieved_harbor_proxyCache: >-
+          {{
+            (harbor_vault_values.data.data.global.proxyCache)if harbor_vault_values.data.data.global.proxyCache is defined and
+            harbor_vault_values.data.data.global.proxyCache | length > 0
+            else []
+          }}
+
 - name: Append registry mirror arguments to extra_kaniko_args
   ansible.builtin.set_fact:
     extra_kaniko_args: "{{ extra_kaniko_args | default('') }} --registry-mirror {{ harbor_domain | regex_replace('^https?://', '') }}/{{ item.name }}"
-  loop: "{{ dsc.harbor.proxyCache }}"
-  when: dsc.harbor.proxyCache is defined
+  loop: "{{ retrieved_harbor_proxyCache }}"
+  when: retrieved_harbor_proxyCache | length > 0
   no_log: true
 
 - name: Set or update insecure args variables

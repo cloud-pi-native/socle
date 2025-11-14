@@ -6,6 +6,43 @@
     kind: Namespace
     state: present
 
+- name: Check cnpg backup secret
+  when: |
+    dsc.global.backup.cnpg.enabled or
+    dsc.global.backup.vault.enabled
+  block:
+    - name: Get cnpg backup secret
+      kubernetes.core.k8s_info:
+        name: "{{ dsc.global.backup.s3.credentials.name }}"
+        namespace: "{{ dsc.keycloakInfra.namespace }}"
+        kind: Secret
+      register: cnpg_s3_backup_secret
+
+    - name: Warning message
+      when: cnpg_s3_backup_secret.resources | length == 0
+      ansible.builtin.debug:
+        msg: |
+          "Attention ! Le déploiement de l'instance d'infra de Keycloak nécessite la création
+          préalable du secret {{ dsc.global.backup.s3.credentials.name }} dans le namespace {{ dsc.keycloakInfra.namespace }}
+          lorsque le paramètre global.backup.cnpg.enabled ou dsc.global.backup.vault.enabled
+          est positionné sur true dans votre ressource de configuration dsc.
+
+          Ce secret {{ dsc.global.backup.s3.credentials.name }} doit contenir les deux clés suivantes :
+            accessKeyId: valeur_encodée_en_base64
+            secretAccessKey: valeur_encodée_en_base64
+
+          Vous pouvez le créer à l'aide d'un fichier yaml
+          ou bien via la commande suivante (à adapter au niveau des valeurs) :
+
+          kubectl create secret generic {{ dsc.global.backup.s3.credentials.name }} \
+          --from-literal=accessKeyId=valeur_en_clair \
+          --from-literal=secretAccessKey=valeur_en_clair \
+          -n {{ dsc.keycloakInfra.namespace }}"
+
+    - name: Stop installation
+      when: cnpg_s3_backup_secret.resources | length == 0
+      ansible.builtin.meta: end_play
+
 # Setup CNPG s3 secret
 
 - name: CNPG s3 CA (secret)
@@ -35,20 +72,6 @@
         definition:
           data:
             ca.pem: "{{ cnpg_s3_ca_pem }}"
-
-# Setup CNPG backup
-
-- name: Set cnpg backup secret
-  when: dsc.global.backup.cnpg.enabled
-  kubernetes.core.k8s:
-    name: "{{ dsc.global.backup.s3.credentials.name }}"
-    namespace: "{{ dsc.keycloakInfra.namespace }}"
-    kind: Secret
-    api_version: v1
-    definition:
-      data:
-        accessKeyId: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | b64encode }}"
-        secretAccessKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | b64encode }}"
 
 - name: Remove cnpg scheduled backup
   kubernetes.core.k8s:

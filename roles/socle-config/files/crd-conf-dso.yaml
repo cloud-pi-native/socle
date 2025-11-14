@@ -124,9 +124,6 @@ spec:
                           default: false
                           description: Specifies whether the Argo CD admin user is enabled.
                           type: boolean
-                        password:
-                          description: The password for the Argo CD admin user.
-                          type: string
                       required:
                         - enabled
                       type: object
@@ -241,9 +238,6 @@ spec:
                         enabled:
                           description: Specifies whether the Argo CD infrastructure instance admin user is enabled.
                           type: boolean
-                        password:
-                          description: The password for the Argo CD infrastructure instance admin user.
-                          type: string
                       required:
                         - enabled
                       type: object
@@ -288,6 +282,9 @@ spec:
                 certmanager:
                   description: Configuration for Cert Manager.
                   properties:
+                    namespace:
+                      description: The namespace for Cert-manager.
+                      type: string
                     installEnabled:
                       default: false
                       description: Specifies whether we should install Cert-manager instance.
@@ -793,6 +790,10 @@ spec:
                         s3:
                           description: S3 configuration to use for backups.
                           properties:
+                            enabled:
+                              default: false
+                              description: Specifies whether S3 backup should be enabled.
+                              type: boolean
                             endpointURL:
                               description: Defines the s3 endpoint for vault backups.
                               type: string
@@ -810,17 +811,11 @@ spec:
                                     key:
                                       description: Defines the s3 accessKeyId kubernetes secret key used for vault backups.
                                       type: string
-                                    value:
-                                      description: Defines the s3 accessKeyId value used for vault backups.
-                                      type: string
                                   type: object
                                 secretAccessKey:
                                   properties:
                                     key:
                                       description: Defines the s3 secretAccessKey kubernetes secret key used for vault backups.
-                                      type: string
-                                    value:
-                                      description: Defines the s3 secretAccessKey value used for vault backups.
                                       type: string
                                   type: object
                               type: object
@@ -1017,14 +1012,8 @@ spec:
                       properties:
                         enabled:
                           default: false
-                          description: Specifies whether we should enabled the use of a Docker account for Argo CD.
+                          description: Specifies whether we should enable the use of a Docker account for Argo CD.
                           type: boolean
-                        username:
-                          description: The Docker account username.
-                          type: string
-                        password:
-                          description: The Docker account password.
-                          type: string
                       type: object
                     playwright:
                       type: object
@@ -1068,12 +1057,6 @@ spec:
                             enabled:
                               description: Specifies whether we should enable the authentication.
                               type: boolean
-                            user:
-                              description: The SMTP account username.
-                              type: string
-                            password:
-                              description: The SMTP account password.
-                              type: string
                       type: object
                   required:
                     - projectsRootDir
@@ -1119,9 +1102,6 @@ spec:
                       default: true
                       description: Specifies whether we should install Harbor instance.
                       type: boolean
-                    adminPassword:
-                      description: Administrator password for Harbor.
-                      type: string
                     namespace:
                       description: The namespace for Harbor.
                       type: string
@@ -1152,48 +1132,6 @@ spec:
                     pvcTrivySize:
                       description: Size for trivy persistent volume.
                       type: string
-                    proxyCache:
-                      description: Array of proxy cache configurations.
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            description: Name of project and registry.
-                            type: string
-                          registry:
-                            description: Registry configuration.
-                            type: object
-                            properties:
-                              provider:
-                                description: Specifies the registry provider. Default is docker-hub.
-                                type: string
-                                default: docker-hub
-                              endpointUrl:
-                                description: URL of the registry endpoint.
-                                type: string
-                                default: ""
-                              insecure:
-                                description: Allows insecure connections. Default is false.
-                                default: false
-                                type: boolean
-                              credential:
-                                type: object
-                                properties:
-                                  accessKey:
-                                    type: string
-                                    default: ""
-                                  accessSecret:
-                                    type: string
-                                    default: ""
-                                  type:
-                                    type: string
-                                    default: "basic"
-                            required:
-                              - provider
-                        required:
-                          - name
-                          - registry
                     s3ImageChartStorage:
                       description: Define s3 storage backend used for registry to store images and charts.
                       type: object
@@ -1210,12 +1148,6 @@ spec:
                           type: string
                         regionendpoint:
                           description: Defines the region s3 endpoint for.
-                          type: string
-                        accesskey:
-                          description: Defines the access key.
-                          type: string
-                        secretkey:
-                          description: Defines the secret key.
                           type: string
                     values:
                       description: |

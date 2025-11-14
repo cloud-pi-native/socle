@@ -31,8 +31,8 @@
                       auth:
                         sonarApiToken: >-
                           {{
-                            (new_token_pass.json.token) if new_token_pass.json.token is defined and
-                            new_token_pass.json.token | length > 0
+                            (retrieved_token_pass)if retrieved_token_pass is defined and
+                            retrieved_token_pass | length > 0
                             else ''
                           }}
 

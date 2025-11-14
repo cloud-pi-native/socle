@@ -11,8 +11,8 @@ stringData:
   name: bitnamicharts
   type: helm
   enableOCI: "true"
-  username: {{ dsc.global.dockerAccount.username }} 
-  password: {{ dsc.global.dockerAccount.password }}
+  username: {{ dockeruser }} 
+  password: {{ dockerpass }}
 {% if dsc.proxy.enabled %}
   proxy: "{{ dsc.proxy.http_proxy }}" 
 {% endif %}

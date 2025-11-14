@@ -141,7 +141,7 @@
             cert_manager_infos.status is not defined
           ansible.builtin.debug:
             msg:
-              - "Cert-manager n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
+              - "Cert-manager n'est pas installé en tant que chart Helm dans le namespace {{ dsc.certmanager.namespace }}."
               - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
               - "Nous ne pouvons en déterminer la version de manière fiable."
 
@@ -368,7 +368,7 @@
         - name: Retrieve gitlab-operator infos
           kubernetes.core.helm_info:
             name: gitlab-operator
-            namespace: "{{ dsc.gitlabOperator.namespace }}"
+            namespace: "{{ dsc.gitlab.namespace }}"
           register: gop_infos
 
         - name: Display gitlab-operator version

@@ -5,10 +5,15 @@
 
   vars:
     packages:
-      - git
-      - python3-pip
-      - ruby
-      - tar
+      debian:
+        - apache2-utils
+      redhat:
+        - httpd-tools
+      common:
+        - git
+        - python3-pip
+        - ruby
+        - tar
     python_modules:
       - hvac
       - jmespath
@@ -25,12 +30,29 @@
       - community.hashi_vault
 
   tasks:
-    - name: "Install some required packages"
+
+    - name: "Install some required packages on Debian family"
+      when: ansible_facts.os_family == "Debian"
       become: true
       ansible.builtin.package:
         name: "{{ item }}"
         state: present
-      loop: "{{ packages }}"
+      loop: "{{ packages.debian }}"
+
+    - name: "Install some required packages on RedHat family"
+      when: ansible_facts.os_family == "RedHat"
+      become: true
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages.redhat }}"
+
+    - name: "Install some required packages regardless of OS family"
+      become: true
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages.common }}"
 
     - name: "Install Python modules"
       ansible.builtin.pip:

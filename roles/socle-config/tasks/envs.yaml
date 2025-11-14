@@ -61,14 +61,14 @@
               cnpgS3CaPem: "{{ cnpg_s3_ca_pem | default('') }}"
               ingressClassName: "{{ dsc.ingress.className | default('') }}"
               dockerAccount:
-                username: "{{ dsc.global.dockerAccount.username | default('') }}"
-                password: "{{ dsc.global.dockerAccount.password | default('') }}"
+                username: ""
+                password: ""
               backup:
                 s3BucketName: "{{ dsc.global.backup.s3.bucketName | default('') }}"
                 s3BucketPrefix: "{{ dsc.global.backup.vault.pathPrefix | default('') }}"
                 s3Endpoint: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
-                s3AccessKey: "{{ dsc.global.backup.s3.credentials.accessKeyId.value | default('') }}"
-                s3SecretKey: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value | default('') }}"
+                s3AccessKey: ""
+                s3SecretKey: ""
                 gitlab:
                   mcExtraArgs: "{{ dsc.global.backup.gitlab.mcExtraArgs | default('') }}"
                   pathPrefix: "{{ dsc.global.backup.gitlab.pathPrefix | default('') }}"
@@ -78,6 +78,10 @@
                   url: "{{ dsc.global.playwright.mattermost.url | default('') }}"
                   channelId: "{{ dsc.global.playwright.mattermost.channelId | default('') }}"
                   botToken: "{{ dsc.global.playwright.mattermost.botToken | default('') }}"
+              smtp:
+                authentication:
+                  user: ""
+                  password: ""
           - argocd_app: awx
             clusterName: "in-cluster"
             nameSpace: "awx"
@@ -108,13 +112,7 @@
             syncWave: 20
             vault_values:
               auth:
-                adminPassword: >-
-                  {{
-                    (keycloak_admin_creds.resources[0].data['admin-password'] | b64decode
-                     if (keycloak_admin_creds.resources[0].data['admin-password'] is defined and
-                         keycloak_admin_creds.resources[0].data['admin-password'] | length > 0)
-                     else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
-                  }}
+                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
                 userTmpPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits', '!@#$%^&*()-_=+']) }}"
               initcontainers:
                 pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
@@ -164,13 +162,23 @@
             vault_values:
               global:
                 harborAdminPassword: |
-                  "{{ dsc.harbor.adminPassword | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+                  "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
                 s3ImageChartStorage:
                   bucket: "{{ dsc.harbor.s3ImageChartStorage.bucket | default('') }}"
                   region: "{{ dsc.harbor.s3ImageChartStorage.region | default('') }}"
                   regionendpoint: "{{ dsc.harbor.s3ImageChartStorage.regionendpoint | default('') }}"
-                  accesskey: "{{ dsc.harbor.s3ImageChartStorage.accesskey | default('') }}"
-                  secretkey: "{{ dsc.harbor.s3ImageChartStorage.secretkey | default('') }}"
+                  accesskey: ""
+                  secretkey: ""
+                proxyCache:
+                  - name: dockerhub
+                    registry:
+                      credential:
+                        accessKey: ""
+                        accessSecret: ""
+                        type: basic
+                      endpointUrl: https://hub.docker.com
+                      insecure: false
+                      provider: docker-hub
           - argocd_app: argocd
             clusterName: ""
             nameSpace: "argocd"
@@ -178,7 +186,7 @@
             syncWave: 50
             vault_values:
               argocdServerAdminPassword: |
-                "{{ dsc.argocd.admin.password | default(lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])) }}"
+                "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           - argocd_app: sonarqube
             clusterName: ""
             nameSpace: "sonarqube"
@@ -186,14 +194,14 @@
             syncWave: 50
             vault_values:
               auth:
-                adminPassword: >-
-                  {{
-                    (sonarqube_secret.resources[0].data.password | b64decode
-                     if (sonarqube_secret.resources[0].data.password is defined and
-                         sonarqube_secret.resources[0].data.password | length > 0)
-                     else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
-                  }}
+                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
                 monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+                sonarApiToken: >-
+                  {{
+                    (retrieved_token_pass)if retrieved_token_pass is defined and
+                    retrieved_token_pass | length > 0
+                    else ''
+                  }}
           - argocd_app: console
             clusterName: ""
             nameSpace: "console"

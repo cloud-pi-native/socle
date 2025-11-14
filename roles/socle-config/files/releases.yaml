@@ -47,6 +47,12 @@ spec:
   gitlabrunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
     chartVersion: "0.81.0"
+  global:
+    backup:
+      vault:
+        chartVersion: "1.0.0"
+      vaultInfra:
+        chartVersion: "1.0.0"
   grafana:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"

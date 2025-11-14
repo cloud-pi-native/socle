@@ -93,6 +93,44 @@
   ansible.builtin.set_fact:
     dsc: "{{ socle_config.resources[0] }}"
 
+- name: Store CRD to local repository
+  when: |
+    post_conf_job is not defined and
+    dsc_name == "conf-dso"
+  block:
+    - name: Create destination dir
+      ansible.builtin.file:
+        path: "{{ gitops_local_repo }}/{{ dsc.spec.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/global/crds"
+        state: directory
+        mode: "0775"
+
+    - name: Render CRD file into GitOps local repo
+      ansible.builtin.copy:
+        src: crd-conf-dso.yaml
+        dest: "{{ gitops_local_repo }}/{{ dsc.spec.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/global/crds/dsc-crd.yaml"
+        mode: "0644"
+
+- name: Set dsc_yaml fact
+  ansible.builtin.set_fact:
+    dsc_yaml: "{{ dsc
+      | ansible.utils.remove_keys(target=['annotations', 'creationTimestamp', 'generation', 'managedFields', 'resourceVersion', 'uid'])
+      | to_nice_yaml(indent=2) }}"
+
+- name: Store dsc to local repository
+  when: post_conf_job is not defined
+  block:
+    - name: Create destination dir
+      ansible.builtin.file:
+        path: "{{ gitops_local_repo }}/{{ dsc.spec.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/global/templates"
+        state: directory
+        mode: "0775"
+
+    - name: Render dsc file into GitOps local repo
+      ansible.builtin.copy:
+        content: "{{ dsc_yaml }}"
+        dest: "{{ gitops_local_repo }}/{{ dsc.spec.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/global/templates/dsc.yaml"
+        mode: "0644"
+
 - name: Set instance name fact
   ansible.builtin.set_fact:
     instance_name: "{{ dsc.metadata.name }}"
@@ -102,13 +140,13 @@
     dsc_default_config: "{{ lookup('ansible.builtin.file', 'config.yaml') | from_yaml }}"
     dsc_default_releases: "{{ lookup('ansible.builtin.file', 'releases.yaml') | from_yaml }}"
 
-- name: Combine and merge DSC fact
+- name: Set full_dsc fact
   ansible.builtin.set_fact:
-    dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
+    full_dsc: "{{ dsc_default_releases | combine(dsc_default_config, recursive=True) | combine(dsc, recursive=True) }}"
 
-- name: Set dsc spec fact
+- name: Set dsc fact
   ansible.builtin.set_fact:
-    dsc: "{{ dsc.spec }}"
+    dsc: "{{ full_dsc.spec }}"
 
 - name: Set private registry fact
   ansible.builtin.set_fact:

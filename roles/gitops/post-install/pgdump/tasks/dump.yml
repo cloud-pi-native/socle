@@ -31,9 +31,9 @@
     bucket: "{{ dsc.global.backup.s3.bucketName }}"
     object: "pgdump/{{ item.name }}/app.dump-{{ lookup('pipe', 'date +%d') | int % 10 }}"
     mode: put
-    overwrite: true
-    access_key: "{{ dsc.global.backup.s3.credentials.accessKeyId.value }}"
-    secret_key: "{{ dsc.global.backup.s3.credentials.secretAccessKey.value }}"
+    overwrite: always
+    access_key: "{{ retrieved_s3AccessKey }}"
+    secret_key: "{{ retrieved_s3SecretKey }}"
     src: "/tmp/{{ item.name }}.dump.tmp"
     encrypt: false
   environment:
@@ -48,8 +48,8 @@
     s3cmd put
       /tmp/{{ item.name }}.dump.tmp
       s3://backup-dso-integ/pgdump/{{ item.name }}/app.dump-{{ lookup('pipe', 'date +%d') | int % 10 }}
-      --access_key={{ dsc.global.backup.s3.credentials.accessKeyId.value }}
-      --secret_key={{ dsc.global.backup.s3.credentials.secretAccessKey.value }}
+      --access_key={{ retrieved_s3AccessKey }}
+      --secret_key={{ retrieved_s3SecretKey }}
       --host={{ dsc.global.backup.s3.endpointURL }}
       --host-bucket="{{ dsc.global.backup.s3.endpointURL | regex_replace('https?://', '') }}/%(bucket)s"
       --ca-certs=/bundle-s3-dir/ca.pem

@@ -11,7 +11,7 @@ crds:
     seccompProfile:
       type: RuntimeDefault
 {% endif %}
-  install: true
+  install: {{ not argocd_crd_present }}
   keep: true
 {% if dsc.global.platform == "openshift" %}
 openshift:
@@ -20,7 +20,7 @@ openshift:
 configs:
 {% if dsc.argocdInfra.admin.enabled %}
   secret:
-    argocdServerAdminPassword: "{{ dsc.argocdInfra.admin.password }}"
+    argocdServerAdminPassword: "{{ encrypted_password }}"
 {% endif %}
   params:
     server.insecure: true

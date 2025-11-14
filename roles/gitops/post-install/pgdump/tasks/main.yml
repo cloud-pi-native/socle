@@ -1,4 +1,35 @@
 ---
+- name: Get s3AccessKey and s3SecretKey from infra Vault
+  block:
+    - name: Retrieve global values from infra Vault
+      community.hashi_vault.vault_kv2_get:
+        url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
+        engine_mount_point: "{{ vaultinfra_kv_name }}"
+        path: "env/{{ dsc_name }}/apps/global/values"
+        validate_certs: "{{ vaultinfra_cert_valid }}"
+      register: global_vault_values
+      ignore_errors: true
+
+    - name: Set retrieved_s3AccessKey fact
+      ansible.builtin.set_fact:
+        retrieved_s3AccessKey: >-
+          {{
+            (global_vault_values.data.data.backup.s3AccessKey)if global_vault_values.data.data.backup.s3AccessKey is defined and
+            global_vault_values.data.data.backup.s3AccessKey | length > 0
+            else ''
+          }}
+
+    - name: Set retrieved_s3SecretKey fact
+      ansible.builtin.set_fact:
+        retrieved_s3SecretKey: >-
+          {{
+            (global_vault_values.data.data.backup.s3SecretKey)if global_vault_values.data.data.backup.s3SecretKey is defined and
+            global_vault_values.data.data.backup.s3SecretKey | length > 0
+            else ''
+          }}
+
 - name: Loop over services
   when: dsc.global.backup.cnpg.enabled
   ansible.builtin.include_tasks: ./dump.yml

@@ -23,4 +23,8 @@
     force_basic_auth: true
     method: POST
     status_code: [200, 204]
-  register: new_token_pass
+  register: token_pass
+
+- name: Set retrieved_token_pass fact
+  ansible.builtin.set_fact:
+    retrieved_token_pass: "{{ token_pass.json.token }}"

@@ -32,7 +32,3 @@
           ansible.builtin.set_fact:
             gitlab_token: "{{ gitlab_current_vault_values.data.data.gitlabToken }}"
           register: set_token_inv
-
-    - name: Import gitlab-catalog role
-      ansible.builtin.import_role:
-        name: gitops/post-install/gitlab-catalog

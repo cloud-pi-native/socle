@@ -61,7 +61,3 @@
           vars:
             vault_secrets_post_install: true
             post_vault_update: true
-
-    - name: Import gitlab-catalog role
-      ansible.builtin.import_role:
-        name: gitops/post-install/gitlab-catalog

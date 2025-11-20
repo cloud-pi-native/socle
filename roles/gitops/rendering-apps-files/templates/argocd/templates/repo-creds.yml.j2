@@ -9,7 +9,7 @@ metadata:
 type: Opaque
 stringData:
   password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
-  url: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.gitlab}>/{{ dsc.global.projectsRootDir | flatten | join ('/') }}"
+  url: "http://gitlab-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8181/{{ dsc.global.projectsRootDir | flatten | join ('/') }}"
   username: "root"
 ---
 apiVersion: v1

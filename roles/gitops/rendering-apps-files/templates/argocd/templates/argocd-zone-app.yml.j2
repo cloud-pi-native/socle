@@ -1,4 +1,9 @@
-{% set dsoZoneRepo = 'https://' + gitlab_domain + '/' + dsc.global.projectsRootDir | join('/') + '/infra/' + dsc.argocd.zoneName + '.git' %}
+{% set dsoZoneRepo = 'http://gitlab-webservice-default.' + dsc.gitlab.namespace + '.svc.cluster.local:8181/'
+    + (dsc.global.projectsRootDir | join('/'))
+    + '/infra/'
+    + dsc.argocd.zoneName
+    + '.git'
+%}
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:

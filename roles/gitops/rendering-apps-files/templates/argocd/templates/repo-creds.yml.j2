@@ -17,6 +17,19 @@ kind: Secret
 metadata:
   labels:
     argocd.argoproj.io/secret-type: repo-creds
+  name: gitlab-internal
+  namespace: {{ dsc.argocd.namespace }}
+type: Opaque
+stringData:
+  password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
+  url: "http://gitlab-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8181/{{ dsc.global.projectsRootDir | flatten | join ('/') }}"
+  username: "root"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
   name: oci-dockerhub-creds
   namespace: {{ dsc.argocd.namespace }}
 stringData:

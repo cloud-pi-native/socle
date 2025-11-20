@@ -29,8 +29,11 @@
     emailVerified: true
     required_actions: >- # This only works during creation
       {{
-        [] if item.value.email == 'admin@example.com'
-        else ['CONFIGURE_TOTP']
+        [] if dsc.global.environment == 'development'
+        else (
+          [] if item.value.email == 'admin@example.com'
+          else ['CONFIGURE_TOTP']
+        )
       }}
     credentials: >-
       {{

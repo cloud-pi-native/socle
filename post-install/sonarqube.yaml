@@ -31,12 +31,13 @@
                       auth:
                         sonarApiToken: >-
                           {{
-                            (retrieved_token_pass.json.token)if retrieved_token_pass.json.token is defined and
-                            retrieved_token_pass.json.token | length > 0
+                            (new_token_pass.json.token) if new_token_pass.json.token is defined and
+                            new_token_pass.json.token | length > 0
                             else ''
                           }}
 
         - name: Post-install vault-secrets run
+          when: sonar_token_validation.json.valid == false
           ansible.builtin.import_role:
             name: gitops/vault-secrets
           vars:

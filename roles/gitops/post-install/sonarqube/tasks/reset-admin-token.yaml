@@ -23,4 +23,4 @@
     force_basic_auth: true
     method: POST
     status_code: [200, 204]
-  register: retrieved_token_pass
+  register: new_token_pass

@@ -77,8 +77,18 @@
             else ''
           }}
 
+    - name: Test SonarQube token
+      ansible.builtin.uri:
+        validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+        url: "{{ sonar_auth_url }}/api/authentication/validate"
+        method: GET
+        status_code: 200
+        headers:
+          Authorization: "Bearer {{ retrieved_token_pass }}"
+      register: sonar_token_validation
+
 - name: Reset Admin Token procedure
-  when: retrieved_token_pass | length == 0
+  when: sonar_token_validation.json.valid == false
   ansible.builtin.include_tasks:
     file: reset-admin-token.yaml
 

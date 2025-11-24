@@ -194,12 +194,6 @@
                      else lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']))
                   }}
                 monitoringPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
-                sonarApiToken: >-
-                  {{
-                    (token_pass.json.token)if token_pass is defined and
-                    token_pass.json.token | length > 0
-                    else ''
-                  }}
           - argocd_app: console
             clusterName: ""
             nameSpace: "console"

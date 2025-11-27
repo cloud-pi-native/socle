@@ -37,13 +37,7 @@ spec:
       - $argocdValues/argocd-values.yaml
       values: |
         dsoZoneRepo: {{ dsoZoneRepo }}
+        autosync: false
   - repoURL: {{ dsoZoneRepo }}
     targetRevision: HEAD
     ref: argocdValues
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true

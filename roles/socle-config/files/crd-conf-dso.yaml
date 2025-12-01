@@ -1313,6 +1313,9 @@ spec:
                     pluginDownloadUrl:
                       description: Plugins download Url.
                       type: string
+                    providerDownloadUrl:
+                      description: Provider's download Url.
+                      type: string
                     managementRealm:
                       description: Keycloak management realm.
                       type: string

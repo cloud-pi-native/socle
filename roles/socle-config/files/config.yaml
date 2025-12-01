@@ -139,6 +139,7 @@ spec:
     helmRepoUrl: oci://registry-1.docker.io/bitnamicharts
     postgresPvcSize: 1Gi
     pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.4/keycloak-theme-for-kc-26-and-above.jar
+    providerDownloadUrl: https://github.com/InseeFr/Keycloak-FranceConnect/releases/download/7.5.0/keycloak-franceconnect-7.5.0.jar
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
     managementRealm: master

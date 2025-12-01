@@ -41,17 +41,29 @@
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
 
-- name: Get keycloak dso realm users from API
+- name: Initialize list of all dso users
+  set_fact:
+    kc_dso_users: []
+
+- name: Get paginated users
+  vars:
+    page_size: 100
+    first_index: "{{ item }}"
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/users"
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/users?first={{ first_index }}&max={{ page_size }}"
     method: GET
-    status_code: [200, 202]
+    headers:
+      Authorization: "Bearer {{ kc_access_token }}"
     return_content: true
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-    body_format: json
-    headers:
-      Authorization: bearer {{ kc_access_token }}
-  register: kc_dso_users
+  loop: "{{ range(0, 800, 100) }}"
+  register: kc_user_pages
+
+- name: Combine all pages
+  set_fact:
+    kc_dso_users: "{{ kc_dso_users + (item.json | list) }}"
+  loop: "{{ kc_user_pages.results }}"
+  when: item.json | length > 0
 
 - name: Force CONFIGURE_TOTP for all users except admin
   ansible.builtin.uri:
@@ -67,5 +79,5 @@
           "requiredActions": ["CONFIGURE_TOTP"]
         })
       }}
-  loop: "{{ kc_dso_users.json }}"
+  loop: "{{ kc_dso_users }}"
   when: item.email != 'admin@example.com'

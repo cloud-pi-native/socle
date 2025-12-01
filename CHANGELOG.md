@@ -1,5 +1,49 @@
 # Changelog
 
+## [4.3.0](https://github.com/cloud-pi-native/socle/compare/v4.2.0...v4.3.0) (2025-12-01)
+
+
+### Features
+
+* :sparkles: add the root application to deploy applications as driven by the Console gitlab repository ([acb8898](https://github.com/cloud-pi-native/socle/commit/acb8898e8bc360f176ee52a06706de6492336d69))
+* :sparkles: check ca certificate presence ([c98f06a](https://github.com/cloud-pi-native/socle/commit/c98f06aa5e73c31ec25d0eac8eff2c05a4ccd504))
+* :sparkles: reorganise retrieval of vault infra unseal keys and root token ([75d4d97](https://github.com/cloud-pi-native/socle/commit/75d4d979f72f992b38d77de80cc950c550062086))
+* **#464:** :passport_control: enforce MFA for applicative realm users ([a094d53](https://github.com/cloud-pi-native/socle/commit/a094d53cda61ce36482d82dbd42e167c57a08877))
+* Deactivate auto sync for argocd zone app ([7b38949](https://github.com/cloud-pi-native/socle/commit/7b389490ec47e6d7e526f819ba8903693c4faea4))
+* enabling kyverno install ([b9390aa](https://github.com/cloud-pi-native/socle/commit/b9390aa920dd885c262f36779609cb6f67bcc2c0))
+
+
+### Bug Fixes
+
+* :art: Adapt code for Ansible 12 compliance ([1bdce51](https://github.com/cloud-pi-native/socle/commit/1bdce514b5d3127a764d0acd8215f9f582425a14))
+* :art: Keycloak alerting rules ([7b79969](https://github.com/cloud-pi-native/socle/commit/7b79969cfb16445fbfaff47c5ffec6a4521d1927))
+* :bug: Adding some missing conditions ([b684bec](https://github.com/cloud-pi-native/socle/commit/b684bec2f2ef963f6f83cbc5a138d914edfc48da))
+* :bug: awx missing ansible-secret ([2b4e7e5](https://github.com/cloud-pi-native/socle/commit/2b4e7e51a1d61ff5985b0e84d41ff261e8f586ea))
+* :bug: delete non and empty rendered files from gitops local repo after rendering ([636eb92](https://github.com/cloud-pi-native/socle/commit/636eb92ce1d3ee3d8090e045b4b6d0a617016f08))
+* :bug: internal url suffix for gitlab, sonarqube, nexus and vault ([9f5222e](https://github.com/cloud-pi-native/socle/commit/9f5222e41abe4be0eb51149507ed32d434fe3562))
+* :bug: nexus admin username Vault value absent for console helm values ([0484aaf](https://github.com/cloud-pi-native/socle/commit/0484aaf189d8b647abb5aa399701765fabaace8b))
+* :bug: remove encryption ([d3d02bb](https://github.com/cloud-pi-native/socle/commit/d3d02bb5c01e1f50bdd289f60032ad3c589456f6))
+* :bug: remove encryption ([b9a0ac8](https://github.com/cloud-pi-native/socle/commit/b9a0ac81fe5d4cda1a96afcbb9c47590ef70b939))
+* :bug: remove useless wait task ([9d1b333](https://github.com/cloud-pi-native/socle/commit/9d1b3339e35456668f9c9be93dc1f36f0647b3da))
+* :bug: sonar token update logic ([21388f8](https://github.com/cloud-pi-native/socle/commit/21388f8a41f7c6d4b6a6ea8ed98abb3c3739bf06))
+* :bug: support Helm version range for obsevability plugin ([d0a20c0](https://github.com/cloud-pi-native/socle/commit/d0a20c01a4c25f7f7fa66ef9b58bab52336cda96))
+* :bug: tls condition ([59ca761](https://github.com/cloud-pi-native/socle/commit/59ca7618e26edac1a200ac5d649ddb64d9326b67))
+* :bug: use of vault infra token before retrieval ([79dfc1b](https://github.com/cloud-pi-native/socle/commit/79dfc1bab765d92a43d8c18d6c2b59136f5d23bd))
+* :pencil2: fixing CRD typos ([787fbba](https://github.com/cloud-pi-native/socle/commit/787fbbaaf16ccf720e670712d0a1d2d21b96988c))
+* :wrench: add custom argo health check to avoid GrafanaDashboard infinite progressing ([45f3e65](https://github.com/cloud-pi-native/socle/commit/45f3e65d12c12eeccf1398eed25d164a421f9913))
+* :wrench: add empty template case ([9a50d1b](https://github.com/cloud-pi-native/socle/commit/9a50d1b0b9f345424e4be54794b00d15955752a5))
+* :wrench: hardcode sonarqube internal url suffix ([556075b](https://github.com/cloud-pi-native/socle/commit/556075b46fc1c7c3a442d8877c1d2c0e5821aad9))
+* :wrench: no MFA for development environment ([49378be](https://github.com/cloud-pi-native/socle/commit/49378bed14f03c6c8f45e2e79feafe265a18228d))
+* add http proxy to obervatorium if enabled ([b9bd9c1](https://github.com/cloud-pi-native/socle/commit/b9bd9c1f58c48b0448ba5357d75dcdd7c300b316))
+* awx post install ([8fd1b44](https://github.com/cloud-pi-native/socle/commit/8fd1b445a11c5d14c0f787598f284584e55c67b3))
+* cert manager image ([bd3a4b9](https://github.com/cloud-pi-native/socle/commit/bd3a4b9d0c4203bca902eb4efb5677895342f7fb))
+* keyloak infra password generation excluding apostrophes and quotes + fix broken conditional for ansible 2.19 ([5a91b26](https://github.com/cloud-pi-native/socle/commit/5a91b267d97b9d6a407a7a64b5e145b5252d1f1e))
+
+
+### Performance Improvements
+
+* :zap: scale down backoffLimit for playwright job ([16beed3](https://github.com/cloud-pi-native/socle/commit/16beed3bb0ecab6bc7ae385da7bfd2a3d633c480))
+
 ## [4.2.0](https://github.com/cloud-pi-native/socle/compare/v4.1.0...v4.2.0) (2025-10-23)
 
 

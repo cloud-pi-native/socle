@@ -116,6 +116,7 @@
                 userTmpPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits', '!@#$%^&*()-_=+']) }}"
               initcontainers:
                 pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
+                providerDownloadUrl: "{{ dsc.keycloak.providerDownloadUrl }}"
           - argocd_app: gitlab
             clusterName: ""
             nameSpace: "gitlab"

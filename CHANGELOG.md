@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.3.1](https://github.com/cloud-pi-native/socle/compare/v4.3.0...v4.3.1) (2025-12-01)
+
+
+### Bug Fixes
+
+* :bug: keycloak users loop ([bbf86c4](https://github.com/cloud-pi-native/socle/commit/bbf86c48d3b6da9d83b26e12a552e5d5e386465d))
+* :bug: revert to public url for nexus ([f02e672](https://github.com/cloud-pi-native/socle/commit/f02e6721d39a134b6a8b46eddba12e4aee4faa3c))
+
 ## [4.3.0](https://github.com/cloud-pi-native/socle/compare/v4.2.0...v4.3.0) (2025-12-01)
 
 

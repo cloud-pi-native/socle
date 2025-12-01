@@ -96,7 +96,7 @@
       - name: PROJECTS_ROOT_DIR
         value: "{{ dsc.global.projectsRootDir | join('/') }}"
       - name: NEXUS_HOST_URL
-        value: "http://nexus.{{ dsc.nexus.namespace }}.svc.cluster.local:8081"
+        value: "https://{{ nexus_domain }}"
       - name: NEXUS_HOSTNAME
         value: "{{ nexus_domain }}"
       - name: SONAR_HOST_URL

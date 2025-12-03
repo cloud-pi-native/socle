@@ -55,6 +55,7 @@
       <active>true</active>
       <host>{{ dsc.proxy.host }}</host>
       <port>{{ dsc.proxy.port }}</port>
+      <nonProxyHosts>nexus.{{ dsc.nexus.namespace }}.svc.cluster.local|localhost|127.0.0.1</nonProxyHosts>
     </proxy>
   </proxies>
 {% endif %}

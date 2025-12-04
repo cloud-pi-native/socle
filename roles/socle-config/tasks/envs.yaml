@@ -184,9 +184,7 @@
             nameSpace: "argocd"
             customNamespacePrefix: ""
             syncWave: 50
-            vault_values:
-              argocdServerAdminPassword: |
-                "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+            vault_values: {}
           - argocd_app: sonarqube
             clusterName: ""
             nameSpace: "sonarqube"

@@ -71,6 +71,58 @@
         namespace: "{{ dsc.keycloak.namespace }}"
       register: keycloak_admin_secret
 
+# Set Argo CD admin password when required
+
+- name: Set Argo CD admin password
+  when: dsc.argocd.admin.enabled
+  block:
+    - name: Set argocd_clear_password fact
+      ansible.builtin.set_fact:
+        argocd_clear_password: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+
+    - name: Set argocd encrypted password
+      block:
+        - name: Encrypt password
+          changed_when: false
+          ansible.builtin.shell:
+            cmd: |
+              set -o pipefail
+              htpasswd -nbBC 10 "" "{{ argocd_clear_password }}" | tr -d ':\n' | sed 's/$2y/$2a/'
+            executable: /bin/bash
+          register: password_encryption
+
+        - name: Set argocd_encrypted_password fact
+          ansible.builtin.set_fact:
+            argocd_encrypted_password: "{{ password_encryption.stdout }}"
+
+    - name: Set argocd_values
+      ansible.builtin.set_fact:
+        argocd_values:
+          argocdServerAdminClearPassword: "{{ argocd_clear_password }}"
+          argocdServerAdminPassword: "{{ argocd_encrypted_password }}"
+
+    - name: Merge argocd_values into envs vault_values only for argocd
+      ansible.builtin.set_fact:
+        envs: "{{ merged_envs | from_json }}"
+      vars:
+        merged_envs: |
+          {%- set res = [] -%}
+          {%- for e in envs | default([]) -%}
+            {%- set apps = [] -%}
+            {%- for a in e.apps | default([]) -%}
+              {#-- On ne merge que si argocd_app == 'argocd' --#}
+              {%- if a.argocd_app | default('') == 'argocd' -%}
+                {%- set merged_vault = (a.vault_values | default({})) | combine(argocd_values | default({})) -%}
+                {%- set new_app = a | combine({'vault_values': merged_vault}) -%}
+              {%- else -%}
+                {%- set new_app = a -%}
+              {%- endif -%}
+              {%- set _ = apps.append(new_app) -%}
+            {%- endfor -%}
+            {%- set _ = res.append(e | combine({'apps': apps})) -%}
+          {%- endfor -%}
+          {{ res | to_nice_json }}
+
 # Write Vault infra secrets
 
 - name: Write secrets

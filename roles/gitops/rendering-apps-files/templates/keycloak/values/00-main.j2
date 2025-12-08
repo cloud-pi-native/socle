@@ -221,6 +221,7 @@ keycloak:
           mkdir -p /emptydir/app-providers-dir && \
           curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
           curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.providerDownloadUrl}>
+      volumeMounts:  
         - name: empty-dir
           mountPath: /emptydir
 {% if dsc.proxy.enabled %}

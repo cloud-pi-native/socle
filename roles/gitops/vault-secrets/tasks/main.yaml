@@ -74,7 +74,7 @@
 # Set Argo CD admin password when required
 
 - name: Set Argo CD admin password
-  when: dsc.argocd.admin.enabled
+  when: dsc.argocd.admin.enabled and post_conf_job is not defined
   block:
     - name: Set argocd_clear_password fact
       ansible.builtin.set_fact:

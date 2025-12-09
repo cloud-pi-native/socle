@@ -23,15 +23,14 @@
     - name: Retrieve current vault secret
       community.hashi_vault.vault_kv2_get:
         url: "https://{{ vaultinfra_domain }}"
+        auth_method: token
+        token: "{{ vault_infra_token }}"
         namespace: "{{ dsc.vaultInfra.namespace }}"
         engine_mount_point: "{{ vaultinfra_kv_name }}"
         path: "env/{{ item.0.name }}/apps/{{ item.1.argocd_app }}/values"
         validate_certs: "{{ vaultinfra_cert_valid }}"
-      environment:
-        VAULT_TOKEN: "{{ vault_infra_token }}"
       register: current_vault_values
       ignore_errors: true
-      no_log: true
 
     - name: Get current non null values
       when: not vault_secrets_post_install
@@ -78,6 +77,6 @@
         data: "{{ current_vault_values_combined.stdout | from_json }}"
         validate_certs: "{{ vaultinfra_cert_valid }}"
 
-    - name: Set_current_vault_values for {{ item.1.argocd_app }}
+    - name: Set {{ item.1.argocd_app }}_current_vault_values
       ansible.builtin.set_fact:
         "{{ item.1.argocd_app }}_current_vault_values": "{{ current_vault_values }}"

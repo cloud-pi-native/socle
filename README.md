@@ -969,7 +969,27 @@ En résumé, il vous faudra renseigner si besoin, et en complément de ce que vo
   - Stockage S3
   - Docker Hub
 
-Lorsque vous avez terminé les vérifications requises, pousser les changements sur votre branche "ma-branche" :
+Afin de vous faciliter cette étape, nous proposons le playbook `credentials-to-vault.yaml` situé dans le répertoire `admin-tools`.
+
+Pour le lancer en utilisant la configuration par défaut (dsc `conf-dso`) :
+
+```shell
+ansible-playbook admin-tools/credentials-to-vault.yaml
+```
+
+Il créera pour vous le fichier `/tmp/my-credentials.yaml` qu'il vous invitera à remplir avant de relancer le playbook.
+
+Une fois ce fichier rempli avec les credentials souhaités pour la partie dont vous avez besoin (S3, Docker Hub et/ou SMTP), relancez simplement le playbook qui ira remplir pour vous les secrets correspondants dans votre Vault d'infrastructure :
+
+```shell
+ansible-playbook admin-tools/credentials-to-vault.yaml
+```
+
+Notez qu'il vous aura également demandé de remplir la variable d'environnement `KUBECONFIG_INFRA` (vue plus haut) qui lui servira pour aller récupérer le token de votre Vault d'infrastructure. Il est également possible de lui fournir plusieurs autres variables d'environnement vues précédemment si besoin, à savoir `KUBECONFIG_PROXY_INFRA`, `VAULT_INFRA_DOMAIN` et `VAULT_INFRA_TOKEN`.
+
+Une fois le playbook `credentials-to-vault.yaml` exécuté si nécessaire, pensez à supprimer le fichier `/tmp/my-credentials.yaml`.
+
+Lorsque vous avez terminé les vérifications requises vues précédemment (cohérences des fichiers générés et des secrets Vault), poussez les changements sur votre branche "ma-branche" :
 
 ```shell
 git ls-files --modified | xargs git add

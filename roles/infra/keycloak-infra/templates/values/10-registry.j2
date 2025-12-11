@@ -1,13 +1,13 @@
-{% if use_private_registry %}
+global:
+  security:
+    allowInsecureImages: true
 image:
-  registry: "{{ dsc.global.registry }}"
+  registry: "{{ dsc.global.registry | default('docker.io') }}"
   repository: bitnamilegacy/keycloak
-{% endif %}
+  pullPolicy: "IfNotPresent"
 
 {% if use_image_pull_secrets %}
 global:
   imagePullSecrets: 
   - dso-config-pull-secret
-  security:
-    allowInsecureImages: true
 {% endif %}

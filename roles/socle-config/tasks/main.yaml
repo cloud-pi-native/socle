@@ -1,7 +1,11 @@
 ---
+- name: Set socle_version fact
+  ansible.builtin.set_fact:
+    socle_version: "{{ (lookup('ansible.builtin.file', '../../package.json') | from_json).version }}"
+
 - name: Create or update DsoSocleConfig CRD
   kubernetes.core.k8s:
-    definition: "{{ lookup('ansible.builtin.file', 'crd-conf-dso.yaml') | from_yaml }}"
+    definition: "{{ lookup('ansible.builtin.template', './templates/crd-conf-dso.yaml') | from_yaml }}"
   when: post_conf_job is not defined
 
 - name: Get socle config from conf-dso dsc (default)
@@ -106,7 +110,7 @@
 
     - name: Render CRD file into GitOps local repo
       ansible.builtin.copy:
-        src: crd-conf-dso.yaml
+        content: "{{ lookup('ansible.builtin.template', './templates/crd-conf-dso.yaml') }}"
         dest: "{{ gitops_local_repo }}/{{ dsc.spec.global.gitOps.repo.path }}/envs/{{ dsc_name }}/apps/global/crds/dsc-crd.yaml"
         mode: "0644"
 
@@ -115,6 +119,26 @@
     dsc_yaml: "{{ dsc
       | ansible.utils.remove_keys(target=['annotations', 'creationTimestamp', 'generation', 'managedFields', 'resourceVersion', 'uid'])
       | to_nice_yaml(indent=2) }}"
+
+- name: Annotate dsc_yaml with socle_version
+  block:
+    - name: Parsing YAML to dict
+      ansible.builtin.set_fact:
+        dsc_yaml_dict: "{{ dsc_yaml | from_yaml }}"
+
+    - name: Adding annotation
+      ansible.builtin.set_fact:
+        dsc_yaml_dict: >-
+          {{ dsc_yaml_dict
+            | combine(
+                {'metadata': {'annotations': {'socleVersion': socle_version}}},
+                recursive=True
+              )
+          }}
+
+    - name: Set back to nice YAML
+      ansible.builtin.set_fact:
+        dsc_yaml: "{{ dsc_yaml_dict | to_nice_yaml(indent=2) }}"
 
 - name: Store dsc to local repository
   when: post_conf_job is not defined

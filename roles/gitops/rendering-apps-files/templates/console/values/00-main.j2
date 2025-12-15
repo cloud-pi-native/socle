@@ -16,6 +16,9 @@ console:
       HARBOR_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global| jsonPath {.harborAdminPassword}>
       HARBOR_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.harbor}>/"
       HARBOR_INTERNAL_URL: "http://harbor-core.{{ dsc.harbor.namespace }}.svc.cluster.local/"
+{% if dsc.global.environment == "production" %}
+      HARBOR_RULE_COUNT: "100"
+{% endif %}
       KEYCLOAK_ADMIN: "dsoadmin"
       KEYCLOAK_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#auth| jsonPath {.adminPassword}>
       KEYCLOAK_URL: "http://{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local/realms/{{ dsc.keycloak.applicationRealm }}/.well-known/openid-configuration"

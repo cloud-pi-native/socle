@@ -8,6 +8,7 @@ console:
     secrets:
       ARGO_NAMESPACE: {{ dsc.argocd.namespace }}
       ARGOCD_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.argocd}>/"
+      ARGOCD_INTERNAL_URL: "http://{{ dsc_name }}-argocd-server.{{ dsc.argocd.namespace }}.svc.cluster.local"
       GITLAB_TOKEN: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
       GITLAB_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.gitlab}>/"
       GITLAB_INTERNAL_URL: "http://gitlab-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8181/"

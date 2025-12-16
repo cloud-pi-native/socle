@@ -25,7 +25,7 @@ spec:
       chartVersion: 0.3.1
     operator:
       # https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
-      chartVersion: "0.25.0"
+      chartVersion: "0.27.0"
   console:
     # https://github.com/cloud-pi-native/console/releases
     chartVersion: ">=2.0.0 <3.0.0"

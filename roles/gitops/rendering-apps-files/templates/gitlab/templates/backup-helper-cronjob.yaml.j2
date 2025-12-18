@@ -40,5 +40,4 @@ spec:
                 mc ${MC_EXTRA_ARGS} rm --recursive --force --older-than "${RETENTION}" backup_host/${S3_BUCKET_NAME%/}/${S3_PATH_PREFIX}
               fi
           restartPolicy: Never
-type: Opaque
 {% endif %}

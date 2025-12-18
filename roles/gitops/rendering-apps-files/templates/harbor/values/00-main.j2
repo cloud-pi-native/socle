@@ -17,12 +17,11 @@ harbor:
 {% for key, val in dsc.ingress.labels.items() %}
           {{ key }}: {{ val }}
 {% endfor %}
-      harbor:
-        annotations:
+      annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
           {{ key }}: {{ val }}
 {% endfor %}
-        labels:
+      labels:
 {% for key, val in dsc.ingress.labels.items() %}
           {{ key }}: {{ val }}
 {% endfor %}

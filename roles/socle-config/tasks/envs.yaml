@@ -83,7 +83,7 @@
                   user: ""
                   password: ""
           - argocd_app: awx
-            clusterName: "in-cluster"
+            clusterName: ""
             nameSpace: "awx"
             customNamespacePrefix: ""
             syncWave: 20

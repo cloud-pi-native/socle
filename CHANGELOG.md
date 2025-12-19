@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.1](https://github.com/cloud-pi-native/socle/compare/v4.4.0...v4.4.1) (2025-12-19)
+
+
+### Bug Fixes
+
+* :bug: DSC annotations ([8280e4f](https://github.com/cloud-pi-native/socle/commit/8280e4fa848ace82df4308ddc1633772f7d6d615))
+
 ## [4.4.0](https://github.com/cloud-pi-native/socle/compare/v4.3.1...v4.4.0) (2025-12-19)
 
 

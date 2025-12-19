@@ -117,21 +117,28 @@
 - name: Set dsc_yaml fact
   ansible.builtin.set_fact:
     dsc_yaml: "{{ dsc
-      | ansible.utils.remove_keys(target=['annotations', 'creationTimestamp', 'generation', 'managedFields', 'resourceVersion', 'uid'])
+      | ansible.utils.remove_keys(target=['metadata', 'creationTimestamp', 'generation', 'managedFields', 'resourceVersion', 'uid'])
       | to_nice_yaml(indent=2) }}"
 
-- name: Annotate dsc_yaml with socle_version
+- name: Add socle_version annotation and dsc_name to dsc_yaml
   block:
     - name: Parsing YAML to dict
       ansible.builtin.set_fact:
         dsc_yaml_dict: "{{ dsc_yaml | from_yaml }}"
 
-    - name: Adding annotation
+    - name: Adding annotation and dsc name
       ansible.builtin.set_fact:
         dsc_yaml_dict: >-
           {{ dsc_yaml_dict
             | combine(
-                {'metadata': {'annotations': {'socleVersion': socle_version}}},
+                {
+                  'metadata': {
+                    'annotations': {
+                      'socleVersion': socle_version
+                      },
+                    'name': dsc_name
+                    }
+                },
                 recursive=True
               )
           }}
@@ -265,3 +272,5 @@
   when: post_conf_job is not defined
   ansible.builtin.include_tasks:
     file: envs.yaml
+
+- meta: end_play

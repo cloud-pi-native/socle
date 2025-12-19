@@ -1,5 +1,32 @@
 # Changelog
 
+## [4.4.0](https://github.com/cloud-pi-native/socle/compare/v4.3.1...v4.4.0) (2025-12-19)
+
+
+### Features
+
+* :sparkles: Add Keycloak custom provider for ProConnect ([05545b5](https://github.com/cloud-pi-native/socle/commit/05545b56e21f7b27dabf3c96d9215d174140e098))
+* :sparkles: Add socleVersion annotation to crd and dsc ([6adcc6c](https://github.com/cloud-pi-native/socle/commit/6adcc6cd74c3145d6389d16c59960732f3017647))
+* :sparkles: CRD and dsc versionning via GitOps ([422ea3e](https://github.com/cloud-pi-native/socle/commit/422ea3ead67be9077dc946984eaf585ea07e125e))
+* :sparkles: Introducing credentials-to-vault admin tool ([58ca77e](https://github.com/cloud-pi-native/socle/commit/58ca77e6626bcaebe14c18596284cad38b97b2b6))
+* :sparkles: Introducing credentials-to-vault admin tool ([ca4465f](https://github.com/cloud-pi-native/socle/commit/ca4465f2224bd669d0d6f16be674010e766a178b))
+* upgrade cnpg controller ([34cbb5e](https://github.com/cloud-pi-native/socle/commit/34cbb5eed400e3b7a856817b5da9017588bdc611))
+
+
+### Bug Fixes
+
+* :bug: Argo CD admin password ([50519fe](https://github.com/cloud-pi-native/socle/commit/50519febfd3026703ebc409055d4ae21a14655ac))
+* :bug: avoid block execution for post-conf job ([cc52d3c](https://github.com/cloud-pi-native/socle/commit/cc52d3c9979a40d8089cbb831bfe5256492f18c5))
+* :bug: internal url for nexus ([9389bd1](https://github.com/cloud-pi-native/socle/commit/9389bd1d37f6ac1c835b744c5d10ea0923ddded7))
+* :bug: Keycloak infra registry values ([07f97f0](https://github.com/cloud-pi-native/socle/commit/07f97f0e7af8541af96ac07b0fa51b37767518af))
+* :wrench: add ARGOCD_INTERNAL_URL environment variable ([ef0060e](https://github.com/cloud-pi-native/socle/commit/ef0060e38bb8b2ce7a2c6a914180ac6a69c4da98))
+* :wrench: add HARBOR_RULE_COUNT environment variable ([81f7729](https://github.com/cloud-pi-native/socle/commit/81f77296a2ab3f8f0e4a4f69a40da7ab50a37440))
+* add missing entry for keycloak sts spec ([3ae065d](https://github.com/cloud-pi-native/socle/commit/3ae065d76a406331023e77f794d8f8e9c2b178fa))
+* fix gitlab cronjob backup s template ([17bcd6e](https://github.com/cloud-pi-native/socle/commit/17bcd6eeff906454bf164c5bb4d5f29ea9b74f82))
+* fix harbor ingress annotation ([1865584](https://github.com/cloud-pi-native/socle/commit/1865584cea6f4b626224206635e792e651461df6))
+* move ansible-job rolebinding to console app ([7588070](https://github.com/cloud-pi-native/socle/commit/7588070786a2b74f0610bde3e9a12dca7643e2e3))
+* use argocd-vault plugin syntax without double quote ([9870d4a](https://github.com/cloud-pi-native/socle/commit/9870d4ac0e18b4a7a0952fe2a09b9122ecdeae87))
+
 ## [4.3.1](https://github.com/cloud-pi-native/socle/compare/v4.3.0...v4.3.1) (2025-12-01)
 
 

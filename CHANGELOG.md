@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.2](https://github.com/cloud-pi-native/socle/compare/v4.4.1...v4.4.2) (2025-12-23)
+
+
+### Bug Fixes
+
+* delete unused task which stop the playbook ([050e90a](https://github.com/cloud-pi-native/socle/commit/050e90a81a636ed6c6ef204b50c970f36370ba94))
+
 ## [4.4.1](https://github.com/cloud-pi-native/socle/compare/v4.4.0...v4.4.1) (2025-12-19)
 
 

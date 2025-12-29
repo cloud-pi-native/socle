@@ -5,7 +5,7 @@ gitlabrunner:
 ## How many old ReplicaSets for this Deployment you want to retain
   revisionHistoryLimit: 2
   
-  gitlabUrl: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.gitlab}>/
+  gitlabUrl: http://gitlab-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8080/
   
   runnerToken: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#runnerToken>
   

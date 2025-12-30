@@ -3,10 +3,11 @@ set -euo pipefail
 
 # Namespace ArgoCD si différent
 ARGO_NS="dso-argocd"
+OUTPUT_SQL="disable_autosync.sql"
 
 # Récupère la liste des noms des anciennes applications en JSON 
 old_app_names=($(kubectl get applications -n "$ARGO_NS" -o json \
-  | jq -r '.items[] | select(.metadata.annotations["argocd.argoproj.io/tracking-id"] | not) | .metadata.name' | grep -v "\-root"))
+  | jq -r '.items[] | select(.metadata.annotations["argocd.argoproj.io/tracking-id"] | not) | .metadata.name' | grep -v "\-root")) || true
 
 echo "Anciennes applications (sans tracking-id) : "
 echo "${old_app_names[*]}"
@@ -86,8 +87,24 @@ for src_name in "${old_app_names[@]}"; do
         echo "  ❌ Patch annulé"
     fi
 
-    read -p "  Voulez-vous supprimer l'application $src_name (non-cascading delete) ? (y/N) " confirm2
+    read -p "  Voulez-vous désactiver l'autosync par la Console de $dst_name ? (y/N) " confirm2
     if [[ "$confirm2" =~ ^[Yy]$ ]]; then
+        # Récupération de l'ID de l'environnement
+        env_id=$(get_label "$src" "dso/environment.id")
+        # Génération de la requête SQL
+        cat >> "$OUTPUT_SQL" <<EOF
+-- Application : $dst_name - Environnement : $env_val
+UPDATE "Environment" SET "autosync" = FALSE
+WHERE id = '$(echo "$env_id" | sed "s/'/''/g")';
+EOF
+        echo "" >> "$OUTPUT_SQL"
+        echo "  ✔ Autosync désactivé pour $dst_name"
+    else
+        echo "  ❌ Update autosync annulé"
+    fi
+
+    read -p "  Voulez-vous supprimer l'application $src_name (non-cascading delete) ? (y/N) " confirm3
+    if [[ "$confirm3" =~ ^[Yy]$ ]]; then
         kubectl -n "$ARGO_NS" patch app "$src_name" -p $'{"metadata": {"finalizers": null}}' --type merge
         kubectl -n "$ARGO_NS" delete app "$src_name"
         echo "  ✔ Suppression de $src_name effectuée"

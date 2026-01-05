@@ -246,6 +246,7 @@
       password: "{{ retrieved_smtp_user_password | default(omit, true) }}"
       auth: "{{ dsc.global.smtp.authentication.enabled }}"
       starttls: "{{ dsc.global.smtp.starttlsEnabled }}"
+      ssl: "{{ dsc.global.smtp.sslEnabled }}"
 
 - name: Create base admins groups
   community.general.keycloak_group:

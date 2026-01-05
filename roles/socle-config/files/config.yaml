@@ -112,6 +112,7 @@ spec:
       authentication:
         enabled: false
       starttlsEnabled: false
+      sslEnabled: false
   grafana:
     namespace: dso-grafana
     subDomain: grafana

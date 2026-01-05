@@ -1053,6 +1053,9 @@ spec:
                         starttlsEnabled:
                           description: Specifies whether we should enable tls encryption.
                           type: boolean
+                        sslEnabled:
+                          description: Specifies whether we should enable ssl.
+                          type: boolean
                         authentication:
                           type: object
                           properties:

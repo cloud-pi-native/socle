@@ -2,7 +2,7 @@ glexporter:
   fullnameOverride: "glexporter"
   config:
     gitlab:
-      url: http://gitlab-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8080/
+      url: http://gitlab-webservice-default.{{ dsc.gitlab.namespace }}.svc.cluster.local:8181/
       token: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
     redis:
       url: "redis://glexporter-redis-master.{{ dsc.gitlab.namespace }}.svc:6379"

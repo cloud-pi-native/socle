@@ -183,6 +183,16 @@ spec:
                     chartVersion:
                       description: AWX Operator helm chart version (e.g., "2.19.1").
                       type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the post-installation Ansible playbooks.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                     defaultAwxVersion:
                       description: |
                         AWX default version related to chartVersion is required only
@@ -200,7 +210,7 @@ spec:
                       type: string
                       default: 10Gi
                     helmRepoUrl:
-                      description: AWX repository url.
+                      description: AWX helm repository url.
                       type: string
                     cnpg:
                       description: Configuration for cnpg clusters.
@@ -215,7 +225,7 @@ spec:
                             - replica
                             - restore
                         exposed:
-                          description: Whether or not the cnpg cluster shoul be exposed via NodePort.
+                          description: Whether or not the cnpg cluster should be exposed via NodePort.
                           type: boolean
                           default: false
                         nodePort:

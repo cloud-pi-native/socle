@@ -1719,13 +1719,14 @@ kubectl explain dsc.spec.global.backup.cnpg
 ## Offline / air gap
 
 En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devront être adaptées.
-- `dsc.sonarqube:`
+- `dsc.sonarqube` :
   - `pluginDownloadUrl` et `prometheusJavaagentVersion`
 - `dsc.gitlabCatalog.catalogRepoUrl`
 - `dsc.argocd.privateGitlabDomain`
 - `dsc.grafanaOperator.ociChartUrl`
 - `helmRepoUrl` pour chaque service à savoir :
   - `argocd`, `certmanager`, `cloudnativepg`, `console`, `glexporter`, `gitlabOperator`, `gitlabrunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
+- `dsc.awx.repoSocle.url` (et optionnellement : `dsc.awx.repoSocle.revision`)
 
 ## Platform
 

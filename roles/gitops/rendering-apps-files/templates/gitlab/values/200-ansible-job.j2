@@ -7,7 +7,7 @@ cpn-ansible-job:
     - /bin/sh
     - -c
     - |
-      git clone https://github.com/cloud-pi-native/socle.git && \
+      git clone {{ dsc.awx.repoSocle.url }} -b {{ dsc.awx.repoSocle.revision }} socle && \
       cd socle && \
       ansible-playbook post-install/gitlab.yaml
     extraEnvFrom:
@@ -22,6 +22,6 @@ cpn-ansible-job:
     - /bin/sh
     - -c
     - |
-      git clone https://github.com/cloud-pi-native/socle.git && \
+      git clone {{ dsc.awx.repoSocle.url }} -b {{ dsc.awx.repoSocle.revision }} socle && \
       cd socle && \
       ansible-playbook post-install/gitlab-ci-catalog.yaml

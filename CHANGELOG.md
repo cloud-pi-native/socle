@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.5.0](https://github.com/cloud-pi-native/socle/compare/v4.4.2...v4.5.0) (2026-01-19)
+
+
+### Features
+
+* enable ssl for keycloak smtp client ([f7b6a62](https://github.com/cloud-pi-native/socle/commit/f7b6a629e956a6a2a6d3f2b29055da5ec40ff588))
+
+
+### Bug Fixes
+
+* gitlab internal url port ([ed91317](https://github.com/cloud-pi-native/socle/commit/ed9131798083ee4077fb3bf3d11e9b444b7584ec))
+* use gitlab internal url for runner adn glexporter ([729b962](https://github.com/cloud-pi-native/socle/commit/729b9628fa500a02e3e19102d16026351b520600))
+
 ## [4.4.2](https://github.com/cloud-pi-native/socle/compare/v4.4.1...v4.4.2) (2025-12-23)
 
 

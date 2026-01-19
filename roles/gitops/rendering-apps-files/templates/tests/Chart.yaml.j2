@@ -1,0 +1,14 @@
+---
+apiVersion: v2
+name: tests 
+type: application
+version: 1.0.0
+dependencies:
+- name: cpn-job
+  alias: console-integration-test
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+- name: cpn-job
+  alias: keycloak-integration-test
+  version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
+  repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}

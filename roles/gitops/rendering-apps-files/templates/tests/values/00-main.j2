@@ -1,0 +1,26 @@
+console-integration-test:
+  job:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/playwright"
+      tag: "1"
+    command:
+    - /bin/bash
+    - -c
+    - ./playwright.sh
+    extraEnvFrom:
+    - secretRef: 
+        name: console-playwright-secret
+    backoffLimit: 1
+keycloak-integration-test:
+  job:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/playwright"
+      tag: "1"
+    command:
+    - /bin/bash
+    - -c
+    - ./playwright.sh
+    extraEnvFrom:
+    - secretRef: 
+        name: keycloak-playwright-secret
+    backoffLimit: 1

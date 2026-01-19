@@ -1027,25 +1027,6 @@ spec:
                           description: Specifies whether we should enable the use of a Docker account for Argo CD.
                           type: boolean
                       type: object
-                    playwright:
-                      type: object
-                      properties:
-                        enabled:
-                          default: false
-                          description: Specifies whether Playwright integration tests should be executed.
-                          type: boolean
-                        mattermost:
-                          type: object
-                          properties:
-                            url:
-                              description: The base URL of the Mattermost server (e.g., https://mattermost.example.com).
-                              type: string
-                            channelId:
-                              description: The ID of the Mattermost channel where test reports will be posted.
-                              type: string
-                            botToken:
-                              description: The Mattermost bot user token used to authenticate API requests.
-                              type: string
                     smtp:
                       properties:
                         enabled:
@@ -1660,6 +1641,31 @@ spec:
                   required:
                     - installEnabled
                   type: object
+                tests:
+                  description: Configuration for Socle dashboards.
+                  required:
+                    - installEnabled
+                  type: object
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: |
+                        Specifies whether we should run integration tests on cluster.
+                      type: boolean
+                    playwright:
+                      type: object
+                      properties:
+                        consoleDestinationCluster:
+                          description: Cluster name where ArgoCD deploys applications.
+                          type: string
+                        consoleValuesFile:
+                          description: Values file for ArgoCD.
+                          type: string
+                    values:
+                      description: |
+                        You can add custom values for tests, they will be merged with roles/gitops/rendering-apps-files/templates/tests/values/
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
                 vault:
                   description: Configuration for Vault.
                   properties:

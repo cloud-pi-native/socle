@@ -17,9 +17,22 @@
     - "{{ dsc.global.gitOps.repo.path }}"
     - applicationSets
 
+- name: Get install-enabled ArgoCD apps
+  ansible.builtin.set_fact:
+    enabled_apps: >-
+      {{ dsc | dict2items | selectattr('value.installEnabled','defined')
+         | selectattr('value.installEnabled','truthy')
+         | map(attribute='key') | reject('equalto','observability') | list
+         + (['observability'] if dsc.observatorium.installEnabled | default(false) else []) }}
+
 - name: Calculate all distinct configured sync waves
   ansible.builtin.set_fact:
-    distinct_waves: "{{ envs | map(attribute='apps') | flatten | map(attribute='syncWave') | unique | sort }}"
+    distinct_waves: >-
+      {{ envs | map(attribute='apps') | flatten
+         | selectattr('syncWave','defined')
+         | selectattr('argocd_app','in',enabled_apps)
+         | map(attribute='syncWave')
+         | unique | sort }}
 
 - name: Render dso-appset template for each sync-waves and write yaml files to destination dir
   vars:

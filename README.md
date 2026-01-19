@@ -50,6 +50,7 @@
 - [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
 - [Gestion des users Keycloak](#gestion-des-users-keycloak)
 - [MFA pour les utilisateurs Keycloak](#mfa-pour-les-utilisateurs-keycloak)
+- [Tests d'intégration](#tests-dintégration)
 - [Contributions](#contributions)
   - [Les commandes de l'application](#les-commandes-de-lapplication)
   - [Conventions](#conventions)
@@ -1810,6 +1811,14 @@ Il sera nécessaire pour activer le MFA sur les utilisateurs existants, de lance
 ```shell
 ansible-playbook admin-tools/keycloak-enforce-mfa.yml
 ```
+
+## Tests d'intégration 
+
+Il est possible d'activer les tests d'intégration sur un environnement en spécifiant le paramètre `dsc.tests.installEnabled` à `true`.  
+Les notifications étant pour l'instant uniquement supporté sur Mattermost dans le code, il faudra alors récupérer l'id du channel et le token du bot pour les insérer dans le Vault d'infrastructure.  
+Pour ce qui concerne les comptes de tests `testuser@example.com` et `secondtestuser@example.com`, il faudra s'assurer que :
+- leurs mots de passe correspondent à ceux qui sont insérés dans le Vault d'infrastructure.
+- le MFA n'est pas appliqué.
 
 ## Contributions
 

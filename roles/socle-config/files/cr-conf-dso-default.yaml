@@ -104,5 +104,6 @@ spec:
   #  no_proxy: .cluster.local,.svc,10.0.0.0/8,127.0.0.1,192.168.0.0/16,api.example.com,api-int.example.com,canary-openshift-ingress-canary.apps.example.com,console-openshift-console.apps.example.com,localhost,oauth-openshift.apps.example.com,svc.cluster.local,localdomain
   #  port: "3128"
   sonarqube: {}
+  tests: {}
   vault: {}
   vaultInfra: {}

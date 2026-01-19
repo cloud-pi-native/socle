@@ -73,11 +73,6 @@
                   mcExtraArgs: "{{ dsc.global.backup.gitlab.mcExtraArgs | default('') }}"
                   pathPrefix: "{{ dsc.global.backup.gitlab.pathPrefix | default('') }}"
                   retentionPolicy: "{{ dsc.global.backup.gitlab.retentionPolicy | default('') }}"
-              playwright:
-                mattermost:
-                  url: "{{ dsc.global.playwright.mattermost.url | default('') }}"
-                  channelId: "{{ dsc.global.playwright.mattermost.channelId | default('') }}"
-                  botToken: "{{ dsc.global.playwright.mattermost.botToken | default('') }}"
               smtp:
                 authentication:
                   user: ""
@@ -241,3 +236,14 @@
             nameSpace: "grafana"
             customNamespacePrefix: ""
             syncWave: 70
+          - argocd_app: tests
+            clusterName: ""
+            nameSpace: "tests"
+            customNamespacePrefix: ""
+            syncWave: 80
+            vault_values:
+              playwright:
+                mattermost:
+                  url: ""
+                  channelId: ""
+                  botToken: ""

@@ -157,7 +157,7 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
 Lorsque vous avez cloné le présent dépôt socle, lancez une première fois la commande suivante depuis votre environnement de déploiement :
 
 ```bash
-ansible-playbook install.yaml
+ansible-playbook install-gitops.yaml
 ```
 
 Elle vous signalera que vous n'avez encore jamais installé le socle sur votre cluster, puis vous invitera à modifier la ressource de scope cluster et de type `dsc` nommée `conf-dso` via la commande suivante :
@@ -546,7 +546,7 @@ Ce playbook fait notamment appel aux roles suivants, situés dans `roles/gitops`
 * `vault-secrets` : sert à peupler le Vault d'infrastructure avec les values de secrets pour notre environnement et les applications associées.
 * `rendering-apps-files` : permet de générer les fichiers de charts Helm des applications du Socle, ainsi que les values et templates associés dans le répertoire `gitops/envs/nom_de_notre_environnement/apps` du clone local de votre dépôt Git. Le role tient compte des paramètres de votre `dsc` lors de la génération, et ajuste le contenu des fichiers en conséquence.
 * `watchpoint` : sert à arrêter le playbook suite à la génération des fichiers de charts, afin de permettre un passage en revue par l'utilisateur avant que ce-dernier n'effectue si besoin un `git push` des changements. Affiche un message en ce sens. Il s'agit du comportement par défaut, contôlé par le paramètre `spec.global.gitOps.watchpointEnabled` de la dsc (positionné à `true` par défaut).
-* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `roles/gitops/dso-app/templates/dso-app.yaml.j2`. La création de cette Application dans Argo CD viendra consommer les applicationSets générés à l'aide du template `roles/gitops/dso-app/templates/dso-appset.yaml.j2` et déposés dans votre dépôt Git utilisé pour le déploiement GitOps. Ceci permet notamment de rendre les applicationSets visibles dans la web UI d'Argo CD. Ce sont ensuite ces mêmes applicationSets qui déploient par vagues les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`. 
+* `dso-app` : déploie l'application `dso-install-manager` dans le namespace de l'Argo CD d'infrastructure en se basant sur le fichier `roles/gitops/dso-app/templates/dso-app.yaml.j2`. La création de cette Application dans Argo CD viendra consommer les applicationSets générés à l'aide du template `roles/gitops/dso-app/templates/dso-appset.yaml.j2` et déposés dans votre dépôt Git utilisé pour le déploiement GitOps. Ceci permet notamment de rendre les applicationSets visibles dans la web UI d'Argo CD. Ce sont ensuite ces mêmes applicationSets qui déploient par vagues les applications du Socle, en allant lire les fichiers JSON se trouvant dans les sous-répertoires de `gitops/envs` qui correspondent à nos environnements. Notons que **le nom d'un environnement doit impérativement correspondre à celui d'une resource `dsc` de configuration, définie dans votre cluster de déploiement**. Par exemple, l'environnement par défaut nommé `conf-dso` correspondra à votre dsc par défaut également nommée `conf-dso`.
 
 Vous constaterez aussi la présence de roles situés dans le répertoire `./roles/gitops/post-install` et qui servent à lancer des tasks de post installation pour les outils concernés. Ces roles sont lus et exécutés à l'aide de jobs Argo CD de post-install, générés pour chacun des outils qui le nécessitent. Les jobs exécutent le chart Helm [cpn-ansible-job](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-ansible-job), positionné en tant que dépendance de chart des outils en question dans votre dépôt Git.
 
@@ -604,7 +604,7 @@ kubectl apply -f roles/socle-config/files/crd-conf-dso.yaml
 
 Passez en revue la ressource dsc de configuration `conf-dso` pour paramétrer le déploiement, en particulier la section `spec.keycloak` puisque c'est cette application du Socle que nous déployons ici à titre d'exemple.
 
-Vérifiez aussi que le paramètre `spec.global.gitOps.watchpointenabled` est bien positionné à `true`. 
+Vérifiez aussi que le paramètre `spec.global.gitOps.watchpointenabled` est bien positionné à `true`.
 
 Dans le dépôt GitOps en local, toujours dans votre branche, positionnez-vous dans le répertoire `gitops/envs` puis dans le sous-répertoire correspondant à l'environnement cible, lequel, pour rappel, **doit impérativement correspondre au nom de votre dsc**.
 
@@ -741,7 +741,7 @@ Passez en revue les paramètres de ce fichier, et notamment :
 * `env` : doit correspondre au nom de l'environnement tel qu'indiqué dans le répertoire `gitops/envs/conf-dso` et dans lequel se trouve le fichier `conf-dso.json`, qui est-lui même nommé d'après le nom de ce même environnement. Ce nom doit également correspondre au nom de la `dsc` que vous utilisez (spécifié via le paramètre `metadata.name` de cette même dsc). Il y a donc **correspondance rigoureuse** entre le nom de l'environnement utilisé ici par le paramètre `env` et celui de la `dsc`. Ce même nom doit se retrouver impérativement dans le nom du répertoire de l'environnement (soit dans notre exemple `gitops/envs/conf-dso`) et celui du fichier de configuration JSON associé (`conf-dso.json`). Sans ces correspondances strictes, l'installation échouera.
 * `customNamespacePrefix` : Il s'agit ici du péfixe de vos namespaces. Ce préfixe doit impérativement se retrouver dans tous les paramètres `namespace` des outils spécifiés dans votre `dsc`, à l'exception des outils d'infrastructure vus précédemment et qui ne sont pas installés en mode GitOps.
 * `destination.clustername` : Si votre Argo CD d'infrastructure n'est pas installé dans le même cluster que le cluster de destination vers lequel vous déployez, préciser alors ici le nom du cluster de destination tel qu'il est connu par votre Argo CD d'infrastructure. S'il est installé dans le même cluster, vous pouvez indiquer "in-cluster".
-* `targetRevision` : Il s'agit du nom de la branche à partir de laquelle vous déployez et depuis laquelle votre instance Argo CD d'infrastructure va aller tirer les fichiers. Dans notre exemple, vous le modifierez et le remplacerez par "ma-branche". 
+* `targetRevision` : Il s'agit du nom de la branche à partir de laquelle vous déployez et depuis laquelle votre instance Argo CD d'infrastructure va aller tirer les fichiers. Dans notre exemple, vous le modifierez et le remplacerez par "ma-branche".
 * `apps` : Ce paramètre est un array qui contient lui-même des objets correspondant chacun à l'une des applications du Socle qui seront déployées, ainsi qu'aux paramètres de cette application lus par les applicationSets Argo CD (`gitops/dso-appset-wave-XX.yaml`). Nous voyons ici que la ligne correspondant à l'application keycloak comprend le paramètre `enabled` positionné à `true`. Ce paramètre est **très important** puisqu'il détermine si une application est installée (`true`) ou pas (`false`). Veuillez noter que si ce paramètre est positionné à `false` et que l'application en question est déjà installée et gérée par notre applicationSet, **alors elle est désinstallée**. Notons aussi la présence du paramètre `namespace`, qui indique le nom du namespace hors préfixe. Il en résulte qu'ici l'application keycloak sera finalement déployée dans le namespace "dso-keycloak", le préfixe venant s'ajouter au nom du namespace.
 
 Compte-tenu des éléments que nous venons de vérifier, et si nous voulons bien déployer uniquement Keycloak dans le namespace dso-keycloak, avec un Argo CD d'infrastructure également présent dans le cluster cible, alors notre fichier `gitops/envs/conf-dso/conf-dso.json`, tenant compte de notre branche de déploiement, se présentera finalement ainsi après édition :
@@ -1048,7 +1048,7 @@ Ceci peut être fait avec la commande suivante en se positionnant sur les namesp
 ```shell
 kubectl config set-context --current --namespace=<namespace>
 kubectl get deploy | grep -v NAME | awk '{print $1}' | xargs --no-run-if-empty kubectl delete deploy && kubectl get sts | grep -v NAME | awk '{print $1}' | xargs --no-run-if-empty kubectl delete sts && kubectl get job | grep -v NAME | awk '{print $1}' | xargs --no-run-if-empty kubectl delete job
-``` 
+```
 
 ### Harbor GitOps
 
@@ -1070,14 +1070,14 @@ Il faut supprimer et remplacer par ce qui suit.
 ```yaml
 harbor:
   s3ImageChartStorage:
-    enabled: true 
+    enabled: true
     accesskey: <accesskey>
     bucket: <bucket>
     region: <region>
     regionendpoint: <regionendpoint>
     secretkey: <secretkey>
 ```
-Puis lancer le playbook d'insertion des secrets dans le Vault d'infrastructure. 
+Puis lancer le playbook d'insertion des secrets dans le Vault d'infrastructure.
 ```shell
 ansible-playbook install-gitops.yaml -t vault-secrets
 ```
@@ -1782,7 +1782,7 @@ kubectl delete cpol replace-kubed
 Puis relancez l'installation de Kyverno, qui va simplement recréer et appliquer immédiatement la policy :
 
 ```bash
-ansible-playbook install.yaml -t kyverno
+ansible-playbook install-gitops.yaml -t kyverno
 ```
 
 Vérifiez la présence du secret `dso-config-pull-secret` dans le(s) namespace(s) souhaité(s) :
@@ -1795,7 +1795,7 @@ Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
 
 ## Gestion des users Keycloak
 
-Il est possible de gérer la création des users dans le realm applicatif (dso) en spécifiant le paramètre `dsc.keycloak.usersGitOpsEnabled` à `true`.  
+Il est possible de gérer la création des users dans le realm applicatif (dso) en spécifiant le paramètre `dsc.keycloak.usersGitOpsEnabled` à `true`.
 Pour migrer vers ce mode de gestion, il est possible d'extraire la liste des utilisateurs existant via un playbook, il suffit de lancer la commande suivante :
 ```shell
 ansible-playbook admin-tools/keycloak-extract-users.yml
@@ -1804,7 +1804,7 @@ Vous pourrez ensuite mettre le contenu de l'extraction dans le fichier, du dép�
 
 ## MFA pour les utilisateurs Keycloak
 
-Le MFA est activé par défaut si le paramètre `dsc.keycloak.usersGitOpsEnabled` est positionné à `true`.  
+Le MFA est activé par défaut si le paramètre `dsc.keycloak.usersGitOpsEnabled` est positionné à `true`.
 Il sera nécessaire pour activer le MFA sur les utilisateurs existants, de lancer en one-shot le playbook suivant :
 ```shell
 ansible-playbook admin-tools/keycloak-enforce-mfa.yml

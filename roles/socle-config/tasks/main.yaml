@@ -84,6 +84,7 @@
           - Si au contraire vous souhaitez utiliser un nom de resource différent, associé à une configuration différente,
           - "alors vous devrez utiliser la commande suivante pour relancer l'installation (exemple avec une dsc nommée conf-perso) :"
           - ""
+          - " ansible-playbook install-gitops.yaml -e dsc_cr=conf-perso "
 
     - name: Exit playbook
       ansible.builtin.meta: end_play

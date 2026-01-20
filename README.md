@@ -133,13 +133,6 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
   - ruby
   - tar
 
-- Modules python requis par certains modules Ansible :
-  - [hvac](https://python-hvac.org/en/stable/overview.html)
-  - [jmespath](https://github.com/jmespath/jmespath.py)
-  - [kubernetes](https://github.com/kubernetes-client/python)
-  - [python-gitlab](https://github.com/python-gitlab/python-gitlab)
-  - [pyyaml](https://github.com/yaml/pyyaml)
-
 - Les collections Ansible suivantes :
   -  [kubernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/)
   -  [community.hashi_vault](https://galaxy.ansible.com/ui/repo/published/community/hashi_vault)
@@ -151,6 +144,35 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
   - [k9s](https://k9scli.io/topics/install/) (utile pour debug et administration)
   - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
   - [yq](https://github.com/mikefarah/yq/#install) (utile pour debug et administration)
+
+### Gestion de l'environnement Python (Recommandé avec uv)
+
+Les dépendances Python (incluant Ansible et ses modules requis) doivent être installées. Nous recommandons l'utilisation de [uv](https://docs.astral.sh/uv/) pour gérer cet environnement de manière isolée et reproductible.
+
+1. **Installation de uv** (si nécessaire) :
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. **Installation des dépendances** :
+   À la racine du projet :
+   ```bash
+   uv sync
+   ```
+   Cette commande créera un environnement virtuel `.venv` et y installera Ansible ainsi que toutes les librairies Python requises.
+
+3. **Activation de l'environnement** :
+   ```bash
+   source .venv/bin/activate
+   ```
+
+4. **Installation des collections Ansible** :
+   Une fois l'environnement activé :
+   ```bash
+   ansible-galaxy collection install kubernetes.core community.hashi_vault
+   ```
+
+> **Note** : Même en utilisant `uv`, vous aurez toujours besoin des outils systèmes (git, tar, etc.) et des binaires (kubectl, helm, etc.) installés par ailleurs (ou via le playbook `install-requirements.yaml`).
 
 ## Configuration
 

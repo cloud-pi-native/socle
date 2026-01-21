@@ -3,11 +3,9 @@
 ## Sommaire <!-- omit in toc -->
 
 - [Introduction](#introduction)
-- [Prérequis](#prérequis)
-- [Configuration](#configuration)
-  - [Utilisation de vos propres values](#utilisation-de-vos-propres-values)
 - [Architecture](#architecture)
-- [Installation en mode GitOps](#installation-en-mode-gitops)
+- [Prérequis](#prérequis)
+- [Installation](#installation)
   - [Prérequis](#prérequis-1)
     - [Configuration du domaine et certificat TLS pour l’Ingress](#configuration-du-domaine-et-certificat-tls-pour-lingress)
       - [Cas 1 : certificat signé par une autorité valide](#cas-1--certificat-signé-par-une-autorité-valide)
@@ -88,152 +86,6 @@ Vous pouvez trouver la version des outils installés dans le fichier [versions.m
 Comme précisé dans le tableau ci-dessus, certains éléments sont optionnels :
 * L'opérateur Grafana et l'instance Grafana ne s'installeront que sur demande explicite, via l'utilisation des tags appropriés. Ceci afin de vous permettre d'opter ou non pour cette solution d'affichage des métriques.
 * Les CRDs de l'opérateur Prometheus ne s'installent que s'il est déjà présent dans le cluster (paramètre `managed` dans notre configuration).
-
-## Prérequis
-
-Cette installation s'effectue par défaut dans un cluster [OpenShift](https://www.redhat.com/fr/technologies/cloud-computing/openshift) opérationnel et correctement démarré.
-
-La plateforme [Kubernetes](https://kubernetes.io/fr/) ([vanilla](https://fr.wikipedia.org/wiki/Logiciel_vanilla)) est également supportée si besoin, via l'option de configuration `global.platform` (cf. section [Configuration](#configuration) ci-dessous).
-
-Un tableau synoptique des prérequis minimaux, pour chaque outil positionné dans votre cluster, est proposé dans le fichier [cluster-requirements.md](cluster-requirements.md).
-
-Vous devrez disposer d'un **accès administrateur au cluster**.
-
-Vous aurez besoin d'une machine distincte du cluster, tournant sous GNU/Linux avec une distribution de la famille Debian ou Red Hat. Cette machine vous servira en tant qu'**environnement de déploiement** [Ansible control node](https://docs.ansible.com/ansible/latest/network/getting_started/basic_concepts.html#control-node). Elle nécessitera donc l'installation d'[Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html), **en version supérieure ou égale à 12**, pour disposer au moins de la commande `ansible-playbook` ainsi que de la collection [community.general](https://github.com/ansible-collections/community.general) à jour.
-
-Toujours sur votre environnement de déploiement, vous devrez :
-
-- Clôner le présent [dépôt](https://github.com/cloud-pi-native/socle).
-- Disposer d'un fichier de configuration `~/.kube/config` paramétré avec les accès administrateur, pour l'appel à l'API du cluster (section users du fichier en question).
-
-L'installation de la suite des prérequis **sur l'environnement de déploiement** s'effectue à l'aide du playbook nommé `install-requirements.yaml`. Il est mis à disposition dans le répertoire `admin-tools` du dépôt socle que vous aurez clôné.
-
-Si l'utilisateur avec lequel vous exécutez ce playbook dispose des droits sudo sans mots de passe (option `NOPASSWD` du fichier sudoers), vous pourrez le lancer directement sans options :
-
-```bash
-ansible-playbook admin-tools/install-requirements.yaml
-```
-
-Sinon, vous devrez utiliser l'option `-K` (abréviation de l'option `--ask-become-pass`) qui vous demandera le mot de passe sudo de l'utilisateur :
-
-```bash
-ansible-playbook -K admin-tools/install-requirements.yaml
-```
-
-Pour information, le playbook `install-requirements.yaml` vous installera les éléments suivants **sur l'environnement de déploiement** :
-
-- Le paquet requis pour bénéficier de la commande `htpasswd` (utilisée pour encrypter le mot de passe d'Argo CD), soit :
-  - apache2-utils (distributions Debian et dérivées)
-  - httpd-tools (distributions Red Hat et dérivées)
-
-- Paquet requis pour l'installation des modules python :
-  - python3-pip
-
-- Paquets requis pour l'installation du gestionnaire de paquets Homebrew :
-  - git
-  - ruby
-  - tar
-
-- Les collections Ansible suivantes :
-  -  [kubernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/)
-  -  [community.hashi_vault](https://galaxy.ansible.com/ui/repo/published/community/hashi_vault)
-
-- Gestionnaire de paquets [Homebrew](https://brew.sh/) pour une installation simplifiée des prérequis restants sur la plupart des distributions GNU/Linux utilisables en production. Testé sous Debian, Ubuntu, Red Hat Enterprise Linux et Rocky Linux.
-
-- Commandes installées avec Homebrew :
-  - [helm](https://helm.sh/docs/intro/install/)
-  - [k9s](https://k9scli.io/topics/install/) (utile pour debug et administration)
-  - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
-  - [yq](https://github.com/mikefarah/yq/#install) (utile pour debug et administration)
-
-### Gestion de l'environnement Python (Recommandé avec uv)
-
-Les dépendances Python (incluant Ansible et ses modules requis) doivent être installées. Nous recommandons l'utilisation de [uv](https://docs.astral.sh/uv/) pour gérer cet environnement de manière isolée et reproductible.
-
-1. **Installation de uv** (si nécessaire) :
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-
-2. **Installation des dépendances** :
-   À la racine du projet :
-   ```bash
-   uv sync
-   ```
-   Cette commande créera un environnement virtuel `.venv` et y installera Ansible ainsi que toutes les librairies Python requises.
-
-3. **Activation de l'environnement** :
-   ```bash
-   source .venv/bin/activate
-   ```
-
-4. **Installation des collections Ansible** :
-   Une fois l'environnement activé :
-   ```bash
-   ansible-galaxy collection install kubernetes.core community.hashi_vault
-   ```
-
-> **Note** : Même en utilisant `uv`, vous aurez toujours besoin des outils systèmes (git, tar, etc.) et des binaires (kubectl, helm, etc.) installés par ailleurs (ou via le playbook `install-requirements.yaml`).
-
-## Configuration
-
-Lorsque vous avez cloné le présent dépôt socle, lancez une première fois la commande suivante depuis votre environnement de déploiement :
-
-```bash
-ansible-playbook install.yaml
-```
-
-Elle vous signalera que vous n'avez encore jamais installé le socle sur votre cluster, puis vous invitera à modifier la ressource de scope cluster et de type `dsc` nommée `conf-dso` via la commande suivante :
-
-```bash
-kubectl edit dsc conf-dso
-```
-
-Vous pourrez procéder comme indiqué si vous le souhaitez, mais pour des raisons de traçabilité et de confort d'édition vous préférerez peut-être déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
-
-```bash
-kubectl apply -f ma-conf-dso.yaml
-```
-
-Pour vous aider à démarrer, le fichier [cr-conf-dso-default.yaml](roles/socle-config/files/cr-conf-dso-default.yaml) est un **exemple** de configuration également utilisé lors de la première installation. Il surcharge les valeurs par défaut des fichiers [config.yaml](roles/socle-config/files/config.yaml) et [releases.yaml](roles/socle-config/files/releases.yaml). Ce fichier doit être adapté à partir de la section **spec**, en particulier pour les éléments suivants :
-* du paramètre `global.rootDomain` (votre domaine principal précédé d'un point),
-* des mots de passe de certains outils,
-* du paramètre `global.platform` (définir à `kubernetes` si vous n'utilisez pas OpenShift),
-* de la taille de certains PVCs,
-* de l'activation ou non des métriques,
-* du proxy si besoin ainsi que des sections CA et ingress.
-
-Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec Argo CD :
-
-```shell
-kubectl explain dsc.spec.argocd
-```
-
-Avant de relancer l'installation avec la dsc configurée, n'hésitez pas à lancer la commande ci-dessus pour obtenir la description de tout champ sur lequel vous avez un doute.
-
-Par ailleurs, les valeurs des helm charts peuvent être surchargées en ajoutant le paramètre `values` au service concerné. Ces `values` dépendent de la [version du helm chart](versions.md) et peuvent être consultées avec la commande `helm show values`. Exemple avec l'opérateur GitLab :
-
-```shell
-helm show values gitlab-operator/gitlab-operator --version 2.4.1
-```
-
-### Utilisation de vos propres values
-
-Comme nous pouvons le voir dans l'exemple de configuration fourni ci-dessus, plusieurs outils sont notamment configurés à l'aide d'un champ `values`.
-
-Il s'agit de valeurs de chart [Helm](https://helm.sh/fr). Vous pouvez les utiliser ici pour surcharger les valeurs par défaut.
-
-Voici les liens vers les documentations de chart Helm pour les outils concernés :
-
-- [Argo CD](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd)
-- [Console Cloud π Native](https://github.com/cloud-pi-native/console#readme)
-- [GitLab](https://gitlab.com/gitlab-org/charts/gitlab)
-- [Harbor](https://github.com/goharbor/harbor-helm)
-- [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
-- [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
-- [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
-
-S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.
 
 ## Architecture
 
@@ -428,7 +280,77 @@ flowchart LR
     Socle_Gitlab -->|R/W| Socle_CNPG_cluster_gitlab
 ```
 
-## Installation en mode GitOps
+## Prérequis
+
+Cette installation s'effectue par défaut dans un cluster [OpenShift](https://www.redhat.com/fr/technologies/cloud-computing/openshift) opérationnel et correctement démarré.
+
+La plateforme [Kubernetes](https://kubernetes.io/fr/) ([vanilla](https://fr.wikipedia.org/wiki/Logiciel_vanilla)) est également supportée si besoin, via l'option de configuration `global.platform` (cf. section [Installation](#installation) ci-dessous).
+
+Un tableau synoptique des prérequis minimaux, pour chaque outil positionné dans votre cluster, est proposé dans le fichier [cluster-requirements.md](cluster-requirements.md).
+
+Vous devrez disposer d'un **accès administrateur au cluster**.
+
+Vous aurez besoin d'une machine distincte du cluster, tournant sous GNU/Linux avec une distribution de la famille Debian ou Red Hat. Cette machine vous servira en tant qu'**environnement de déploiement** [Ansible control node](https://docs.ansible.com/ansible/latest/network/getting_started/basic_concepts.html#control-node). Elle nécessitera donc l'installation d'[Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html), **en version supérieure ou égale à 12**, pour disposer au moins de la commande `ansible-playbook` ainsi que de la collection [community.general](https://github.com/ansible-collections/community.general) à jour.
+
+Toujours sur votre environnement de déploiement, vous devrez :
+
+- Clôner le présent [dépôt](https://github.com/cloud-pi-native/socle).
+- Disposer d'un fichier de configuration `~/.kube/config` paramétré avec les accès administrateur, pour l'appel à l'API du cluster (section users du fichier en question).
+
+L'installation de la suite des prérequis **sur l'environnement de déploiement** s'effectue à l'aide du playbook nommé `install-requirements.yaml`. Il est mis à disposition dans le répertoire `admin-tools` du dépôt socle que vous aurez clôné.
+
+Si l'utilisateur avec lequel vous exécutez ce playbook dispose des droits sudo sans mots de passe (option `NOPASSWD` du fichier sudoers), vous pourrez le lancer directement sans options :
+
+```bash
+ansible-playbook admin-tools/install-requirements.yaml
+```
+
+Sinon, vous devrez utiliser l'option `-K` (abréviation de l'option `--ask-become-pass`) qui vous demandera le mot de passe sudo de l'utilisateur :
+
+```bash
+ansible-playbook -K admin-tools/install-requirements.yaml
+```
+
+Pour information, le playbook `install-requirements.yaml` vous installera les éléments suivants **sur l'environnement de déploiement** :
+
+- Le paquet requis pour bénéficier de la commande `htpasswd` (utilisée pour encrypter le mot de passe d'Argo CD), soit :
+  - apache2-utils (distributions Debian et dérivées)
+  - httpd-tools (distributions Red Hat et dérivées)
+
+- Paquets requis pour l'installation du gestionnaire de paquets Homebrew :
+  - git
+  - ruby
+  - tar
+
+- Les collections Ansible suivantes :
+  -  [kubernetes.core](https://galaxy.ansible.com/ui/repo/published/kubernetes/core/)
+  -  [community.hashi_vault](https://galaxy.ansible.com/ui/repo/published/community/hashi_vault)
+
+- Gestionnaire de paquets [Homebrew](https://brew.sh/) pour une installation simplifiée des prérequis restants sur la plupart des distributions GNU/Linux utilisables en production. Testé sous Debian, Ubuntu, Red Hat Enterprise Linux et Rocky Linux.
+
+- Commandes installées avec Homebrew :
+  - [helm](https://helm.sh/docs/intro/install/)
+  - [k9s](https://k9scli.io/topics/install/) (utile pour debug et administration)
+  - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+  - [uv](https://docs.astral.sh/uv/)
+  - [yq](https://github.com/mikefarah/yq/#install) (utile pour debug et administration)
+
+Enfin, vous devez configurer l'environnement Python. Les dépendances (incluant Ansible et ses modules requis) sont gérées via [uv](https://docs.astral.sh/uv/) pour garantir un environnement isolé et reproductible.
+
+Installez les dépendances et activez l'environnement virtuel :
+
+```bash
+uv sync
+source .venv/bin/activate
+```
+
+Une fois l'environnement activé, installez les collections Ansible :
+
+```bash
+ansible-galaxy collection install kubernetes.core community.hashi_vault
+```
+
+## Installation
 
 Nous proposons dès maintenant un mode d'installation s'appuyant sur l'approche [GitOps](https://en.wikipedia.org/wiki/DevOps#GitOps), et reposant sur une application Argo CD qui déploie plusieurs [applicationSets](https://argo-cd.readthedocs.io/en/stable/user-guide/application-set/) par vagues (notion de [sync waves](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/)). Chaque applicationSet déploie lui-même une ou plusieurs applications du Socle, selon la vague à laquelle elles sont rattachées, ceci en fonction d'un environnement donné et des paramètres qui le caractérisent.
 
@@ -1806,7 +1728,7 @@ kubectl delete cpol replace-kubed
 Puis relancez l'installation de Kyverno, qui va simplement recréer et appliquer immédiatement la policy :
 
 ```bash
-ansible-playbook install.yaml -t kyverno
+ansible-playbook install-gitops.yaml -t kyverno
 ```
 
 Vérifiez la présence du secret `dso-config-pull-secret` dans le(s) namespace(s) souhaité(s) :

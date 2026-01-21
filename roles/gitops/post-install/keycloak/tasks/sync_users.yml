@@ -38,7 +38,7 @@
     credentials: >-
       {{
         omit
-        if item.value.email in (kc_dso_users_list | map(attribute='email') | list)
+        if item.value.email in (kc_dso_users_list | map(attribute='email') | list) or item.value.status != 'active'
         else [
           {
             'type': 'password',

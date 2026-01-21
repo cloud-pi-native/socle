@@ -15,19 +15,19 @@
     <mirror>
       <id>mirror-dso</id>
       <name>mirror-dso</name>
-      <url>https://{{ nexus_domain }}/repository/$${env.PROJECT_PATH}-repository-group/</url>
+      <url>http://nexus.{{ dsc.nexus.namespace }}.svc.cluster.local:8081/repository/$${env.PROJECT_PATH}-repository-group/</url>
       <mirrorOf>*</mirrorOf>
     </mirror>
     <mirror>
       <id>nexus</id>
       <name>nexus</name>
-      <url>https://{{ nexus_domain }}/repository/maven-public/</url>
+      <url>http://nexus.{{ dsc.nexus.namespace }}.svc.cluster.local:8081/repository/maven-public/</url>
       <mirrorOf>*</mirrorOf>
     </mirror>
     <mirror>
       <id>mirror-dso</id>
       <name>mirror-dso</name>
-      <url>https://{{ nexus_domain }}/repository/public/</url>
+      <url>http://nexus.{{ dsc.nexus.namespace }}.svc.cluster.local:8081/repository/public/</url>
       <mirrorOf>*</mirrorOf>
     </mirror>
   </mirrors>
@@ -37,7 +37,7 @@
       <repositories>
         <repository>
           <id>nexus</id>
-          <url>https://{{ nexus_domain }}/repository/$${env.PROJECT_PATH}-repository-group/</url>
+          <url>http://nexus.{{ dsc.nexus.namespace }}.svc.cluster.local:8081/repository/$${env.PROJECT_PATH}-repository-group/</url>
           <releases>
             <enabled>true</enabled>
           </releases>

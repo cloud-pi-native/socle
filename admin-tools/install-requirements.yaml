@@ -11,19 +11,13 @@
         - httpd-tools
       common:
         - git
-        - python3-pip
         - ruby
         - tar
-    python_modules:
-      - hvac
-      - jmespath
-      - kubernetes
-      - python-gitlab
-      - pyyaml
     apps:
       - helm
       - k9s
       - kubectl
+      - uv
       - yq # Go version, i.e. https://github.com/mikefarah/yq
     ansible_modules:
       - kubernetes.core # ansible 2.19+ requires kubernetes.core >= 5.3
@@ -53,12 +47,6 @@
         name: "{{ item }}"
         state: present
       loop: "{{ packages.common }}"
-
-    - name: "Install Python modules"
-      ansible.builtin.pip:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ python_modules }}"
 
     - name: "Install ansible modules"
       community.general.ansible_galaxy_install:

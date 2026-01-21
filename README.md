@@ -158,7 +158,7 @@ Pour information, le playbook `install-requirements.yaml` vous installera les é
 Lorsque vous avez cloné le présent dépôt socle, lancez une première fois la commande suivante depuis votre environnement de déploiement :
 
 ```bash
-ansible-playbook install.yaml
+ansible-playbook install-gitops.yaml
 ```
 
 Elle vous signalera que vous n'avez encore jamais installé le socle sur votre cluster, puis vous invitera à modifier la ressource de scope cluster et de type `dsc` nommée `conf-dso` via la commande suivante :
@@ -1784,7 +1784,7 @@ kubectl delete cpol replace-kubed
 Puis relancez l'installation de Kyverno, qui va simplement recréer et appliquer immédiatement la policy :
 
 ```bash
-ansible-playbook install.yaml -t kyverno
+ansible-playbook install-gitops.yaml -t kyverno
 ```
 
 Vérifiez la présence du secret `dso-config-pull-secret` dans le(s) namespace(s) souhaité(s) :

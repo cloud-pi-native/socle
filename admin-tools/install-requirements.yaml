@@ -11,15 +11,8 @@
         - httpd-tools
       common:
         - git
-        - python3-pip
         - ruby
         - tar
-    python_modules:
-      - hvac
-      - jmespath
-      - kubernetes
-      - python-gitlab
-      - pyyaml
     apps:
       - helm
       - k9s

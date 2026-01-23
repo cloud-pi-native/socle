@@ -79,7 +79,7 @@ spec:
     # https://github.com/cloud-pi-native/helm-charts/tags
     observabilityChartVersion: ">=0.0.0 <1.0.0"
     # https://github.com/cloud-pi-native/helm-charts/tags
-    observabilityPluginVersion: "v1.1.6"
+    observabilityPluginVersion: "v1.1.7"
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.8.1

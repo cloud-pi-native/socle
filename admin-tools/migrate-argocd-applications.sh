@@ -87,18 +87,18 @@ for src_name in "${old_app_names[@]}"; do
         echo "  ❌ Patch annulé"
     fi
 
-    read -p "  Voulez-vous désactiver l'autosync par la Console de $dst_name ? (y/N) " confirm2
+    read -p "  Voulez-vous réactiver l'autosync par la Console de $dst_name ? (y/N) " confirm2
     if [[ "$confirm2" =~ ^[Yy]$ ]]; then
         # Récupération de l'ID de l'environnement
         env_id=$(get_label "$src" "dso/environment.id")
         # Génération de la requête SQL
         cat >> "$OUTPUT_SQL" <<EOF
 -- Application : $dst_name - Environnement : $env_val
-UPDATE "Environment" SET "autosync" = FALSE
+UPDATE "Environment" SET "autosync" = TRUE
 WHERE id = '$(echo "$env_id" | sed "s/'/''/g")';
 EOF
         echo "" >> "$OUTPUT_SQL"
-        echo "  ✔ Autosync désactivé pour $dst_name"
+        echo "  ✔ Autosync réactivé pour $dst_name"
     else
         echo "  ❌ Update autosync annulé"
     fi

@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.1](https://github.com/cloud-pi-native/socle/compare/v4.5.0...v4.5.1) (2026-01-26)
+
+
+### Bug Fixes
+
+* keycloak user as gitops - dont update the password of inactivated user ([ff607b5](https://github.com/cloud-pi-native/socle/commit/ff607b5dceee26348ac2106cc105b7f8a1c36b53))
+
 ## [4.5.0](https://github.com/cloud-pi-native/socle/compare/v4.4.2...v4.5.0) (2026-01-19)
 
 

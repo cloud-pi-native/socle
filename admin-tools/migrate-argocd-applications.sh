@@ -81,8 +81,11 @@ for src_name in "${old_app_names[@]}"; do
 
     read -p "  Voulez-vous appliquer le .spec.source de $src_name (gauche) sur $dst_name (droite) ? (y/N) " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        kubectl patch application "$dst_name" -n "$ARGO_NS" -p $"spec:\n  source:\n    $spec_src"
+        patch_src=$(echo "$spec_src" | yq -o=json '. | {"spec": {"source": .}}')
+        kubectl patch application "$dst_name" -n "$ARGO_NS" -p "$patch_src"
         echo "  ✔ Patch appliqué à $dst_name"
+        spec_dst=$(get_spec_source "$dst_name")
+        diff --color -y <(echo "$spec_src") <(echo "$spec_dst") || true
     else
         echo "  ❌ Patch annulé"
     fi

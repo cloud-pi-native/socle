@@ -11,15 +11,8 @@
         - httpd-tools
       common:
         - git
-        - python3-pip
         - ruby
         - tar
-    python_modules:
-      - hvac
-      - jmespath
-      - kubernetes
-      - python-gitlab
-      - pyyaml
     apps:
       - helm
       - k9s
@@ -53,12 +46,6 @@
         name: "{{ item }}"
         state: present
       loop: "{{ packages.common }}"
-
-    - name: "Install Python modules"
-      ansible.builtin.pip:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ python_modules }}"
 
     - name: "Install ansible modules"
       community.general.ansible_galaxy_install:

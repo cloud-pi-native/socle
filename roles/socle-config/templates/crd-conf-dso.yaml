@@ -189,7 +189,7 @@ spec:
                       properties:
                         url:
                           type: string
-                          description: URL of the socle Git repository containing the post-installation Ansible playbooks.
+                          description: URL of the socle Git repository containing the Awx post-installation Ansible playbook.
                         revision:
                           type: string
                           description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
@@ -491,6 +491,16 @@ spec:
                     chartVersion:
                       description: GitLab chart version (e.g., "6.11.10").
                       type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Gitlab post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                     pvcGitalySize:
                       description: Size for Gitaly persistent volume.
                       type: string
@@ -720,6 +730,16 @@ spec:
                     namespace:
                       description: The namespace for Global configuration.
                       type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Global post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                     values:
                       description: |
                         You can add custom values for Global configuration, they will be merged with roles/gitops/rendering-apps-files/templates/global/
@@ -1113,6 +1133,16 @@ spec:
                     chartVersion:
                       description: Harbor helm chart version (e.g., "1.12.2").
                       type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Harbor post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                     pvcRegistrySize:
                       description: Size for registry persistent volume.
                       type: string
@@ -1290,6 +1320,16 @@ spec:
                     chartVersion:
                       description: Keycloak Bitnami chart version (e.g., "16.0.3").
                       type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Keycloak post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1602,6 +1642,16 @@ spec:
                     chartVersion:
                       description: SonarQube helm chart version (e.g., "10.2.1+800").
                       type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Sonarqube post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1688,6 +1738,16 @@ spec:
                     chartVersion:
                       description: Hashicorp Vault helm chart version (e.g., "0.25.0").
                       type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Vault post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                     pvcSize:
                       description: Size for Vault persistent volume.
                       type: string

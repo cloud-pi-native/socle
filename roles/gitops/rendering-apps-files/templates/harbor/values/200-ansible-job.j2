@@ -7,7 +7,7 @@ cpn-ansible-job:
     - /bin/sh
     - -c
     - |
-      git clone {{ dsc.awx.repoSocle.url }} -b {{ dsc.awx.repoSocle.revision }} socle && \
+      git clone {{ dsc.harbor.repoSocle.url }} -b {{ dsc.harbor.repoSocle.revision }} socle && \
       cd socle && \
       ansible-playbook post-install/harbor.yaml
     extraEnvFrom:

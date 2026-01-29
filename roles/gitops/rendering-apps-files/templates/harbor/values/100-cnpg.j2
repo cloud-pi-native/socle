@@ -57,6 +57,12 @@ cluster:
       schedule: 0 0 */6 * * *                                                              
       backupOwnerReference: self
       method: barmanObjectStore
+{% if dsc.global.cloudProvider is defined and dsc.global.cloudProvider == 'Scaleway' %}
+    wal:
+      encryption: ''
+    data:
+      encryption: ''
+{% endif %}
 {% if dsc.global.backup.s3.endpointCA is defined %}
     endpointCA:
       create: true

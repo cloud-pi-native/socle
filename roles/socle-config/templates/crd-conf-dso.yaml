@@ -983,6 +983,10 @@ spec:
                               type: string
                           type: object
                       type: object
+                    cloudProvider:
+                      description: |
+                        Cloud provider (AWS, GCP, Azure, Scaleway...).
+                      type: string
                     platform:
                       default: openshift
                       description: |

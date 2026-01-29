@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Namespace ArgoCD si différent
 ARGO_NS="dso-argocd"
-OUTPUT_SQL="disable_autosync.sql"
+OUTPUT_SQL="enable_autosync.sql"
 
 # Récupère la liste des noms des anciennes applications en JSON 
 old_app_names=($(kubectl get applications -n "$ARGO_NS" -o json \
@@ -82,7 +82,7 @@ for src_name in "${old_app_names[@]}"; do
     read -p "  Voulez-vous appliquer le .spec.source de $src_name (gauche) sur $dst_name (droite) ? (y/N) " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
         patch_src=$(echo "$spec_src" | yq -o=json '. | {"spec": {"source": .}}')
-        kubectl patch application "$dst_name" -n "$ARGO_NS" -p "$patch_src"
+        kubectl patch application "$dst_name" -n "$ARGO_NS" --type merge -p "$patch_src"
         echo "  ✔ Patch appliqué à $dst_name"
         spec_dst=$(get_spec_source "$dst_name")
         diff --color -y <(echo "$spec_src") <(echo "$spec_dst") || true
@@ -119,3 +119,6 @@ done
 
 echo ""
 echo "=== Terminé ==="
+echo ""
+echo "Script SQL à passer sur la base de données : $OUTPUT_SQL"
+cat "$OUTPUT_SQL"

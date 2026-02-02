@@ -423,6 +423,10 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
+                        values:
+                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                   required:
                     - installEnabled
                   type: object
@@ -565,6 +569,10 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
+                        values:
+                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                   required:
                     - installEnabled
                   type: object
@@ -1205,6 +1213,10 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
+                        values:
+                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                   required:
                     - pvcRegistrySize
                     - installEnabled
@@ -1375,6 +1387,10 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
+                        values:
+                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                   required:
                     - installEnabled
                   type: object
@@ -1688,6 +1704,10 @@ spec:
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
+                        values:
+                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                   required:
                     - installEnabled
                   type: object

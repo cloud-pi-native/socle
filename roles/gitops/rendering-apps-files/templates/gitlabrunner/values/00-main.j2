@@ -59,6 +59,7 @@ gitlabrunner:
     # runner configuration: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
     config: |
       [[runners]]
+        request_concurrency = 4
 {% if dsc.exposedCA.type != 'none' %}
         tls-ca-file = "/home/gitlab-runner/.gitlab-runner/certs/tls.crt"
 {% endif %}

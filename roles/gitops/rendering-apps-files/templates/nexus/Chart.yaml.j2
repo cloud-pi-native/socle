@@ -5,6 +5,6 @@ type: application
 version: {{ dsc.nexus.chartVersion }}
 dependencies:
 - name: nexus3
-  alias: nexus3
+  alias: nexus
   version: {{ dsc.nexus.chartVersion }}
   repository: "{{ dsc.nexus.helmRepoUrl if 'oci://' in dsc.nexus.helmRepoUrl else dsc.nexus.helmRepoUrl ~ '/nexus' }}"

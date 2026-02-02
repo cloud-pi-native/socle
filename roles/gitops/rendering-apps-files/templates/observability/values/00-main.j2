@@ -1,24 +1,4 @@
 observatorium:
-  global:
-    projects:
-      console:
-        envs:
-          hprod:
-            groups:
-            - /admin
-            - /admin
-            tenants:
-              hprod-dso: {}
-          prod:
-            groups:
-            - /admin
-            - /admin
-            tenants:
-              prod-dso: {}
-        projectName: dso
-        projectRepository:
-          path: roles/gitops/rendering-apps-files/templates/dashboard
-          url: https://github.com/cloud-pi-native/socle.git
   ingress:
     enabled: false
   api:

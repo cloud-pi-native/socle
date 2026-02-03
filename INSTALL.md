@@ -13,7 +13,7 @@ Vous aurez besoin d'une machine avec les outils suivants installés :
 - [Git](https://git-scm.com/install/)
 - [uv](https://docs.astral.sh/uv/)
 - [Python 3](https://www.python.org/downloads/)
-- [Ansible](https://docs.ansible.com/projects/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible-with-pip)
+- [Ansible 12+](https://docs.ansible.com/projects/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible-with-pip)
   - [Ansible Galaxy](https://galaxy.ansible.com/docs/install/index.html) pour la gestion des collections Ansible (par défaut, elle est installée avec Ansible)
   - La collection [kubernetes.core](https://docs.ansible.com/projects/ansible/latest/collections/kubernetes/core/index.html)
   - La collection [community.hashi_vault](https://docs.ansible.com/projects/ansible/latest/collections/community/hashi_vault/index.html)

@@ -7,8 +7,7 @@ redis:
     repository: "{{ dsc.global.registry }}"
 {% endif %}
 
-{% if use_image_pull_secrets %}
+{% if dsc.global.imagePullSecrets is defined %}
 global:
-  imagePullSecrets: 
-  - name: dso-config-pull-secret
+  imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

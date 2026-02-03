@@ -5,9 +5,8 @@ cluster:
     primaryUpdateMethod: restart
     enablePDB: false
     imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloak.cnpg.imageName }}"
-{% if use_image_pull_secrets %}
-    imagePullSecrets:
-    - name: dso-config-pull-secret
+{% if dsc.global.imagePullSecrets is defined %}
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}
     initdb:
       owner: "keycloak"

@@ -1007,9 +1007,15 @@ spec:
                     registry:
                       description: Specifies the internal registry to use.
                       type: string
-                    imagePullSecretsData:
-                      description: Specifies the credentials to use for pulling image, encoded in base64.
-                      type: string
+                    imagePullSecrets:
+                      description: Specifies the image pull secrets to use.
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            description: The name of the image pull secret.
+                            type: string
                     profile:
                       description: Specifies security profile (e.g., cis).
                       type: string

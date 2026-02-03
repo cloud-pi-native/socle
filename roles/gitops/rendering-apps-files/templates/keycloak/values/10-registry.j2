@@ -2,14 +2,10 @@ keycloak:
   global:
     security:
       allowInsecureImages: true
+{% if dsc.global.imagePullSecrets is defined %}
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
+{% endif %}
   image:
     registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>
     repository: bitnamilegacy/keycloak
     pullPolicy: "IfNotPresent"
-
-{% if use_image_pull_secrets %}
-keycloak:
-  global:
-    imagePullSecrets:
-    - dso-config-pull-secret
-{% endif %}

@@ -2,7 +2,6 @@ cloudnativepg:
   image:
     registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloudnative-pg/cloudnative-pg
 
-{% if use_image_pull_secrets %}
-  imagePullSecrets:
-    - name: dso-config-pull-secret
+{% if dsc.global.imagePullSecrets is defined %}
+  imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

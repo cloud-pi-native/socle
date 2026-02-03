@@ -6,8 +6,7 @@ image:
   repository: bitnamilegacy/keycloak
   pullPolicy: "IfNotPresent"
 
-{% if use_image_pull_secrets %}
+{% if dsc.global.imagePullSecrets is defined %}
 global:
-  imagePullSecrets: 
-  - dso-config-pull-secret
+  imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

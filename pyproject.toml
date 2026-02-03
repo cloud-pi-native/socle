@@ -3,9 +3,9 @@ name = "dso-socle"
 version = "4.5.0"
 description = "Outillage d'installation de la plateforme Cloud Pi Native"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
-  "ansible>=13.2.0",
+  "ansible>=12.0.0,<14.0.0",
   "hvac>=2.4.0",
   "jmespath>=1.0.1",
   "kubernetes>=35.0.0",

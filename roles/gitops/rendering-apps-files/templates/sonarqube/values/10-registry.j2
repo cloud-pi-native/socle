@@ -1,6 +1,5 @@
-{% if use_image_pull_secrets %}
+{% if dsc.global.imagePullSecrets is defined %}
 sonarqube:
   image:
-    pullSecrets:
-    - name: dso-config-pull-secret
+    pullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

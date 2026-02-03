@@ -11,9 +11,8 @@ argocd:
       repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/library/redis
       tag: 7.4.1-alpine
 
-{% if use_image_pull_secrets %}
+{% if dsc.global.imagePullSecrets is defined %}
 argocd:
   global:
-    imagePullSecrets:
-    - name: dso-config-pull-secret
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

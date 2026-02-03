@@ -21,11 +21,6 @@
         - always
       when: dsc.global.offline
 
-    - role: imagepullsecret
-      tags:
-        - always
-      when: use_image_pull_secrets
-
     - role: prometheus
       tags:
         - prometheus

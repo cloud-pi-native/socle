@@ -908,57 +908,31 @@ Pour un déploiement sur un cluster qui n'est pas de la famille d'Openshift, par
 profile: cis
 ```
 
-## Utilisation de credentials Docker Hub pour le pull des images
+## Utilisation de credentials pour le pull des images de registres privés
 
-Si vous disposez d'un compte Docker Hub, il est possible de l'utiliser pour le pull d'images des outils de la plateforme elle-même.
+Il est possible d'utiliser des secrets de type docker-registry pour le pull des images des outils de la plateforme elle-même depuis un registre privé.
 
-Ceci peut se révéler utile si vous effectuez de nombreux tests d'installation, et que vous vous retrouvez confronté à la problématique des [pull rate limits](https://www.docker.com/increase-rate-limits) de Docker Hub.
+### Gestion des secrets de type docker-registry
 
-Pour cela, générez tout d'abord un secret de type `kubernetes.io/dockerconfigjson` en mode dry run et qui contiendra vos identifiants Docker Hub.
+L'**équipe Infrastructure** est chargée de créer les secrets de type docker-registry lors de la phase de provisionnement initial du cluster.  
+Si ces secrets ne sont pas présents ou ne peuvent pas être automatisés à la source, l'équipe Ops est responsable de leur **création manuelle** dans le cluster
 
-Vous en récupérerez le contenu encodé en base64, en une seule fois, via la commande suivante (à adapter avec vos identifiants) :
+### Configuration `dsc`
 
-```bash
-k create secret docker-registry docker-hub-creds \
-    --docker-server="https://index.docker.io/v1/" \
-    --docker-username="email@example.com" \
-    --docker-password="mot_de_passe_ici" \
-    --docker-email="email@example.com" \
-    --dry-run=client \
-    -o yaml \
-    | yq '.data[.dockerconfigjson]'
-```
+Pour que le socle technique utilise ces secrets lors de l'installation, il suffit de référencer les noms des secrets existants dans votre ressource `dsc` (par défaut `conf-dso`)
 
-Notez que du fait de l'utilisation de l'option `dry-run`, le secret n'est pas véritablement créé. La partie qui nous intéresse, encodée en base64, est simplement affichée sur la sortie standard.
-
-Copiez cette sortie, et collez-la dans la section `spec.global.imagePullSecretsData` de votre resource dsc (par défaut `conf-dso`), exemple :
+Modifiez le champ `global.imagePullSecrets` en y insérant la liste des noms de secrets sous forme d'objets, comme dans l'exemple suivant :
 
 ```yaml
-global:
-  imagePullSecretsData: valeur_récupérée_ici
+spec:
+  global:
+    imagePullSecrets:
+      - name: "test-secret-registry"
 ```
 
-Une fois le changement appliqué à la dsc, relancez l'installation de l'outil souhaité ou de la chaîne DSO complète. Le processus d'installation va maintenant s'appuyer sur le secret `dso-config-pull-secret` créé dans le namespace `default`, utilisant vos identifiants Docker Hub, et répliqué dans le namespace de chaque outil.
+Une fois la `dsc` mise à jour et appliquée, le processus d'installation s'appuiera sur ces références pour autoriser le pull des images.
 
-Si vous constatez que la réplication du secret n'a pas lieu ou qu'elle prend trop de temps, supprimez préalablement la ClusterPolicy Kyverno `replace-kubed` :
-
-```bash
-kubectl delete cpol replace-kubed
-```
-
-Puis relancez l'installation de Kyverno, qui va simplement recréer et appliquer immédiatement la policy :
-
-```bash
-ansible-playbook install-gitops.yaml -t kyverno
-```
-
-Vérifiez la présence du secret `dso-config-pull-secret` dans le(s) namespace(s) souhaité(s) :
-
-```bash
-kubectl get secrets -A | egrep 'NAME|dso-config-pull-secret'
-```
-
-Puis relancez l'installation de l'outil voulu ou de la chaîne complète.
+Si vous constatez que les secrets ne sont pas correctement propagés ou reconnus dans les namespaces cibles, assurez-vous que la ClusterPolicy Kyverno chargée de la réplication est active, ou contactez l'équipe Ops pour vérifier la disponibilité du secret nommé dans le namespace concerné.
 
 ## Gestion des users Keycloak
 

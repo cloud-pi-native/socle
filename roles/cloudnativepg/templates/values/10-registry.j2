@@ -3,7 +3,6 @@ image:
   repository: "{{ dsc.global.registry }}/cloudnative-pg/cloudnative-pg"
 {% endif %}
 
-{% if use_image_pull_secrets %}
-imagePullSecrets:
-- name: dso-config-pull-secret
+{% if dsc.global.imagePullSecrets is defined %}
+imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

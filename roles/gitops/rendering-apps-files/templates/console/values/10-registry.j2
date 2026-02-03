@@ -10,8 +10,8 @@ console:
       registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>"
       repository: "postgres:15.3"
 
-{% if use_image_pull_secrets %}
+{% if dsc.global.imagePullSecrets is defined %}
   global:
-    imagePullSecrets:
-    - dso-config-pull-secret
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}
+

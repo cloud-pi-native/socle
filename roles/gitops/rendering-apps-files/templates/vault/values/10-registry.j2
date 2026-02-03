@@ -16,9 +16,7 @@ vault:
       image:
         repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
 
-{% if use_image_pull_secrets %}
-vault:
+{% if dsc.global.imagePullSecrets is defined %}
   global:
-    imagePullSecrets:
-    - name: dso-config-pull-secret
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

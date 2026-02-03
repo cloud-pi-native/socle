@@ -49,6 +49,10 @@ global:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-webservice-ce"
     workhorse:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-workhorse-ce"
+{% if dsc.global.imagePullSecrets is defined %}
+  image:
+    pullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
+{% endif %}
 
 shared-secrets:
   selfsign:
@@ -74,9 +78,4 @@ redis:
     image:
       registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>"
 
-{% if use_image_pull_secrets %}
-global:
-  image:
-    pullSecrets:
-    - name: dso-config-pull-secret
-{% endif %}
+

@@ -4,9 +4,9 @@ cluster:
   cluster:
     primaryUpdateMethod: restart
     enablePDB: false
-{% if use_image_pull_secrets %}
-    imagePullSecrets:
-    - name: dso-config-pull-secret
+
+{% if dsc.global.imagePullSecrets is defined %}
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}
     initdb:
       owner: awx

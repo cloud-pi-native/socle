@@ -67,6 +67,8 @@
       default_branch_protection: 0
       import_sources:
         - git
+      restricted_visibility_levels:
+        - public
     body_format: form-urlencoded
   changed_when: true
 

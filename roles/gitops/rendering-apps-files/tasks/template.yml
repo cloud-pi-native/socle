@@ -107,10 +107,14 @@
         combine_user_values: >-
           {%- set app_name = item.1.argocd_app -%}
           {%- if app_name == 'gitlab' -%}
+            {%- if 'cnpg' in dsc.gitlab and 'values' in dsc.gitlab['cnpg'] -%}
           {{ {} | combine({app_name: dsc.gitlabOperator['values'], 'cluster': dsc[app_name]['cnpg']['values']}) }}
+            {%- else -%}
+          {{ {} | combine({app_name: dsc.gitlabOperator['values']}) }}
+            {%- endif -%}
           {%- elif app_name == 'cloudnativepg' -%}
           {{ {} | combine({app_name: dsc[app_name]['operator']['values']}) }}
-          {%- elif dsc[app_name]['cnpg'] is defined and dsc[app_name]['cnpg']['values'] is defined -%}
+          {%- elif 'cnpg' in dsc[app_name] and 'values' in dsc[app_name]['cnpg'] -%}
           {{ {} | combine({app_name: dsc[app_name]['values'], 'cluster': dsc[app_name]['cnpg']['values']}) }}
           {%- else -%}
           {{ {} | combine({app_name: dsc[app_name]['values']}) }}

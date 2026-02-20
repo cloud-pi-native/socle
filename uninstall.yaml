@@ -1,17 +1,6 @@
 - name: Désinstallation du socle DSO
   hosts: localhost
   gather_facts: false
-  vars:
-    grafana_dashboards:
-      - argo-cd
-      - gitlab-ci-pipelines
-      - gitlab-gitaly
-      - gitlab-runner
-      - harbor
-      - keycloak
-      - nexus
-      - sonarqube
-      - vault
 
   tasks:
     - name: "Récupération de la conf socle à partir de la dsc conf-dso (défaut)"

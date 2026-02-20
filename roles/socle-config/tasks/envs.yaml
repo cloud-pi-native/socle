@@ -231,16 +231,11 @@
             vault_values:
               auth:
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
-          - argocd_app: dashboard
-            clusterName: ""
-            nameSpace: "grafana"
-            customNamespacePrefix: ""
-            syncWave: 70
           - argocd_app: tests
             clusterName: ""
             nameSpace: "tests"
             customNamespacePrefix: ""
-            syncWave: 80
+            syncWave: 70
             vault_values:
               playwright:
                 mattermost:

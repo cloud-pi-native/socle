@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "zone-{{ .Values.zoneName }}-app"
+  namespace: {{ .Release.Namespace }}
+spec:
+  destination:
+    namespace: {{ .Release.Namespace }}
+    server: https://kubernetes.default.svc
+  project: "zone-{{ .Values.zoneName }}-project"
+  sources:
+  - chart: dso-argocd-zone
+    targetRevision: {{ .Values.zoneChartVersion | default ">=1.0.0 <2.0.0" | quote }}
+    repoURL: https://cloud-pi-native.github.io/helm-charts
+    helm:
+      valueFiles:
+      - ./values.yaml
+      - $argocdValues/argocd-values.yaml
+      values: |
+        dsoZoneRepo: {{ .Values.dsoZoneRepo }}
+        autosync: true
+  - repoURL: {{ .Values.dsoZoneRepo }}
+    targetRevision: HEAD
+    ref: argocdValues
+  syncPolicy:
+        automated:
+          enabled: true
+          prune: true
+          selfHeal: true

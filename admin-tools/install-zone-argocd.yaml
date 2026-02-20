@@ -1,0 +1,17 @@
+---
+- name: Install zone ArgoCD
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    custom_values_file_path: "{{ lookup('env', 'CUSTOM_VALUES_FILE_PATH') }}"
+    vaultinfra_domain: "{{ lookup('env', 'VAULT_INFRA_DOMAIN') }}"
+    vault_infra_token: "{{ lookup('env', 'VAULT_INFRA_TOKEN') }}"
+    env_name: "{{ lookup('env', 'ENV_NAME') }}"
+    dsc_name: "{{ lookup('env', 'DSC_NAME') | default('conf-dso', true) }}"
+    target_namespace: "{{ lookup('env', 'ARGOCD_NAMESPACE') | default('argo-cpin', true) }}"
+
+  tasks:
+    - name: Import install-zone-argocd role
+      ansible.builtin.import_role:
+        name: admin-tools/install-zone-argocd

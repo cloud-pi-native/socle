@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: "zone-{{ .Values.zoneName }}-project"
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: "Projet contenant l'Application responsable de tous les déploiements par zone"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  sourceRepos:
+    - https://cloud-pi-native.github.io/helm-charts
+    - {{ .Values.dsoZoneRepo }}
+  destinations:
+    - namespace: {{ .Release.Namespace }}
+      server: "https://kubernetes.default.svc"

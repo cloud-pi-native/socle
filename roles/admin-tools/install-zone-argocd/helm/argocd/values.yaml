@@ -1,0 +1,65 @@
+# -- Nom court de la zone
+zoneName:
+# -- L'URL du repo de la zone dans le GitLab DSO dans le groupe infra (n'oubliez pas le .git à la fin)
+dsoZoneRepo:
+
+# -- Le nom de domaine de l'instance Argo CD
+global:
+  domain:
+
+# -- Les valeurs du chart Helm ArgoCD (pour plus d'informations consultez le lien suivant: https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/README.md)
+argo-cd:
+  configs:
+    rbac:
+      scopes: "[groups]"
+      policy.default: role:nada
+      policy.csv: |
+        p, role:admin, *, *, */*, allow
+        p, role:nada, applicationsets, *, */*, deny
+        p, role:nada, applications, *, */*, deny
+        p, role:nada, logs, get, */*, allow
+        p, role:nada, exec, *, */*, deny
+        p, role:nada, certificates, *, *, deny
+        p, role:nada, accounts, *, *, deny
+        p, role:nada, gpgkeys, *, *, deny
+        p, role:nada, projects, *, *, deny
+        p, role:nada, clusters, *, *, deny
+        p, role:nada, repositories, get, *, allow
+        g, system:cluster-admins, role:admin
+        g, cluster-admins, role:admin
+        g, /admin, role:admin
+        g, admin, role:admin
+    
+    resource.exclusions: |
+        - apiGroups:
+          - tekton.dev
+          clusters:
+          - '*'
+          kinds:
+          - TaskRun
+          - PipelineRun
+        - apiGroups:
+          - wgpolicyk8s.io
+          - aquasecurity.github.io
+          clusters:
+          - '*'
+          kinds:
+          - '*'
+        - apiGroups:
+          - postgresql.cnpg.io
+          clusters:
+          - '*'
+          kinds:
+          - Backup
+        - apiGroups:
+          - reports.kyverno.io
+          clusters:
+          - '*'
+          kinds:
+          - EphemeralReport
+        - apiGroups:
+          - reports.kyverno.io/v1
+          clusters:
+          - '*'
+          kinds:
+          - EphemeralReport

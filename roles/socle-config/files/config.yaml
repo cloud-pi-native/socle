@@ -55,7 +55,6 @@ spec:
   cpnIntegrationTestJob:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
-  dashboard: {}
   gitlab:
     installEnabled: true
     namespace: dso-gitlab

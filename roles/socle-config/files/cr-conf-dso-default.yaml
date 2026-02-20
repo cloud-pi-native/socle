@@ -65,7 +65,6 @@ spec:
   console: {}
   cpnAnsibleJob: {}
   cpnIntegrationTestJob: {}
-  dashboard: {}
   gitlab: {}
   glexporter: {}
   gitlabOperator: {}

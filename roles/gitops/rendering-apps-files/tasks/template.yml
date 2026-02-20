@@ -99,7 +99,6 @@
   when: install_enabled
   block:
     - name: Compute "{{ item.1.argocd_app }}" Helm values
-      when: item.1.argocd_app != "dashboard"
       ansible.builtin.include_role:
         name: combine
       vars:
@@ -122,16 +121,8 @@
         combine_dest_var: "{{ item.1.argocd_app }}_values"
 
     - name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination
-      when: item.1.argocd_app != "dashboard"
       ansible.builtin.copy:
         content: "{{ lookup('vars', item.1.argocd_app ~ '_values') | to_nice_yaml(indent=2) }}"
-        dest: "{{ dest_path }}/values.yaml"
-        mode: "0644"
-
-    - name: Render "{{ item.1.argocd_app }}" values template file and write to destination
-      when: item.1.argocd_app == "dashboard"
-      ansible.builtin.copy:
-        content: "{{ lookup('ansible.builtin.template', source_path + '/values.yaml.j2') | from_yaml | to_nice_yaml(indent=2) }}"
         dest: "{{ dest_path }}/values.yaml"
         mode: "0644"
 

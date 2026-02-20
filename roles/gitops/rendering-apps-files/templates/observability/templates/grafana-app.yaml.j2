@@ -13,8 +13,10 @@ spec:
   - chart: dso-grafana
     repoURL: {{ dsc.grafana.helmRepoUrl }}
     targetRevision: {{ dsc.grafana.chartVersion | quote }}
-    helm:  
+    helm:
       values: {% raw %}|
+        global:
+          {{ .Values.global | toYaml | nindent 10 }}
         {{ .Values.grafana | toYaml | nindent 8 }}
 {% endraw %}
       valueFiles:

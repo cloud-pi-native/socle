@@ -1,3 +1,24 @@
+global:
+  projects:
+    console:
+      envs:
+        hprod:
+          groups:
+          - /admin
+          - /admin
+          tenants:
+            hprod-dso: {}
+        prod:
+          groups:
+          - /admin
+          - /admin
+          tenants:
+            prod-dso: {}
+      projectName: dso
+      projectRepository:
+        path: ./charts/socle-observability
+        url: https://github.com/cloud-pi-native/helm-charts.git
+
 observatorium:
   ingress:
     enabled: false
@@ -56,7 +77,6 @@ observatorium:
 {% endif %}
 grafana:
   grafanaNamespace: "{{ dsc.grafana.namespace }}"
-  default: {}
   oauth:
     enabled: true
     url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
@@ -83,23 +103,3 @@ grafana:
     - name: NO_PROXY
       value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
 {% endif %}
-  global:
-    projects:
-      console:
-        envs:
-          hprod:
-            groups:
-              - /admin
-              - /admin
-            tenants:
-              hprod-dso: {}
-          prod:
-            groups:
-              - /admin
-              - /admin
-            tenants:
-              prod-dso: {}
-        projectName: dso
-        projectRepository:
-          url: https://github.com/cloud-pi-native/socle.git
-          path: roles/gitops/rendering-apps-files/templates/dashboard

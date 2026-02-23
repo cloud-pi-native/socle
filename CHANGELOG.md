@@ -1,5 +1,32 @@
 # Changelog
 
+## [4.6.0](https://github.com/cloud-pi-native/socle/compare/v4.5.1...v4.6.0) (2026-02-23)
+
+
+### Features
+
+* :sparkles: add cloudProvider for specificity ([a7ba9e1](https://github.com/cloud-pi-native/socle/commit/a7ba9e16d1c70d5faf168fddce1874ded48109d7))
+* :sparkles: make socle repository url and revision configurable ([ce5dbe7](https://github.com/cloud-pi-native/socle/commit/ce5dbe7623621a8f088f120b72151a00f6401953))
+* :sparkles: use internal Nexus url in Maven config file ([7e5bd7b](https://github.com/cloud-pi-native/socle/commit/7e5bd7b6ed245e3c061538d4fee659c803dbdce3))
+* **#921:** :zap: increase request concurrency from 1 to 4 ([311a3bb](https://github.com/cloud-pi-native/socle/commit/311a3bbd4acf4e9bd80e6f832f06888feb82cf25))
+* image pull secrets gitops ([158fbba](https://github.com/cloud-pi-native/socle/commit/158fbba686eab3d01a080425686a5288f5d725bc))
+* Move dashboard and alert to helm-charts repo ([a2b571f](https://github.com/cloud-pi-native/socle/commit/a2b571fef42f203f91aacc1d317e852c6faa9476))
+* override cnpg values from the dsc ([7458754](https://github.com/cloud-pi-native/socle/commit/74587548039b9d800d9944b2f31d3b75b144a127))
+
+
+### Bug Fixes
+
+* :bug: make repoSocle configuration separate for each service ([35ffc89](https://github.com/cloud-pi-native/socle/commit/35ffc894bf55f2823e67eed11eea5c4ec30ba980))
+* :bug: mattermost secret reference path ([4811547](https://github.com/cloud-pi-native/socle/commit/48115474adf26b8523751373343aa54cdab2033c))
+* bump version to non destructive values on error ([e4bbe25](https://github.com/cloud-pi-native/socle/commit/e4bbe25b2cbbf36cc872ed38d6913c8be83b1d39))
+* combine with user supplied values task fixes ([9a942c1](https://github.com/cloud-pi-native/socle/commit/9a942c1983a79ca93192f70d60008f521a1c1d0c))
+* delete unused grafana instance ([3067e24](https://github.com/cloud-pi-native/socle/commit/3067e24e209b0959d45e0c019db2dd907a508899))
+* disable gitlab public search ([624c2b1](https://github.com/cloud-pi-native/socle/commit/624c2b1d80085a306fcb0608d1f15486776905e0))
+* mvn config internal url no proxy fix ([4bfccec](https://github.com/cloud-pi-native/socle/commit/4bfccec1e6dbe136736b9c06972779bb3f8f48d2))
+* nexus values override from the dsc ([d14f72d](https://github.com/cloud-pi-native/socle/commit/d14f72db662b80b72a9ae58d94f658011328b96d))
+* preview environment ansible job rolebinding ns ([ef583a5](https://github.com/cloud-pi-native/socle/commit/ef583a5e980a75f0aa1d41e31409c74ee9984f20))
+* revert add cloudProvider for specificity ([d66d966](https://github.com/cloud-pi-native/socle/commit/d66d966732b3b1ffed9055b00c2c5ec53e5b0a73))
+
 ## [4.5.1](https://github.com/cloud-pi-native/socle/compare/v4.5.0...v4.5.1) (2026-01-26)
 
 

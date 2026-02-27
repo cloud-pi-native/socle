@@ -1,0 +1,63 @@
+argocd:
+  server:
+    ingress:
+      enabled: true
+      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
+      hostname: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
+
+{% if (dsc.ingress.annotations | default({})) or (dsc.argocd['values'].server.ingress.annotations | default({})) %}
+      annotations:
+      {% for key, val in (dsc.ingress.annotations | combine(dsc.argocd['values'].server.ingress.annotations | default([]))).items() %}
+        {{ key }}: {{ val }}
+      {% endfor %}
+{% endif %}
+
+{% if dsc.ingress.labels | default({}) %}
+      labels:
+      {% for key, val in dsc.ingress.labels.items() %}
+        {{ key }}: {{ val }}
+      {% endfor %}
+{% endif %}
+
+{% if not dsc.ingress.tls.type == 'none' %}
+  {% if dsc.ingress.tls.type == 'tlsSecret' %}
+      extraTls:
+        - hosts:
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
+          secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+  {% else +%}
+      tls: true
+  {% endif %}
+{% endif %}
+
+  applicationSet:
+    ingress:
+      enabled: true
+      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
+      hostname: appset.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
+
+{% if (dsc.ingress.annotations | default({})) or (dsc.argocd['values'].server.ingress.annotations | default({})) %}
+      annotations:
+      {% for key, val in (dsc.ingress.annotations | combine(dsc.argocd['values'].server.ingress.annotations | default([]))).items() %}
+        {{ key }}: {{ val }}
+      {% endfor %}
+{% endif %}
+
+{% if dsc.ingress.labels | default({}) %}
+      labels:
+      {% for key, val in dsc.ingress.labels.items() %}
+        {{ key }}: {{ val }}
+      {% endfor %}
+{% endif %}
+
+{% if not dsc.ingress.tls.type == 'none' %}
+  {% if dsc.ingress.tls.type == 'tlsSecret' %}
+      extraTls:
+        - hosts:
+          - appset.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
+          secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+  {% else +%}
+      tls: true
+  {% endif %}
+{% endif %}
+

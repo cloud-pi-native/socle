@@ -10,17 +10,17 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: "{{ dsc_name }}-argocd-repo-server"
-  namespace: "{{ dsc.argocd.namespace }}"
+  namespace: "{{ '{{ .Release.Namespace }}' }}"
 - kind: ServiceAccount
   name: argocd-server
-  namespace: "{{ dsc.argocd.namespace }}"
+  namespace: "{{ '{{ .Release.Namespace }}' }}"
 - kind: ServiceAccount
   name: "{{ dsc_name }}-redis"
-  namespace: "{{ dsc.argocd.namespace }}"
+  namespace: "{{ '{{ .Release.Namespace }}' }}"
 - kind: ServiceAccount
   name: "{{ dsc_name }}-redis-ha"
-  namespace: "{{ dsc.argocd.namespace }}"
+  namespace: "{{ '{{ .Release.Namespace }}' }}"
 - kind: ServiceAccount
   name: "{{ dsc_name }}-redis-ha-haproxy"
-  namespace: "{{ dsc.argocd.namespace }}"
+  namespace: "{{ '{{ .Release.Namespace }}' }}"
 {% endif %}

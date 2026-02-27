@@ -1,3 +1,7 @@
+{% set dsoZoneRepo = 'https://' + gitlab_domain + '/' + dsc.global.projectsRootDir | join('/') + '/infra/' + dsc.argocd.zoneName + '.git' %}
+zoneName: {{ dsc.argocd.zoneName }}
+dsoZoneRepo: {{ dsoZoneRepo }}
+
 argocd:
   fullnameOverride: "{{ dsc_name }}-argocd"
   crds:
@@ -35,10 +39,6 @@ argocd:
     enabled: false
   server:
     replicas: 3
-    ingress:
-      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
-    ingressGrpc:
-      ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
   repoServer:
     replicas: 3
     initContainers:
@@ -113,13 +113,6 @@ argocd:
       subPath: helm.bin
 {% endif %}
   applicationSet:
-    enabled: false
     replicas: 2
-    webhook:
-      ingress:
-        ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
   notifications:
     enabled: false
-    webhook:
-      ingress:
-        ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>

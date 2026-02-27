@@ -1,3 +1,7 @@
+{% set dsoZoneRepo = 'https://' + gitlab_domain + '/' + dsc.global.projectsRootDir | join('/') + '/infra/' + dsc.argocd.zoneName + '.git' %}
+zoneName: {{ dsc.argocd.zoneName }}
+dsoZoneRepo: {{ dsoZoneRepo }}
+
 argocd:
   fullnameOverride: "{{ dsc_name }}-argocd"
   crds:

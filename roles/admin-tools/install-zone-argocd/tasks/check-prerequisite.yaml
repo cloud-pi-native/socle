@@ -1,0 +1,73 @@
+- name: Validate environment variables
+  block:
+    - name: Check custom values file path
+      ansible.builtin.assert:
+        that:
+          - custom_values_file_path | length > 0
+        fail_msg: "ERROR: The environment variable 'CUSTOM_VALUES_FILE_PATH' is not defined or is empty. Please export it before running."
+        success_msg: "Validation successful: Using values from {{ custom_values_file_path }}"
+    - name: Check Vault infra Domain
+      ansible.builtin.assert:
+        that:
+          - vaultinfra_domain | length > 0
+        fail_msg: "ERROR: The environment variable 'VAULT_INFRA_DOMAIN' is not defined or is empty. Please export it before running."
+        success_msg: "Validation successful: Using Vault Infra domain {{ vaultinfra_domain }}"
+    - name: Check Vault infra token
+      ansible.builtin.assert:
+        that:
+          - vault_infra_token | length > 0
+        fail_msg: "ERROR: The environment variable 'VAULT_INFRA_TOKEN' is not defined or is empty. Please export it before running."
+        success_msg: "Validation successful: Using Vault Infra token"
+    - name: Check ENV_NAME
+      ansible.builtin.assert:
+        that:
+          - env_name | length > 0
+        fail_msg: "ERROR: The environment variable 'ENV_NAME' is not defined or is empty. Please export it before running."
+        success_msg: "Validation successful: Using environment: {{ env_name }}"
+    - name: Set vaultinfra_kv_name fact
+      ansible.builtin.set_fact:
+        vaultinfra_kv_name: "dso-{{ env_name }}"
+
+- name: Check cluster connectivity
+  kubernetes.core.k8s_cluster_info:
+  register: cluster_check
+  ignore_errors: false
+
+- name: Check Ingress Controller installation
+  block:
+    - name: Gather IngressClass information
+      kubernetes.core.k8s_info:
+        kind: IngressClass
+      register: ingress_check
+
+    - name: Validate Ingress Controller presence
+      ansible.builtin.fail:
+        msg: "Aborting: No IngressController (IngressClass) detected on the cluster. Please install one before running this playbook."
+      when: ingress_check.resources | length == 0
+
+- name: Check Vault Secrets Operator (VSO) installation
+  block:
+    - name: Check if VSO CRDs are registered
+      kubernetes.core.k8s_info:
+        kind: CustomResourceDefinition
+        name: vaultauths.secrets.hashicorp.com
+      register: vso_crd_check
+
+    - name: Check if VSO Controller pods are running
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: infra-vso
+        label_selectors:
+          - app.kubernetes.io/name=vault-secrets-operator
+      register: vso_pod_check
+
+    - name: Assert VSO is healthy
+      ansible.builtin.assert:
+        that:
+          - vso_crd_check.resources | length > 0
+          - vso_pod_check.resources | length > 0
+          - vso_pod_check.resources[0].status.phase == 'Running'
+        fail_msg: >
+          VSO Validation Failed: 
+          Ensure the Vault Secrets Operator is installed and the CRDs are present.
+        success_msg: "VSO is correctly installed and running."

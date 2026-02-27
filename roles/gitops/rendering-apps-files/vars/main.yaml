@@ -82,7 +82,6 @@ values:
         enabled: {{ dsc.global.metrics.enabled | lower }}
         serviceMonitor:
           enabled: {{ dsc.global.metrics.enabled | lower }}
-          namespace: {{ dsc.argocd.namespace }}
 
     controller_metrics_labels: |
       labels: {{ dsc.global.metrics.additionalLabels | default('') }}

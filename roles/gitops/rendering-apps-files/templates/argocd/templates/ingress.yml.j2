@@ -3,7 +3,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: argo-ingress
-  namespace: {{ dsc.argocd.namespace }}
   annotations:
 {% for key, val in (dsc.ingress.annotations | combine(dsc.argocd['values'].server.ingress.annotations | default([]))).items() %}
     {{ key }}: {{ val }}
@@ -41,7 +40,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: argo-appset-ingress
-  namespace: {{ dsc.argocd.namespace }}
   annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: {{ val }}

@@ -1,0 +1,23 @@
+---
+- name: Check prerequisites
+  ansible.builtin.include_tasks:
+    file: check-prerequisite.yaml
+
+- name: Create GitLab secret
+  ansible.builtin.include_tasks:
+    file: create-gitlab-secret.yaml
+
+- name: Install Zone ArgoCD
+  kubernetes.core.helm:
+    state: present
+    name: argocd
+    # Ansible kubernetes.core.helm module does not support helm v4 yet
+    # You need to install helm v3 with homebrew "brew install helm@3" and use the binary_path option
+    binary_path: /opt/homebrew/opt/helm@3/bin/helm
+    chart_ref: "{{ role_path + '/helm/argocd' }}"
+    release_namespace: "{{ target_namespace }}"
+    dependency_update: true
+    create_namespace: true
+    values_files:
+      - "{{ role_path + '/helm/argocd/values.yaml' }}"
+      - "{{ custom_values_file_path }}"

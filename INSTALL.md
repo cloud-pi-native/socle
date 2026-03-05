@@ -376,6 +376,51 @@ watch "kubectl get ns | grep '\-mynamespace'"
   - Pour Kyverno : `-t kyverno`
 - La fonctionnalité actuellement remplie par le role Kyverno était auparavant gérée par un role kubed. C'est la raison pour laquelle la désinstallation de kubed est toujours disponible. Si kubed est encore présent dans votre cluster hébergeant le socle DSO, nous vous recommandons sa désinstallation via l'utilisation du tag `-t kubed` (ou `-t confSyncer`).
 
+### Installation d'un Argo CD dans une nouvelle zone
+
+Cette section décrit comment installer Argo CD dans une nouvelle zone.
+
+Pour cela, connectez vous à votre console DSO et allez dans la page `Zones` dans la section `Administration` et suivez les instructions de la [documentation](https://cloud-pi-native.fr/administration/zones) pour créer une zone.
+
+La création d'une zone déclenchera la création d'un repository GitLab DSO de la zone dans le groupe `infra`.
+
+**NB: Une fois la zone créée, vous aurez besoin du nom court de la zone ainsi que du repository GitLab de la zone pour pouvoir l'utiliser dans l'installation.**
+
+#### Installation
+
+Veuillez suivre les étapes suivantes dans l'ordre pour installer l'instance Argo CD dans la nouvelle zone.
+
+L'installation de l'instance Argo CD se fait de manière automatisée via un script bash.
+
+Assurez-vous d'avoir le CLI [`argocd-vault-plugin`](https://argocd-vault-plugin.readthedocs.io/en/stable/installation/) installé et les variables d'environnement suivantes définies :
+
+```bash
+export GITOPS_REPO_PATH=/chemin/absolu/vers/votre/gitops
+export VAULT_INFRA_DOMAIN=infra-vault.example.com
+export VAULT_INFRA_TOKEN=vault-infra-token
+```
+
+Dans votre repository GitOps, créez un fichier `gitops/envs/conf-dso/apps/argocd/zone-<zoneName>-values.yaml` avec les valeurs suivantes :
+
+```yaml
+# Repository GitLab DSO de la zone (n'oubliez pas le .git à la fin)
+dsoZoneRepo: <repository-git-lab-dso-de-la-zone>
+# Nom court de la zone
+zoneName: <zone-name>
+
+# Les valeurs suivantes correspondent à la configuration de l'instance Argo CD dans la nouvelle zone.
+# Veuillez consulter la documentation Argo CD pour les valeurs possibles (https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/README.md)
+argocd:
+```
+
+Positionnez votre kube context sur la zone cible et exécutez la commande suivante :
+
+```bash
+./admin-tools/install-zone-argocd.sh
+```
+
+Ce script va installer l'instance Argo CD dans la zone dans le namespace `dso-argocd`.
+
 ### Désinstaller un ou plusieurs outils
 
 Le playbook de désinstallation peut aussi être utilisé pour supprimer un ou plusieurs outils **de manière ciblée**, via les tags associés.

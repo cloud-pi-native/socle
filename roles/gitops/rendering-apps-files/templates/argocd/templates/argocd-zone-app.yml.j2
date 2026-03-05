@@ -1,9 +1,7 @@
-{% set dsoZoneRepo = 'https://' + gitlab_domain + '/' + dsc.global.projectsRootDir | join('/') + '/infra/' + dsc.argocd.zoneName + '.git' %}
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: zone-{{ dsc.argocd.zoneName }}-project
-  namespace: {{ dsc.argocd.namespace }}
+  name: "zone-{{ '{{ .Values.zoneName }}' }}-project"
 spec:
   description: "Projet contenant l'Application responsable de tous les déploiements par zone"
   clusterResourceWhitelist:
@@ -11,22 +9,21 @@ spec:
     kind: '*'
   sourceRepos:
     - https://cloud-pi-native.github.io/helm-charts
-    - {{ dsoZoneRepo }}
+    - {{ '{{ .Values.dsoZoneRepo }}' }}
   destinations:
-    - namespace: {{ dsc.argocd.namespace }}
+    - namespace: {{ '{{ .Release.Namespace }}' }}
       server: "https://kubernetes.default.svc"
 
 ---      
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: zone-{{ dsc.argocd.zoneName }}-app
-  namespace: {{ dsc.argocd.namespace }}
+  name: "zone-{{ '{{ .Values.zoneName }}' }}-app"
 spec:
   destination:
-    namespace: {{ dsc.argocd.namespace }}
+    namespace: {{ '{{ .Release.Namespace }}' }}
     server: https://kubernetes.default.svc
-  project: zone-{{ dsc.argocd.zoneName }}-project
+  project: "zone-{{ '{{ .Values.zoneName }}' }}-project"
   sources:
   - chart: dso-argocd-zone
     targetRevision: {{ dsc.argocd.zoneChartVersion | quote }}
@@ -36,8 +33,8 @@ spec:
       - ./values.yaml
       - $argocdValues/argocd-values.yaml
       values: |
-        dsoZoneRepo: {{ dsoZoneRepo }}
+        dsoZoneRepo: {{ '{{ .Values.dsoZoneRepo }}' }}
         autosync: true
-  - repoURL: {{ dsoZoneRepo }}
+  - repoURL: {{ '{{ .Values.dsoZoneRepo }}' }}
     targetRevision: HEAD
     ref: argocdValues

@@ -37,11 +37,8 @@ keycloak_clients:
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     directAccessGrantsEnabled: true
-    redirectUris:
-      - https://{{ argocd_domain }}/auth/callback
-      - "*"
-    webOrigins:
-      - https://{{ argocd_domain }}
+    redirectUris: "{{ lookup('ansible.builtin.template', 'argocd-redirectUris.yaml.j2') | from_yaml }}"
+    webOrigins: "{{ lookup('ansible.builtin.template', 'argocd-webOrigins.yaml.j2') | from_yaml }}"
     defaultClientScopes:
       - basic
       - generic

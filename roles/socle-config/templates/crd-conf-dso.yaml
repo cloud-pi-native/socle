@@ -160,6 +160,19 @@ spec:
                     zoneChartVersion:
                       description: Version of the Helm Chart to use to manage zone objects. See https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
                       type: string
+                    secondaryZones:
+                      description: List of secondary zones each run an Argo CD instance to manage all applications deployed in the secondary zone.
+                      type: array
+                      default: []
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            description: Name of the zone.
+                            type: string
+                          domain:
+                            description: The fully qualified domain name of the Argo CD of the zone.
+                            type: string
                   required:
                     - admin
                     - installEnabled

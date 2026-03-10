@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.7.0](https://github.com/cloud-pi-native/socle/compare/v4.6.0...v4.7.0) (2026-03-10)
+
+
+### Features
+
+* add install Zone Argo CD script ([a6fb8f5](https://github.com/cloud-pi-native/socle/commit/a6fb8f5d1b49288f227ae44792e479086c0f88a0))
+* update Argo CD oidc configuration to support multizones ([514e84a](https://github.com/cloud-pi-native/socle/commit/514e84a02bfd0a9127429b05b9f2775c8d81176e))
+
 ## [4.6.0](https://github.com/cloud-pi-native/socle/compare/v4.5.1...v4.6.0) (2026-02-23)
 
 

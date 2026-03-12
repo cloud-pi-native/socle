@@ -20,7 +20,7 @@ argocd:
 {% endif %}
 
 {% if not dsc.ingress.tls.type == 'none' %}
-  {% if dsc.ingress.tls.type == 'tlsSecret' %}
+  {% if dsc.ingress.tls.type == 'tlsSecret' +%}
       extraTls:
         - hosts:
           - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>
@@ -51,7 +51,7 @@ argocd:
 {% endif %}
 
 {% if not dsc.ingress.tls.type == 'none' %}
-  {% if dsc.ingress.tls.type == 'tlsSecret' %}
+  {% if dsc.ingress.tls.type == 'tlsSecret' +%}
       extraTls:
         - hosts:
           - appset.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.argocd}>

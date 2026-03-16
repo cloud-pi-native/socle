@@ -111,19 +111,6 @@ global:
       key: password
   registry:
     enabled: false
-  certificates:
-    customCAs:
-{% for item in dsc.additionalsCA %}
-{% if item.kind == 'ConfigMap' %}
-      - configMap: {{ item.name }}
-{% endif %}
-{% if item.kind == 'Secret' %}
-      - secret: {{ item.name }}
-{% endif %}
-{% endfor %}
-{% if dsc.exposedCA.type != 'none' %}
-      - secret: exposed-ca
-{% endif %}
   hosts:
     domain: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#rootDomain>
     registry:

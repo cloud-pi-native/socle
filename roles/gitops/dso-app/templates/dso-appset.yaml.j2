@@ -70,13 +70,13 @@ spec:
       syncPolicy:
         automated:
           prune: true
-        #  selfHeal: true
+          selfHeal: true
         syncOptions:
           - CreateNamespace=true
           - ApplyOutOfSyncOnly=true
           - ServerSideApply=true
   syncPolicy:
     preserveResourcesOnDeletion: true
-    # automated:
-    #   selfHeal: true
+    automated:
+      selfHeal: true
 {% endraw %}

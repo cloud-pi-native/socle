@@ -65,6 +65,7 @@
       signup_enabled: false
       outbound_local_requests_allowlist_raw: "0.0.0.0/0"
       default_branch_protection: 0
+      prometheus_metrics_enabled: false
       import_sources:
         - git
       restricted_visibility_levels:

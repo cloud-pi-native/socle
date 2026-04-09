@@ -460,23 +460,6 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
-                cpnIntegrationTestJob:
-                  description: Configuration for cpn-job.
-                  properties:
-                    helmRepoUrl:
-                      description: Cloud-Pi-Native helm repository url.
-                      type: string
-                    chartVersion:
-                      description: Cloud-Pi-Native helm chart version (e.g., "1.0.0").
-                      type: string
-                    values:
-                      description: |
-                        You can add custom values for cpn-job, they will be merged with roles/gitops/rendering-apps-files/
-                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-job
-                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-job/values.yaml
-                      type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                  type: object
                 gitlab:
                   description: Configuration for GitLab.
                   properties:

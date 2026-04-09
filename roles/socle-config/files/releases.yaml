@@ -7,7 +7,7 @@ spec:
     # https://artifacthub.io/packages/helm/argo/argo-cd
     chartVersion: 8.5.6
     # https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
-    zoneChartVersion: ">=1.0.0 <2.0.0"
+    zoneChartVersion: "1.0.5"
   argocdInfra:
     # https://artifacthub.io/packages/helm/argo/argo-cd
     chartVersion: 8.5.6
@@ -28,13 +28,10 @@ spec:
       chartVersion: "0.27.0"
   console:
     # https://github.com/cloud-pi-native/console/releases
-    chartVersion: ">=2.0.0 <3.0.0"
+    chartVersion: 2.3.5
   cpnAnsibleJob:
     # https://github.com/cloud-pi-native/helm-charts/releases
-    chartVersion: ">=1.0.0 <2.0.0"
-  cpnIntegrationTestJob:
-    # https://github.com/cloud-pi-native/helm-charts/releases
-    chartVersion: ">=1.0.0 <2.0.0"
+    chartVersion: "1.1.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "9.4.1"
@@ -57,7 +54,7 @@ spec:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"
     # https://github.com/cloud-pi-native/helm-charts/tags
-    chartVersion: ">=1.0.0 <2.0.0"
+    chartVersion: "1.7.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.16.0
@@ -75,11 +72,11 @@ spec:
     chartVersion: 5.14.0
   observatorium:
     # https://github.com/cloud-pi-native/helm-charts/tags
-    chartVersion: ">=0.0.0 <1.0.0"
+    chartVersion: "0.5.4"
     # https://github.com/cloud-pi-native/helm-charts/tags
-    observabilityChartVersion: ">=0.0.0 <1.0.0"
+    observabilityChartVersion: "0.1.8"
     # https://github.com/cloud-pi-native/helm-charts/tags
-    observabilityPluginVersion: "v1.2.0"
+    observabilityPluginVersion: "v1.2.1"
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
     chartVersion: 10.8.1

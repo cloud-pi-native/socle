@@ -159,6 +159,9 @@ console:
     envFrom:
       - secretRef:
           name: dso-config
+    env:
+      DSO_NS_CHART_VERSION: "dso-ns-1.1.5"
+      DSO_ENV_CHART_VERSION: "dso-env-1.7.0"
 {% if dsc.observatorium.installEnabled %}
     env:
       DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion | quote }}

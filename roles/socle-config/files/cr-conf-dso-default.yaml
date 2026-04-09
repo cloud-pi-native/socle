@@ -64,7 +64,6 @@ spec:
   cloudnativepg: {}
   console: {}
   cpnAnsibleJob: {}
-  cpnIntegrationTestJob: {}
   gitlab: {}
   glexporter: {}
   gitlabOperator: {}

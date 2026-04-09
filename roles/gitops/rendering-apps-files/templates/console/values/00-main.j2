@@ -40,9 +40,6 @@ console:
         backend: "{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local"
         frontend: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.keycloak}>"
       realm: {{ dsc.keycloak.applicationRealm }} 
-      protocol:
-        backend: "http"
-        frontend: "https"
       clientIds:
         backend: "console-backend"
         frontend: "console-frontend"
@@ -60,110 +57,27 @@ console:
     - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.console}>
     annotations: {{ dsc.ingress.annotations }}
     labels: {{ dsc.ingress.labels }}
-  client:
-    replicaCount: 1
-    container:
-      port: 8080
-    healthcheckPath: "/"
-    strategy:
-      type: "RollingUpdate"
-    startupProbe:
-      enabled: true
-      initialDelaySeconds: 0
-      successThreshold: 1
-      failureThreshold: 10
-      periodSeconds: 10
-      timeoutSeconds: 5
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 15
-      successThreshold: 2
-      failureThreshold: 2
-      periodSeconds: 10
-      timeoutSeconds: 5
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 30
-      successThreshold: 1
-      failureThreshold: 3
-      periodSeconds: 30
-      timeoutSeconds: 5
-    service:
-      type: "ClusterIP"
-      port: 80
-    resources:
-      requests:
-        memory: "128Mi"
-        cpu: "250m"
-      limits:
-        memory: "512Mi"
-        cpu: "500m"
-    autoscaling:
-      enabled: false
-      minReplicas: 1
-      maxReplicas: 3
-      targetCPUUtilizationPercentage: 80
-      targetMemoryUtilizationPercentage: 80
   server:
-    replicaCount: 1
-    container:
-      port: 8080
-    healthcheckPath: "/api/v1/healthz"
-    strategy:
-      type: "RollingUpdate"
-    startupProbe:
-      enabled: true
-      initialDelaySeconds: 0
-      successThreshold: 1
-      failureThreshold: 10
-      periodSeconds: 10
-      timeoutSeconds: 5
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 15
-      successThreshold: 2
-      failureThreshold: 2
-      periodSeconds: 10
-      timeoutSeconds: 5
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 30
-      successThreshold: 1
-      failureThreshold: 3
-      periodSeconds: 30
-      timeoutSeconds: 5
-    extraCa: 
-      name: ""
-      key: ""
-      mountSubPath: "ca_certs"
-    service:
-      type: "ClusterIP"
-      port: 80
-    disabledPlugins: ""
-    resources:
-      requests: 
-        memory: "128Mi"
-        cpu: "250m"
-      limits:
-        memory: "512Mi"
-        cpu: "500m"
-    autoscaling:
-      enabled: false 
-      minReplicas: 1   
-      maxReplicas: 3
-      targetCPUUtilizationPercentage: 80
-      targetMemoryUtilizationPercentage: 80
-    serviceAccount:
-      create: true
-      name: "cpn-console-server"
     envFrom:
       - secretRef:
           name: dso-config
     env:
-      DSO_NS_CHART_VERSION: "dso-ns-1.1.5"
-      DSO_ENV_CHART_VERSION: "dso-env-1.7.0"
+      DSO_NS_CHART_VERSION: "1.1.5"
+      DSO_ENV_CHART_VERSION: "1.7.0"
 {% if dsc.observatorium.installEnabled %}
+      DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion | quote }}
+      GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>
+    plugins:
+    - https://github.com/cloud-pi-native/console-plugin-observability/releases/download/{{ dsc.observatorium.observabilityPluginVersion }}/build-artifact.zip
+{% endif %}
+  backend:
+    envFrom:
+      - secretRef:
+          name: dso-config
     env:
+      DSO_NS_CHART_VERSION: "1.1.5"
+      DSO_ENV_CHART_VERSION: "1.7.0"
+{% if dsc.observatorium.installEnabled %}
       DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion | quote }}
       GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>
     plugins:

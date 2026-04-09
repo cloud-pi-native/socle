@@ -22,3 +22,27 @@ console:
                   app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.console.namespace }}
                   app.kubernetes.io/name: {{ dsc_name }}-cpn-console-server
               topologyKey: kubernetes.io/hostname
+
+  strangler:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.console.namespace }}
+                  app.kubernetes.io/name: {{ dsc_name }}-cpn-console-server
+              topologyKey: kubernetes.io/hostname
+
+  backend:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.console.namespace }}
+                  app.kubernetes.io/name: {{ dsc_name }}-cpn-console-server
+              topologyKey: kubernetes.io/hostname

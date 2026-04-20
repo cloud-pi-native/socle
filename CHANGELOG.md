@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.8.0](https://github.com/cloud-pi-native/socle/compare/v4.7.0...v4.8.0) (2026-04-20)
+
+
+### Features
+
+* add backend and strangler config to the console app ([6381ad3](https://github.com/cloud-pi-native/socle/commit/6381ad3d51dd620e9f0978ceaf37000df378749e))
+* use static version for helm charts ([f12a331](https://github.com/cloud-pi-native/socle/commit/f12a331caa87145771533f4fd06799a6f0c1feb2))
+
+
+### Bug Fixes
+
+* dso charts version fix ([53505ad](https://github.com/cloud-pi-native/socle/commit/53505ad6ea8acbb458e6bf37e3df8573ebc9090a))
+* gitlab cnpg connection params ([35628e8](https://github.com/cloud-pi-native/socle/commit/35628e880c7707b1d7a82417fbc16bb4ed5ac643))
+* harbor admin password format fix ([b0e8f7f](https://github.com/cloud-pi-native/socle/commit/b0e8f7fd5a64b91a414ee5875678061e43a3001a))
+* override nexus label ([e03901f](https://github.com/cloud-pi-native/socle/commit/e03901fee1400d3cbbc6ce148f0edb3297967303))
+
 ## [4.7.0](https://github.com/cloud-pi-native/socle/compare/v4.6.0...v4.7.0) (2026-03-30)
 
 

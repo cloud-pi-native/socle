@@ -35,7 +35,9 @@
 - [Offline / air gap](#offline--air-gap)
 - [Platform](#platform)
 - [Profile CIS](#profile-cis)
-- [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
+- [Utilisation de credentials pour le pull des images de registres privés](#utilisation-de-credentials-pour-le-pull-des-images-de-registres-privés)
+  - [Gestion des secrets de type docker-registry](#gestion-des-secrets-de-type-docker-registry)
+  - [Configuration `dsc`](#configuration-dsc)
 - [Gestion des users Keycloak](#gestion-des-users-keycloak)
 - [MFA pour les utilisateurs Keycloak](#mfa-pour-les-utilisateurs-keycloak)
 - [Tests d'intégration](#tests-dintégration)
@@ -298,11 +300,9 @@ harbor:
     persistence:
       imageChartStorage:
         s3:
-          accesskey: <accesskey>
           bucket: <bucket>
           region: <region>
           regionendpoint: <regionendpoint>
-          secretkey: <secretkey>
         type: s3
 ```
 Il faut supprimer et remplacer par ce qui suit.
@@ -310,11 +310,9 @@ Il faut supprimer et remplacer par ce qui suit.
 harbor:
   s3ImageChartStorage:
     enabled: true
-    accesskey: <accesskey>
     bucket: <bucket>
     region: <region>
     regionendpoint: <regionendpoint>
-    secretkey: <secretkey>
 ```
 Puis lancer le playbook d'insertion des secrets dans le Vault d'infrastructure.
 ```shell
@@ -884,28 +882,29 @@ kubectl explain dsc.spec.global.backup.cnpg
 
 ## Offline / air gap
 
-En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devront être adaptées.
-- `dsc.sonarqube` :
-  - `pluginDownloadUrl` et `prometheusJavaagentVersion`
+En mode air gap ou déconnecté d'internet, positionnez `global.offline` à `true` dans la `dsc`.
+Certaines valeurs devront également être adaptées.
+- `dsc.sonarqube.pluginDownloadUrl` et `dsc.sonarqube.prometheusJavaagentVersion`
+- `dsc.keycloak.pluginDownloadUrl` et `dsc.keycloak.providerDownloadUrl`
 - `dsc.gitlabCatalog.catalogRepoUrl`
 - `dsc.argocd.privateGitlabDomain`
-- `dsc.grafanaOperator.ociChartUrl`
-- `helmRepoUrl` pour chaque service à savoir :
-  - `argocd`, `certmanager`, `cloudnativepg`, `console`, `glexporter`, `gitlabOperator`, `gitlabrunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
-- `dsc.awx.repoSocle.url` (et optionnellement : `dsc.awx.repoSocle.revision`)
+- `helmRepoUrl` pour chaque service concerné
+- `repoSocle.url` (et optionnellement : `repoSocle.revision`) pour les applications ayant un job ansible de post-installation
 
 ## Platform
 
 Par défaut, le déploiement du socle DSO se fait sur un cluster de la famille Openshift, mais il est possible de déployer sur les autres types de distribution Kubernetes (Vanilla, K3s, RKE2, EKS, GKE...) en spécifiant comme suit dans la dsc.
 ```
-platform: kubernetes
+global:
+  platform: kubernetes
 ```
 
 ## Profile CIS
 
 Pour un déploiement sur un cluster qui n'est pas de la famille d'Openshift, par exemple sur un Kubernetes Vanilla, il est possible d'activer le profil de sécurité CIS pour enforcer la partie securityContext, en spécifiant comme suit dans la dsc.
 ```
-profile: cis
+global:
+  profile: cis
 ```
 
 ## Utilisation de credentials pour le pull des images de registres privés
@@ -914,7 +913,7 @@ Il est possible d'utiliser des secrets de type docker-registry pour le pull des 
 
 ### Gestion des secrets de type docker-registry
 
-L'**équipe Infrastructure** est chargée de créer les secrets de type docker-registry lors de la phase de provisionnement initial du cluster.  
+L'**équipe Infrastructure** est chargée de créer les secrets de type docker-registry lors de la phase de provisionnement initial du cluster.
 Si ces secrets ne sont pas présents ou ne peuvent pas être automatisés à la source, l'équipe Ops est responsable de leur **création manuelle** dans le cluster
 
 ### Configuration `dsc`
@@ -951,10 +950,10 @@ Il sera nécessaire pour activer le MFA sur les utilisateurs existants, de lance
 ansible-playbook admin-tools/keycloak-enforce-mfa.yml
 ```
 
-## Tests d'intégration 
+## Tests d'intégration
 
-Il est possible d'activer les tests d'intégration sur un environnement en spécifiant le paramètre `dsc.tests.installEnabled` à `true`.  
-Les notifications étant pour l'instant uniquement supporté sur Mattermost dans le code, il faudra alors récupérer l'id du channel et le token du bot pour les insérer dans le Vault d'infrastructure.  
+Il est possible d'activer les tests d'intégration sur un environnement en spécifiant le paramètre `dsc.tests.installEnabled` à `true`.
+Les notifications étant pour l'instant uniquement supporté sur Mattermost dans le code, il faudra alors récupérer l'id du channel et le token du bot pour les insérer dans le Vault d'infrastructure.
 Pour ce qui concerne les comptes de tests `testuser@example.com` et `secondtestuser@example.com`, il faudra s'assurer que :
 - leurs mots de passe correspondent à ceux qui sont insérés dans le Vault d'infrastructure.
 - le MFA n'est pas appliqué.

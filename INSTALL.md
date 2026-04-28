@@ -235,6 +235,8 @@ Pour configurer la ressource `dsc` nommée `conf-dso`, vous pouvez soit la modif
 kubectl edit dsc conf-dso
 ```
 
+La ressource correspond au type `DsoSocleConfig` (apiVersion `cloud-pi-native.fr/v1alpha`).
+
 Ou vous pouvez déclarer la ressource `dsc` nommée `conf-dso` dans un fichier YAML, par exemple « ma-conf-dso.yaml », puis la créer via la commande suivante :
 
 ```bash
@@ -244,8 +246,11 @@ kubectl apply -f ma-conf-dso.yaml
 Pour vous aider à démarrer, le fichier [cr-conf-dso-default.yaml](roles/socle-config/files/cr-conf-dso-default.yaml) est un **exemple** de configuration également utilisé lors de la première installation. Il surcharge les valeurs par défaut des fichiers [config.yaml](roles/socle-config/files/config.yaml) et [releases.yaml](roles/socle-config/files/releases.yaml). Ce fichier doit être adapté à partir de la section **spec**, en particulier pour les éléments suivants :
 
 - du paramètre `global.rootDomain` (votre domaine principal précédé d'un point),
+- du paramètre `global.infraRootDomain` si vous utilisez un domaine distinct pour l'infrastructure,
 - des mots de passe de certains outils,
 - du paramètre `global.platform` (définir à `kubernetes` si vous n'utilisez pas OpenShift),
+- des paramètres `global.gitOps` (`repo.url`, `repo.path`, `envName`, `namespacePrefix`),
+- du paramètre `global.offline` en mode air gap,
 - de la taille de certains PVCs,
 - de l'activation ou non des métriques,
 - du proxy si besoin ainsi que des sections CA et ingress.
@@ -294,7 +299,9 @@ Aucune configuration supplémentaire n’est nécessaire, l’Ingress est direct
 ##### Cas 2 : certificat auto-signé
 
 Si vous utilisez un certificat auto-signé, vous devez exposer la **CA racine** pour que les autres composants puissent valider ce certificat.
-Pour cela, ajoutez la CA racine dans un `Secret` ou un `ConfigMap`, puis référencez-le dans le champ `exposedCA` de la ressource `DSC`.
+Pour cela, ajoutez la CA racine dans un `Secret` ou un `ConfigMap`, puis référencez-le dans le champ `exposedCA` de la ressource `dsc`.
+
+La configuration TLS des ingress se fait via `spec.ingress.tls` (type `tlsSecret`, `acme` ou `ca`).
 
 Exemple avec un Secret :
 
@@ -315,8 +322,8 @@ stringData:
 Et puis dans la configuration `dsc`:
 
 ```yaml
-apiVersion: dso.cloud-pi-native.io/v1alpha1
-kind: DSC
+apiVersion: cloud-pi-native.fr/v1alpha
+kind: DsoSocleConfig
 metadata:
   name: conf-dso
 spec:
@@ -326,6 +333,12 @@ spec:
       namespace: ingress-nginx
       name: root-ca
       key: ca
+  ingress:
+    tls:
+      type: tlsSecret
+      tlsSecret:
+        method: in-namespace
+        name: wildcard-tls
 ```
 
 ## Désinstallation

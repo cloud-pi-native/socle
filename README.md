@@ -300,11 +300,9 @@ harbor:
     persistence:
       imageChartStorage:
         s3:
-          accesskey: <accesskey>
           bucket: <bucket>
           region: <region>
           regionendpoint: <regionendpoint>
-          secretkey: <secretkey>
         type: s3
 ```
 Il faut supprimer et remplacer par ce qui suit.
@@ -312,11 +310,9 @@ Il faut supprimer et remplacer par ce qui suit.
 harbor:
   s3ImageChartStorage:
     enabled: true
-    accesskey: <accesskey>
     bucket: <bucket>
     region: <region>
     regionendpoint: <regionendpoint>
-    secretkey: <secretkey>
 ```
 Puis lancer le playbook d'insertion des secrets dans le Vault d'infrastructure.
 ```shell
@@ -886,7 +882,8 @@ kubectl explain dsc.spec.global.backup.cnpg
 
 ## Offline / air gap
 
-En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devront être adaptées.
+En mode air gap ou déconnecté d'internet, positionnez `global.offline` à `true` dans la `dsc`.
+Certaines valeurs devront également être adaptées.
 - `dsc.sonarqube.pluginDownloadUrl` et `dsc.sonarqube.prometheusJavaagentVersion`
 - `dsc.keycloak.pluginDownloadUrl` et `dsc.keycloak.providerDownloadUrl`
 - `dsc.gitlabCatalog.catalogRepoUrl`
@@ -898,14 +895,16 @@ En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devron
 
 Par défaut, le déploiement du socle DSO se fait sur un cluster de la famille Openshift, mais il est possible de déployer sur les autres types de distribution Kubernetes (Vanilla, K3s, RKE2, EKS, GKE...) en spécifiant comme suit dans la dsc.
 ```
-platform: kubernetes
+global:
+  platform: kubernetes
 ```
 
 ## Profile CIS
 
 Pour un déploiement sur un cluster qui n'est pas de la famille d'Openshift, par exemple sur un Kubernetes Vanilla, il est possible d'activer le profil de sécurité CIS pour enforcer la partie securityContext, en spécifiant comme suit dans la dsc.
 ```
-profile: cis
+global:
+  profile: cis
 ```
 
 ## Utilisation de credentials pour le pull des images de registres privés

@@ -57,7 +57,7 @@ Nous appellerons ce cluster **cluster socle**.
 
 ## Installation
 
-L'installation de la plateforme Cloud Pi Native se fait de manière automatisée via Ansible.  
+L'installation de la plateforme Cloud Pi Native se fait de manière automatisée via Ansible.
 Veuillez suivre les étapes suivantes dans l'ordre pour installer la plateforme.
 
 ### 1. Création du dépôt GitOps
@@ -119,7 +119,7 @@ export VAULT_INFRA_DOMAIN=infra-vault.example.com
 export VAULT_INFRA_TOKEN=vault-infra-token
 ```
 
-Si vous utilisez un proxy pour accéder à votre cluster d'administration, vous devez également définir la variable d'environnement `KUBECONFIG_PROXY_INFRA` avec le chemin absolu vers votre configuration proxy.  
+Si vous utilisez un proxy pour accéder à votre cluster d'administration, vous devez également définir la variable d'environnement `KUBECONFIG_PROXY_INFRA` avec le chemin absolu vers votre configuration proxy.
 Exemple :
 
 ```bash
@@ -155,9 +155,15 @@ La commande créera pour vous le fichier `/tmp/my-credentials.yaml` qu'il vous i
 
 ### 8. Configuration première installation de Nexus
 
-En cas de premiere installation de l'outil Nexus, il faudra mettre le champs `nexus.chownDataDir` à `true` dans le fichier `values.yaml` du chart Helm générés par le playbook `rendering-apps-files.yaml` situé dans le répertoire `gitops/envs/conf-dso/apps/nexus`.
+En cas de première installation de l'outil Nexus, il faudra définir le champ `nexus.values.chownDataDir` à `true` dans la ressource `dsc`, par exemple :
 
-**NB**: Une fois Nexus installé et configuré, il est recommandé de mettre à jour le champs `nexus3.chownDataDir` à `false` pour éviter de modifier les permissions des fichiers de Nexus.
+```yaml
+nexus:
+  values:
+    chownDataDir: true
+```
+
+**NB** : Une fois Nexus installé et configuré, il est recommandé de remettre ce champ à `false` pour éviter de modifier les permissions des fichiers de Nexus.
 
 ### 9. Pousser les fichiers IaC générés dans le dépôt GitOps
 

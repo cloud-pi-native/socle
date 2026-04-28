@@ -35,7 +35,9 @@
 - [Offline / air gap](#offline--air-gap)
 - [Platform](#platform)
 - [Profile CIS](#profile-cis)
-- [Utilisation de credentials Docker Hub pour le pull des images](#utilisation-de-credentials-docker-hub-pour-le-pull-des-images)
+- [Utilisation de credentials pour le pull des images de registres privés](#utilisation-de-credentials-pour-le-pull-des-images-de-registres-privés)
+  - [Gestion des secrets de type docker-registry](#gestion-des-secrets-de-type-docker-registry)
+  - [Configuration `dsc`](#configuration-dsc)
 - [Gestion des users Keycloak](#gestion-des-users-keycloak)
 - [MFA pour les utilisateurs Keycloak](#mfa-pour-les-utilisateurs-keycloak)
 - [Tests d'intégration](#tests-dintégration)
@@ -885,14 +887,12 @@ kubectl explain dsc.spec.global.backup.cnpg
 ## Offline / air gap
 
 En mode air gap ou déconnecté d'internet, certaines valeurs de la `dsc` devront être adaptées.
-- `dsc.sonarqube` :
-  - `pluginDownloadUrl` et `prometheusJavaagentVersion`
+- `dsc.sonarqube.pluginDownloadUrl` et `dsc.sonarqube.prometheusJavaagentVersion`
+- `dsc.keycloak.pluginDownloadUrl` et `dsc.keycloak.providerDownloadUrl`
 - `dsc.gitlabCatalog.catalogRepoUrl`
 - `dsc.argocd.privateGitlabDomain`
-- `dsc.grafanaOperator.ociChartUrl`
-- `helmRepoUrl` pour chaque service à savoir :
-  - `argocd`, `certmanager`, `cloudnativepg`, `console`, `glexporter`, `gitlabOperator`, `gitlabrunner`, `harbor`, `keycloak`, `kyverno`, `sonarqube` et `vault`
-- `dsc.awx.repoSocle.url` (et optionnellement : `dsc.awx.repoSocle.revision`)
+- `helmRepoUrl` pour chaque service concerné
+- `repoSocle.url` (et optionnellement : `repoSocle.revision`) pour les applications ayant un job ansible de post-installation
 
 ## Platform
 
@@ -914,7 +914,7 @@ Il est possible d'utiliser des secrets de type docker-registry pour le pull des 
 
 ### Gestion des secrets de type docker-registry
 
-L'**équipe Infrastructure** est chargée de créer les secrets de type docker-registry lors de la phase de provisionnement initial du cluster.  
+L'**équipe Infrastructure** est chargée de créer les secrets de type docker-registry lors de la phase de provisionnement initial du cluster.
 Si ces secrets ne sont pas présents ou ne peuvent pas être automatisés à la source, l'équipe Ops est responsable de leur **création manuelle** dans le cluster
 
 ### Configuration `dsc`
@@ -951,10 +951,10 @@ Il sera nécessaire pour activer le MFA sur les utilisateurs existants, de lance
 ansible-playbook admin-tools/keycloak-enforce-mfa.yml
 ```
 
-## Tests d'intégration 
+## Tests d'intégration
 
-Il est possible d'activer les tests d'intégration sur un environnement en spécifiant le paramètre `dsc.tests.installEnabled` à `true`.  
-Les notifications étant pour l'instant uniquement supporté sur Mattermost dans le code, il faudra alors récupérer l'id du channel et le token du bot pour les insérer dans le Vault d'infrastructure.  
+Il est possible d'activer les tests d'intégration sur un environnement en spécifiant le paramètre `dsc.tests.installEnabled` à `true`.
+Les notifications étant pour l'instant uniquement supporté sur Mattermost dans le code, il faudra alors récupérer l'id du channel et le token du bot pour les insérer dans le Vault d'infrastructure.
 Pour ce qui concerne les comptes de tests `testuser@example.com` et `secondtestuser@example.com`, il faudra s'assurer que :
 - leurs mots de passe correspondent à ceux qui sont insérés dans le Vault d'infrastructure.
 - le MFA n'est pas appliqué.

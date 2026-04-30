@@ -27,3 +27,18 @@ stringData:
 {% if dsc.proxy.enabled %}
   proxy: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
 {% endif %}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+  name: oci-harbor-creds
+stringData:
+  url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.harbor}>
+  name: harbor
+  type: helm
+  enableOCI: "true"
+  username: admin
+  password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.harborAdminPassword}>
+

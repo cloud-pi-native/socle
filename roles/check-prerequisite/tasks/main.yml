@@ -9,6 +9,7 @@
   ignore_errors: true
 
 - name: Validate cert-manager is first install
+  when: dsc.certmanager.installEnabled
   block:
     - name: Get cluster infos
       kubernetes.core.k8s_cluster_info:

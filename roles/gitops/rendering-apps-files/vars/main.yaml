@@ -75,7 +75,7 @@ values:
 
     rootCA_block: |
       rootCA: |
-        <path:{{ vaultinfra_kv_name }}/data/env/conf-dso/apps/global/values#exposedCa | indent 2>
+        <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#exposedCa | indent 2>
 
     controller_metrics: |
       metrics:

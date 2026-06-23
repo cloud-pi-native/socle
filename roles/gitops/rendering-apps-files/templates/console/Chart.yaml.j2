@@ -11,3 +11,9 @@ dependencies:
   name: cpn-console
   repository: {{ dsc.console.helmRepoUrl }}
   version: {{ dsc.console.chartVersion | quote }}
+{% if dsc.global.backup.velero.enabled | default(false) %}
+- name: dso-backup
+  alias: dso-backup
+  version: {{ dsc.global.backup.dsoBackup.chartVersion | default('1.0.0') | quote }}
+  repository: {{ dsc.global.backup.dsoBackup.helmRepoUrl | default(dsc.cpnAnsibleJob.helmRepoUrl) }}
+{% endif %}

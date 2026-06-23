@@ -1,0 +1,28 @@
+{% if dsc.global.backup.velero.enabled | default(false) %}
+dso-backup:
+  global:
+    appName: vault
+  strategy: vault
+  velero:
+    backupNamePrefix: socle
+  vault:
+    s3:
+      bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>
+      endpoint: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
+      forcePathStyle: true
+      credentialsSecret: vault-backup-s3-credentials
+      insecure: true
+    tokenSecret:
+      name: {{ dsc_name }}-vault-keys
+      key: root_token
+  application:
+    workloads:
+      - type: deployment
+        name: {{ dsc_name }}-vault-agent-injector
+        replicas: 1
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.vault.namespace }}
+          app.kubernetes.io/name: vault-agent-injector
+          component: webhook
+        shutdownTimeout: 120
+{% endif %}

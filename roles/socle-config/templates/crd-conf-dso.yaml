@@ -974,6 +974,16 @@ spec:
                               description: String of arguments to pass to the backup utility.
                               type: string
                           type: object
+                        dsoBackup:
+                          description: Configuration for the dso-backup orchestrator chart (Velero + per-app shutdown/CNPG hooks).
+                          properties:
+                            chartVersion:
+                              description: dso-backup helm chart version (e.g., "1.0.0").
+                              type: string
+                            helmRepoUrl:
+                              description: dso-backup helm repository url. Defaults to the cpnAnsibleJob helm repo.
+                              type: string
+                          type: object
                       type: object
                     platform:
                       default: openshift

@@ -18,3 +18,9 @@ dependencies:
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
   repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+{% if dsc.global.backup.velero.enabled | default(false) %}
+- name: dso-backup
+  alias: dso-backup
+  version: {{ dsc.global.backup.dsoBackup.chartVersion | default('1.0.0') | quote }}
+  repository: {{ dsc.global.backup.dsoBackup.helmRepoUrl | default(dsc.cpnAnsibleJob.helmRepoUrl) }}
+{% endif %}

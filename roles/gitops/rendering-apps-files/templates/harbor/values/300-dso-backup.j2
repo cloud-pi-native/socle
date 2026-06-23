@@ -1,0 +1,61 @@
+{% if dsc.global.backup.velero.enabled | default(false) %}
+{% set harbor_release = dsc.global.gitOps.envName ~ '-' ~ dsc.harbor.namespace %}
+dso-backup:
+  global:
+    appName: harbor
+  strategy: cnpg
+  velero:
+    backupNamePrefix: socle
+  cnpg:
+    clusterName: pg-cluster-harbor
+  application:
+    workloads:
+      - type: deployment
+        name: harbor-portal
+        replicas: 2
+        podLabelSelector:
+          app: harbor
+          component: portal
+          release: {{ harbor_release }}
+        shutdownTimeout: 180
+      - type: deployment
+        name: harbor-core
+        replicas: 3
+        podLabelSelector:
+          app: harbor
+          component: core
+          release: {{ harbor_release }}
+        shutdownTimeout: 240
+      - type: deployment
+        name: harbor-jobservice
+        replicas: 2
+        podLabelSelector:
+          app: harbor
+          component: jobservice
+          release: {{ harbor_release }}
+        shutdownTimeout: 240
+      - type: deployment
+        name: harbor-registry
+        replicas: 3
+        podLabelSelector:
+          app: harbor
+          component: registry
+          release: {{ harbor_release }}
+        shutdownTimeout: 240
+      - type: statefulset
+        name: harbor-trivy
+        replicas: 2
+        podLabelSelector:
+          app: harbor
+          component: trivy
+          release: {{ harbor_release }}
+        shutdownTimeout: 180
+      - type: statefulset
+        name: harbor-redis
+        replicas: 1
+        podLabelSelector:
+          app: harbor
+          component: redis
+          release: {{ harbor_release }}
+        shutdownTimeout: 120
+{% endif %}

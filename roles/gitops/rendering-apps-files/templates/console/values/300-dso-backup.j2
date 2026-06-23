@@ -1,0 +1,41 @@
+{% if dsc.global.backup.velero.enabled | default(false) %}
+{% set console_instance = dsc.global.gitOps.envName ~ '-' ~ dsc.console.namespace %}
+dso-backup:
+  global:
+    appName: console
+  strategy: cnpg
+  velero:
+    backupNamePrefix: socle
+  cnpg:
+    clusterName: pg-cluster-console
+  application:
+    workloads:
+      - type: deployment
+        name: dso-cpn-console-client
+        replicas: 1
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ console_instance }}
+          app.kubernetes.io/name: {{ dsc_name }}-cpn-console-client
+        shutdownTimeout: 180
+      - type: deployment
+        name: dso-cpn-console-strangler
+        replicas: 1
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ console_instance }}
+          app.kubernetes.io/name: {{ dsc_name }}-cpn-console-strangler
+        shutdownTimeout: 180
+      - type: deployment
+        name: dso-cpn-console-server
+        replicas: 1
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ console_instance }}
+          app.kubernetes.io/name: {{ dsc_name }}-cpn-console-server
+        shutdownTimeout: 240
+      - type: deployment
+        name: dso-cpn-console-backend
+        replicas: 1
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ console_instance }}
+          app.kubernetes.io/name: {{ dsc_name }}-cpn-console-backend
+        shutdownTimeout: 240
+{% endif %}

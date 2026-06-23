@@ -50,6 +50,8 @@ spec:
         chartVersion: "1.0.0"
       vaultInfra:
         chartVersion: "1.0.0"
+      dsoBackup:
+        chartVersion: "1.0.3"
   grafana:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"

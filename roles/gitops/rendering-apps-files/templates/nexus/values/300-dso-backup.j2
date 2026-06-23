@@ -1,0 +1,17 @@
+{% if dsc.global.backup.velero.enabled | default(false) %}
+dso-backup:
+  global:
+    appName: nexus
+  velero:
+    backupNamePrefix: socle
+  application:
+    workloads:
+      - type: statefulset
+        name: nexus
+        replicas: 1
+        podLabelSelector:
+          app.kubernetes.io/component: repository
+          app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.nexus.namespace }}
+          app.kubernetes.io/name: nexus
+        shutdownTimeout: 300
+{% endif %}

@@ -1,0 +1,52 @@
+{% if dsc.global.backup.velero.enabled | default(false) %}
+{% set argocd_release = dsc.global.gitOps.envName ~ '-' ~ dsc.argocd.namespace %}
+dso-backup:
+  global:
+    appName: argocd
+  velero:
+    backupNamePrefix: socle
+  application:
+    workloads:
+      - type: deployment
+        name: {{ dsc_name }}-argocd-applicationset-controller
+        replicas: 2
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ argocd_release }}
+          app.kubernetes.io/name: argocd-applicationset-controller
+        shutdownTimeout: 120
+      - type: deployment
+        name: {{ dsc_name }}-argocd-server
+        replicas: 3
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ argocd_release }}
+          app.kubernetes.io/name: argocd-server
+        shutdownTimeout: 180
+      - type: statefulset
+        name: {{ dsc_name }}-argocd-application-controller
+        replicas: 3
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ argocd_release }}
+          app.kubernetes.io/name: argocd-application-controller
+        shutdownTimeout: 300
+      - type: deployment
+        name: {{ dsc_name }}-argocd-repo-server
+        replicas: 3
+        podLabelSelector:
+          app.kubernetes.io/instance: {{ argocd_release }}
+          app.kubernetes.io/name: argocd-repo-server
+        shutdownTimeout: 180
+      - type: deployment
+        name: {{ dsc_name }}-redis-ha-haproxy
+        replicas: 3
+        podLabelSelector:
+          app: redis-ha-haproxy
+          release: {{ argocd_release }}
+        shutdownTimeout: 120
+      - type: statefulset
+        name: {{ dsc_name }}-redis-ha-server
+        replicas: 3
+        podLabelSelector:
+          app: redis-ha
+          release: {{ argocd_release }}
+        shutdownTimeout: 180
+{% endif %}

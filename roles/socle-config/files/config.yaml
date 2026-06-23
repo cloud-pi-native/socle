@@ -101,6 +101,7 @@ spec:
         mcExtraArgs: ""
       gitlab:
         enabled: false
+      dsoBackup: {}
     metrics:
       enabled: false
     alerting:

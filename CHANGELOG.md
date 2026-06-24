@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.9.1](https://github.com/cloud-pi-native/socle/compare/v4.9.0...v4.9.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* hard coded dsc_name in Argo CD Vault plugin's path ([24378e4](https://github.com/cloud-pi-native/socle/commit/24378e4d617bd4ed33f2b16c44b5972228df0553))
+* skip long cert-manager checks when install disabled ([47fcb07](https://github.com/cloud-pi-native/socle/commit/47fcb0715e39c1cd5ad1ee138b4389f40cf58ce0))
+
 ## [4.9.0](https://github.com/cloud-pi-native/socle/compare/v4.8.0...v4.9.0) (2026-06-24)
 
 

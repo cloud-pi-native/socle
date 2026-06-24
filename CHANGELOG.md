@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.9.0](https://github.com/cloud-pi-native/socle/compare/v4.8.0...v4.9.0) (2026-06-24)
+
+
+### Features
+
+* **opencds-mockoon:** add deploy script in admin-tools ([7b91297](https://github.com/cloud-pi-native/socle/commit/7b91297cb5d5d6f918a88349a3541c94824cbf3f))
+* **opencds-mockoon:** add deploy script in admin-tools ([8e7e147](https://github.com/cloud-pi-native/socle/commit/8e7e147e97a64767c6e2280ea79675ff5ba68bed))
+* Update console chart version to 2.4.18 ([1acd1a1](https://github.com/cloud-pi-native/socle/commit/1acd1a157b8705d4d30803c1680071132597e240))
+
+
+### Bug Fixes
+
+* :bug: awx deploy ([f396985](https://github.com/cloud-pi-native/socle/commit/f396985bc08f77d229dfe4e5b458311d0b60455d))
+* **console:** client security context runAsUser fix for nginx alpine ([cdb03b1](https://github.com/cloud-pi-native/socle/commit/cdb03b139a0c8e6f37b01437ebe0eb1f0fe9b24b))
+
 ## [4.8.0](https://github.com/cloud-pi-native/socle/compare/v4.7.0...v4.8.0) (2026-04-20)
 
 

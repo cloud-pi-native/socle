@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.9.2](https://github.com/cloud-pi-native/socle/compare/v4.9.1...v4.9.2) (2026-06-29)
+
+
+### Bug Fixes
+
+* console backend healthcheck ([2200fb1](https://github.com/cloud-pi-native/socle/commit/2200fb13b376cef4bee06419a47485d9cd08b55c))
+
 ## [4.9.1](https://github.com/cloud-pi-native/socle/compare/v4.9.0...v4.9.1) (2026-06-24)
 
 

@@ -1,25 +1,58 @@
 ---
-- name: Get Argo CD app version
+- name: Set repo type fact
+  ansible.builtin.set_fact:
+    is_oci_repo: "{{ dsc.argocdInfra.helmRepoUrl.startswith('oci://') }}"
+    repo_name: "argo" # for HTTP repositories
+
+- name: Get Argo CD infra app version (HTTP)
+  when: not is_oci_repo
   block:
-    - name: Add Argo CD helm repo
+    - name: Add Argo CD Helm repo (HTTP repo only)
       changed_when: false
       kubernetes.core.helm_repository:
-        name: argo
-        repo_url: "{{ dsc.argocd.helmRepoUrl }}"
+        name: "{{ repo_name }}"
+        repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
         force_update: true
 
-    - name: Retrieve Argo CD Helm infos
+    - name: Retrieve Argo CD Helm chart info (HTTP)
       changed_when: false
-      ansible.builtin.shell:
-        cmd: |
-          set -o pipefail
-          helm search repo -l argo --version "{{ dsc.argocd.chartVersion }}" | tail -n 1
-        executable: /bin/bash
+      ansible.builtin.command: >-
+        helm search repo {{ repo_name }}/argo-cd --version "{{ dsc.argocdInfra.chartVersion }}"
       register: argo_infos
+      ignore_errors: true
 
-    - name: Set argo_app_version fact
+    - name: Fail if chart version retrieval failed (HTTP)
+      when: argo_infos.rc != 0 or argo_infos.stdout == ""
+      ansible.builtin.fail:
+        msg: >-
+          Failed to retrieve Argo CD Helm chart version.
+          Check the repository URL ({{ dsc.argocdInfra.helmRepoUrl }}) and chart version ({{ dsc.argocdInfra.chartVersion }}).
+
+    - name: Set argo_app_version fact (HTTP)
       ansible.builtin.set_fact:
-        argo_app_version: "{{ argo_infos.stdout | regex_search('v([0-9]*\\.)+([0-9]+)') }}"
+        argo_app_version: >-
+          {{ argo_infos.stdout | regex_search('v([0-9]+\\.[0-9]+\\.[0-9]+)') }}
+
+- name: Get Argo CD infra app version (OCI)
+  when: is_oci_repo
+  block:
+    - name: Retrieve Argo CD Helm chart info (OCI)
+      changed_when: false
+      ansible.builtin.command: >-
+        helm show chart {{ dsc.argocdInfra.helmRepoUrl }}/argo-cd --version "{{ dsc.argocdInfra.chartVersion }}"
+      register: argo_infos
+      ignore_errors: true
+
+    - name: Fail if chart version retrieval failed (OCI)
+      when: argo_infos.rc != 0 or argo_infos.stdout == ""
+      ansible.builtin.fail:
+        msg: >-
+          Failed to retrieve Argo CD Helm chart version.
+          Check the repository URL ({{ dsc.argocdInfra.helmRepoUrl }}) and chart version ({{ dsc.argocdInfra.chartVersion }}).
+
+    - name: Set argo_app_version fact (OCI)
+      ansible.builtin.set_fact:
+        argo_app_version: "{{ argo_infos.stdout | regex_search('(?<=appVersion: )v([0-9]+\\.[0-9]+\\.[0-9]+)') }}"
 
 - name: Find argo crd existence
   kubernetes.core.k8s_info:
@@ -41,7 +74,7 @@
   ansible.builtin.set_fact:
     path: "{{ role_path + '/gitlab/values' }}"
 
-- name: Compute Gitlab Helm values
+- name: Compute GitLab Helm values
   ansible.builtin.include_role:
     name: combine
   vars:

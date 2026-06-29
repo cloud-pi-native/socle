@@ -139,26 +139,26 @@ spec:
                       description: The domain for Argo CD.
                       type: string
                     helmRepoUrl:
-                      description: Argo CD helm repository url.
+                      description: Argo CD Helm repository url.
                       type: string
                     chartVersion:
-                      description: Argo CD helm chart version (e.g., "4.7.13").
+                      description: Argo CD Helm chart version (e.g., "4.7.13").
                       type: string
                     values:
                       description: |
-                        You can add custom values for Argo CD, they will be merged with roles/argocd/templates/values/
+                        Custom values for the Argo CD Helm chart will be merged under the `argocd:` key with the base values from: roles/gitops/rendering-apps-files/templates/argocd/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
-                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:
-                      description: Private Gitlab repository for Argo CD to access.
+                      description: Private GitLab repository for Argo CD to access.
                       type: string
                     zoneName:
                       description: Name of the zone (multiple clusters) managed by this Argo CD instance.
                       type: string
                     zoneChartVersion:
-                      description: Version of the Helm Chart to use to manage zone objects. See https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
+                      description: Version of the Helm chart to use to manage zone objects. See https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
                       type: string
                     secondaryZones:
                       description: List of secondary zones each run an Argo CD instance to manage all applications deployed in the secondary zone.
@@ -194,7 +194,7 @@ spec:
                       description: The domain for AWX.
                       type: string
                     chartVersion:
-                      description: AWX Operator helm chart version (e.g., "2.19.1").
+                      description: AWX Operator Helm chart version (e.g., "2.19.1").
                       type: string
                     repoSocle:
                       type: object
@@ -213,8 +213,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can merge customs values for awx, it will be merged with roles/awx/tasks/main.yaml
-                        See https://artifacthub.io/packages/helm/awx-operator/awx-operator
+                        Custom values for the AWX Helm chart will be merged under the `awx:` key with the base values from: roles/gitops/rendering-apps-files/templates/awx/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/ansible-community/awx-operator-helm/tree/main/charts/awx-operator
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
@@ -223,7 +224,7 @@ spec:
                       type: string
                       default: 10Gi
                     helmRepoUrl:
-                      description: AWX helm repository url.
+                      description: AWX Helm repository url.
                       type: string
                     cnpg:
                       description: Configuration for cnpg clusters.
@@ -276,20 +277,20 @@ spec:
                       description: The domain for Argo CD infrastructure instance.
                       type: string
                     helmRepoUrl:
-                      description: Argo CD community maintained helm repository url.
+                      description: Argo CD community maintained Helm repository url.
                       type: string
                     chartVersion:
-                      description: Argo CD community maintained helm chart version (e.g., "7.3.11").
+                      description: Argo CD community maintained Helm chart version (e.g., "7.3.11").
                       type: string
                     values:
                       description: |
-                        You can add custom values for Argo CD infrastructure instance, they will be merged with roles/infra/argocd-infra/templates/values/
+                        Custom values for the Argo CD infra instance Helm chart will be merged with the base values from: roles/infra/argocd-infra/templates/values/ (direct chart values, no wrapper key)
+                        For reference, see the upstream chart and its default values (in values.yaml):
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
-                        https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     privateGitlabDomain:
-                      description: Private Gitlab repository for Argo CD to access.
+                      description: Private GitLab repository for Argo CD to access.
                       type: string
                     vaultPluginVersion:
                       description: |
@@ -315,10 +316,10 @@ spec:
                       description: Specifies whether we should install Cert-manager instance.
                       type: boolean
                     helmRepoUrl:
-                      description: Cert-manager helm repository url.
+                      description: Cert-manager Helm repository url.
                       type: string
                     chartVersion:
-                      description: Cert-manager helm chart version (e.g., "v1.13.1").
+                      description: Cert-manager Helm chart version (e.g., "v1.13.1").
                       type: string
                     forcedInstall:
                       description: |
@@ -329,9 +330,11 @@ spec:
                       type: boolean
                     values:
                       description: |
-                        You can add custom values for cert-manager, they will be merged with roles/cert-manager/templates/values/
-                        https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
-                        https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
+                        Custom values for cert-manager will be merged as follows:
+                        - Initial installation (Ansible): with the base values from roles/cert-manager/templates/values/ (direct chart values, no wrapper key)
+                        - ArgoCD-managed installation: under the `certmanager:` key with the base values from roles/gitops/rendering-apps-files/templates/certmanager/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/cert-manager/cert-manager/tree/master/deploy/charts/cert-manager
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -362,26 +365,26 @@ spec:
                       type: object
                       properties:
                         helmRepoUrl:
-                          description: CloudNativePG helm repository url.
+                          description: CloudNativePG Helm repository url.
                           type: string
                         chartVersion:
-                          description: CloudNativePG helm chart version (e.g., "0.3.1").
+                          description: CloudNativePG Helm chart version (e.g., "0.3.1").
                           type: string
                     operator:
                       description: Configuration for the operator.
                       type: object
                       properties:
                         helmRepoUrl:
-                          description: CloudNativePG helm repository url.
+                          description: CloudNativePG Helm repository url.
                           type: string
                         chartVersion:
-                          description: CloudNativePG helm chart version (e.g., "0.25.0").
+                          description: CloudNativePG Helm chart version (e.g., "0.25.0").
                           type: string
                         values:
                           description: |
-                            You can add custom values for CloudNativePG, they will be merged with roles/gitops/rendering-apps-files/
-                            https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg
-                            https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml
+                            Custom values for the CloudNativePG Helm chart will be merged under the `cloudnativepg:` key with the base values from: roles/gitops/rendering-apps-files/templates/cloudnativepg/values/
+                            For reference, see the upstream chart and its default values (in values.yaml):
+                            https://github.com/cloudnative-pg/charts/tree/main/charts/cloudnative-pg
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                 console:
@@ -398,7 +401,7 @@ spec:
                       description: Console release version (e.g., "9.4.0").
                       type: string
                     chartVersion:
-                      description: Console helm chart version (e.g., "2.1.11").
+                      description: Console Helm chart version (e.g., "2.1.11").
                       type: string
                     subDomain:
                       description: The subdomain for console.
@@ -407,10 +410,13 @@ spec:
                       description: The domain for console.
                       type: string
                     helmRepoUrl:
-                      description: Console helm repository url.
+                      description: Console Helm repository url.
                       type: string
                     values:
-                      description: Extra helm values for console.
+                      description: |
+                        Custom values for the Console Helm chart will be merged under the `console:` key with the base values from: roles/gitops/rendering-apps-files/templates/console/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-console
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     postgresPvcSize:
@@ -437,7 +443,10 @@ spec:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
                         values:
-                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          description: |
+                            Custom values for the CloudNativePG *cluster* Helm chart will be merged under the `cluster:` key with the base values from: roles/gitops/rendering-apps-files/templates/console/values/100-cnpg.j2
+                            For reference, see the upstream chart and its default values (in values.yaml):
+                            https://github.com/cloudnative-pg/charts/tree/main/charts/cluster/
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -447,16 +456,16 @@ spec:
                   description: Configuration for cpn-ansible-job.
                   properties:
                     helmRepoUrl:
-                      description: Cloud-Pi-Native helm repository url.
+                      description: Cloud-Pi-Native Helm repository url.
                       type: string
                     chartVersion:
-                      description: Cloud-Pi-Native helm chart version (e.g., "1.0.0").
+                      description: Cloud-Pi-Native Helm chart version (e.g., "1.0.0").
                       type: string
                     values:
                       description: |
-                        You can add custom values for cpn-ansible-job, they will be merged with roles/gitops/rendering-apps-files/
-                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job
-                        https://github.com/cloud-pi-native/helm-charts/blob/main/charts/dso-ansible-job/values.yaml
+                        Custom values for the post-install Ansible job Helm chart will be merged under the `cpn-ansible-job:` key with the base values from: roles/gitops/rendering-apps-files/templates/<app_name>/values/200-ansible-job.j2 (when present)
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-job/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -465,7 +474,7 @@ spec:
                   properties:
                     installEnabled:
                       default: true
-                      description: Specifies whether we should install Gitlab instance.
+                      description: Specifies whether we should install GitLab instance.
                       type: boolean
                     namespace:
                       description: The namespace for GitLab.
@@ -485,7 +494,7 @@ spec:
                       properties:
                         url:
                           type: string
-                          description: URL of the socle Git repository containing the Gitlab post-installation Ansible playbook.
+                          description: URL of the socle Git repository containing the GitLab post-installation Ansible playbook.
                         revision:
                           type: string
                           description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
@@ -494,9 +503,11 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/
-                        https://docs.gitlab.com/charts/charts/globals.html
-                        https://gitlab.com/gitlab-org/charts/gitlab/-/blob/master/values.yaml
+                        Custom values for the GitLab instance are merged into the GitLab CR definition generated in roles/gitops/rendering-apps-files/tasks/preliminary.yml
+                        They are combined with roles/gitops/rendering-apps-files/templates/gitlab/values/* and written to spec.chart.values in {{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ env_name }}/apps/gitlab/templates/gitlab.yaml
+                        For reference, see the GitLab Operator chart values:
+                        https://docs.gitlab.com/operator/
+                        https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tree/master/deploy/chart/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     insecureCI:
@@ -513,17 +524,17 @@ spec:
                       items:
                         properties:
                           name:
-                            description: Variable name of the Gitlab CI var.
+                            description: Variable name of the GitLab CI var.
                             type: string
                           value:
-                            description: Value of the Gitlab CI var.
+                            description: Value of the GitLab CI var.
                             type: string
                           masked:
-                            description: Should the Gitlab CI var be masked in logs.
+                            description: Should the GitLab CI var be masked in logs.
                             type: boolean
                             default: true
                           protected:
-                            description: Should the Gitlab CI var be protected.
+                            description: Should the GitLab CI var be protected.
                             type: boolean
                             default: false
                         type: object
@@ -554,7 +565,10 @@ spec:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
                         values:
-                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          description: |
+                            Custom values for the CloudNativePG *cluster* Helm chart will be merged under the `cluster:` key with the base values from: roles/gitops/rendering-apps-files/templates/gitlab/values/100-cnpg.j2
+                            For reference, see the upstream chart and its default values (in values.yaml):
+                            https://github.com/cloudnative-pg/charts/tree/main/charts/cluster/
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -565,20 +579,19 @@ spec:
                   properties:
                     installEnabled:
                       default: true
-                      description: Specifies whether we should install Gitlab-ci pipelines exporter instance.
+                      description: Specifies whether we should install GitLab CI Pipelines Exporter instance.
                       type: boolean
                     helmRepoUrl:
-                      description: GitLab CI Pipelines Exporter helm repository url.
+                      description: GitLab CI Pipelines Exporter Helm repository url.
                       type: string
                     chartVersion:
                       description: GitLab CI Pipelines Exporter chart version (e.g., "0.3.4").
                       type: string
                     values:
                       description: |
-                        You can add custom values for gitLab-ci-pipelines-exporter, they will be
-                        merged with roles/gitlab-ci-pipelines-exporter/templates/values/
-                        https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter
-                        https://github.com/mvisonneau/helm-charts/blob/main/charts/gitlab-ci-pipelines-exporter/values.yaml
+                        Custom values for the gitlab-ci-pipelines-exporter Helm chart will be merged under the `glexporter:` key with the base values from: roles/gitops/rendering-apps-files/templates/glexporter/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -588,7 +601,7 @@ spec:
                   description: Configuration for GitLab Operator.
                   properties:
                     helmRepoUrl:
-                      description: GitLab Operator helm repository url.
+                      description: GitLab Operator Helm repository url.
                       type: string
                     chartVersion:
                       description: GitLab Operator release version (e.g., "0.24.1").
@@ -619,9 +632,11 @@ spec:
                               type: string
                     values:
                       description: |
-                        You can add custom values for GitLab Operator, they will be merged with roles/gitlab-operator/templates/values/
+                        Custom values for the GitLab Operator chart are merged under the `gitlab:` key in the GitLab wrapper chart values.
+                        They are combined with roles/gitops/rendering-apps-files/templates/gitlab/values/* via roles/gitops/rendering-apps-files/tasks/template.yml
+                        For reference, see the GitLab Operator chart values:
                         https://docs.gitlab.com/operator/
-                        https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/blob/master/deploy/chart/values.yaml
+                        https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tree/master/deploy/chart/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
@@ -638,10 +653,10 @@ spec:
                   properties:
                     installEnabled:
                       default: true
-                      description: Specifies whether we should install Gitlab-runner instance.
+                      description: Specifies whether we should install GitLab Runner instance.
                       type: boolean
                     helmRepoUrl:
-                      description: GitLab Runner helm repository url.
+                      description: GitLab Runner Helm repository url.
                       type: string
                     chartVersion:
                       description: GitLab Runner chart version (e.g., "0.57.0").
@@ -704,9 +719,10 @@ spec:
                           type: boolean
                     values:
                       description: |
-                        You can add custom values for GitLab Runner, they will be merged with roles/gitlab-runner/templates/values/
+                        Custom values for the GitLab Runner Helm chart will be merged under the `gitlabrunner:` key with the base values from: roles/gitops/rendering-apps-files/templates/gitlabrunner/values/
+                        For reference, see the documentation, the upstream chart and its default values (in values.yaml):
                         https://docs.gitlab.com/runner/
-                        https://gitlab.com/gitlab-org/cloud-native/distroless/gitlab-runner
+                        https://gitlab.com/gitlab-org/charts/gitlab-runner/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -732,12 +748,6 @@ spec:
                         revision:
                           type: string
                           description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
-                    values:
-                      description: |
-                        You can add custom values for Global configuration, they will be merged with roles/gitops/rendering-apps-files/templates/global/
-                        https://github.com/cloud-pi-native/socle
-                      type: object
-                      x-kubernetes-preserve-unknown-fields: true
                     environment:
                       default: production
                       description: Defines DSO environment type, i.e. development or production.
@@ -746,7 +756,7 @@ spec:
                       default:
                         - forge
                       description: |
-                        Defines root directory for projects in Gitlab and Vault.
+                        Defines root directory for projects in GitLab and Vault.
                         These values should NEVER be changed once a project is used !
                         Projects will not be migrated automatically.
                         Represented as array of strings (e.g., ['company', 'forge', 'projects'])
@@ -872,10 +882,10 @@ spec:
                               default: false
                               type: boolean
                             helmRepoUrl:
-                              description: Vault backup-utils helm repository url.
+                              description: Vault backup-utils Helm repository url.
                               type: string
                             chartVersion:
-                              description: Vault backup-utils helm chart version (e.g., "1.12.2").
+                              description: Vault backup-utils Helm chart version (e.g., "1.12.2").
                               type: string
                             pathPrefix:
                               description: Defines the s3 destination path for vault backups.
@@ -900,10 +910,10 @@ spec:
                               default: false
                               type: boolean
                             helmRepoUrl:
-                              description: Vault infra backup-utils helm repository url.
+                              description: Vault infra backup-utils Helm repository url.
                               type: string
                             chartVersion:
-                              description: Vault infra backup-utils helm chart version (e.g., "1.12.2").
+                              description: Vault infra backup-utils Helm chart version (e.g., "1.12.2").
                               type: string
                             pathPrefix:
                               description: Defines the s3 destination path for vault infra backups.
@@ -1010,7 +1020,7 @@ spec:
                           properties:
                             url:
                               type: string
-                              description: URL of the Git repository to watch as GitOps source of truth.
+                              description: URL of the Git repository to watch as GitOps source of truth. For GitLab repositories, the URL must include the `.git` suffix.
                             revision:
                               type: string
                               description: Branch or tag name to watch as GitOps source of truth.
@@ -1103,7 +1113,7 @@ spec:
                       description: Grafana release version (e.g., "9.5.5").
                       type: string
                     helmRepoUrl:
-                      description: DSO Grafana instances helm repository url.
+                      description: DSO Grafana instances Helm repository url.
                       type: string
                     chartVersion:
                       description: DSO Grafana instances release version (e.g., "9.5.5").
@@ -1126,10 +1136,10 @@ spec:
                       description: The domain for Harbor.
                       type: string
                     helmRepoUrl:
-                      description: Harbor helm repository url.
+                      description: Harbor Helm repository url.
                       type: string
                     chartVersion:
-                      description: Harbor helm chart version (e.g., "1.12.2").
+                      description: Harbor Helm chart version (e.g., "1.12.2").
                       type: string
                     repoSocle:
                       type: object
@@ -1175,9 +1185,9 @@ spec:
                           type: string
                     values:
                       description: |
-                        You can add custom values for harbor, they will be merged with roles/harbor/templates/values/
-                        https://github.com/goharbor/harbor-helm
-                        https://github.com/goharbor/harbor-helm/blob/main/values.yaml
+                        Custom values for the Harbor Helm chart will be merged under the `harbor:` key with the base values from: roles/gitops/rendering-apps-files/templates/harbor/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/goharbor/harbor-helm/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     postgresPvcSize:
@@ -1204,7 +1214,10 @@ spec:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
                         values:
-                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          description: |
+                            Custom values for the CloudNativePG *cluster* Helm chart will be merged under the `cluster:` key with the base values from: roles/gitops/rendering-apps-files/templates/harbor/values/100-cnpg.j2
+                            For reference, see the upstream chart and its default values (in values.yaml):
+                            https://github.com/cloudnative-pg/charts/tree/main/charts/cluster/
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -1317,7 +1330,7 @@ spec:
                       description: The domain for Keycloak.
                       type: string
                     helmRepoUrl:
-                      description: Keycloak Bitnami helm repository url.
+                      description: Keycloak Bitnami Helm repository url.
                       type: string
                     chartVersion:
                       description: Keycloak Bitnami chart version (e.g., "16.0.3").
@@ -1365,9 +1378,9 @@ spec:
                       type: boolean
                     values:
                       description: |
-                        You can add custom values for keycloak, they will be merged with roles/keycloak/templates/values/
-                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak
-                        https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                        Custom values for the Keycloak Helm chart will be merged under the `keycloak:` key with the base values from: roles/gitops/rendering-apps-files/templates/keycloak/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     cnpg:
@@ -1378,7 +1391,10 @@ spec:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
                         values:
-                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          description: |
+                            Custom values for the CloudNativePG *cluster* Helm chart will be merged under the `cluster:` key with the base values from: roles/gitops/rendering-apps-files/templates/keycloak/values/100-cnpg.j2
+                            For reference, see the upstream chart and its default values (in values.yaml):
+                            https://github.com/cloudnative-pg/charts/tree/main/charts/cluster/
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -1401,7 +1417,7 @@ spec:
                       description: The domain for Keycloak infrastructure instance.
                       type: string
                     helmRepoUrl:
-                      description: Keycloak Bitnami helm repository url.
+                      description: Keycloak Bitnami Helm repository url.
                       type: string
                     chartVersion:
                       description: Keycloak Bitnami chart version (e.g., "19.3.4").
@@ -1427,9 +1443,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for keycloakInfra, they will be merged with roles/infra/keycloak-infra/templates/values/
-                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak
-                        https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
+                        Custom values for the Keycloak infra instance Helm chart will be merged with the base values from: roles/infra/keycloak-infra/templates/values/ (direct chart values, no wrapper key)
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/bitnami/charts/tree/main/bitnami/keycloak/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     cnpg:
@@ -1460,16 +1476,18 @@ spec:
                       default: false
                       type: boolean
                     helmRepoUrl:
-                      description: Kyverno helm repository url.
+                      description: Kyverno Helm repository url.
                       type: string
                     chartVersion:
-                      description: Kyverno helm chart version (e.g., "3.1.4").
+                      description: Kyverno Helm chart version (e.g., "3.1.4").
                       type: string
                     values:
                       description: |
-                        You can add custom values for Kyverno, they will be merged with roles/kyverno/templates/values/
-                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno
-                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
+                        Custom values for Kyverno will be merged as follows:
+                        - Initial installation (Ansible): with the base values from roles/kyverno/templates/values/ (direct chart values, no wrapper key)
+                        - ArgoCD-managed installation: under the `kyverno:` key with the base values from roles/gitops/rendering-apps-files/templates/kyverno/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/kyverno/kyverno/tree/main/charts/kyverno/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -1483,10 +1501,10 @@ spec:
                       description: Specifies whether we should install Nexus instance.
                       type: boolean
                     helmRepoName:
-                      description: Nexus helm repository name (e.g., "stevehipwell").
+                      description: Nexus Helm repository name (e.g., "stevehipwell").
                       type: string
                     helmRepoUrl:
-                      description: Nexus helm repository url (e.g., "https://stevehipwell.github.io/helm-charts/").
+                      description: Nexus Helm repository url (e.g., "https://stevehipwell.github.io/helm-charts/").
                       type: string
                     chartVersion:
                       description: Nexus Helm chart version (e.g., "5.8.3").
@@ -1526,9 +1544,9 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                     values:
                       description: |
-                        You can add custom values for nexus, they will be merged with roles/nexus/templates/values/
-                        https://github.com/stevehipwell/helm-charts/
-                        https://github.com/stevehipwell/helm-charts/blob/main/charts/nexus3/values.yaml
+                        Custom values for the Nexus Helm chart will be merged under the `nexus:` key with the base values from: roles/gitops/rendering-apps-files/templates/nexus/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/stevehipwell/helm-charts/tree/main/charts/nexus3/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -1560,13 +1578,13 @@ spec:
                       description: The namespace for Observatorium.
                       type: string
                     helmRepoUrl:
-                      description: Observatorium helm repository url.
+                      description: Observatorium Helm repository url.
                       type: string
                     chartVersion:
-                      description: Observatorium helm chart version (e.g., "0.25.0").
+                      description: Observatorium Helm chart version (e.g., "0.25.0").
                       type: string
                     observabilityChartVersion:
-                      description: Dso-observability helm chart version (e.g., "0.1.8").
+                      description: Dso-observability Helm chart version (e.g., "0.1.8").
                       type: string
                     observabilityPluginVersion:
                       description: |
@@ -1643,10 +1661,10 @@ spec:
                       description: The domain for SonarQube.
                       type: string
                     helmRepoUrl:
-                      description: SonarQube helm repository url.
+                      description: SonarQube Helm repository url.
                       type: string
                     chartVersion:
-                      description: SonarQube helm chart version (e.g., "10.2.1+800").
+                      description: SonarQube Helm chart version (e.g., "10.2.1+800").
                       type: string
                     repoSocle:
                       type: object
@@ -1682,9 +1700,9 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for sonarqube, they will be merged with roles/sonarqube/templates/values/
-                        https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube
-                        https://github.com/SonarSource/helm-chart-sonarqube/blob/master/charts/sonarqube/values.yaml
+                        Custom values for the Sonarqube Helm chart will be merged under the `sonarqube:` key with the base values from: roles/gitops/rendering-apps-files/templates/sonarqube/values/
+                        For reference, see the upstream chart and its default values (in values.yaml):
+                        https://github.com/SonarSource/helm-chart-sonarqube/tree/master/charts/sonarqube/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     cnpg:
@@ -1695,7 +1713,10 @@ spec:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
                         values:
-                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          description: |
+                            Custom values for the CloudNativePG *cluster* Helm chart will be merged under the `cluster:` key with the base values from: roles/gitops/rendering-apps-files/templates/sonarqube/values/100-cnpg.j2
+                            For reference, see the upstream chart and its default values (in values.yaml):
+                            https://github.com/cloudnative-pg/charts/tree/main/charts/cluster/
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -1716,14 +1737,14 @@ spec:
                       type: object
                       properties:
                         consoleDestinationCluster:
-                          description: Cluster name where ArgoCD deploys applications.
+                          description: Cluster name where Argo CD deploys applications.
                           type: string
                         consoleValuesFile:
-                          description: Values file for ArgoCD.
+                          description: Values file for Argo CD.
                           type: string
                     values:
                       description: |
-                        You can add custom values for tests, they will be merged with roles/gitops/rendering-apps-files/templates/tests/values/
+                        Custom values for tests will be merged with the base values from roles/gitops/rendering-apps-files/templates/tests/values/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                 vault:
@@ -1743,10 +1764,10 @@ spec:
                       description: The domain for Vault.
                       type: string
                     helmRepoUrl:
-                      description: Hashicorp Vault helm repository url.
+                      description: Hashicorp Vault Helm repository url.
                       type: string
                     chartVersion:
-                      description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                      description: Hashicorp Vault Helm chart version (e.g., "0.25.0").
                       type: string
                     repoSocle:
                       type: object
@@ -1763,9 +1784,10 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for vault, they will be merged with roles/vault/templates/values/
+                        Custom values for the Vault Helm chart will be merged under the `vault:` key with the base values from: roles/gitops/rendering-apps-files/templates/vault/values/
+                        For reference, see the documentation, the upstream chart and its default values (in values.yaml):
                         https://developer.hashicorp.com/vault/docs/platform/k8s/helm
-                        https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+                        https://github.com/hashicorp/vault-helm/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   required:
@@ -1788,19 +1810,20 @@ spec:
                       description: The domain for Vault infrastructure instance.
                       type: string
                     helmRepoUrl:
-                      description: Hashicorp Vault helm repository url.
+                      description: Hashicorp Vault Helm repository url.
                       type: string
                     chartVersion:
-                      description: Hashicorp Vault helm chart version (e.g., "0.25.0").
+                      description: Hashicorp Vault Helm chart version (e.g., "0.25.0").
                       type: string
                     pvcSize:
                       description: Size for Vault infrastructure instance persistent volume.
                       type: string
                     values:
                       description: |
-                        You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/
+                        Custom values for the Vault infra instance Helm chart will be merged with the base values from: roles/infra/vault-infra/templates/values/ (direct chart values, no wrapper key)
+                        For reference, see the documentation, the upstream chart and its default values (in values.yaml):
                         https://developer.hashicorp.com/vault/docs/platform/k8s/helm
-                        https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+                        https://github.com/hashicorp/vault-helm/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   required:

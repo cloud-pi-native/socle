@@ -1,0 +1,19 @@
+{% if dsc.global.backup.velero.enabled | default(false) %}
+dso-backup:
+  global:
+    appName: sonarqube
+  strategy: cnpg
+  velero:
+    backupNamePrefix: socle
+  cnpg:
+    clusterName: pg-cluster-sonar
+  application:
+    workloads:
+      - type: statefulset
+        name: sonarqube-sonarqube
+        replicas: 1
+        podLabelSelector:
+          app: sonar
+          release: {{ dsc.global.gitOps.envName }}-{{ dsc.sonarqube.namespace }}
+        shutdownTimeout: 300
+{% endif %}

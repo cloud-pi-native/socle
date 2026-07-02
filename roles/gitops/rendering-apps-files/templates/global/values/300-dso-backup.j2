@@ -1,0 +1,7 @@
+{% if dsc.global.backup.velero.enabled | default(false) %}
+dso-backup:
+  global:
+    appName: global
+  velero:
+    backupNamePrefix: socle
+{% endif %}

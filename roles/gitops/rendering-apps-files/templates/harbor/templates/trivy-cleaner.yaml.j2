@@ -47,7 +47,7 @@ spec:
           restartPolicy: Never
           containers:
           - name: trivy-cleaner
-            image: "registry.k8s.io/kubectl"
+            image: "rancher/kubectl:v1.36.2"
             command:
               - /bin/sh
               - -c

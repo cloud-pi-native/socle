@@ -63,7 +63,7 @@ console:
           name: dso-config
     env:
       DSO_NS_CHART_VERSION: "dso-ns-1.1.5"
-      DSO_ENV_CHART_VERSION: "dso-env-1.7.0"
+      DSO_ENV_CHART_VERSION: "dso-env-1.9.2"
 {% if dsc.observatorium.installEnabled %}
       DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion | quote }}
       GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>
@@ -76,7 +76,7 @@ console:
           name: dso-config
     env:
       DSO_NS_CHART_VERSION: "dso-ns-1.1.5"
-      DSO_ENV_CHART_VERSION: "dso-env-1.7.0"
+      DSO_ENV_CHART_VERSION: "dso-env-1.9.2"
 {% if dsc.observatorium.installEnabled %}
       DSO_OBSERVABILITY_CHART_VERSION: {{ dsc.observatorium.observabilityChartVersion | quote }}
       GRAFANA_URL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.grafana}>

@@ -1452,39 +1452,6 @@ spec:
                   required:
                     - installEnabled
                   type: object
-                kyverno:
-                  description: Configuration for Kyverno.
-                  properties:
-                    installEnabled:
-                      default: false
-                      description: Specifies whether we should install Kyverno instance.
-                      type: boolean
-                    namespace:
-                      description: The namespace for Kyverno.
-                      type: string
-                    forcedInstall:
-                      description: |
-                        If set to true, Kyverno will be installed (or reinstalled) in the
-                        desired namespace regardless of its existing state.
-                        The default value is false, which means no forced installation will occur.
-                      default: false
-                      type: boolean
-                    helmRepoUrl:
-                      description: Kyverno helm repository url.
-                      type: string
-                    chartVersion:
-                      description: Kyverno helm chart version (e.g., "3.1.4").
-                      type: string
-                    values:
-                      description: |
-                        You can add custom values for Kyverno, they will be merged with roles/kyverno/templates/values/
-                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno
-                        https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
-                      type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                  required:
-                    - installEnabled
-                  type: object
                 nexus:
                   description: Configuration for Nexus.
                   properties:

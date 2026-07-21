@@ -90,11 +90,6 @@
             nameSpace: "certmanager"
             customNamespacePrefix: ""
             syncWave: 10
-          - argocd_app: kyverno
-            clusterName: ""
-            nameSpace: "kyverno"
-            customNamespacePrefix: ""
-            syncWave: 10
           - argocd_app: cloudnativepg
             clusterName: ""
             nameSpace: "cloudnativepg"

@@ -1,5 +1,22 @@
 # Changelog
 
+## [4.10.0](https://github.com/cloud-pi-native/socle/compare/v4.9.2...v4.10.0) (2026-07-21)
+
+
+### Features
+
+* add harbor oci repo cred to Argo CD ([ccd0b38](https://github.com/cloud-pi-native/socle/commit/ccd0b38b99b36cfa4d85ff59c903b220f855fd39))
+* enable velero backup ([504cff7](https://github.com/cloud-pi-native/socle/commit/504cff7bc2b34479d971b0ab23b56a317690c351))
+* update console related charts ([bc233f4](https://github.com/cloud-pi-native/socle/commit/bc233f46aa81997213dfa02e5d04c4c4b94d7d3a))
+* upgrade harbor ([3f3b929](https://github.com/cloud-pi-native/socle/commit/3f3b929c70addc2e6aa441492c686b8b7fc67fda))
+* upgrade nexus ([f1c98e5](https://github.com/cloud-pi-native/socle/commit/f1c98e50b348547c251bbe6e189d20eafb797523))
+
+
+### Bug Fixes
+
+* for trivy cleaner use a kubectl image with bash ([b0ee155](https://github.com/cloud-pi-native/socle/commit/b0ee155be915ba7ab263cdc78cb4e6b761696f7e))
+* use rancher kubectl image for trivy cleaner ([091f735](https://github.com/cloud-pi-native/socle/commit/091f73509f0c68fd751d9d261a5d58bb658b38a3))
+
 ## [4.9.2](https://github.com/cloud-pi-native/socle/compare/v4.9.1...v4.9.2) (2026-06-29)
 
 

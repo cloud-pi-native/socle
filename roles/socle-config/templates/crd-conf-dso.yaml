@@ -557,6 +557,68 @@ spec:
                           description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
+                    pages:
+                      description: Configuration for GitLab Pages.
+                      type: object
+                      properties:
+                        enabled:
+                          description: Specifies whether GitLab Pages should be enabled.
+                          type: boolean
+                          default: false
+                        accessControl:
+                          description: Enable access control for GitLab Pages.
+                          type: boolean
+                          default: true
+                        hostPrefix:
+                          description: Host prefix for GitLab Pages (e.g., "pages" results in pages.<rootDomain>).
+                          type: string
+                          default: pages
+                        https:
+                          description: Enable HTTPS for GitLab Pages.
+                          type: boolean
+                          default: true
+                        namespaceInPath:
+                          description: Include the namespace in the Pages URL path.
+                          type: boolean
+                          default: true
+                        tls:
+                          description: TLS configuration for GitLab Pages ingress.
+                          type: object
+                          properties:
+                            secretName:
+                              description: Name of the TLS secret for GitLab Pages ingress.
+                              type: string
+                              default: gitlab-pages-tls
+                        objectStore:
+                          description: Object storage configuration for GitLab Pages.
+                          type: object
+                          properties:
+                            external:
+                              description: |
+                                Use an external S3-compatible object store for GitLab Pages.
+                                When true, credentials are read from Vault key pagesS3 under apps/gitlab/values.
+                              type: boolean
+                              default: false
+                            bucket:
+                              description: Bucket name for GitLab Pages object storage.
+                              type: string
+                              default: gitlab-pages
+                            path_style:
+                              description: Use path-style addressing for the S3 endpoint.
+                              type: boolean
+                              default: true
+                            connection:
+                              description: Kubernetes secret connection settings for the object store.
+                              type: object
+                              properties:
+                                secret:
+                                  description: Name of the Secret containing the object store connection.
+                                  type: string
+                                  default: gitlab-pages-storage
+                                key:
+                                  description: Key within the Secret that holds the connection configuration.
+                                  type: string
+                                  default: connection
                   required:
                     - installEnabled
                   type: object

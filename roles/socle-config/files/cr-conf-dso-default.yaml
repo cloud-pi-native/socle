@@ -65,6 +65,21 @@ spec:
   console: {}
   cpnAnsibleJob: {}
   gitlab: {}
+  #  pages:
+  #    enabled: true
+  #    accessControl: true
+  #    hostPrefix: pages
+  #    https: true
+  #    namespaceInPath: true
+  #    tls:
+  #      secretName: gitlab-pages-tls
+  #    objectStore:
+  #      external: false
+  #      bucket: gitlab-pages
+  #      path_style: true
+  #      connection:
+  #        secret: gitlab-pages-storage
+  #        key: connection
   glexporter: {}
   gitlabOperator: {}
   gitlabrunner: {}

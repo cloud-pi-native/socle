@@ -64,6 +64,21 @@ spec:
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
     values: {}
+    pages:
+      enabled: false
+      accessControl: true
+      hostPrefix: pages
+      https: true
+      namespaceInPath: true
+      tls:
+        secretName: gitlab-pages-tls
+      objectStore:
+        external: false
+        bucket: gitlab-pages
+        path_style: true
+        connection:
+          secret: gitlab-pages-storage
+          key: connection
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git
   glexporter:

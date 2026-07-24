@@ -1,0 +1,29 @@
+{% if dsc.gitlab.pages.enabled %}
+gitlab:
+  gitlab-pages:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-pages"
+    ingress:
+      tls:
+        secretName: {{ dsc.gitlab.pages.tls.secretName }}
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      serviceMonitor:
+        enabled: true
+{% endif %}
+global:
+  pages:
+    accessControl: {{ dsc.gitlab.pages.accessControl }}
+    enabled: true
+    host: {{ dsc.gitlab.pages.hostPrefix }}.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#rootDomain>
+    https: {{ dsc.gitlab.pages.https }}
+    namespaceInPath: {{ dsc.gitlab.pages.namespaceInPath }}
+{% if dsc.gitlab.pages.objectStore.external %}
+    objectStore:
+      enabled: true
+      bucket: {{ dsc.gitlab.pages.objectStore.bucket }}
+      connection:
+        secret: {{ dsc.gitlab.pages.objectStore.connection.secret }}
+        key: {{ dsc.gitlab.pages.objectStore.connection.key }}
+{% endif %}
+{% endif %}

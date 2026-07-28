@@ -40,7 +40,7 @@
           echo '{
             "old": {{ current_vault_values.secret | default({}) | to_json }},
             "new": {{ item.1.vault_values | default({}) | to_json }}
-          }' | yq -p=json -o=json -I=0 '.old *n .new'
+          }' | yq -p=json -o=json -I=0 '(.old | del(.vault_infra_token)) as $old | $old *n .new'
       register: current_vault_values_combined_pre
       changed_when: false
 

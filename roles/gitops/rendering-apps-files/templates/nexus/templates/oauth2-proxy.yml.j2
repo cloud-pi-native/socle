@@ -42,6 +42,9 @@ spec:
             - --redirect-url=https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>/oauth2/callback
             - --http-address=0.0.0.0:4180
             - --email-domain=*
+            - --scope=openid
+            - --cookie-secure=true
+            - --oidc-extra-audience=account
             - --skip-provider-button=true
             - --set-xauthrequest=true
             - --pass-authorization-header=true

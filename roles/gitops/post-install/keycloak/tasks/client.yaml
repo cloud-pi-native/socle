@@ -17,6 +17,8 @@
     redirectUris: "{{ item.redirectUris }}"
     webOrigins: "{{ item.webOrigins }}"
     defaultClientScopes: "{{ item.defaultClientScopes }}"
+    optionalClientScopes: "{{ item.optionalClientScopes | default(omit) }}"
+    protocolMappers: "{{ item.protocolMappers | default(omit) }}"
 
 - name: Get clients secrets from Keycloak
   when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'

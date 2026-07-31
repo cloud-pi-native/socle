@@ -11,6 +11,9 @@ keycloak_clients:
     defaultClientScopes:
       - basic
       - generic
+    optionalClientScopes:
+      - email
+      - profile
     publicClient: false
 
   - clientId: console-frontend
@@ -136,4 +139,16 @@ keycloak_clients:
     defaultClientScopes:
       - basic
       - generic
+    optionalClientScopes:
+      - email
+      - profile
     publicClient: false
+    protocolMappers:
+      - name: audience-nexus-client
+        protocol: openid-connect
+        protocolMapper: oidc-audience-mapper
+        consentRequired: false
+        config:
+          included.client.audience: nexus-client
+          id.token.claim: "false"
+          access.token.claim: "true"

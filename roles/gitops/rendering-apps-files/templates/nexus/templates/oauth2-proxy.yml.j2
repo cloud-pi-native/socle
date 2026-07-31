@@ -47,8 +47,6 @@ spec:
             - --oidc-extra-audience=account
             - --skip-provider-button=true
             - --set-xauthrequest=true
-            - --pass-authorization-header=true
-            - --set-authorization-header=true
 {% if not dsc.exposedCA.type == 'none' %}
             - --ssl-insecure-skip-verify=true
 {% endif %}

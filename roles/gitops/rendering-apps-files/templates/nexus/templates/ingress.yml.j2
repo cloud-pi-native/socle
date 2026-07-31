@@ -32,6 +32,13 @@ spec:
     - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
       http:
         paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy
+                port:
+                  name: http
           - path: /
             pathType: Prefix
             backend:

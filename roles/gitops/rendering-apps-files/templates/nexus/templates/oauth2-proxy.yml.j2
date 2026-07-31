@@ -44,6 +44,9 @@ spec:
             - --email-domain=*
             - --scope=openid
             - --cookie-secure=true
+            - --cookie-samesite=lax
+            - --cookie-csrf-per-request=true
+            - --cookie-csrf-expire=5m
             - --oidc-extra-audience=account
             - --skip-provider-button=true
             - --set-xauthrequest=true
@@ -90,41 +93,3 @@ spec:
     - name: http
       port: 80
       targetPort: 4180
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nexus-oauth2-proxy
-  namespace: {{ dsc.nexus.namespace }}
-  annotations:
-{% for key, val in dsc.ingress.annotations.items() %}
-    {{ key }}: {{ val }}
-{% endfor %}
-  labels:
-    app: oauth2-proxy
-{% for key, val in dsc.ingress.labels.items() %}
-    {{ key }}: {{ val }}
-{% endfor %}
-spec:
-{% if not dsc.ingress.tls.type == 'none' %}
-  tls:
-  - hosts:
-    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
-{% if dsc.ingress.tls.type == 'tlsSecret' %}
-    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
-{% else %}
-    secretName: nexus-tls-secret
-{% endif %}
-{% endif %}
-  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
-  rules:
-    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
-      http:
-        paths:
-          - path: /oauth2
-            pathType: Prefix
-            backend:
-              service:
-                name: oauth2-proxy
-                port:
-                  name: http

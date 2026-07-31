@@ -230,6 +230,8 @@
             vault_values:
               auth:
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+              oauth2proxy:
+                cookieSecret: "{{ lookup('ansible.builtin.password', '/dev/null', length=32, chars=['ascii_letters', 'digits']) }}"
           - argocd_app: tests
             clusterName: ""
             nameSpace: "tests"

@@ -1,0 +1,129 @@
+---
+kind: Secret
+apiVersion: v1
+type: Opaque
+metadata:
+  name: oauth2-proxy-creds
+  namespace: {{ dsc.nexus.namespace }}
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+  labels:
+    app: oauth2-proxy
+stringData:
+  clientId: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.nexus.id}>
+  clientSecret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.nexus.secret}>
+  cookieSecret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#oauth2proxy | jsonPath {.cookieSecret}>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth2-proxy
+  namespace: {{ dsc.nexus.namespace }}
+  labels:
+    app: oauth2-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        app: oauth2-proxy
+    spec:
+      containers:
+        - name: oauth2-proxy
+          image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/oauth2-proxy/oauth2-proxy:v7.6.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --provider=keycloak-oidc
+            - --oidc-issuer-url=https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
+            - --upstream=http://{{ dsc.nexus.release }}.{{ dsc.nexus.namespace }}.svc:8081
+            - --redirect-url=https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>/oauth2/callback
+            - --http-address=0.0.0.0:4180
+            - --email-domain=*
+            - --skip-provider-button=true
+            - --set-xauthrequest=true
+            - --pass-authorization-header=true
+            - --set-authorization-header=true
+{% if not dsc.exposedCA.type == 'none' %}
+            - --ssl-insecure-skip-verify=true
+{% endif %}
+          env:
+            - name: OAUTH2_PROXY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-proxy-creds
+                  key: clientId
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-proxy-creds
+                  key: clientSecret
+            - name: OAUTH2_PROXY_COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-proxy-creds
+                  key: cookieSecret
+          ports:
+            - containerPort: 4180
+              name: http
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-proxy
+  namespace: {{ dsc.nexus.namespace }}
+  labels:
+    app: oauth2-proxy
+spec:
+  selector:
+    app: oauth2-proxy
+  ports:
+    - name: http
+      port: 80
+      targetPort: 4180
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nexus-oauth2-proxy
+  namespace: {{ dsc.nexus.namespace }}
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+    app: oauth2-proxy
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+spec:
+{% if not dsc.ingress.tls.type == 'none' %}
+  tls:
+  - hosts:
+    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: nexus-tls-secret
+{% endif %}
+{% endif %}
+  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
+  rules:
+    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
+      http:
+        paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy
+                port:
+                  name: http

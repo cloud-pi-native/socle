@@ -78,6 +78,9 @@
                         vault:
                           id: "{{ vault_client_id | default('') }}"
                           secret: "{{ vault_client_secret | default('') }}"
+                        nexus:
+                          id: "{{ nexus_client_id | default('') }}"
+                          secret: "{{ nexus_client_secret | default('') }}"
 
         - name: Post-install vault-secrets run
           ansible.builtin.import_role:

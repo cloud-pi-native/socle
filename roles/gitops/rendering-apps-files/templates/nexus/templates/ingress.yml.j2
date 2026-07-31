@@ -8,6 +8,9 @@ metadata:
 {% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.{{ dsc.nexus.namespace }}.svc/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User,X-Auth-Request-Email,Authorization"
   labels:
     app: nexus
 {% for key, val in dsc.ingress.labels.items() %}

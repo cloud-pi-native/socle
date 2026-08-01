@@ -8,9 +8,8 @@ metadata:
 {% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
-    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.{{ dsc.nexus.namespace }}.svc/oauth2/auth"
-    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
-    nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User,X-Auth-Request-Email,Authorization"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
   labels:
     app: nexus
 {% for key, val in dsc.ingress.labels.items() %}
@@ -32,17 +31,10 @@ spec:
     - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
       http:
         paths:
-          - path: /oauth2
-            pathType: Prefix
-            backend:
-              service:
-                name: oauth2-proxy
-                port:
-                  name: http
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ dsc.nexus.release }}
+                name: oauth2-proxy
                 port:
                   name: http

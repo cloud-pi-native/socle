@@ -45,11 +45,10 @@ spec:
             - --scope=openid
             - --cookie-secure=true
             - --cookie-samesite=lax
-            - --cookie-csrf-per-request=true
-            - --cookie-csrf-expire=5m
             - --oidc-extra-audience=account
             - --skip-provider-button=true
             - --set-xauthrequest=true
+            - --skip-auth-regex=^/(favicon\.ico|robots\.txt|apple-touch-icon.*\.png|sitemap\.xml)$
 {% if not dsc.exposedCA.type == 'none' %}
             - --ssl-insecure-skip-verify=true
 {% endif %}

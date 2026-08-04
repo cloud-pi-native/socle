@@ -1,3 +1,4 @@
+{% if dsc.global.platform == "openshift" %}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -36,3 +37,4 @@ spec:
                 name: {{ dsc.nexus.release }}
                 port:
                   name: http
+{% endif %}

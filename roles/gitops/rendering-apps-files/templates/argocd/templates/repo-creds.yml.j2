@@ -35,7 +35,7 @@ metadata:
     argocd.argoproj.io/secret-type: repo-creds
   name: oci-harbor-creds
 stringData:
-  url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.harbor}>
+  url: "oci://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.harbor}>"
   name: harbor
   type: helm
   enableOCI: "true"

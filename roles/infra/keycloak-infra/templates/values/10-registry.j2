@@ -1,9 +1,11 @@
 global:
   security:
     allowInsecureImages: true
+# Overriding the official (non-Bitnami) Keycloak image: the Bitnami entrypoint
 image:
-  registry: "{{ dsc.global.registry | default('docker.io') }}"
-  repository: bitnamilegacy/keycloak
+  registry: "{{ dsc.global.registry | default('quay.io') }}"
+  repository: keycloak/keycloak
+  tag: "26.7.2"
   pullPolicy: "IfNotPresent"
 
 {% if dsc.global.imagePullSecrets is defined %}

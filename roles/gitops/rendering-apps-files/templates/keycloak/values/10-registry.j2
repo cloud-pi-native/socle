@@ -5,7 +5,9 @@ keycloak:
 {% if dsc.global.imagePullSecrets is defined %}
     imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}
+  # Overriding the official (non-Bitnami) Keycloak image: the Bitnami entrypoint
   image:
-    registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>
-    repository: bitnamilegacy/keycloak
+    registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>
+    repository: keycloak/keycloak
+    tag: "26.7.2"
     pullPolicy: "IfNotPresent"

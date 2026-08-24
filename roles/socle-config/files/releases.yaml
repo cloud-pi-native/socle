@@ -62,10 +62,16 @@ spec:
     chartVersion: 1.17.1
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
-    chartVersion: 24.4.11
+    # NOTE: image overridden to the official quay.io/keycloak/keycloak:26.7.2
+    # image (see roles/gitops/rendering-apps-files/templates/keycloak/values/00-main.j2)
+    # since Bitnami hasn't packaged this Keycloak version yet.
+    chartVersion: 25.4.0
   keycloakInfra:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
-    chartVersion: 24.4.11
+    # NOTE: image overridden to the official quay.io/keycloak/keycloak:26.7.2
+    # image (see roles/infra/keycloak-infra/templates/values/00-main.j2)
+    # since Bitnami hasn't packaged this Keycloak version yet.
+    chartVersion: 25.4.0
   kyverno:
     # https://artifacthub.io/packages/helm/kyverno/kyverno
     chartVersion: 3.1.4

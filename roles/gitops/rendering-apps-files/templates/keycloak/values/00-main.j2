@@ -1,6 +1,16 @@
 keycloak:
   fullnameOverride: {{ dsc.keycloak.subDomain }}
 
+  # Prepare-write-dirs init container are built for the Bitnami image
+  # internals and don't apply here, so we drive kc.sh directly and drop the
+  # read-only rootfs that prepare-write-dirs would normally satisfy.
+  defaultInitContainers:
+    prepareWriteDirs:
+      enabled: false
+
+  containerSecurityContext:
+    readOnlyRootFilesystem: false
+
   auth:
     adminUser: "admin"
     existingSecret: "keycloak"
@@ -16,8 +26,10 @@ keycloak:
   existingConfigmap: ""
   extraStartupArgs: ""
   initdbScriptsConfigMap: ""
-  command: []
-  args: []
+  command:
+    - /opt/keycloak/bin/kc.sh
+  args:
+    - start
   extraEnvVarsCM: ""
   extraEnvVarsSecret: ""
   replicaCount: 3
@@ -193,12 +205,23 @@ keycloak:
 
   cache:
     enabled: true
-    stackName: "kubernetes"
-    stackFile: ""
+    stack: "kubernetes"
+    configFile: ""
 
   logging:
     output: "default"
     level: "INFO"
+
+  # The chart's built-in "empty-dir" volume mounts app-providers-dir at
+  # /opt/bitnami/keycloak/providers, which doesn't exist on the official
+  # (non-Bitnami) image. Providers must land in /opt/keycloak/providers
+  # instead, so we use a dedicated volume for that.
+  extraVolumes:
+    - name: provider-jars
+      emptyDir: {}
+  extraVolumeMounts:
+    - name: provider-jars
+      mountPath: /opt/keycloak/providers
 
   extraEnvVars:
     - name: DSFR_THEME_HOME_URL
@@ -218,12 +241,11 @@ keycloak:
       args:
         - -c
         - |
-          mkdir -p /emptydir/app-providers-dir && \
-          curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
-          curl -k -fsSL -o /emptydir/app-providers-dir/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.providerDownloadUrl}>
-      volumeMounts:  
-        - name: empty-dir
-          mountPath: /emptydir
+          curl -k -fsSL -o /providers/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
+          curl -k -fsSL -o /providers/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.providerDownloadUrl}>
+      volumeMounts:
+        - name: provider-jars
+          mountPath: /providers
 {% if dsc.proxy.enabled %}
       env:
         - name: HTTP_PROXY

@@ -101,9 +101,6 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.{{ dsc.nexus.namespace }}.svc.cluster.local/oauth2/auth"
     nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$scheme://$host$request_uri"
     nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User, X-Auth-Request-Email"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      auth_request_set $remote_user $upstream_http_x_auth_request_user;
-      proxy_set_header REMOTE_USER $remote_user;
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
   labels:

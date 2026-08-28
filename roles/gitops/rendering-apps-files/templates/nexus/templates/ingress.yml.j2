@@ -2,12 +2,108 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: nexus-oauth2
+  namespace: {{ dsc.nexus.namespace }}
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+    app: nexus
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+spec:
+{% if not dsc.ingress.tls.type == 'none' %}
+  tls:
+  - hosts:
+    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: nexus-tls-secret
+{% endif %}
+{% endif %}
+  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
+  rules:
+    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
+      http:
+        paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nexus-api
+  namespace: {{ dsc.nexus.namespace }}
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+  labels:
+    app: nexus
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: {{ val }}
+{% endfor %}
+spec:
+{% if not dsc.ingress.tls.type == 'none' %}
+  tls:
+  - hosts:
+    - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
+{% if dsc.ingress.tls.type == 'tlsSecret' %}
+    secretName: {{ dsc.ingress.tls.tlsSecret.name }}
+{% else %}
+    secretName: nexus-tls-secret
+{% endif %}
+{% endif %}
+  ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
+  rules:
+    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.nexus}>
+      http:
+        paths:
+          - path: /repository
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ dsc.nexus.release }}
+                port:
+                  name: http
+          - path: /service/rest
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ dsc.nexus.release }}
+                port:
+                  name: http
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ dsc.nexus.release }}
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   name: nexus-alternative
   namespace: {{ dsc.nexus.namespace }}
   annotations:
 {% for key, val in dsc.ingress.annotations.items() %}
     {{ key }}: {{ val }}
 {% endfor %}
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.{{ dsc.nexus.namespace }}.svc.cluster.local/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$scheme://$host$request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User, X-Auth-Request-Email"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      auth_request_set $remote_user $upstream_http_x_auth_request_user;
+      proxy_set_header REMOTE_USER $remote_user;
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
   labels:
@@ -35,6 +131,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: oauth2-proxy
+                name: {{ dsc.nexus.release }}
                 port:
                   name: http

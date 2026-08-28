@@ -236,7 +236,7 @@
       passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)
     enabled: true
     otp_policy_algorithm: "HmacSHA1"
-    reset_password_allowed: true
+    reset_password_allowed: false
     action_token_generated_by_user_lifespan: 900
     smtp_server:
       host: "{{ (dsc.global.smtp | default({})).host | default(omit) }}"

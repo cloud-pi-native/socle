@@ -1541,6 +1541,16 @@ spec:
                         https://github.com/stevehipwell/helm-charts/blob/main/charts/nexus3/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Awx post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
                   required:
                     - installEnabled
                   type: object

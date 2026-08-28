@@ -194,6 +194,9 @@ spec:
     storageSize: 25Gi
     proxyEnabled: false
     proxyCacheSize: 25Gi
+    repoSocle:
+      url: https://github.com/cloud-pi-native/socle.git
+      revision: main
     values:
       replicaCount: 1
   sonarqube:

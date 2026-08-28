@@ -1,0 +1,3 @@
+---
+nexus_auth_url: "http://{{ dsc.nexus.release }}.{{ dsc.nexus.namespace }}.svc.cluster.local:8081"
+nexus_rutauth_header: "X-Auth-Request-User"

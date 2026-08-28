@@ -1,0 +1,15 @@
+cpn-ansible-job:
+  job:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/git-ansible"
+      tag: "1"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      git clone {{ dsc.nexus.repoSocle.url }} -b {{ dsc.nexus.repoSocle.revision }} socle && \
+      cd socle && \
+      ansible-playbook post-install/nexus.yaml
+    extraEnvFrom:
+    - secretRef:
+        name: ansible-secret

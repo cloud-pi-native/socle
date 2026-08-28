@@ -1,0 +1,96 @@
+---
+- name: Set Nexus admin credentials fact
+  ansible.builtin.set_fact:
+    nexus_admin_password: "{{ nexus_current_vault_values.data.data.auth.adminPassword }}"
+
+- name: Wait for Nexus API to be ready
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "{{ nexus_auth_url }}/service/rest/v1/status"
+    status_code: [200, 503]
+  register: get_nexus_status
+  until: get_nexus_status.status == 200
+  retries: 15
+  delay: 10
+
+# Nexus CE n'expose pas les Capabilities via l'API REST publique : on passe par
+# l'API de script (nexus.scripts.allowCreation=true, cf. nexus/values/00-main.j2)
+# pour activer/configurer la capability "Rut Auth" de façon idempotente.
+- name: Define rutauth-setup groovy script content
+  ansible.builtin.set_fact:
+    nexus_rutauth_script: |
+      import org.sonatype.nexus.capability.CapabilityRegistry
+      import org.sonatype.nexus.capability.CapabilityType
+
+      capabilityRegistry = container.lookup(CapabilityRegistry.class.name)
+      capabilityType = CapabilityType.capabilityType('rutauth')
+
+      existing = capabilityRegistry.all.find { it.context().type() == capabilityType }
+
+      if (existing == null) {
+          capabilityRegistry.add(
+              capabilityType,
+              true,
+              'RUT Auth (oauth2-proxy)',
+              ['httpHeader': '{{ nexus_rutauth_header }}']
+          )
+          return 'created'
+      }
+      return 'already-exists'
+
+- name: Check if rutauth-setup script already exists
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    url: "{{ nexus_auth_url }}/service/rest/v1/script/rutauth-setup"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: get_rutauth_script
+
+- name: Create rutauth-setup script
+  when: get_rutauth_script.status == 404
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: POST
+    url: "{{ nexus_auth_url }}/service/rest/v1/script"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    status_code: [204]
+    body:
+      name: rutauth-setup
+      type: groovy
+      content: "{{ nexus_rutauth_script }}"
+
+- name: Update rutauth-setup script
+  when: get_rutauth_script.status == 200
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: PUT
+    url: "{{ nexus_auth_url }}/service/rest/v1/script/rutauth-setup"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    status_code: [204]
+    body:
+      name: rutauth-setup
+      type: groovy
+      content: "{{ nexus_rutauth_script }}"
+
+- name: Run rutauth-setup script
+  ansible.builtin.uri:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    method: POST
+    url: "{{ nexus_auth_url }}/service/rest/v1/script/rutauth-setup/run"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    force_basic_auth: true
+    headers:
+      Content-Type: text/plain
+    body: ""
+    status_code: [200]
+  register: run_rutauth_script
+  changed_when: "'created' in (run_rutauth_script.json.result | default(''))"

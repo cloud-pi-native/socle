@@ -2,6 +2,8 @@ nexus:
   fullnameOverride: nexus
   nameOverride: nexus3
   chownDataDir: false
+  properties:
+    - nexus.scripts.allowCreation=true
   config:
     enabled: true
     cleanup:

@@ -4,4 +4,11 @@ argocd:
     tls:
       certificates:
         {{ gitlab_domain }}: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#exposedCa>
+  repoServer:
+# argocd-tls-certs-cm is mounted at /app/config/tls. Adding it to SSL_CERT_DIR puts
+# the private CA in the process trust store, the only one helm consults for oci://
+# chart dependencies. /etc/ssl/certs stays first to keep the public roots.
+    env:
+    - name: SSL_CERT_DIR
+      value: /etc/ssl/certs:/app/config/tls
 {% endif %}

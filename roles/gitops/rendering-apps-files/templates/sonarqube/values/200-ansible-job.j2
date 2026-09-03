@@ -9,7 +9,7 @@ cpn-ansible-job:
     - |
       git clone {{ dsc.sonarqube.repoSocle.url }} -b {{ dsc.sonarqube.repoSocle.revision }} socle && \
       cd socle && \
-      ansible-playbook post-install/sonarqube.yaml
+      ansible-playbook post-install/sonarqube.yaml -e dsc_cr={{ dsc_name }}
     extraEnvFrom:
     - secretRef: 
         name: ansible-secret

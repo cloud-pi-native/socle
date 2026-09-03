@@ -68,6 +68,7 @@
 # OpenShift CRB
 
 - name: Argo CD OpenShift scc crb
+  when: dsc.global.platform == "openshift"
   kubernetes.core.k8s:
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
@@ -96,29 +97,63 @@
           namespace: "{{ dsc.argocdInfra.namespace }}"
           name: "{{ dsc_name }}-argo-infra-redis-ha-haproxy"
 
-- name: Add Argo CD helm repo
-  changed_when: false
-  kubernetes.core.helm_repository:
-    name: argo
-    repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
-    force_update: true
+- name: Set repo type facts
+  ansible.builtin.set_fact:
+    is_oci_repo: "{{ dsc.argocdInfra.helmRepoUrl.startswith('oci://') }}"
+    repo_name: argo
+
+# Retreive Argo CD app version
+
+- name: Get Argo CD infra app version (HTTP)
+  when: not is_oci_repo
+  block:
+    - name: Add Argo CD Helm repo (HTTP repo only)
+      changed_when: false
+      kubernetes.core.helm_repository:
+        name: "{{ repo_name }}"
+        repo_url: "{{ dsc.argocdInfra.helmRepoUrl }}"
+        force_update: true
+    - name: Retrieve Argo CD Helm chart info (HTTP)
+      changed_when: false
+      ansible.builtin.command: >-
+        helm search repo {{ repo_name }}/argo-cd --version "{{ dsc.argocdInfra.chartVersion }}"
+      register: argo_infos
+      ignore_errors: true
+
+    - name: Fail if chart version retrieval failed (HTTP)
+      when: argo_infos.rc != 0 or argo_infos.stdout == ""
+      ansible.builtin.fail:
+        msg: >-
+          Failed to retrieve Argo CD Helm chart version.
+          Check the repository URL ({{ dsc.argocdInfra.helmRepoUrl }}) and chart version ({{ dsc.argocdInfra.chartVersion }}).
+
+    - name: Set argo_app_version fact (HTTP)
+      ansible.builtin.set_fact:
+        argo_app_version: >-
+          {{ argo_infos.stdout | regex_search('v([0-9]+\\.[0-9]+\\.[0-9]+)') }}
+
+- name: Get Argo CD infra app version (OCI)
+  when: is_oci_repo
+  block:
+    - name: Retrieve Argo CD Helm chart info (OCI)
+      changed_when: false
+      ansible.builtin.command: >-
+        helm show chart {{ dsc.argocdInfra.helmRepoUrl }}/argo-cd --version "{{ dsc.argocdInfra.chartVersion }}"
+      register: argo_infos
+      ignore_errors: true
+
+    - name: Fail if chart version retrieval failed (OCI)
+      when: argo_infos.rc != 0 or argo_infos.stdout == ""
+      ansible.builtin.fail:
+        msg: >-
+          Failed to retrieve Argo CD Helm chart version.
+          Check the repository URL ({{ dsc.argocdInfra.helmRepoUrl }}) and chart version ({{ dsc.argocdInfra.chartVersion }}).
+
+    - name: Set argo_app_version fact (OCI)
+      ansible.builtin.set_fact:
+        argo_app_version: "{{ argo_infos.stdout | regex_search('(?<=appVersion: )v([0-9]+\\.[0-9]+\\.[0-9]+)') }}"
 
 # Vault plugin setup
-
-- name: Get Argo CD infra app version
-  block:
-    - name: Retrieve Argo CD Helm infos
-      changed_when: false
-      ansible.builtin.shell:
-        cmd: |
-          set -o pipefail
-          helm search repo -l argo --version "{{ dsc.argocdInfra.chartVersion }}" | tail -n 1
-        executable: /bin/bash
-      register: argo_infos
-
-    - name: Set argo_app_version fact
-      ansible.builtin.set_fact:
-        argo_app_version: "{{ argo_infos.stdout | regex_search('v([0-9]*\\.)+([0-9]+)') }}"
 
 - name: Deploy Argo CD infra Vault plugin config
   kubernetes.core.k8s:
@@ -152,8 +187,7 @@
         missing_secret: false
 
     - name: Update missing_secret fact
-      when:
-        (helm_docker_registry_secret.resources | length == 0) or
+      when: (helm_docker_registry_secret.resources | length == 0) or
         (oci_dockerhub_creds.resources | length == 0)
       ansible.builtin.set_fact:
         missing_secret: true
@@ -217,10 +251,10 @@
     combine_user_values: "{{ dsc.argocdInfra['values'] }}"
     combine_dest_var: "argo_values"
 
-- name: Deploy helm
+- name: Deploy Argo CD Helm chart
   kubernetes.core.helm:
     name: "{{ dsc_name }}-argo-infra"
-    chart_ref: argo/argo-cd
+    chart_ref: "{{ is_oci_repo | ternary(dsc.argocdInfra.helmRepoUrl, repo_name) }}/argo-cd"
     chart_version: "{{ dsc.argocdInfra.chartVersion }}"
     release_namespace: "{{ dsc.argocdInfra.namespace }}"
     create_namespace: true

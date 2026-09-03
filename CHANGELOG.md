@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.10.3](https://github.com/cloud-pi-native/socle/compare/v4.10.2...v4.10.3) (2026-09-03)
+
+
+### Bug Fixes
+
+* **argocd:** trust private CA in argocd repo-server for oci helm deps ([ceb5cb2](https://github.com/cloud-pi-native/socle/commit/ceb5cb2e165c850aa666fe00d9c8afeaaf848c1d))
+* bump console chart version ([52f5434](https://github.com/cloud-pi-native/socle/commit/52f54343b3929da1055028b1934ba8f90ac0e263))
+* harbor oci url fix for argocd creds ([e2743fa](https://github.com/cloud-pi-native/socle/commit/e2743fa7efc989eb8f5695d179745b1aacd5ff32))
+* Switch off reset_password_allowed ([a667f40](https://github.com/cloud-pi-native/socle/commit/a667f4002dbcfbdb8f612d191dd37cee7f0e16fa))
+* upgrade ds-backup version ([05cfa0c](https://github.com/cloud-pi-native/socle/commit/05cfa0cecebf93aad288876e7559a823298b7aa4))
+
 ## [4.10.2](https://github.com/cloud-pi-native/socle/compare/v4.10.1...v4.10.2) (2026-08-19)
 
 

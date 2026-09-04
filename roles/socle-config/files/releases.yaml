@@ -5,7 +5,7 @@ metadata:
 spec:
   argocd:
     # https://artifacthub.io/packages/helm/argo/argo-cd
-    chartVersion: 8.5.6
+    chartVersion: 10.7.2
     # https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-argocd-zone
     zoneChartVersion: "1.0.6"
   argocdInfra:

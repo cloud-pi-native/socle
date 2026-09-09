@@ -1,6 +1,10 @@
 keycloakx:
   fullnameOverride: {{ dsc.keycloakx.subDomain }}
   replicas: {{ dsc.keycloakx.replicas }}
+  command:
+    - /opt/keycloak/bin/kc.sh
+  args:
+    - start
   image:
     pullPolicy: IfNotPresent
   http:

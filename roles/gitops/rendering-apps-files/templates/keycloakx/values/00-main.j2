@@ -1,5 +1,5 @@
 keycloakx:
-  fullnameOverride: {{ dsc.keycloakx.subDomain }}
+  fullnameOverride: {{ dsc.keycloak.subDomain }}
   replicas: {{ dsc.keycloakx.replicas }}
   command:
     - /opt/keycloak/bin/kc.sh
@@ -45,7 +45,8 @@ keycloakx:
     - name: KC_LOG_LEVEL
       value: INFO
     - name: KC_HOSTNAME
-      value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+      # Migration step 4: production host, not the temporary one.
+      value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
     - name: DSFR_THEME_HOME_URL
       value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.console}>
     - name: DSFR_THEME_SERVICE_TITLE
@@ -103,7 +104,8 @@ keycloakx:
       {{ key }}: "{{ val }}"
 {% endfor %}
     rules:
-      - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+      # Migration step 4: production host, not the temporary one.
+      - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
         paths:
           - path: /
             pathType: Prefix

@@ -12,6 +12,7 @@ dependencies:
   alias: keycloak
   version: {{ dsc.keycloak.chartVersion }}
   repository: "{{ dsc.keycloak.helmRepoUrl if 'oci://' in dsc.keycloak.helmRepoUrl else dsc.keycloak.helmRepoUrl ~ '/keycloak' }}"
+  condition: keycloak.enabled
 - name: cpn-job
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}

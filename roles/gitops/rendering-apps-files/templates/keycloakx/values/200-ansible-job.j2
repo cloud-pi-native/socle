@@ -1,0 +1,27 @@
+cpn-ansible-job:
+  enabled: {{ dsc.keycloakx.ansibleJobEnabled | lower }}
+  job:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/git-ansible"
+      tag: "1"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      git clone {{ dsc.keycloak.repoSocle.url }} -b {{ dsc.keycloak.repoSocle.revision }} socle && \
+      cd socle && \
+      ansible-playbook post-install/keycloak.yaml
+    extraEnvFrom:
+    - secretRef:
+        # Distinct name from the legacy app's `ansible-secret`: same
+        # namespace, would otherwise trigger an ArgoCD SharedResourceWarning
+        # while both apps are enabled at once.
+        name: keycloakx-ansible-secret
+    extraVolumes:
+    - name: users-csv
+      configMap:
+        name: keycloak-users
+    extraVolumeMounts:
+    - name: users-csv
+      mountPath: /config
+      readOnly: true

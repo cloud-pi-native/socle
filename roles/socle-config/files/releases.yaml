@@ -66,7 +66,12 @@ spec:
   keycloakx:
     # https://codecentric.github.io/helm-charts (keycloakx)
     chartVersion: "7.2.3"
-    imageVersion: "26.7.2"
+    # Intermediate stepping-stone version, not the final target (26.7.2).
+    # Direct 26.1.x -> 26.7.x fails on a known upstream bug: LazyInitialization
+    # Exception in MigrateTo26_7_0.addOrganizationAdminRoles.
+    # See https://github.com/keycloak/keycloak/issues/51304
+    # Land on 26.6.4 successfully first, THEN bump straight to 26.7.2.
+    imageVersion: "26.6.4"
   keycloakInfra:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11

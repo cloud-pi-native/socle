@@ -3,13 +3,11 @@ keycloakx:
 {% if dsc.ingress.tls.type == "tlsSecret" %}
     tls:
       - hosts:
-          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
         secretName: "{{ dsc.ingress.tls.tlsSecret.name }}"
 {% else %}
-    # No pre-existing wildcard secret configured: let cert-manager issue one
-    # for this host (cert-manager.io/cluster-issuer annotation, see 00-main).
     tls:
       - hosts:
-          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
         secretName: keycloakx-tls
 {% endif %}

@@ -90,6 +90,7 @@ values:
     raft_standalone_config: |
       config: |
         ui = true
+        disable_mlock = true
         service_registration "kubernetes" {}
         listener "tcp" {
           tls_disable = 1

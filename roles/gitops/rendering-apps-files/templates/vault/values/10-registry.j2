@@ -4,17 +4,20 @@ vault:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault-k8s"
     agentImage:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
-  
+      tag: "{{ dsc.vault.imageVersion }}"
+
   server:
     image:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
-  
+      tag: "{{ dsc.vault.imageVersion }}"
+
   csi:
     image:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault-csi-provider"
     agent:
       image:
         repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault"
+        tag: "{{ dsc.vault.imageVersion }}"
 
 {% if dsc.global.imagePullSecrets is defined %}
   global:

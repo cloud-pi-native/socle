@@ -164,11 +164,8 @@ spec:
     helmRepoUrl: https://codecentric.github.io/helm-charts
     managementRealm: master
     applicationRealm: dso
-    replicas: 1
-    # Single flag gating both the cpn-ansible-job values (200-ansible-job.j2)
-    # and its RBAC/secret templates (post-conf-job.yaml.j2,
-    # secret-ansible.yaml.j2) - off while `keycloak` still owns provisioning.
-    ansibleJobEnabled: false
+    replicas: 3
+    ansibleJobEnabled: true
     values: {}
   keycloakInfra:
     installEnabled: false

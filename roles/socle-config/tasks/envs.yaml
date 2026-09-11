@@ -101,20 +101,6 @@
             nameSpace: "cloudnativepg"
             customNamespacePrefix: ""
             syncWave: 10
-          - argocd_app: keycloak
-            clusterName: ""
-            nameSpace: "keycloak"
-            customNamespacePrefix: ""
-            syncWave: 20
-            vault_values:
-              auth:
-                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
-                userTmpPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits', '!@#$%^&*()-_=+']) }}"
-              initcontainers:
-                pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
-                providerDownloadUrl: "{{ dsc.keycloak.providerDownloadUrl }}"
-          # Nouvelle app Keycloak permanente (remplace `keycloak`, chart Bitnami
-          # figé). Cohabite avec `keycloak` uniquement le temps de la migration
           - argocd_app: keycloakx
             clusterName: ""
             nameSpace: "keycloak"

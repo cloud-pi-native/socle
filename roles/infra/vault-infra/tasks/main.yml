@@ -61,7 +61,7 @@
     - name: Add Helm repo
       kubernetes.core.helm_repository:
         name: dso
-        repo_url: "{{ dsc.global.backup.vault.helmRepoUrl }}"
+        repo_url: "{{ dsc.global.backup.vaultInfra.helmRepoUrl }}"
         force_update: true
 
     - name: Get s3 backup secret from Keycloak infra namespace

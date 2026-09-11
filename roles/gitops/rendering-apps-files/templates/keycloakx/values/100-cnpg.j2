@@ -1,5 +1,34 @@
 cluster:
-  enabled: false
+  # RECOVERY INCIDENT (formation-sdan): the Cluster + PVCs were wiped when
+  # the legacy `keycloak` app entry was removed from envs.yaml, despite
+  # preserveResourcesOnDeletion: true on the ApplicationSet - it did NOT
+  # protect the resource this time either (same failure mode confirmed
+  # twice now, cpin-hp and formation-sdan). Bootstrapping via
+  # `mode: recovery` from the freshest barmanObjectStore backup
+  # (pre-step7-manual-backup, ~1h old) instead of `initdb`.
+  enabled: true
+
+  # `mode`/`recovery` are top-level in the cluster chart's OWN values, NOT
+  # nested under its inner `cluster:` block (storage/initdb/postgresql live
+  # there instead) - verified against templates/_bootstrap.tpl.
+  mode: recovery
+  recovery:
+    method: object_store
+    clusterName: pg-cluster-keycloak
+    database: keycloak
+    owner: keycloak
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
+    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
+    s3:
+      accessKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
+      secretKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
+{% if dsc.global.backup.s3.endpointCA is defined %}
+    endpointCA:
+      create: true
+      name: {{ dsc.global.backup.s3.endpointCA.name }}
+      key: {{ dsc.global.backup.s3.endpointCA.key }}
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#cnpgS3CaPem>
+{% endif %}
 
   nameOverride: "pg-cluster-keycloak"
   fullnameOverride: "pg-cluster-keycloak"
@@ -37,7 +66,12 @@ cluster:
 
 {% if dsc.global.backup.cnpg.enabled %}
   backups:
-    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
+    # Distinct path from `recovery.destinationPath` above on purpose: CNPG
+    # ties a cluster's own ongoing backup identity to its metadata.name
+    # (pg-cluster-keycloak, same as the archive we're recovering from), so
+    # writing future backups to the same destination fails the
+    # barman-cloud-check-wal-archive "Expected empty archive" safety check.
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg-keycloak-post-recovery
     enabled: true
     endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
     retentionPolicy: 14d

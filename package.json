@@ -1,6 +1,6 @@
 {
   "name": "dso-socle",
-  "version": "4.10.5",
+  "version": "4.11.0",
   "private": true,
   "scripts": {
     "format": "eslint . --fix",

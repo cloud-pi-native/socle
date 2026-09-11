@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.11.0](https://github.com/cloud-pi-native/socle/compare/v4.10.5...v4.11.0) (2026-09-11)
+
+
+### Features
+
+* **console:** add ARGOCD_SHARED_SOURCE_REPOSITORIES with harbor oci url templated per project ([c9b3799](https://github.com/cloud-pi-native/socle/commit/c9b3799352565ca22401350dfecd76b891749d6c))
+
 ## [4.10.5](https://github.com/cloud-pi-native/socle/compare/v4.10.4...v4.10.5) (2026-09-09)
 
 

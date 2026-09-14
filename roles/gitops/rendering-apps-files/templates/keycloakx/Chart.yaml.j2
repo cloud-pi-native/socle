@@ -1,25 +1,27 @@
 ---
 apiVersion: v2
-name: keycloak
+name: keycloakx
 type: application
-version: {{ dsc.keycloak.chartVersion }}
+version: {{ dsc.keycloakx.chartVersion }}
 dependencies:
 - name: cluster
   alias: cluster
   version: {{ dsc.cloudnativepg.cluster.chartVersion }}
   repository: {{ dsc.cloudnativepg.cluster.helmRepoUrl }}
-- name: keycloak
-  alias: keycloak
-  version: {{ dsc.keycloak.chartVersion }}
-  repository: "{{ dsc.keycloak.helmRepoUrl if 'oci://' in dsc.keycloak.helmRepoUrl else dsc.keycloak.helmRepoUrl ~ '/keycloak' }}"
-  condition: keycloak.enabled
+  condition: cluster.enabled
+- name: keycloakx
+  alias: keycloakx
+  version: {{ dsc.keycloakx.chartVersion }}
+  repository: {{ dsc.keycloakx.helmRepoUrl }}
 - name: cpn-job
   alias: cpn-ansible-job
   version: {{ dsc.cpnAnsibleJob.chartVersion | quote }}
   repository: {{ dsc.cpnAnsibleJob.helmRepoUrl }}
+  condition: cpn-ansible-job.enabled
 {% if dsc.global.backup.velero.enabled | default(false) %}
 - name: dso-backup
   alias: dso-backup
   version: {{ dsc.global.backup.dsoBackup.chartVersion | default('1.0.0') | quote }}
   repository: {{ dsc.global.backup.dsoBackup.helmRepoUrl | default(dsc.cpnAnsibleJob.helmRepoUrl) }}
+  condition: dso-backup.enabled
 {% endif %}

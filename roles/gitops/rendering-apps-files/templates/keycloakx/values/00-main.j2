@@ -1,0 +1,124 @@
+keycloakx:
+  fullnameOverride: {{ dsc.keycloak.subDomain }}
+  replicas: {{ dsc.keycloakx.replicas }}
+  command:
+    - /opt/keycloak/bin/kc.sh
+  args:
+    - start
+  image:
+    pullPolicy: IfNotPresent
+  http:
+    relativePath: "/"
+  proxy:
+    enabled: true
+    mode: xforwarded
+    http:
+      enabled: true
+  cache:
+    stack: default
+  metrics:
+    enabled: {{ dsc.global.metrics.enabled | lower }}
+  health:
+    enabled: true
+  resources:
+    limits:
+      memory: "2048Mi"
+    requests:
+      memory: "1024Mi"
+  networkPolicy:
+    enabled: false
+
+  database:
+    vendor: postgres
+    hostname: pg-cluster-keycloak-rw
+    port: 5432
+    database: keycloak
+    existingSecret: pg-cluster-keycloak-app
+    existingSecretUserKey: username
+    existingSecretPasswordKey: password
+
+  extraEnvFrom: |
+    - secretRef:
+        name: keycloakx-admin-secret
+
+  extraEnv: |
+    - name: KC_LOG_LEVEL
+      value: INFO
+    - name: KC_HOSTNAME
+      # Migration step 4: production host, not the temporary one.
+      value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
+    - name: DSFR_THEME_HOME_URL
+      value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.console}>
+    - name: DSFR_THEME_SERVICE_TITLE
+      value: Cloud Pi Native
+    - name: DSFR_THEME_BRAND_TOP
+      value: "Ministere<br/>de l'interieur"
+    - name: DSFR_THEME_CONTACT_EMAIL
+      value: cloudpinative-relations@interieur.gouv.fr
+
+  extraInitContainers: |
+    - name: realm-ext-provider
+      image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/curlimages/curl:8.12.1"
+      imagePullPolicy: IfNotPresent
+      command:
+        - sh
+      args:
+        - -c
+        - |
+          mkdir -p /providers && \
+          curl -k -fsSL -o /providers/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
+          curl -k -fsSL -o /providers/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.providerDownloadUrl}>
+      volumeMounts:
+        - name: providers
+          mountPath: /providers
+{% if dsc.proxy.enabled %}
+      env:
+        - name: HTTP_PROXY
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpProxy}>
+        - name: HTTPS_PROXY
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.httpsProxy}>
+        - name: NO_PROXY
+          value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#proxy | jsonPath {.noProxy}>
+{% endif %}
+
+  extraVolumes: |
+    - name: providers
+      emptyDir: {}
+
+  extraVolumeMounts: |
+    - name: providers
+      mountPath: /opt/keycloak/providers
+
+  ingress:
+    enabled: true
+    ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
+    servicePort: http
+    annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+      {{ key }}: "{{ val }}"
+{% endfor %}
+      route.openshift.io/termination: "edge"
+    labels:
+      app: keycloakx
+{% for key, val in dsc.ingress.labels.items() %}
+      {{ key }}: "{{ val }}"
+{% endfor %}
+    rules:
+      # Migration step 4: production host, not the temporary one.
+      - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>
+        paths:
+          - path: /
+            pathType: Prefix
+{% if dsc.global.environment == "production" %}
+          - path: /admin/
+            pathType: Prefix
+            serviceName: forbidden
+            servicePort: http
+          - path: /realms/{{ dsc.keycloakx.managementRealm }}/
+            pathType: Prefix
+            serviceName: forbidden
+            servicePort: http
+{% endif %}
+{% if dsc.global.imagePullSecrets is defined %}
+  imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
+{% endif %}

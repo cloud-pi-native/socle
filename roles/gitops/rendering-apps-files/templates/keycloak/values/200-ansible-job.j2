@@ -9,7 +9,7 @@ cpn-ansible-job:
     - |
       git clone {{ dsc.keycloak.repoSocle.url }} -b {{ dsc.keycloak.repoSocle.revision }} socle && \
       cd socle && \
-      ansible-playbook post-install/keycloak.yaml
+      ansible-playbook post-install/keycloak.yaml -e dsc_cr={{ dsc_name }}
     extraEnvFrom:
     - secretRef: 
         name: ansible-secret

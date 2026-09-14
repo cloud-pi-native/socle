@@ -1,4 +1,10 @@
 keycloakx:
+  # Intentionally dsc.keycloak.subDomain (legacy "keycloak"), NOT dsc.keycloakx.subDomain:
+  # this drives the codecentric chart's HTTP service name ("<fullname>-http"), which
+  # service-compat.yaml.j2 aliases from for internal callers still using "keycloak-http".
+  # Repointing this to dsc.keycloakx.subDomain would rename the Service to
+  # "keycloakx-http" and break that compat alias. Do not include in the
+  # dsc.keycloak.* -> dsc.keycloakx.* repoint cleanup.
   fullnameOverride: {{ dsc.keycloak.subDomain }}
   replicas: {{ dsc.keycloakx.replicas }}
   command:

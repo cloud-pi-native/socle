@@ -39,10 +39,10 @@ cluster:
 
   nameOverride: "pg-cluster-keycloak"
   fullnameOverride: "pg-cluster-keycloak"
-  cluster
+  cluster:
     primaryUpdateMethod: restart
     enablePDB: false
-    imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloak.cnpg.imageName }}"
+    imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloakx.cnpg.imageName }}"
 {% if dsc.global.imagePullSecrets is defined %}
     imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}
@@ -51,18 +51,18 @@ cluster:
       database: "keycloak"
 
     storage:
-      size: {{ dsc.keycloak.postgresPvcSize }}
-{% if dsc.keycloak.postgresWalPvcSize is defined %}
+      size: {{ dsc.keycloakx.postgresPvcSize }}
+{% if dsc.keycloakx.postgresWalPvcSize is defined %}
     walStorage:
       enabled: true
-      size: {{ dsc.keycloak.postgresWalPvcSize }}
+      size: {{ dsc.keycloakx.postgresWalPvcSize }}
 {% endif %}
 
     postgresql:
       parameters:
         max_worker_processes: "60"
-{% if dsc.keycloak.postgresWalMaxSlotKeepSize is defined %}
-        max_slot_wal_keep_size: {{ dsc.keycloak.postgresWalMaxSlotKeepSize }}
+{% if dsc.keycloakx.postgresWalMaxSlotKeepSize is defined %}
+        max_slot_wal_keep_size: {{ dsc.keycloakx.postgresWalMaxSlotKeepSize }}
 {% endif %}
       pg_hba:
         - host keycloak keycloak all md5

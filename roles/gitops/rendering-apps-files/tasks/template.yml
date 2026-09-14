@@ -113,8 +113,6 @@
             {%- endif -%}
           {%- elif app_name == 'cloudnativepg' -%}
           {{ {} | combine({app_name: dsc[app_name]['operator']['values']}) }}
-          {%- elif app_name == 'keycloakx' and 'cnpg' in dsc.keycloak and 'values' in dsc.keycloak['cnpg'] -%}
-          {{ {} | combine({app_name: dsc[app_name]['values'], 'cluster': dsc.keycloak['cnpg']['values']}) }}
           {%- elif 'cnpg' in dsc[app_name] and 'values' in dsc[app_name]['cnpg'] -%}
           {{ {} | combine({app_name: dsc[app_name]['values'], 'cluster': dsc[app_name]['cnpg']['values']}) }}
           {%- else -%}

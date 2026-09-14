@@ -8,7 +8,7 @@ cpn-ansible-job:
     - /bin/sh
     - -c
     - |
-      git clone {{ dsc.keycloak.repoSocle.url }} -b {{ dsc.keycloak.repoSocle.revision }} socle && \
+      git clone {{ dsc.keycloakx.repoSocle.url }} -b {{ dsc.keycloakx.repoSocle.revision }} socle && \
       cd socle && \
       ansible-playbook post-install/keycloak.yaml
     extraEnvFrom:

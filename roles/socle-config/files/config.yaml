@@ -160,7 +160,7 @@ spec:
   keycloakx:
     installEnabled: true
     namespace: dso-keycloak
-    subDomain: keycloakx
+    subDomain: keycloak
     helmRepoUrl: https://codecentric.github.io/helm-charts
     repoSocle:
       url: https://github.com/cloud-pi-native/socle.git

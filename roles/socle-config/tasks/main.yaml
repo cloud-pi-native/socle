@@ -201,6 +201,7 @@
     grafana_domain: "{{ dsc.grafana.domain | default(dsc.grafana.subDomain ~ root_domain) }}"
     harbor_domain: "{{ dsc.harbor.domain | default(dsc.harbor.subDomain ~ root_domain) }}"
     keycloak_domain: "{{ dsc.keycloak.domain | default(dsc.keycloak.subDomain ~ root_domain) }}"
+    keycloakx_domain: "{{ dsc.keycloakx.domain | default(dsc.keycloakx.subDomain ~ root_domain) }}"
     keycloakinfra_domain: "{{ dsc.keycloakInfra.domain | default(dsc.keycloakInfra.subDomain ~ infra_root_domain) }}"
     nexus_domain: "{{ dsc.nexus.domain | default(dsc.nexus.subDomain ~ root_domain) }}"
     sonar_domain: "{{ dsc.sonarqube.domain | default(dsc.sonarqube.subDomain ~ root_domain) }}"

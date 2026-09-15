@@ -47,6 +47,7 @@
                 harbor: "{{ harbor_domain }}"
                 harborNotary: "{{ dsc.harbor.subDomain }}-notary{{ root_domain }}"
                 keycloak: "{{ keycloak_domain }}"
+                keycloakx: "{{ keycloakx_domain }}"
                 nexus: "{{ nexus_domain }}"
                 nexusDockerProxy: "{{ dsc.nexus.subDomain }}-docker-proxy{{ root_domain }}"
                 sonarqube: "{{ sonar_domain }}"
@@ -100,7 +101,7 @@
             nameSpace: "cloudnativepg"
             customNamespacePrefix: ""
             syncWave: 10
-          - argocd_app: keycloak
+          - argocd_app: keycloakx
             clusterName: ""
             nameSpace: "keycloak"
             customNamespacePrefix: ""
@@ -108,7 +109,6 @@
             vault_values:
               auth:
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
-                userTmpPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits', '!@#$%^&*()-_=+']) }}"
               initcontainers:
                 pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
                 providerDownloadUrl: "{{ dsc.keycloak.providerDownloadUrl }}"

@@ -1,0 +1,7 @@
+- "https://{{ console_domain }}"
+{% if dsc.global.environment == 'development' %}
+- "http://console.dso.local"
+- "http://localhost:8080"
+- "http://127.0.0.1:8080"
+- "*"
+{% endif %}

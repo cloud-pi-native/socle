@@ -63,6 +63,11 @@ spec:
   keycloak:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11
+  keycloakx:
+    # https://codecentric.github.io/helm-charts (keycloakx)
+    chartVersion: "7.2.3"
+    # See https://github.com/keycloak/keycloak/issues/51304
+    imageVersion: "26.7.2"
   keycloakInfra:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11

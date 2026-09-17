@@ -90,10 +90,10 @@ gitlab:
   toolbox:
     backups:
       cron:
-        enabled: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlab | jsonPath {.toolbox.backups.cron.enabled}>
+        enabled: {{ dsc.global.backup.gitlab.enabled }}
 {% if dsc.global.backup.gitlab.enabled %}
-        schedule: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlab | jsonPath {.toolbox.backups.cron.schedule}>
-        extraArgs: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlab | jsonPath {.toolbox.backups.cron.extraArgs}>
+        schedule: "{{ dsc.global.backup.gitlab.cron }}"
+        extraArgs: "{{ dsc.global.backup.gitlab.extraArgs | default('') }}"
       objectStorage:
         config:
           secret: gitlab-backup
@@ -140,7 +140,7 @@ global:
       autoLinkUser: ["openid_connect"]
       providers:
         - secret: openid-connect
-{% if dsc.global.backup.s3.enabled %}
+{% if dsc.global.backup.gitlab.enabled %}
     backups:
       bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>
 {% endif %}

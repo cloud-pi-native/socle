@@ -140,7 +140,7 @@ global:
       autoLinkUser: ["openid_connect"]
       providers:
         - secret: openid-connect
-{% if dsc.global.backup.s3.enabled %}
+{% if dsc.global.backup.gitlab.enabled %}
     backups:
       bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>
 {% endif %}

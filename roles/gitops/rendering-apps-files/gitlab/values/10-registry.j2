@@ -60,9 +60,9 @@ shared-secrets:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/cfssl-self-sign"
 
 minio:
-  image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.minio}>/minio"
+  image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/minio/minio"
   minioMc:
-    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.minio}>/mc"
+    image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/minio/mc"
 
 postgresql:
   image:

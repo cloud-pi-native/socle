@@ -12,7 +12,6 @@
 - [Récupération des secrets](#récupération-des-secrets)
 - [Debug](#debug)
   - [Cert-manager](#cert-manager)
-  - [Kyverno](#kyverno)
   - [Prometheus](#prometheus)
 - [Gel des versions](#gel-des-versions)
   - [Introduction](#introduction-1)
@@ -27,7 +26,6 @@
     - [GitLab Runner](#gitlab-runner)
     - [Harbor](#harbor)
     - [Keycloak](#keycloak)
-    - [Kyverno](#kyverno-1)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
@@ -66,7 +64,6 @@ Les éléments déployés seront les suivants :
 | Harbor | <https://goharbor.io> |
 | HashiCorp Vault | <https://www.vaultproject.io> |
 | Keycloak | <https://www.keycloak.org> |
-| Kyverno | <https://kyverno.io> |
 | Prometheus Operator CRDs (optionnel) | <https://github.com/prometheus-operator/prometheus-operator/releases><br>Fichier `stripped-down-crds.yaml` disponible dans les Assets de chaque version. |
 | SonarQube Community Edition | <https://www.sonarsource.com/open-source-editions/sonarqube-community-edition> |
 | Sonatype Nexus Repository | <https://www.sonatype.com/products/sonatype-nexus-repository> |
@@ -474,12 +471,6 @@ Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que 
 
 **Attention !** Assurez-vous que si une précédente instance de cert-manager a été désinstallée du cluster, elle l'a été proprement. En effet, si l'outil avait déjà été installé auparavant, mais qu'il n'a pas été correctement désinstallé au préalable, alors il est possible que les deux ressources vérifiées par le role soient toujours présentes. Dans ce cas de figure, et si un ingress avec tls de type acme est déclaré dans votre ressource `dsc`, les déploiements de ressources ingress et les routes associées échoueront à se créer, car cert-manager n'aura pas été installé par le role.
 
-### Kyverno
-
-Kyverno est installé en GitOps. Il est utilisé pour déployer une ClusterPolicy qui automatise la réplication des secrets et configmaps portant le label `ns.kyverno.io/all-sync: ""` dans tous les namespaces de la chaîne DSO.
-
-Pour l'instant, seuls les secrets et configmaps présents dans le namespace `{{ dsc.global.namespace }}` et portant ce label sont ainsi répliqués.
-
 ### Prometheus
 
 Les tâches du rôle prometheus ne se lancent que si le paramètre `prometheus.crd.type` de la `dsc` est positionné sur `managed` comme dans l'exemple suivant :
@@ -524,7 +515,7 @@ Ceci parce que la version de la Console Cloud π Native déployée par le socle,
 
 Aussi, **nous ne pouvons garantir le bon fonctionnement** de la forge DSO dans un contexte avec lequel les versions de charts seraient modifiées.
 
-De plus, et comme indiqué plus haut, les outils cert-manager, CloudNativePG, GitLab Operator et Kyverno seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
+De plus, et comme indiqué plus haut, les outils cert-manager, CloudNativePG et GitLab Operator seront communs à toutes les instances de la chaine DSO ou à toute autre application déployée dans le cluster. En modifier la version n'est donc pas anodin.
 
 Si vous souhaitez malgré tout tenter une modification de version d'un chart en particulier, vous devrez **avoir au moins installé le socle DSO une première fois**. En effet, le playbook et les roles associés installeront les dépôts Helm de chaque outil. Ceci vous permettra ensuite d'utiliser la commande `helm` pour rechercher plus facilement les versions de charts disponibles.
 
@@ -586,7 +577,6 @@ Les sections suivantes détaillent la façon de procéder au gel de version d'im
   - [GitLab Runner](#gitlab-runner)
   - [Harbor](#harbor)
   - [Keycloak](#keycloak)
-  - [Kyverno](#kyverno-1)
   - [Sonatype Nexus Repository](#sonatype-nexus-repository)
   - [SonarQube Community Edition](#sonarqube-community-edition)
   - [Vault](#vault)
@@ -772,11 +762,6 @@ Pour mémoire, les values utilisables sont disponibles ici : <https://github.com
 
 Les release notes de Keycloak se trouvent ici : <https://github.com/keycloak/keycloak/releases>
 
-#### Kyverno
-
-La version d'image utilisée par Kyverno est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
-
-Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez ce que vous faites.
 
 #### Sonatype Nexus Repository
 
@@ -931,7 +916,6 @@ spec:
 
 Une fois la `dsc` mise à jour et appliquée, le processus d'installation s'appuiera sur ces références pour autoriser le pull des images.
 
-Si vous constatez que les secrets ne sont pas correctement propagés ou reconnus dans les namespaces cibles, assurez-vous que la ClusterPolicy Kyverno chargée de la réplication est active, ou contactez l'équipe Ops pour vérifier la disponibilité du secret nommé dans le namespace concerné.
 
 ## Gestion des users Keycloak
 

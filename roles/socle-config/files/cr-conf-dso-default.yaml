@@ -87,7 +87,6 @@ spec:
       type: none
   keycloak: {}
   keycloakInfra: {}
-  kyverno: {}
   nexus: {}
   observatorium:
     enabled: false

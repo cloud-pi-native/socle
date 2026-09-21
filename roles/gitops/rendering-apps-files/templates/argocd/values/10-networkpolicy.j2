@@ -1,0 +1,13 @@
+# argo-cd chart 10.0.0 flips global.networkPolicy.create from false to true. We pin it back
+# to false so the 8.5.6 -> 10.7.2 bump stays network-neutral: the Argo CD namespace has no
+# NetworkPolicy today, so enabling them would be a posture change unrelated to the upgrade.
+#
+# To turn on later, once flows have been validated cluster by cluster:
+#   - console -> argocd-server: the chart leaves the server on `ingress: [{}]`, so unrestricted
+#   - Prometheus -> metrics ports: allowed from any namespace
+#   - repo-server: gRPC restricted to server / application-controller / applicationset-controller
+# Then set create to true here, or override per environment through dsc.argocd.values.
+argocd:
+  global:
+    networkPolicy:
+      create: false

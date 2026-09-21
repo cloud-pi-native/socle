@@ -7,10 +7,10 @@
 | cloudnativepg.operator    | 1.28.0           | 0.27.0        | [cloudnative-pg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                 |
 | console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | cpn-job                   | 1.\*.\*          | 1.\*.\*       | [cpn-job](https://github.com/cloud-pi-native/helm-charts)                                                            |
-| gitlab                    | 18.4.1         | 9.4.1       | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
+| gitlab                    | 18.5.5         | 9.5.5       | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
 | glexporter | 0.5.10           | 0.3.5         | [glexporter](https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter) |
-| gitlabOperator            | 2.4.1           | 2.4.1        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
-| gitlabrunner              | 18.4.0          | 0.78.1        | [gitlabrunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)                                            |
+| gitlabOperator            | 2.7.1           | 2.7.1        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
+| gitlabrunner              | 18.5.0          | 0.82.0        | [gitlabrunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)                                            |
 | grafana                   | 10.4.3           | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
 | keycloak                  | 26.3.3           | 25.2.0        | [keycloak](https://artifacthub.io/packages/helm/bitnami/keycloak)                                                    |

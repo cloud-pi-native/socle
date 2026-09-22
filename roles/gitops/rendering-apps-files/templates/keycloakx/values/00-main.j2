@@ -1,11 +1,10 @@
 keycloakx:
-  # Intentionally dsc.keycloak.subDomain (legacy "keycloak"), NOT dsc.keycloakx.subDomain:
-  # this drives the codecentric chart's HTTP service name ("<fullname>-http"), which
-  # service-compat.yaml.j2 aliases from for internal callers still using "keycloak-http".
-  # Repointing this to dsc.keycloakx.subDomain would rename the Service to
-  # "keycloakx-http" and break that compat alias. Do not include in the
-  # dsc.keycloak.* -> dsc.keycloakx.* repoint cleanup.
-  fullnameOverride: {{ dsc.keycloak.subDomain }}
+  # subDomain value is "keycloak" (not "keycloakx"): this drives the codecentric
+  # chart's HTTP service name ("<fullname>-http" -> "keycloak-http"). All in-cluster
+  # consumers now address that Service directly as "keycloak-http" (the
+  # service-compat.yaml.j2 ExternalName alias to the old bare "keycloak" name was
+  # removed once every consumer was repointed).
+  fullnameOverride: {{ dsc.keycloakx.subDomain }}
   replicas: {{ dsc.keycloakx.replicas }}
   command:
     - /opt/keycloak/bin/kc.sh
@@ -72,8 +71,8 @@ keycloakx:
         - -c
         - |
           mkdir -p /providers && \
-          curl -k -fsSL -o /providers/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
-          curl -k -fsSL -o /providers/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.providerDownloadUrl}>
+          curl -k -fsSL -o /providers/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
+          curl -k -fsSL -o /providers/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#initcontainers | jsonPath {.providerDownloadUrl}>
       volumeMounts:
         - name: providers
           mountPath: /providers

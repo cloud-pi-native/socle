@@ -1,9 +1,0 @@
-#Workaround pour permettre la compatibilité avec les call en interne (limitation de la chart codecentric qui force le keycloak-http)
-apiVersion: v1
-kind: Service
-metadata:
-  name: keycloak
-  namespace: {{ dsc.keycloakx.namespace }}
-spec:
-  type: ExternalName
-  externalName: keycloak-http.{{ dsc.keycloakx.namespace }}.svc.cluster.local

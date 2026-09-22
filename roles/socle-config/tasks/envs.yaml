@@ -110,8 +110,8 @@
               auth:
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
               initcontainers:
-                pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
-                providerDownloadUrl: "{{ dsc.keycloak.providerDownloadUrl }}"
+                pluginDownloadUrl: "{{ dsc.keycloakx.pluginDownloadUrl }}"
+                providerDownloadUrl: "{{ dsc.keycloakx.providerDownloadUrl }}"
           - argocd_app: gitlab
             clusterName: ""
             nameSpace: "gitlab"

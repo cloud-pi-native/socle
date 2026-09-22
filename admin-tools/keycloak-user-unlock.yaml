@@ -79,7 +79,7 @@
         command: >
           bash -c "JAVA_OPTS_APPEND='-Djgroups.dns.query=keycloak-headless.{{ dsc.keycloakx.namespace }}.svc.cluster.local -Djgroups.bind.port=7900';
           export PASS_VAR='{{ tmp_admin_pass }}';
-          kc.sh bootstrap-admin user --username {{ tmp_admin }} --password:env PASS_VAR"
+          /opt/keycloak/bin/kc.sh bootstrap-admin user --username {{ tmp_admin }} --password:env PASS_VAR"
       register: tmp_adm
 
     - name: Get Keycloak API token

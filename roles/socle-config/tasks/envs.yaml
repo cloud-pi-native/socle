@@ -101,14 +101,6 @@
             nameSpace: "cloudnativepg"
             customNamespacePrefix: ""
             syncWave: 10
-          # Migration step 7 complete: the `keycloak` (Bitnami) app entry has
-          # been removed. `dsc.keycloak.*` config (config.yaml/releases.yaml)
-          # is kept around on purpose - keycloakx still reads several fields
-          # from it (postgresPvcSize, postgresWalPvcSize, cnpg.imageName,
-          # pluginDownloadUrl, providerDownloadUrl...). Full decoupling onto
-          # dsc.keycloakx.* equivalents is a separate, non-urgent cleanup.
-          # Nouvelle app Keycloak permanente (remplace `keycloak`, chart Bitnami
-          # figé). Cohabite avec `keycloak` uniquement le temps de la migration
           - argocd_app: keycloakx
             clusterName: ""
             nameSpace: "keycloak"
@@ -118,8 +110,8 @@
               auth:
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
               initcontainers:
-                pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
-                providerDownloadUrl: "{{ dsc.keycloak.providerDownloadUrl }}"
+                pluginDownloadUrl: "{{ dsc.keycloakx.pluginDownloadUrl }}"
+                providerDownloadUrl: "{{ dsc.keycloakx.providerDownloadUrl }}"
           - argocd_app: gitlab
             clusterName: ""
             nameSpace: "gitlab"

@@ -130,7 +130,7 @@
     - name: "Suppression de l'instance Keycloak"
       kubernetes.core.helm:
         name: keycloak
-        release_namespace: "{{ dsc.keycloak.namespace }}"
+        release_namespace: "{{ dsc.keycloakx.namespace }}"
         state: absent
         wait: true
       tags:
@@ -140,7 +140,7 @@
       kubernetes.core.k8s:
         state: absent
         kind: Namespace
-        name: "{{ dsc.keycloak.namespace }}"
+        name: "{{ dsc.keycloakx.namespace }}"
       tags:
         - keycloak
 

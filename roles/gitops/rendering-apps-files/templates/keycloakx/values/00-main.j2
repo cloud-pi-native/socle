@@ -1,5 +1,5 @@
 keycloakx:
-  fullnameOverride: {{ dsc.keycloak.subDomain }}
+  fullnameOverride: {{ dsc.keycloakx.subDomain }}
   replicas: {{ dsc.keycloakx.replicas }}
   command:
     - /opt/keycloak/bin/kc.sh
@@ -66,8 +66,8 @@ keycloakx:
         - -c
         - |
           mkdir -p /providers && \
-          curl -k -fsSL -o /providers/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
-          curl -k -fsSL -o /providers/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#initcontainers | jsonPath {.providerDownloadUrl}>
+          curl -k -fsSL -o /providers/keycloak-theme-dsfr.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#initcontainers | jsonPath {.pluginDownloadUrl}> && \
+          curl -k -fsSL -o /providers/keycloak-franceconnect.jar <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#initcontainers | jsonPath {.providerDownloadUrl}>
       volumeMounts:
         - name: providers
           mountPath: /providers

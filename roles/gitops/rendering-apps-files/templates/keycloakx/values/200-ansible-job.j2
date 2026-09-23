@@ -8,14 +8,11 @@ cpn-ansible-job:
     - /bin/sh
     - -c
     - |
-      git clone {{ dsc.keycloak.repoSocle.url }} -b {{ dsc.keycloak.repoSocle.revision }} socle && \
+      git clone {{ dsc.keycloakx.repoSocle.url }} -b chore/migrate-keycloakx-formation-sdan socle && \
       cd socle && \
-      ansible-playbook post-install/keycloak.yaml
+      ansible-playbook post-install/keycloakx.yaml
     extraEnvFrom:
     - secretRef:
-        # Distinct name from the legacy app's `ansible-secret`: same
-        # namespace, would otherwise trigger an ArgoCD SharedResourceWarning
-        # while both apps are enabled at once.
         name: keycloakx-ansible-secret
     extraVolumes:
     - name: users-csv

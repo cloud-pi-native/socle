@@ -22,7 +22,7 @@
             envs:
               - name: "{{ dsc_name }}"
                 apps:
-                  - argocd_app: keycloak
+                  - argocd_app: keycloakx
                     vault_values:
                       global:
                         userTmpPassword: "itDoesNotMatterWhatWeWriteHere"
@@ -33,7 +33,7 @@
 
     - name: Import keycloak role
       ansible.builtin.import_role:
-        name: gitops/post-install/keycloak
+        name: gitops/post-install/keycloakx
 
     - name: Update vault-secrets for oidc
       block:
@@ -49,7 +49,7 @@
                   - argocd_app: gitlab
                     vault_values:
                       oidcProvider: "{{ gitlab_oidc_provider | b64encode | default('') }}"
-                  - argocd_app: keycloak
+                  - argocd_app: keycloakx
                     vault_values:
                       client:
                         argo:

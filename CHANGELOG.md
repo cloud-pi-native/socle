@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.11.0](https://github.com/cloud-pi-native/socle/compare/v4.10.5...v4.11.0) (2026-09-23)
+
+
+### Features
+
+* **console:** add ARGOCD_SHARED_SOURCE_REPOSITORIES with harbor oci url templated per project ([c9b3799](https://github.com/cloud-pi-native/socle/commit/c9b3799352565ca22401350dfecd76b891749d6c))
+* **gitlab:** use quay.io for minio image ([81b658f](https://github.com/cloud-pi-native/socle/commit/81b658f7aa0becc378306b625ea3b830eeabfa0e))
+
 ## [4.10.5](https://github.com/cloud-pi-native/socle/compare/v4.10.4...v4.10.5) (2026-09-09)
 
 

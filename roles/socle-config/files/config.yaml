@@ -158,7 +158,7 @@ spec:
     applicationRealm: dso
     usersGitOpsEnabled: false
     replicas: 1
-    ansibleJobEnabled: false
+    ansibleJobEnabled: true
     values: {}
   keycloakInfra:
     installEnabled: false

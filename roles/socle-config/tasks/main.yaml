@@ -265,6 +265,34 @@
   ansible.builtin.import_role:
     name: ca
 
+# The keycloakx admin bootstrap password is only ever consumed by Keycloak
+# once, at first-ever boot - the running instance never re-reads it after
+# that. But envs.yaml used to (re)generate it from a fresh
+# `lookup('ansible.builtin.password', '/dev/null', ...)` on EVERY full run
+# (this job has no persistent disk to cache a password file on across runs),
+# and write.yml writes any non-null value straight to Vault. Net effect: every
+# full deploy silently overwrote Vault/keycloakx-admin-secret with a value
+# that no longer matched Keycloak's real DB password - confirmed live on both
+# cpin-console-hp and formation-sdan (post-install job failing with
+# invalid_grant right after a reset had just fixed it). Fetching the current
+# Vault value here and having envs.yaml fall back to it (instead of always
+# generating fresh) makes the write idempotent: a real rotation (via
+# keycloak-admin-password-reset*.yaml, which also writes to this same Vault
+# path) sticks, and routine deploys stop clobbering it.
+- name: Get current keycloakx admin password from Vault
+  when: post_conf_job is not defined
+  community.hashi_vault.vault_kv2_get:
+    url: "https://{{ vaultinfra_domain }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    engine_mount_point: "{{ vaultinfra_kv_name }}"
+    path: "env/{{ dsc_name }}/apps/keycloakx/values"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
+  environment:
+    VAULT_TOKEN: "{{ vault_infra_token }}"
+  register: current_keycloakx_vault_values
+  ignore_errors: true
+  no_log: true
+
 - name: Set envs fact
   when: post_conf_job is not defined
   ansible.builtin.include_tasks:

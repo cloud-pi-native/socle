@@ -108,7 +108,17 @@
             syncWave: 20
             vault_values:
               auth:
-                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+                # Reuse the existing Vault value if there is one (set by
+                # main.yaml's "Get current keycloakx admin password from
+                # Vault" task) - only fall back to generating fresh on true
+                # first-bootstrap, when Vault has nothing yet. See that
+                # task's comment for why: Keycloak only reads this once,
+                # ever, so regenerating it on every run just breaks it.
+                adminPassword: >-
+                  {{
+                    (((current_keycloakx_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))
+                    or lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
+                  }}
               initcontainers:
                 pluginDownloadUrl: "{{ dsc.keycloakx.pluginDownloadUrl }}"
                 providerDownloadUrl: "{{ dsc.keycloakx.providerDownloadUrl }}"

@@ -60,7 +60,7 @@
         namespace: "{{ dsc.keycloakx.namespace }}"
         kind: Pod
         label_selectors:
-          - app.kubernetes.io/name=keycloak
+          - app.kubernetes.io/name=keycloakx
       register: kc_pods
 
     - name: Set kc_pod fact

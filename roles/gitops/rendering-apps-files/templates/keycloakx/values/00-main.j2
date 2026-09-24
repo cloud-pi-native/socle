@@ -116,17 +116,20 @@ keycloakx:
       {{ key }}: "{{ val }}"
 {% endfor %}
     rules:
-      # Temporary host ("keycloakx.<domain>"), NOT the production
-      # "keycloak.<domain>" host the legacy Ingress already owns - claiming
-      # that host now, before any cutover was decided, would collide with
-      # the live legacy Ingress (and its cert-manager Certificate, see
-      # skill §5). Repointing to the production host is a separate,
-      # deliberate cutover step, not part of initial parallel deployment.
+      # dsc.keycloakx.subDomain starts as the temporary "keycloakx" host
+      # during parallel deployment, then becomes "keycloak" (the production
+      # identity) at the deliberate cutover step - this same field/formula
+      # resolves correctly in both cases, no template change needed at
+      # cutover time.
       - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
         paths:
           - path: /
             pathType: Prefix
-{% if dsc.global.environment == "production" %}
+{% if dsc.global.environment == "production" and dsc.keycloakx.subDomain == "keycloakx" %}
+          # Only while still on the temporary pre-cutover host - blocks
+          # public admin/master-realm access there. Self-disables once
+          # subDomain becomes "keycloak" (production identity): the real
+          # admin console must stay reachable on the real production host.
           - path: /admin/
             pathType: Prefix
             serviceName: forbidden

@@ -283,6 +283,28 @@
   ignore_errors: true
   no_log: true
 
+# keycloakx runs against the same live CNPG Postgres as the legacy keycloak
+# app (cnpg.enabled: false in 100-cnpg.j2) - the `dsoadmin` user already
+# exists in that shared DB with the legacy password, so the bootstrap-admin
+# mechanism is a no-op on keycloakx's first boot (it only creates the admin
+# user when it doesn't already exist). The real, working password is
+# whichever one keycloak (legacy) currently has in Vault - keep keycloakx's
+# recorded value in sync with it instead of a disconnected freshly-generated
+# one that will never actually work while both apps share the DB.
+- name: Get current keycloak (legacy) admin password from Vault
+  when: post_conf_job is not defined
+  community.hashi_vault.vault_kv2_get:
+    url: "https://{{ vaultinfra_domain }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    engine_mount_point: "{{ vaultinfra_kv_name }}"
+    path: "env/{{ dsc_name }}/apps/keycloak/values"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
+  environment:
+    VAULT_TOKEN: "{{ vault_infra_token }}"
+  register: current_keycloak_vault_values
+  ignore_errors: true
+  no_log: true
+
 - name: Set envs fact
   when: post_conf_job is not defined
   ansible.builtin.include_tasks:

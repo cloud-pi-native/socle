@@ -128,18 +128,20 @@
             syncWave: 20
             vault_values:
               auth:
-                # Reuse the existing Vault value if there is one (set by
-                # main.yaml's "Get current keycloakx admin password from
-                # Vault" task) - only fall back to generating fresh on true
-                # first-bootstrap, when Vault has nothing yet. Keycloak only
-                # ever reads this bootstrap password once, at first boot -
-                # regenerating it on every deploy (the naive
-                # lookup('ansible.builtin.password', '/dev/null', ...)
-                # pattern used elsewhere in this file) silently breaks admin
-                # login on every subsequent full deploy. See skill §14.
+                # keycloakx shares the same live Postgres as legacy keycloak
+                # (see main.yaml) - the real, working password for `dsoadmin`
+                # is whichever one keycloak (legacy) currently has, since the
+                # bootstrap-admin mechanism is a no-op once that user already
+                # exists in the shared DB. Priority: legacy keycloak's
+                # current Vault value (source of truth while both apps
+                # coexist) > keycloakx's own previously-recorded value (kept
+                # for after legacy is decommissioned, step 7) > fresh
+                # generation on true first-ever bootstrap. Never regenerate
+                # unconditionally - see skill §14.
                 adminPassword: >-
                   {{
-                    (((current_keycloakx_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))
+                    (((current_keycloak_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))
+                    or (((current_keycloakx_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))
                     or lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
                   }}
               initcontainers:

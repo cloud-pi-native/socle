@@ -71,9 +71,9 @@ spec:
     # A direct jump to 26.7.x hits a known upstream bug on migration:
     # LazyInitializationException in MigrateTo26_7_0.addOrganizationAdminRoles.
     # See https://github.com/keycloak/keycloak/issues/51304 and skill §3.
-    # Bump to 26.7.2 only as its own separate step, once 26.6.4 is confirmed
-    # healthy.
-    imageVersion: "26.6.4"
+    # 26.6.4 confirmed healthy (recovered cluster, 3/3 pods, real auth
+    # traffic via console/etc.) before this bump.
+    imageVersion: "26.7.2"
   keycloakInfra:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11

@@ -101,26 +101,6 @@
             nameSpace: "cloudnativepg"
             customNamespacePrefix: ""
             syncWave: 10
-          - argocd_app: keycloak
-            clusterName: ""
-            nameSpace: "keycloak"
-            customNamespacePrefix: ""
-            syncWave: 20
-            vault_values:
-              auth:
-                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
-                userTmpPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits', '!@#$%^&*()-_=+']) }}"
-              initcontainers:
-                pluginDownloadUrl: "{{ dsc.keycloak.pluginDownloadUrl }}"
-                providerDownloadUrl: "{{ dsc.keycloak.providerDownloadUrl }}"
-          # New, parallel deployment - does not touch/replace the `keycloak`
-          # (legacy) entry above. Runs against the same live CNPG Postgres
-          # via a Service DNS name (cluster.enabled: false in 100-cnpg.j2),
-          # under its own temporary subDomain, not yet serving any real
-          # traffic. See keycloak-bitnami-migration skill for the full
-          # staged plan - removing the `keycloak` entry above is a much
-          # later, separate step (runbook step 7) requiring its own
-          # explicit go-ahead, never bundled with other changes.
           - argocd_app: keycloakx
             clusterName: ""
             nameSpace: "keycloak"
@@ -128,16 +108,6 @@
             syncWave: 20
             vault_values:
               auth:
-                # keycloakx shares the same live Postgres as legacy keycloak
-                # (see main.yaml) - the real, working password for `dsoadmin`
-                # is whichever one keycloak (legacy) currently has, since the
-                # bootstrap-admin mechanism is a no-op once that user already
-                # exists in the shared DB. Priority: legacy keycloak's
-                # current Vault value (source of truth while both apps
-                # coexist) > keycloakx's own previously-recorded value (kept
-                # for after legacy is decommissioned, step 7) > fresh
-                # generation on true first-ever bootstrap. Never regenerate
-                # unconditionally - see skill §14.
                 adminPassword: >-
                   {{
                     (((current_keycloak_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))

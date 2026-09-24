@@ -2,6 +2,15 @@ cluster:
   nameOverride: "pg-cluster-keycloak"
   fullnameOverride: "pg-cluster-keycloak"
   cluster:
+    # Protects the Cluster resource from ArgoCD prune when this
+    # (legacy keycloak) Application is removed at runbook step 7 - neither
+    # preserveResourcesOnDeletion nor careful step ordering alone prevented
+    # the Cluster+PVCs from being deleted in either of the two prior
+    # incidents on other environments. See keycloak-bitnami-migration
+    # skill §7. Kept here (not just applied live via kubectl) so it
+    # survives a routine sync of this Application before its removal.
+    annotations:
+      argocd.argoproj.io/sync-options: Prune=false
     primaryUpdateMethod: restart
     enablePDB: false
     imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloak.cnpg.imageName }}"

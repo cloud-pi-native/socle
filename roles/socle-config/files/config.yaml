@@ -184,10 +184,7 @@ spec:
     # cutover done), unlike legacy's 3 live replicas. Bump once it's
     # actually taking over.
     replicas: 1
-    # Provisioning cutover (realm/client/user sync, RBAC, secret-ansible)
-    # deferred - a separate, deliberate step once the parallel deployment
-    # itself is confirmed healthy.
-    ansibleJobEnabled: false
+    ansibleJobEnabled: true
     values: {}
   keycloakInfra:
     installEnabled: false

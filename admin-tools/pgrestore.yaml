@@ -16,8 +16,13 @@
 
   vars:
     pgdump_cnpg_clusters:
-      - name: "{{ dsc.keycloak.subDomain }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
+      # Hardcoded, not derived from subDomain: the real CNPG cluster is
+      # `pg-cluster-keycloak` regardless of which app currently owns it -
+      # dsc.keycloakx.subDomain is still "keycloakx" (temporary, pre-cutover)
+      # at this stage, which would resolve to the wrong cluster name. See
+      # keycloak-bitnami-migration skill §10.
+      - name: keycloak
+        namespace: "{{ dsc.keycloakx.namespace }}"
         db: keycloak
       - name: "{{ dsc.sonarqube.subDomain }}"
         namespace: "{{ dsc.sonarqube.namespace }}"

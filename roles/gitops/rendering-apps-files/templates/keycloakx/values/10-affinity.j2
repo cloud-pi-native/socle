@@ -1,0 +1,12 @@
+keycloakx:
+  affinity: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+{% raw %}
+                {{- include "keycloak.selectorLabels" . | nindent 16 }}
+{% endraw %}
+            topologyKey: kubernetes.io/hostname

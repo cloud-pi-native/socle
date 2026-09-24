@@ -1,0 +1,51 @@
+cluster:
+  # Disabled on purpose at this stage of the migration: `keycloak` (legacy)
+  # still owns and manages the live `pg-cluster-keycloak` Cluster resource.
+  # keycloakx connects to the SAME running Postgres via the existing
+  # `pg-cluster-keycloak-rw` Service (see values/00-main.j2's `database:`
+  # block) without claiming the Cluster resource itself - this is what lets
+  # it run in parallel against real production data with zero ownership
+  # risk. Only flip this to `true` at runbook step 7/8 (adoption), and only
+  # following that step's strict live-verified ordering: see the
+  # keycloak-bitnami-migration skill §7 for the incident this exact flip
+  # caused twice already on other environments (Cluster + PVCs deleted via
+  # a dual-ownership prune race). Do NOT copy the `mode: recovery` bootstrap
+  # block from other environments' 100-cnpg.j2 blindly when the time comes -
+  # that was a post-incident recovery measure specific to their own outage,
+  # not a normal part of a clean adoption. Re-derive what's actually needed
+  # then, verified live against this cluster's real state at that time.
+  enabled: false
+
+  nameOverride: "pg-cluster-keycloak"
+  fullnameOverride: "pg-cluster-keycloak"
+  cluster:
+    primaryUpdateMethod: restart
+    enablePDB: false
+    imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloakx.cnpg.imageName }}"
+{% if dsc.global.imagePullSecrets is defined %}
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
+{% endif %}
+    initdb:
+      owner: "keycloak"
+      database: "keycloak"
+
+    storage:
+      size: {{ dsc.keycloakx.postgresPvcSize }}
+{% if dsc.keycloakx.postgresWalPvcSize is defined %}
+    walStorage:
+      enabled: true
+      size: {{ dsc.keycloakx.postgresWalPvcSize }}
+{% endif %}
+
+    postgresql:
+      parameters:
+        max_worker_processes: "60"
+{% if dsc.keycloakx.postgresWalMaxSlotKeepSize is defined %}
+        max_slot_wal_keep_size: {{ dsc.keycloakx.postgresWalMaxSlotKeepSize }}
+{% endif %}
+      pg_hba:
+        - host keycloak keycloak all md5
+        - host keycloak streaming_replica all md5
+
+    monitoring:
+      enabled: {{ dsc.global.metrics.enabled }}

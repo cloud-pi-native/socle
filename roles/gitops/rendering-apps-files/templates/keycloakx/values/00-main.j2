@@ -1,11 +1,4 @@
 keycloakx:
-  # dsc.keycloakx.subDomain is "keycloakx" (temporary) at this stage, not
-  # "keycloak" - this drives the codecentric chart's fullname, and therefore
-  # its Service name ("<fullname>-http" -> "keycloakx-http"), distinct from
-  # the legacy Service. Repointing this to the production "keycloak" name is
-  # runbook step 5 (cutover) - see skill §5 for the Service-rename/
-  # cert-manager pitfalls that step carries, and do it as its own deliberate
-  # action once legacy is actually being retired, not before.
   fullnameOverride: {{ dsc.keycloakx.subDomain }}
   replicas: {{ dsc.keycloakx.replicas }}
   command:
@@ -52,12 +45,6 @@ keycloakx:
     - name: KC_LOG_LEVEL
       value: INFO
     - name: KC_HOSTNAME
-      # Temporary host - dsc.keycloakx.subDomain ("keycloakx"), NOT the
-      # production "keycloak" host that the legacy Ingress already owns.
-      # Switching this to the production domain is runbook step 4/5
-      # (cutover), a separate deliberate action - not something to do at
-      # initial parallel deployment, see skill §5 for why (Ingress/Service
-      # rename pitfalls) and this file's ingress.rules.host below.
       value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
     - name: DSFR_THEME_HOME_URL
       value: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.console}>
@@ -116,29 +103,10 @@ keycloakx:
       {{ key }}: "{{ val }}"
 {% endfor %}
     rules:
-      # dsc.keycloakx.subDomain starts as the temporary "keycloakx" host
-      # during parallel deployment, then becomes "keycloak" (the production
-      # identity) at the deliberate cutover step - this same field/formula
-      # resolves correctly in both cases, no template change needed at
-      # cutover time.
       - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
         paths:
           - path: /
             pathType: Prefix
-{% if dsc.global.environment == "production" and dsc.keycloakx.subDomain == "keycloakx" %}
-          # Only while still on the temporary pre-cutover host - blocks
-          # public admin/master-realm access there. Self-disables once
-          # subDomain becomes "keycloak" (production identity): the real
-          # admin console must stay reachable on the real production host.
-          - path: /admin/
-            pathType: Prefix
-            serviceName: forbidden
-            servicePort: http
-          - path: /realms/{{ dsc.keycloakx.managementRealm }}/
-            pathType: Prefix
-            serviceName: forbidden
-            servicePort: http
-{% endif %}
 {% if dsc.global.imagePullSecrets is defined %}
   imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
 {% endif %}

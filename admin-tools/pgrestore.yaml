@@ -16,11 +16,8 @@
 
   vars:
     pgdump_cnpg_clusters:
-      # Hardcoded, not derived from subDomain: the real CNPG cluster is
-      # `pg-cluster-keycloak` regardless of which app currently owns it -
-      # dsc.keycloakx.subDomain is still "keycloakx" (temporary, pre-cutover)
-      # at this stage, which would resolve to the wrong cluster name. See
-      # keycloak-bitnami-migration skill §10.
+      # Hardcoded, not derived from subDomain: the CNPG cluster's real
+      # identity is `pg-cluster-keycloak` regardless of which app owns it.
       - name: keycloak
         namespace: "{{ dsc.keycloakx.namespace }}"
         db: keycloak

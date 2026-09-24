@@ -110,8 +110,7 @@
               auth:
                 adminPassword: >-
                   {{
-                    (((current_keycloak_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))
-                    or (((current_keycloakx_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))
+                    (((current_keycloakx_vault_values.secret | default({})).auth | default({})).adminPassword | default(''))
                     or lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits'])
                   }}
               initcontainers:

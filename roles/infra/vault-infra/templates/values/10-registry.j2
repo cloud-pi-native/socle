@@ -4,10 +4,12 @@ injector:
     repository: "{{ dsc.global.registry }}/hashicorp/vault-k8s"
   agentImage:
     repository: "{{ dsc.global.registry }}/hashicorp/vault"
+    tag: "{{ dsc.vaultInfra.imageVersion }}"
 
 server:
   image:
     repository: "{{ dsc.global.registry }}/hashicorp/vault"
+    tag: "{{ dsc.vaultInfra.imageVersion }}"
 
 csi:
   image:
@@ -15,6 +17,7 @@ csi:
   agent:
     image:
       repository: "{{ dsc.global.registry }}/hashicorp/vault"
+      tag: "{{ dsc.vaultInfra.imageVersion }}"
 {% endif %}
 
 {% if dsc.global.imagePullSecrets is defined %}

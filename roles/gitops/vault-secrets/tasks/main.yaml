@@ -68,7 +68,7 @@
       kubernetes.core.k8s_info:
         kind: Secret
         name: keycloak
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
       register: keycloak_admin_secret
 
 # Set Argo CD admin password when required
@@ -143,4 +143,4 @@
   when: vault_secrets_post_install and keycloak_reset_password and not argo_infra_ns_check.failed
   ansible.builtin.include_tasks: argocd.yml
   loop:
-    - "{{ dsc.keycloak.namespace }}"
+    - "{{ dsc.keycloakx.namespace }}"

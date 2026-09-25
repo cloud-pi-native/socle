@@ -28,7 +28,7 @@ spec:
       chartVersion: "0.27.0"
   console:
     # https://github.com/cloud-pi-native/console/releases
-    chartVersion: 2.4.38
+    chartVersion: 2.4.40
   cpnAnsibleJob:
     # https://github.com/cloud-pi-native/helm-charts/releases
     chartVersion: "1.1.0"
@@ -60,9 +60,10 @@ spec:
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.17.1
-  keycloak:
-    # https://artifacthub.io/packages/helm/bitnami/keycloak
-    chartVersion: 24.4.11
+  keycloakx:
+    # https://codecentric.github.io/helm-charts (keycloakx)
+    chartVersion: "7.2.3"
+    imageVersion: "26.7.2"
   keycloakInfra:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11

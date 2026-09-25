@@ -16,8 +16,10 @@
 
   vars:
     pgdump_cnpg_clusters:
-      - name: "{{ dsc.keycloak.subDomain }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
+      # Hardcoded, not derived from subDomain: the CNPG cluster's real
+      # identity is `pg-cluster-keycloak` regardless of which app owns it.
+      - name: keycloak
+        namespace: "{{ dsc.keycloakx.namespace }}"
         db: keycloak
       - name: "{{ dsc.sonarqube.subDomain }}"
         namespace: "{{ dsc.sonarqube.namespace }}"

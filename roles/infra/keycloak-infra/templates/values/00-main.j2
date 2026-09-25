@@ -318,7 +318,7 @@ initContainers:
       - sh
     args:
       - -c
-      - mkdir -p /emptydir/app-providers-dir && curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloak.pluginDownloadUrl }}
+      - mkdir -p /emptydir/app-providers-dir && curl -k -L -f -S -o /emptydir/app-providers-dir/keycloak-theme-dsfr.jar {{ dsc.keycloakInfra.pluginDownloadUrl }}
     volumeMounts:
       - name: empty-dir
         mountPath: /emptydir

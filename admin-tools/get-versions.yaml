@@ -248,7 +248,7 @@
         - name: Retrieve Keycloak infos
           kubernetes.core.helm_info:
             name: keycloak
-            namespace: "{{ dsc.keycloak.namespace }}"
+            namespace: "{{ dsc.keycloakx.namespace }}"
           register: keycloak_infos
 
         - name: Display Keycloak version

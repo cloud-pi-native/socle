@@ -1,0 +1,10 @@
+{% if dsc.keycloakx.subDomain == "keycloak" %}
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: {{ dsc.keycloakx.namespace }}
+spec:
+  type: ExternalName
+  externalName: keycloak-http.{{ dsc.keycloakx.namespace }}.svc.cluster.local
+{% endif %}

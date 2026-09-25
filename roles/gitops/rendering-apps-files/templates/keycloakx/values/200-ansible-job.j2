@@ -1,4 +1,5 @@
 cpn-ansible-job:
+  enabled: {{ dsc.keycloakx.ansibleJobEnabled | lower }}
   job:
     image:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/cloud-pi-native/git-ansible"
@@ -7,12 +8,12 @@ cpn-ansible-job:
     - /bin/sh
     - -c
     - |
-      git clone {{ dsc.keycloak.repoSocle.url }} -b {{ dsc.keycloak.repoSocle.revision }} socle && \
+      git clone {{ dsc.keycloakx.repoSocle.url }} -b chore/migrate-keycloakx-cpin socle && \
       cd socle && \
-      ansible-playbook post-install/keycloak.yaml
+      ansible-playbook post-install/keycloakx.yaml
     extraEnvFrom:
-    - secretRef: 
-        name: ansible-secret
+    - secretRef:
+        name: keycloakx-ansible-secret
     extraVolumes:
     - name: users-csv
       configMap:

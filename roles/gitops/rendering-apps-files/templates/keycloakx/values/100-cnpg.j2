@@ -1,0 +1,73 @@
+cluster:
+  enabled: true
+
+  nameOverride: "pg-cluster-keycloak"
+  fullnameOverride: "pg-cluster-keycloak"
+
+  # Top-level, NOT nested under cluster.cluster - see skill §6.
+  mode: recovery
+  recovery:
+    method: object_store
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
+    clusterName: pg-cluster-keycloak
+    owner: keycloak
+    database: keycloak
+    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
+    provider: s3
+    s3:
+      accessKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
+      secretKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
+
+  cluster:
+    annotations:
+      argocd.argoproj.io/sync-options: Prune=false
+    primaryUpdateMethod: restart
+    enablePDB: false
+    imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloakx.cnpg.imageName }}"
+{% if dsc.global.imagePullSecrets is defined %}
+    imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
+{% endif %}
+
+    storage:
+      size: {{ dsc.keycloakx.postgresPvcSize }}
+{% if dsc.keycloakx.postgresWalPvcSize is defined %}
+    walStorage:
+      enabled: true
+      size: {{ dsc.keycloakx.postgresWalPvcSize }}
+{% endif %}
+
+    postgresql:
+      parameters:
+        max_worker_processes: "60"
+{% if dsc.keycloakx.postgresWalMaxSlotKeepSize is defined %}
+        max_slot_wal_keep_size: {{ dsc.keycloakx.postgresWalMaxSlotKeepSize }}
+{% endif %}
+      pg_hba:
+        - host keycloak keycloak all md5
+        - host keycloak streaming_replica all md5
+
+    monitoring:
+      enabled: {{ dsc.global.metrics.enabled }}
+
+{% if dsc.global.backup.cnpg.enabled %}
+  backups:
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg-keycloakx-recovered
+    enabled: true
+    endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
+    retentionPolicy: 14d
+    s3:
+      accessKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
+      secretKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>
+    scheduledBackups:
+    - name: pg-cluster-keycloak
+      schedule: 0 0 */6 * * *
+      backupOwnerReference: self
+      method: barmanObjectStore
+{% if dsc.global.backup.s3.endpointCA is defined %}
+    endpointCA:
+      create: true
+      name: {{ dsc.global.backup.s3.endpointCA.name }}
+      key: {{ dsc.global.backup.s3.endpointCA.key }}
+      value: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#cnpgS3CaPem>
+{% endif %}
+{% endif %}

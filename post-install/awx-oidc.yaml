@@ -14,7 +14,7 @@
     - name: Get awx client secret
       kubernetes.core.k8s_info:
         kind: Secret
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
         name: keycloak-client-secret-awx-client
       register: awx_secret
       failed_when: awx_secret.resources | length == 0

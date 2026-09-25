@@ -85,7 +85,7 @@ spec:
       route.openshift.io/termination: edge
     tls:
       type: none
-  keycloak: {}
+  keycloakx: {}
   keycloakInfra: {}
   kyverno: {}
   nexus: {}

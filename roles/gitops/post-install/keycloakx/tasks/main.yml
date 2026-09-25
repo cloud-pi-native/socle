@@ -3,19 +3,19 @@
 
 - name: Get Keycloak admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakx.namespace }}"
     kind: Secret
-    name: keycloak
+    name: keycloakx-admin-secret
   register: kc_adm_pass
 
 - name: Set Keycloak admin facts
   ansible.builtin.set_fact:
-    keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password'] | b64decode }}"
+    keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['KEYCLOAK_ADMIN_PASSWORD'] | b64decode }}"
     keycloak_admin: admin
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloakx.managementRealm }}/protocol/openid-connect/token"
     method: POST
     status_code: [200, 202]
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -31,7 +31,7 @@
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloakx.managementRealm }}/protocol/openid-connect/token"
     method: POST
     status_code: [200, 202]
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -47,7 +47,7 @@
 
 - name: Get keycloak master realm users from API
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.managementRealm }}/users"
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloakx.managementRealm }}/users"
     method: GET
     status_code: [200, 202]
     return_content: true
@@ -74,20 +74,20 @@
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
         auth_keycloak_url: "{{ keycloak_auth_url }}"
-        auth_realm: "{{ dsc.keycloak.managementRealm }}"
+        auth_realm: "{{ dsc.keycloakx.managementRealm }}"
         auth_username: "{{ keycloak_admin }}"
         auth_password: "{{ keycloak_admin_password }}"
         name: admin
-        realm: "{{ dsc.keycloak.managementRealm }}"
+        realm: "{{ dsc.keycloakx.managementRealm }}"
         state: present
 
     - name: Map admin realm role from admin group
       community.general.keycloak_realm_rolemapping:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
-        realm: "{{ dsc.keycloak.managementRealm }}"
+        realm: "{{ dsc.keycloakx.managementRealm }}"
         auth_client_id: admin-cli
         auth_keycloak_url: "{{ keycloak_auth_url }}"
-        auth_realm: "{{ dsc.keycloak.managementRealm }}"
+        auth_realm: "{{ dsc.keycloakx.managementRealm }}"
         auth_username: "{{ keycloak_admin }}"
         auth_password: "{{ keycloak_admin_password }}"
         state: present
@@ -100,11 +100,11 @@
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
         auth_keycloak_url: "{{ keycloak_auth_url }}"
-        auth_realm: "{{ dsc.keycloak.managementRealm }}"
+        auth_realm: "{{ dsc.keycloakx.managementRealm }}"
         auth_username: "{{ keycloak_admin }}"
         auth_password: "{{ keycloak_admin_password }}"
         state: present
-        realm: "{{ dsc.keycloak.managementRealm }}"
+        realm: "{{ dsc.keycloakx.managementRealm }}"
         credentials:
           - temporary: false
             type: password
@@ -136,18 +136,18 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     state: absent
-    realm: "{{ dsc.keycloak.managementRealm }}"
+    realm: "{{ dsc.keycloakx.managementRealm }}"
     username: admin
 
 # Ensure we will use permanent admin for subsequent tasks
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloakx.managementRealm }}/protocol/openid-connect/token"
     method: POST
     status_code: [200, 202]
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -163,7 +163,7 @@
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloakx.managementRealm }}/protocol/openid-connect/token"
     method: POST
     status_code: [200, 202]
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -213,12 +213,12 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     state: present
-    id: "{{ dsc.keycloak.applicationRealm }}"
-    realm: "{{ dsc.keycloak.applicationRealm }}"
+    id: "{{ dsc.keycloakx.applicationRealm }}"
+    realm: "{{ dsc.keycloakx.applicationRealm }}"
     display_name: Dso Realm
     loginWithEmailAllowed: true
     registration_email_as_username: false
@@ -236,7 +236,7 @@
       passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)
     enabled: true
     otp_policy_algorithm: "HmacSHA1"
-    reset_password_allowed: false
+    reset_password_allowed: true
     action_token_generated_by_user_lifespan: 900
     smtp_server:
       host: "{{ (dsc.global.smtp | default({})).host | default(omit) }}"
@@ -253,16 +253,16 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     state: present
-    realm: "{{ dsc.keycloak.applicationRealm }}"
+    realm: "{{ dsc.keycloakx.applicationRealm }}"
     name: admin
 
 - name: Get keycloak dso realm users from API
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/users"
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloakx.applicationRealm }}/users"
     method: GET
     status_code: [200, 202]
     return_content: true
@@ -274,7 +274,7 @@
 
 - name: Find dso admin secret
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakx.namespace }}"
     kind: Secret
     name: dso-admin-user-secret
   register: dso_admin_secret
@@ -293,7 +293,7 @@
         definition:
           kind: Secret
           metadata:
-            namespace: "{{ dsc.keycloak.namespace }}"
+            namespace: "{{ dsc.keycloakx.namespace }}"
             name: dso-admin-user-secret
           data:
             ADMIN_USER: "{{ 'admin@example.com' | b64encode }}"
@@ -305,11 +305,11 @@
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
         auth_keycloak_url: "{{ keycloak_auth_url }}"
-        auth_realm: "{{ dsc.keycloak.managementRealm }}"
+        auth_realm: "{{ dsc.keycloakx.managementRealm }}"
         auth_username: "{{ keycloak_admin }}"
         auth_password: "{{ keycloak_admin_password }}"
         state: absent
-        realm: "{{ dsc.keycloak.applicationRealm }}"
+        realm: "{{ dsc.keycloakx.applicationRealm }}"
         username: admin@example.com
 
     - name: Create dso admin user
@@ -317,11 +317,11 @@
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
         auth_keycloak_url: "{{ keycloak_auth_url }}"
-        auth_realm: "{{ dsc.keycloak.managementRealm }}"
+        auth_realm: "{{ dsc.keycloakx.managementRealm }}"
         auth_username: "{{ keycloak_admin }}"
         auth_password: "{{ keycloak_admin_password }}"
         state: present
-        realm: "{{ dsc.keycloak.applicationRealm }}"
+        realm: "{{ dsc.keycloakx.applicationRealm }}"
         credentials:
           - temporary: false
             type: password
@@ -339,7 +339,7 @@
 
 - name: Get dso keycloak client scopes from API
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/client-scopes"
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloakx.applicationRealm }}/client-scopes"
     method: GET
     status_code: [200, 202]
     return_content: true
@@ -355,11 +355,11 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     name: generic
-    realm: "{{ dsc.keycloak.applicationRealm }}"
+    realm: "{{ dsc.keycloakx.applicationRealm }}"
     description: Generic client scope
     protocol: openid-connect
     attributes:
@@ -375,11 +375,11 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     name: group
-    realm: "{{ dsc.keycloak.applicationRealm }}"
+    realm: "{{ dsc.keycloakx.applicationRealm }}"
     description: Group client scope
     protocol: openid-connect
     attributes:
@@ -399,22 +399,22 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     realm: "{{ item }}"
     brute_force_protected: true
     failure_factor: 10
   with_items:
-    - "{{ dsc.keycloak.managementRealm }}"
-    - "{{ dsc.keycloak.applicationRealm }}"
+    - "{{ dsc.keycloakx.managementRealm }}"
+    - "{{ dsc.keycloakx.applicationRealm }}"
 
 - name: Set GitLab OIDC provider fact
   block:
     - name: Get Gitlab client secret
       kubernetes.core.k8s_info:
         kind: Secret
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
         name: keycloak-client-secret-gitlab-client
       register: gitlab_secret
       failed_when: gitlab_secret.resources | length == 0
@@ -430,7 +430,7 @@
               - openid
               - generic
             response_type: code
-            issuer: https://{{ keycloak_domain }}/realms/{{ dsc.keycloak.applicationRealm }}
+            issuer: https://{{ keycloak_domain }}/realms/{{ dsc.keycloakx.applicationRealm }}
             client_auth_method: query
             discovery: true
             uid_field: email
@@ -440,6 +440,6 @@
               redirect_uri: https://{{ gitlab_domain }}/users/auth/openid_connect/callback
 
 - name: Reconcile keycloak users
-  when: dsc.keycloak.usersGitOpsEnabled
+  when: dsc.keycloakx.usersGitOpsEnabled
   ansible.builtin.include_tasks:
     file: sync_users.yml

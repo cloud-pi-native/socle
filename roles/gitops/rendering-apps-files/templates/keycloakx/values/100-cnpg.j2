@@ -40,6 +40,14 @@ cluster:
   nameOverride: "pg-cluster-keycloak"
   fullnameOverride: "pg-cluster-keycloak"
   cluster:
+    # Protects the Cluster resource from ArgoCD prune if this Application
+    # is ever removed/recreated again - does NOT protect against CNPG's
+    # own operator reconciliation tearing down pods/PVCs if the owning
+    # Application is deleted outright (a different mechanism); confirmed
+    # on cpin-console, where this exact annotation still wasn't enough on
+    # its own. Best-effort extra layer, not a full guarantee.
+    annotations:
+      argocd.argoproj.io/sync-options: Prune=false
     primaryUpdateMethod: restart
     enablePDB: false
     imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloakx.cnpg.imageName }}"

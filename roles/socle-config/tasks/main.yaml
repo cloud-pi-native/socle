@@ -265,6 +265,24 @@
   ansible.builtin.import_role:
     name: ca
 
+# Keycloak only ever reads its bootstrap admin password once, at first
+# boot. Fetching the current Vault value here lets envs.yaml prefer it
+# over generating a fresh one on every full deploy (which would silently
+# break admin login going forward) - confirmed live on this environment.
+- name: Get current keycloakx admin password from Vault
+  when: post_conf_job is not defined
+  community.hashi_vault.vault_kv2_get:
+    url: "https://{{ vaultinfra_domain }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    engine_mount_point: "{{ vaultinfra_kv_name }}"
+    path: "env/{{ dsc_name }}/apps/keycloakx/values"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
+  environment:
+    VAULT_TOKEN: "{{ vault_infra_token }}"
+  register: current_keycloakx_vault_values
+  ignore_errors: true
+  no_log: true
+
 - name: Set envs fact
   when: post_conf_job is not defined
   ansible.builtin.include_tasks:

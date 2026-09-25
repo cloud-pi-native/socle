@@ -42,7 +42,7 @@
         else [
           {
             'type': 'password',
-            'value': keycloak_current_vault_values.data.data.auth.userTmpPassword,
+            'value': keycloakx_current_vault_values.secret.auth.userTmpPassword,
             'temporary': true
           }
         ]

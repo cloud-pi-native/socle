@@ -156,7 +156,7 @@ spec:
       imageName: cloudnative-pg/postgresql:16.2
     managementRealm: master
     applicationRealm: dso
-    usersGitOpsEnabled: false
+    usersGitOpsEnabled: true
     replicas: 3
     ansibleJobEnabled: true
     values: {}

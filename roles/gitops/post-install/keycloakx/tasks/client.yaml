@@ -4,11 +4,11 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
     state: present
-    realm: "{{ dsc.keycloak.applicationRealm }}"
+    realm: "{{ dsc.keycloakx.applicationRealm }}"
     clientId: "{{ item.clientId }}"
     clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
     standardFlowEnabled: "{{ item.standardFlowEnabled }}"
@@ -24,10 +24,10 @@
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
     auth_client_id: admin-cli
     auth_keycloak_url: "{{ keycloak_auth_url }}"
-    auth_realm: "{{ dsc.keycloak.managementRealm }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
     auth_username: "{{ keycloak_admin }}"
     auth_password: "{{ keycloak_admin_password }}"
-    realm: "{{ dsc.keycloak.applicationRealm }}"
+    realm: "{{ dsc.keycloakx.applicationRealm }}"
     clientId: "{{ item.clientId }}"
   register: kc_clients_secrets
 
@@ -43,7 +43,7 @@
         CLIENT_SECRET: "{{ kc_clients_secrets.clientsecret_info.value | b64encode }}"
       metadata:
         name: keycloak-client-secret-{{ item.clientId }}
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
       type: Opaque
 
 - name: Set Keycloak clients secrets in Keycloak namespace
@@ -57,7 +57,7 @@
         CLIENT_ID: "{{ item.clientId | b64encode }}"
       metadata:
         name: keycloak-client-secret-{{ item.clientId }}
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
       type: Opaque
 
 - name: Set facts for vault-secret update

@@ -140,22 +140,25 @@ spec:
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
     values: {}
-  keycloak:
+  keycloakx:
     installEnabled: true
     namespace: dso-keycloak
     subDomain: keycloak
-    helmRepoUrl: oci://registry-1.docker.io/bitnamicharts
+    helmRepoUrl: https://codecentric.github.io/helm-charts
     repoSocle:
       url: https://github.com/cloud-pi-native/socle.git
       revision: main
-    postgresPvcSize: 1Gi
+    postgresPvcSize: 15Gi
+    postgresWalPvcSize: 15Gi
     pluginDownloadUrl: https://github.com/codegouvfr/keycloak-theme-dsfr/releases/download/v2.1.4/keycloak-theme-for-kc-26-and-above.jar
     providerDownloadUrl: https://github.com/InseeFr/Keycloak-FranceConnect/releases/download/7.5.0/keycloak-franceconnect-7.5.0.jar
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
     managementRealm: master
     applicationRealm: dso
-    usersGitOpsEnabled: false
+    usersGitOpsEnabled: true
+    replicas: 1
+    ansibleJobEnabled: true
     values: {}
   keycloakInfra:
     installEnabled: false

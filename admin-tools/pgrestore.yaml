@@ -16,8 +16,8 @@
 
   vars:
     pgdump_cnpg_clusters:
-      - name: "{{ dsc.keycloak.subDomain }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
+      - name: "keycloak"
+        namespace: "{{ dsc.keycloakx.namespace }}"
         db: keycloak
       - name: "{{ dsc.sonarqube.subDomain }}"
         namespace: "{{ dsc.sonarqube.namespace }}"

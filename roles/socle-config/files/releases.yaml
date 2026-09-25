@@ -60,9 +60,14 @@ spec:
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.17.1
-  keycloak:
-    # https://artifacthub.io/packages/helm/bitnami/keycloak
-    chartVersion: 24.4.11
+  keycloakx:
+    # https://codecentric.github.io/helm-charts (keycloakx)
+    chartVersion: "7.2.3"
+    # Target version. Reached via a 26.6.4 stepping-stone (validated working)
+    # to dodge a known upstream bug on direct 26.1.x -> 26.7.x upgrades:
+    # LazyInitializationException in MigrateTo26_7_0.addOrganizationAdminRoles.
+    # See https://github.com/keycloak/keycloak/issues/51304
+    imageVersion: "26.7.2"
   keycloakInfra:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11

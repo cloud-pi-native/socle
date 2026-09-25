@@ -31,7 +31,7 @@ observatorium:
       groups: [/admin]
       # Default oidc config
       clientID: "account"
-      issuerURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
+      issuerURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloakx.applicationRealm }}
       usernameClaim: "preferred_username"
       groupClaim: "groups"
 {% if dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret" %}
@@ -79,9 +79,9 @@ grafana:
   grafanaNamespace: "{{ dsc.grafana.namespace }}"
   oauth:
     enabled: true
-    url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
-    id: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.id}>
-    secret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.grafana.secret}>
+    url: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloakx.applicationRealm }}
+    id: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#client | jsonPath {.grafana.id}>
+    secret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#client | jsonPath {.grafana.secret}>
     aud: grafana
     scopes: profile, email, openid, group
     groups_attribute_path: group

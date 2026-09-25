@@ -200,7 +200,8 @@
     gitlab_domain: "{{ dsc.gitlab.domain | default(dsc.gitlab.subDomain ~ root_domain) }}"
     grafana_domain: "{{ dsc.grafana.domain | default(dsc.grafana.subDomain ~ root_domain) }}"
     harbor_domain: "{{ dsc.harbor.domain | default(dsc.harbor.subDomain ~ root_domain) }}"
-    keycloak_domain: "{{ dsc.keycloak.domain | default(dsc.keycloak.subDomain ~ root_domain) }}"
+    keycloak_domain: "{{ dsc.keycloakx.domain | default(dsc.keycloakx.subDomain ~ root_domain) }}"
+    keycloakx_domain: "{{ dsc.keycloakx.domain | default(dsc.keycloakx.subDomain ~ root_domain) }}"
     keycloakinfra_domain: "{{ dsc.keycloakInfra.domain | default(dsc.keycloakInfra.subDomain ~ infra_root_domain) }}"
     nexus_domain: "{{ dsc.nexus.domain | default(dsc.nexus.subDomain ~ root_domain) }}"
     sonar_domain: "{{ dsc.sonarqube.domain | default(dsc.sonarqube.subDomain ~ root_domain) }}"
@@ -263,6 +264,24 @@
 - name: Import ca role
   ansible.builtin.import_role:
     name: ca
+
+# Keycloak only ever reads its bootstrap admin password once, at first
+# boot. Fetching the current Vault value here lets envs.yaml prefer it
+# over generating a fresh one on every full deploy (which would silently
+# break admin login going forward) - confirmed live on this environment.
+- name: Get current keycloakx admin password from Vault
+  when: post_conf_job is not defined
+  community.hashi_vault.vault_kv2_get:
+    url: "https://{{ vaultinfra_domain }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    engine_mount_point: "{{ vaultinfra_kv_name }}"
+    path: "env/{{ dsc_name }}/apps/keycloakx/values"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
+  environment:
+    VAULT_TOKEN: "{{ vault_infra_token }}"
+  register: current_keycloakx_vault_values
+  ignore_errors: true
+  no_log: true
 
 - name: Set envs fact
   when: post_conf_job is not defined

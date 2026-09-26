@@ -9,7 +9,7 @@ cpn-ansible-job:
     - |
       git clone {{ dsc.gitlab.repoSocle.url }} -b {{ dsc.gitlab.repoSocle.revision }} socle && \
       cd socle && \
-      ansible-playbook post-install/gitlab.yaml
+      ansible-playbook post-install/gitlab.yaml -e dsc_cr={{ dsc_name }}
     extraEnvFrom:
     - secretRef: 
         name: ansible-secret
@@ -24,4 +24,4 @@ cpn-ansible-job:
     - |
       git clone {{ dsc.gitlab.repoSocle.url }} -b {{ dsc.gitlab.repoSocle.revision }} socle && \
       cd socle && \
-      ansible-playbook post-install/gitlab-ci-catalog.yaml
+      ansible-playbook post-install/gitlab-ci-catalog.yaml -e dsc_cr={{ dsc_name }}

@@ -9,7 +9,7 @@ cpn-ansible-job:
     - |
       git clone {{ dsc.awx.repoSocle.url }} -b {{ dsc.awx.repoSocle.revision }} socle && \
       cd socle && \
-      ansible-playbook post-install/awx-oidc.yaml
+      ansible-playbook post-install/awx-oidc.yaml -e dsc_cr={{ dsc_name }}
 {% if dsc.proxy.enabled %}
     extraEnvFrom:
     - secretRef: 

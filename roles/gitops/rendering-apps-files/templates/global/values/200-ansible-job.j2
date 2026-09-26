@@ -10,7 +10,7 @@ cpn-ansible-job:
     - |
       git clone {{ dsc.global.repoSocle.url }} -b {{ dsc.global.repoSocle.revision }} socle && \
       cd socle && \
-      ansible-playbook post-install/pgdump.yaml
+      ansible-playbook post-install/pgdump.yaml -e dsc_cr={{ dsc_name }}
 {% if dsc.global.backup.s3.endpointCA is defined %}
     extraEnv:
       - name: AWS_CA_BUNDLE

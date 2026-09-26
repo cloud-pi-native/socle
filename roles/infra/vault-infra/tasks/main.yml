@@ -1,23 +1,26 @@
 ---
 - name: Create Vault namespace
   kubernetes.core.k8s:
-    state: present
-    kind: Namespace
     name: "{{ dsc.vaultInfra.namespace }}"
     api_version: v1
+    kind: Namespace
+    state: present
 
-- name: Add helm repo
+- name: Set path and repo type facts
+  ansible.builtin.set_fact:
+    path: "{{ role_path + '/templates/values' }}"
+    is_oci_repo: "{{ dsc.vaultInfra.helmRepoUrl.startswith('oci://') }}"
+    repo_name: "hashicorp" # for HTTP repositories
+
+- name: Add Vault Helm repo (HTTP repo only)
+  when: not is_oci_repo
   changed_when: false
   kubernetes.core.helm_repository:
-    name: hashicorp
+    name: "{{ repo_name }}"
     repo_url: "{{ dsc.vaultInfra.helmRepoUrl }}"
     force_update: true
 
-- name: Set path fact
-  ansible.builtin.set_fact:
-    path: "{{ role_path + '/templates/values' }}"
-
-- name: Compute Vault Helm values
+- name: Compute Vault infra Helm values
   ansible.builtin.include_role:
     name: combine
   vars:
@@ -35,10 +38,10 @@
         tls.crt: "{{ exposed_ca_pem | b64encode }}"
   when: dsc.exposedCA.type == "configmap" or dsc.exposedCA.type == "secret"
 
-- name: Deploy helm
+- name: Deploy Helm chart
   kubernetes.core.helm:
     name: "{{ dsc_name }}-vault-infra"
-    chart_ref: hashicorp/vault
+    chart_ref: "{{ is_oci_repo | ternary(dsc.vaultInfra.helmRepoUrl, repo_name) }}/vault"
     chart_version: "{{ dsc.vaultInfra.chartVersion }}"
     release_namespace: "{{ dsc.vaultInfra.namespace }}"
     create_namespace: true
@@ -58,9 +61,15 @@
 - name: Add backup utils Helm repo and deploy
   when: dsc.global.backup.vaultInfra.enabled
   block:
-    - name: Add Helm repo
+    - name: Set backup utils repo type facts
+      ansible.builtin.set_fact:
+        is_oci_repo: "{{ dsc.global.backup.vault.helmRepoUrl.startswith('oci://') }}"
+        repo_name: "dso" # for HTTP repositories
+
+    - name: Add backup utils Helm repo (HTTP repo only)
+      when: not is_oci_repo
       kubernetes.core.helm_repository:
-        name: dso
+        name: "{{ repo_name }}"
         repo_url: "{{ dsc.global.backup.vault.helmRepoUrl }}"
         force_update: true
 
@@ -76,10 +85,10 @@
         s3_access_key: "{{ s3_backup_secret.resources[0].data.accessKeyId | b64decode }}"
         s3_secret_key: "{{ s3_backup_secret.resources[0].data.secretAccessKey | b64decode }}"
 
-    - name: Deploy Helm chart
+    - name: Deploy backup utils Helm chart
       kubernetes.core.helm:
         name: "{{ dsc_name }}-vault-backup"
-        chart_ref: dso/cpn-backup-utils
+        chart_ref: "{{ is_oci_repo | ternary(dsc.global.backup.vault.helmRepoUrl, repo_name) }}/cpn-backup-utils"
         chart_version: "{{ dsc.global.backup.vaultInfra.chartVersion }}"
         release_namespace: "{{ dsc.vaultInfra.namespace }}"
         values:
@@ -124,6 +133,5 @@
         name: "{{ item }}"
         definition:
           metadata:
-            labels:
-              "{{ dsc.global.metrics.additionalLabels }}"
+            labels: "{{ dsc.global.metrics.additionalLabels }}"
       loop: "{{ service_monitors_names }}"

@@ -19,11 +19,6 @@
     cm_mwhc.resources | length == 0 or
     dsc.certmanager.forcedInstall
   block:
-    - name: Add cert-manager helm repo
-      kubernetes.core.helm_repository:
-        name: jetstack
-        repo_url: "{{ dsc.certmanager.helmRepoUrl }}"
-        force_update: true
 
     # Installation des CRDs indépendamment du chart helm.
     # Recommandé en production.
@@ -42,8 +37,17 @@
     - name: Set path fact
       ansible.builtin.set_fact:
         path: "{{ role_path + '/templates/values' }}"
+        is_oci_repo: "{{ dsc.certmanager.helmRepoUrl.startswith('oci://') }}"
+        repo_name: "jetstack" # for HTTP repositories
 
-    - name: Compute Cert-manager Helm values
+    - name: Add cert-manager Helm repo (HTTP repo only)
+      when: not is_oci_repo
+      kubernetes.core.helm_repository:
+        name: "{{ repo_name }}"
+        repo_url: "{{ dsc.certmanager.helmRepoUrl }}"
+        force_update: true
+
+    - name: Compute cert-manager Helm values
       ansible.builtin.include_role:
         name: combine
       vars:
@@ -51,11 +55,11 @@
         combine_user_values: "{{ dsc.certmanager['values'] }}"
         combine_dest_var: "cm_values"
 
-    - name: Deploy helm
+    - name: Deploy cert-manager Helm chart
       kubernetes.core.helm:
         #    force: true
         name: cert-manager
-        chart_ref: jetstack/cert-manager
+        chart_ref: "{{ is_oci_repo | ternary(dsc.certmanager.helmRepoUrl, repo_name) }}/cert-manager"
         chart_version: "{{ dsc.certmanager.chartVersion }}"
         release_namespace: cert-manager
         create_namespace: true

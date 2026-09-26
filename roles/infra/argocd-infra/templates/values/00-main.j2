@@ -136,12 +136,10 @@ global:
 {% endif %}
 redis-ha:
   enabled: true
-{% if use_private_registry %}
   image:
-    repository: "{{ dsc.global.registry }}/library/redis"
     tag: 7.4.1-alpine
-{% endif %}
 {% if use_private_registry %}
+    repository: "{{ dsc.global.registry }}/library/redis"
   haproxy:
     image:
       repository: "{{ dsc.global.registry }}/haproxy"

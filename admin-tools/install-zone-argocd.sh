@@ -140,7 +140,7 @@ else
     echo "✅ Namespace '$NAMESPACE' already exists."
 fi
 
-helm dependency build "$CHART_PATH"
+helm dependency update "$CHART_PATH"
 helm template "$RELEASE_NAME" "$CHART_PATH" \
     --namespace "$NAMESPACE" \
     --values "$CHART_PATH/values.yaml" \
@@ -161,7 +161,10 @@ echo "Step 2: Deploying to cluster..."
 echo "Installing CRDs first..."
 # This grep/sed logic finds the blocks that are Kind: CustomResourceDefinition
 # and applies only those to ensure the API server knows about them.
-awk '/^---/{if (p ~ /[kK]ind: CustomResourceDefinition/) print p; p=""} {p=p $0 "\n"} END{if (p ~ /[kK]ind: CustomResourceDefinition/) print p}' "$FINAL_MANIFEST" | kubectl apply -f -
+# Server-side apply is required: the ApplicationSet CRD exceeds the 256KB
+# last-applied-configuration annotation limit of client-side apply.
+# --force-conflicts takes ownership of fields from earlier client-side applies.
+awk '/^---/{if (p ~ /[kK]ind: CustomResourceDefinition/) print p; p=""} {p=p $0 "\n"} END{if (p ~ /[kK]ind: CustomResourceDefinition/) print p}' "$FINAL_MANIFEST" | kubectl apply --server-side --force-conflicts -f -
 
 # 8b. Wait for CRDs to be established
 # This gives the Kubernetes API server a few seconds to register the new types
@@ -171,7 +174,9 @@ kubectl wait --for condition=established --timeout=60s crd -l "app.kubernetes.io
 # 8c. Apply the full manifest (including Namespace, Deployments, RBAC, etc.)
 echo "Applying full manifest..."
 echo ""
-if kubectl apply -f "$FINAL_MANIFEST" -n "$NAMESPACE" --server-side; then
+# No -n here: the manifest spans several namespaces (e.g. dso-backup targets
+# infra-velero), and 'helm template --namespace' already sets metadata.namespace.
+if kubectl apply -f "$FINAL_MANIFEST" --server-side; then
     echo "🎉 Deployment of $SELECTED_ZONE zone completed successfully!"
 else
     echo "❌ Error: kubectl apply failed."

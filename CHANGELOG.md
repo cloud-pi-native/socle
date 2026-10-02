@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.11.1](https://github.com/cloud-pi-native/socle/compare/v4.11.0...v4.11.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **admin-tools:** make install-zone-argocd work with ArgoCD 10.x chart and multi-namespace manifests ([ea8bc89](https://github.com/cloud-pi-native/socle/commit/ea8bc896f3062dd89871ef8b4367cd88002ac9aa))
+
 ## [4.11.0](https://github.com/cloud-pi-native/socle/compare/v4.10.5...v4.11.0) (2026-10-01)
 
 

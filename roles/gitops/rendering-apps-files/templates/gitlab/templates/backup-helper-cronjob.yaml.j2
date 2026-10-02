@@ -11,33 +11,56 @@ spec:
         spec:
           containers:
           - name: gitlab-backup-helper
-            image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/minio/mc:latest
+            image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/rclone/rclone:latest
             env:
-            - name: S3_ENDPOINT
+            - name: RCLONE_CONFIG
+              value: "/tmp/rclone.conf"
+            - name: RCLONE_CONFIG_BACKUP_TYPE
+              value: "s3"
+            - name: RCLONE_CONFIG_BACKUP_PROVIDER
+              value: "Other"
+            - name: RCLONE_CONFIG_BACKUP_FORCE_PATH_STYLE
+              value: "true"
+            - name: RCLONE_CONFIG_BACKUP_ENDPOINT
               value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>"
+            - name: RCLONE_CONFIG_BACKUP_ACCESS_KEY_ID
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>"
+            - name: RCLONE_CONFIG_BACKUP_SECRET_ACCESS_KEY
+              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>"
+{% if dsc.global.platform == "openshift" %}
+            - name: RCLONE_NO_CHECK_CERTIFICATE
+              value: "true"
+{% endif %}
             - name: S3_BUCKET_NAME
               value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>"
-            - name: S3_ACCESS_KEY
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>"
-            - name: S3_SECRET_KEY
-              value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>"
             - name: S3_PATH_PREFIX
               value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.gitlab.pathPrefix}>"
             - name: RETENTION
               value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.gitlab.retentionPolicy}>"
-            - name: MC_EXTRA_ARGS
+            - name: RCLONE_EXTRA_ARGS
               value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.gitlab.mcExtraArgs}>"
-            args:
+            command:
             - /bin/sh
             - -c
             - |
-              mc ${MC_EXTRA_ARGS} alias set backup_host "${S3_ENDPOINT}" "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
-              for BACKUP in $(mc ls --json backup_host/${S3_BUCKET_NAME%/} | jq -c 'select(.key | contains("gitlab_backup"))'); do
-                BACKUP_NAME="$(echo ${BACKUP} | jq -r '.key')"
-                mc ${MC_EXTRA_ARGS} mv --recursive backup_host/${S3_BUCKET_NAME%/}/${BACKUP_NAME} backup_host/${S3_BUCKET_NAME%/}/${S3_PATH_PREFIX}
-              done
-              if [ ! -z "${RETENTION}" ]; then
-                mc ${MC_EXTRA_ARGS} rm --recursive --force --older-than "${RETENTION}" backup_host/${S3_BUCKET_NAME%/}/${S3_PATH_PREFIX}
+              set -eu
+              BUCKET="${S3_BUCKET_NAME%/}"
+              PREFIX="${S3_PATH_PREFIX%/}"
+
+              # The GitLab toolbox drops its dumps at the bucket root, move them under the
+              # prefix. Filter rules are first match wins: the destination has to be ruled
+              # out first, otherwise rclone refuses to move between overlapping remotes.
+              if [ -n "${PREFIX}" ]; then
+                rclone move "backup:${BUCKET}" "backup:${BUCKET}/${PREFIX}" \
+                  --filter "- ${PREFIX}/**" \
+                  --filter "+ **gitlab_backup**" \
+                  --filter "- **" \
+                  -v ${RCLONE_EXTRA_ARGS}
+              fi
+
+              if [ -n "${RETENTION}" ]; then
+                rclone delete "backup:${BUCKET}/${PREFIX}" \
+                  --min-age "${RETENTION}" --rmdirs -v ${RCLONE_EXTRA_ARGS}
               fi
           restartPolicy: Never
 {% endif %}

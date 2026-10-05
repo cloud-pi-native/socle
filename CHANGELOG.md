@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.12.1](https://github.com/cloud-pi-native/socle/compare/v4.12.0...v4.12.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* bump console chart version ([f6a1080](https://github.com/cloud-pi-native/socle/commit/f6a108051b826fc5854acbe7de2649e7b1e90a5c))
+
 ## [4.12.0](https://github.com/cloud-pi-native/socle/compare/v4.11.0...v4.12.0) (2026-10-05)
 
 

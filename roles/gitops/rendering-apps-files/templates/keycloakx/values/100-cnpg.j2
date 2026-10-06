@@ -9,9 +9,10 @@ cluster:
   nameOverride: "pg-cluster-keycloak"
   fullnameOverride: "pg-cluster-keycloak"
   cluster:
-    # Best-effort extra layer against ArgoCD prune, not a guarantee (runbook §7).
+    # Prune=false: no prune on ownership change. Delete=false: no cascade delete if
+    # the Application is removed (runbook §7). Same value as the legacy app.
     annotations:
-      argocd.argoproj.io/sync-options: Prune=false
+      argocd.argoproj.io/sync-options: Prune=false,Delete=false
     primaryUpdateMethod: restart
     enablePDB: false
     imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloakx.cnpg.imageName }}"

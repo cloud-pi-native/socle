@@ -2,6 +2,10 @@ cluster:
   nameOverride: "pg-cluster-keycloak"
   fullnameOverride: "pg-cluster-keycloak"
   cluster:
+    # keycloakx migration (step 7): never let ArgoCD prune or cascade-delete the
+    # Cluster when this legacy app is removed - keycloakx adopts it.
+    annotations:
+      argocd.argoproj.io/sync-options: Prune=false,Delete=false
     primaryUpdateMethod: restart
     enablePDB: false
     imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.keycloak.cnpg.imageName }}"

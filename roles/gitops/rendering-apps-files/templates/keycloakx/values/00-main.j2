@@ -38,9 +38,12 @@ keycloakx:
     hostname: pg-cluster-keycloak-rw
     port: 5432
     database: keycloak
+    # Chart 7.2.3 only sets KC_DB_USERNAME from `username` (no existingSecretUserKey
+    # support). Without it JDBC falls back to the OS user, which only happens to be
+    # "keycloak" when running as UID 1000 - not under OpenShift's random UID.
+    username: keycloak
     existingSecret: pg-cluster-keycloak-app
-    existingSecretUserKey: username
-    existingSecretPasswordKey: password
+    existingSecretKey: password
 
   extraEnvFrom: |
     - secretRef:

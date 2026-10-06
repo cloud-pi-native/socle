@@ -1,5 +1,13 @@
 {% if dsc.global.platform == "openshift" %}
 keycloakx:
-  podSecurityContext: {}
-  securityContext: {}
+  # `{}` does not drop the chart defaults (Helm merges maps): null the keys
+  # explicitly so restricted-v2 SCC can assign the namespace UID/fsGroup range.
+  podSecurityContext:
+    fsGroup: null
+  securityContext:
+    runAsUser: null
+
+cpn-ansible-job:
+  global:
+    platform: openshift
 {% endif %}

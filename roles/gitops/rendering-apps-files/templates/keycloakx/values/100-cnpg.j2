@@ -1,10 +1,8 @@
 cluster:
-  # Disabled during the parallel phase: the Cluster is still owned by the legacy
-  # `keycloak` app (automated prune). Only flip to true after the legacy app is
-  # removed from envs.yaml AND the Cluster is confirmed alive - see the
-  # keycloak-bitnami-migration runbook §7 (two real incidents). No recovery
-  # bootstrap here: keycloakx adopts the existing Cluster, it does not recreate it.
-  enabled: false
+  # Adopted from the legacy `keycloak` app (step 7, 2026-10-06): legacy app removed
+  # first and Cluster confirmed alive (same UID, pods, PVCs) before enabling here.
+  # Prune=false,Delete=false below stays as a safety net.
+  enabled: true
 
   nameOverride: "pg-cluster-keycloak"
   fullnameOverride: "pg-cluster-keycloak"

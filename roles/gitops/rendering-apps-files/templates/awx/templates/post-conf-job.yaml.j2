@@ -32,7 +32,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: awx-oidc-post-conf-rb
-  namespace: {{ dsc.keycloak.namespace }}
+  namespace: {{ dsc.keycloakx.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

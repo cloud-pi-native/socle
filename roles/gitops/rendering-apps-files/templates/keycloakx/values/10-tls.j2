@@ -1,0 +1,13 @@
+keycloakx:
+  ingress:
+{% if dsc.ingress.tls.type == "tlsSecret" %}
+    tls:
+      - hosts:
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+        secretName: "{{ dsc.ingress.tls.tlsSecret.name }}"
+{% else %}
+    tls:
+      - hosts:
+          - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+        secretName: keycloakx-tls
+{% endif %}

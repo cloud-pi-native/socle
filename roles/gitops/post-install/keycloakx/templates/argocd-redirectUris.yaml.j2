@@ -1,0 +1,6 @@
+- https://{{ argocd_domain }}/auth/callback
+{% if dsc.argocd.secondaryZones is defined and dsc.argocd.secondaryZones %}
+{% for zone in dsc.argocd.secondaryZones %}
+- https://{{ zone.domain }}/auth/callback
+{% endfor %}
+{% endif %}

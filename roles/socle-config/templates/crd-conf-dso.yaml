@@ -1452,6 +1452,99 @@ spec:
                   required:
                     - installEnabled
                   type: object
+                keycloakx:
+                  description: Configuration for Keycloak (keycloakx / codecentric chart, official Keycloak image).
+                  properties:
+                    installEnabled:
+                      default: true
+                      description: Specifies whether we should install the Keycloak (keycloakx) instance.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Keycloak (keycloakx).
+                      type: string
+                    subDomain:
+                      description: The subdomain for Keycloak (keycloakx).
+                      type: string
+                    domain:
+                      description: The domain for Keycloak (keycloakx).
+                      type: string
+                    helmRepoUrl:
+                      description: Keycloak (keycloakx / codecentric) helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Keycloak (keycloakx / codecentric) chart version (e.g., "7.2.3").
+                      type: string
+                    imageVersion:
+                      description: Keycloak (official quay.io/keycloak/keycloak image) version (e.g., "26.7.2").
+                      type: string
+                    repoSocle:
+                      type: object
+                      description: Configuration for the socle Git repository used by Ansible jobs for post-installation tasks.
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the socle Git repository containing the Keycloak (keycloakx) post-installation Ansible playbook.
+                        revision:
+                          type: string
+                          description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
+                    postgresPvcSize:
+                      description: Size for postgres data pvc.
+                      type: string
+                      default: 10Gi
+                    postgresWalMaxSlotKeepSize:
+                      description: |
+                        Maximum size of WAL files that replication slots are allowed to retain in
+                        the pg_wal directory at checkpoint time.
+                        Default is -1, meaning that replication slots may retain an unlimited amount
+                        of WAL files. You can for instance set it to "9GB".
+                        https://cloudnative-pg.io/documentation/current/replication/#capping-the-wal-size-retained-for-replication-slots
+                        Refer to postgresql.conf for memory units.
+                      type: string
+                    postgresWalPvcSize:
+                      description: Size for postgres wal pvc (if value is not set then WAL files are stored within the data PVC).
+                      type: string
+                    pluginDownloadUrl:
+                      description: Plugins download Url.
+                      type: string
+                    providerDownloadUrl:
+                      description: Provider's download Url.
+                      type: string
+                    managementRealm:
+                      description: Keycloak (keycloakx) management realm.
+                      type: string
+                    applicationRealm:
+                      description: Keycloak (keycloakx) application realm.
+                      type: string
+                    usersGitOpsEnabled:
+                      description: Specifies whether we should manage users with GitOps.
+                      type: boolean
+                    ansibleJobEnabled:
+                      description: Specifies whether the post-install Ansible job (realm/users config) is enabled.
+                      type: boolean
+                    replicas:
+                      description: Number of Keycloak (keycloakx) replicas.
+                      type: integer
+                    values:
+                      description: |
+                        You can add custom values for keycloakx, they will be merged with roles/gitops/rendering-apps-files/templates/keycloakx/values/
+                        https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx
+                        https://github.com/codecentric/helm-charts/blob/master/charts/keycloakx/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    cnpg:
+                      description: Configuration for cnpg clusters.
+                      type: object
+                      properties:
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
+                          type: string
+                        values:
+                          description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 kyverno:
                   description: Configuration for Kyverno.
                   properties:

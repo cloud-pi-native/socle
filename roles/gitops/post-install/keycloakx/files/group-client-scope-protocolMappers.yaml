@@ -1,0 +1,10 @@
+- id: 9b5b5710-8fcf-4ade-9ed5-4bb1af391863
+  name: group
+  protocol: openid-connect
+  protocolMapper: oidc-group-membership-mapper
+  config:
+    full.path: true
+    id.token.claim: true
+    access.token.claim: true
+    claim.name: group
+    userinfo.token.claim: true

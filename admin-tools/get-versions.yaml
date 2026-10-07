@@ -11,7 +11,6 @@
           - "(Can also be retrieved with the --list-tags option on ansible-playbook run) :"
           - ""
           - "cert-manager"
-          - "kyverno"
           - "cnpg (or cloudNativePG)"
           - "keycloak"
           - "nexus"
@@ -154,49 +153,6 @@
               - "Version de cert-manager : {{ cert_manager_infos.status.app_version }}"
               - "Version de chart Helm cert-manager : {{ cert_manager_infos.status.chart }}"
 
-    - name: Get Kyverno app and chart versions
-      tags:
-        - kyverno
-      block:
-        - name: Get Kyverno namespace
-          kubernetes.core.k8s_info:
-            kind: Namespace
-            name: "{{ dsc.kyverno.namespace }}"
-          register: kyverno_ns
-
-        - name: Warning message
-          when: kyverno_ns.resources | length == 0
-          ansible.builtin.debug:
-            msg:
-              - "Le namespace {{ dsc.kyverno.namespace }} n'existe pas."
-              - "Cela signifie que Kyverno est probablement installé dans un namespace indépendant du Socle."
-
-        - name: Retrieve Kyverno infos
-          when: kyverno_ns.resources | length > 0
-          kubernetes.core.helm_info:
-            name: kyverno
-            namespace: "{{ dsc.kyverno.namespace }}"
-          register: kyverno_infos
-
-        - name: Warning message
-          when: >
-            kyverno_ns.resources | length > 0 and
-            kyverno_infos.status is not defined
-          ansible.builtin.debug:
-            msg:
-              - "Kyverno n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
-              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
-              - "Nous ne pouvons en déterminer la version de manière fiable."
-
-        - name: Display Kyverno version
-          when: >
-            kyverno_ns.resources | length > 0 and
-            kyverno_infos.status is defined
-          ansible.builtin.debug:
-            msg:
-              - "Version de Kyverno : {{ kyverno_infos.status.app_version }}"
-              - "Version de chart Helm Kyverno : {{ kyverno_infos.status.chart }}"
-
     - name: Get CNPG Operator app and chart versions
       tags:
         - cnpg
@@ -221,16 +177,6 @@
             name: cloudnative-pg
             namespace: "{{ dsc.cloudnativepg.namespace }}"
           register: cnpg_infos
-
-        - name: Warning message
-          when: >
-            cnpg_ns.resources | length > 0 and
-            cnpg_infos.status is not defined
-          ansible.builtin.debug:
-            msg:
-              - "L'opérateur CNPG n'est pas installé en tant que chart Helm dans le namespace {{ dsc.kyverno.namespace }}."
-              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
-              - "Nous ne pouvons en déterminer la version de manière fiable."
 
         - name: Display CNPG Operator version
           when: >

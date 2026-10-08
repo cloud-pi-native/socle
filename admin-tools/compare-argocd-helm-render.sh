@@ -20,7 +20,12 @@
 #   APPS_JSON, API_VERSIONS_FILE, KUBE_VERSION
 #                      skip kubectl and use these instead (offline run)
 #
-# Private Helm/OCI registries: log in first, e.g. `helm registry login <harbor-domain>`.
+# Public https dependency repos are added automatically, like the repo-server does. Private OCI
+# registries need a login first, e.g. `helm registry login <harbor-domain>`; logging in to
+# registry-1.docker.io also avoids Docker Hub's anonymous rate limit (429 toomanyrequests).
+#
+# Apps that already have a ComparisonError in Argo CD and fail here too are reported as
+# ALREADY-BROKEN: they are broken today, independently of the upgrade.
 set -uo pipefail
 
 ARGO_NS="${ARGO_NS:-dso-argocd}"
@@ -106,17 +111,35 @@ normalize() {
   yq ea -P '[.] | map(select(. != null)) | sort_by(.kind, .metadata.namespace // "", .metadata.name) | .[] | (... comments="") | sort_keys(..) | splitDoc' "$1" 2>/dev/null || cat "$1"
 }
 
-# render <helm-bin> <tag> <chart-dir|""> <workdir> <release> <ns> <src-json> <refs-json> <app-dir>
-# Mirrors the repo-server: dependency build, then helm template with the app's values.
+# Same as the repo-server before `helm dependency build`: `helm repo add` every https dependency
+# of Chart.yaml (named like Argo CD does, "/" replaced by "-"). OCI ones rely on `helm registry login`.
+add_dependency_repos() {
+  local helm="$1" chart="$2" log="$3" url
+  while IFS= read -r url; do
+    [[ "$url" == https://* ]] || continue
+    "$helm" repo add "${url//\//-}" "$url" --force-update >>"$log" 2>&1
+  done < <(yq -r '.dependencies[]?.repository // ""' "$chart/Chart.yaml" 2>/dev/null)
+}
+
+is_missing_dependency() {
+  grep -qE "found in (requirements.yaml|Chart.yaml), but missing in charts" "$1"
+}
+
+# render <helm-bin> <tag> <repo-dir|""> <workdir> <release> <ns> <src-json> <refs-json> <app-dir>
+# Mirrors the repo-server: works inside the whole repo checkout (so ../ value files and file://
+# dependencies resolve), runs helm template, and only on a missing-dependency error adds the
+# dependency repos, runs helm dependency build and templates again.
 render() {
-  local helm="$1" tag="$2" chart_src="$3" work="$4" release="$5" ns="$6" src="$7" refs="$8" adir="$9"
+  local helm="$1" tag="$2" repo_src="$3" work="$4" release="$5" ns="$6" src="$7" refs="$8" adir="$9"
   local chart args=() vf vfp f
   export HELM_CACHE_HOME="$OUT/cache-$tag"
+  export HELM_REPOSITORY_CONFIG="$OUT/cache-$tag/repositories.yaml"
+  export HELM_REPOSITORY_CACHE="$OUT/cache-$tag/repository"
   mkdir -p "$work"
-  if [ -n "$chart_src" ]; then
-    cp -R "$chart_src/." "$work/"
-    chart="$work"
-    ( cd "$chart" && "$helm" dependency build . >"$adir/$tag.dep.log" 2>&1 ) || return 2
+  : >"$adir/$tag.dep.log"
+  if [ -n "$repo_src" ]; then
+    tar -C "$repo_src" --exclude .git -cf - . | tar -C "$work" -xf -
+    chart="$work/$(jq -r '.path // "."' <<<"$src")"
   else
     local repo chartname ver
     repo=$(jq -r '.repoURL' <<<"$src"); chartname=$(jq -r '.chart' <<<"$src"); ver=$(jq -r '.targetRevision // ""' <<<"$src")
@@ -129,7 +152,8 @@ render() {
     chart="$work/$chartname"
   fi
 
-  args=(template "$release" "$chart" --namespace "$ns" --kube-version "$KUBE_VERSION" "${API_ARGS[@]}")
+  # --name-template like Argo CD: unlike the positional name it is not limited to 53 characters
+  args=(template "$chart" --name-template "$release" --namespace "$ns" --kube-version "$KUBE_VERSION" "${API_ARGS[@]}")
   [ "$(jq -r '.helm.skipCrds // false' <<<"$src")" = "true" ] || args+=(--include-crds)
 
   # valueFiles: relative to the chart, or "$ref/path" pointing at another source
@@ -140,6 +164,8 @@ render() {
       vfp="$(jq -r --arg r "$ref" '.[$r] // ""' <<<"$refs")/${vf#*/}"
     elif [[ "$vf" == *://* ]]; then
       vfp="$vf"
+    elif [[ "$vf" == /* && -n "$repo_src" ]]; then
+      vfp="$work$vf"  # absolute paths are relative to the repo root
     else
       vfp="$chart/$vf"
     fi
@@ -162,7 +188,12 @@ render() {
     if [ "$force" = "true" ]; then args+=(--set-string "$name=$value"); else args+=(--set "$name=$value"); fi
   done < <(jq -r '.helm.parameters[]? | [.name, .value, (.forceString // false)] | @tsv' <<<"$src")
 
-  "$helm" "${args[@]}" >"$adir/$tag.raw.yaml" 2>"$adir/$tag.err" || return 3
+  if ! "$helm" "${args[@]}" >"$adir/$tag.raw.yaml" 2>"$adir/$tag.err"; then
+    is_missing_dependency "$adir/$tag.err" || return 3
+    add_dependency_repos "$helm" "$chart" "$adir/$tag.dep.log"
+    ( cd "$chart" && "$helm" dependency build >>"$adir/$tag.dep.log" 2>&1 ) || return 2
+    "$helm" "${args[@]}" >"$adir/$tag.raw.yaml" 2>"$adir/$tag.err" || return 3
+  fi
   normalize "$adir/$tag.raw.yaml" >"$adir/$tag.yaml"
 }
 
@@ -176,6 +207,7 @@ jq -c '.items[]' "$APPS_JSON" | while IFS= read -r app; do
   echo "  $name"
   ns=$(jq -r '.spec.destination.namespace // "default"' <<<"$app")
   sources=$(jq -c 'if .spec.sources then .spec.sources else [.spec.source] end' <<<"$app")
+  argo_error=$(jq -r '[.status.conditions[]? | select(.type == "ComparisonError")] | length | select(. > 0)' <<<"$app")
 
   # Resolve every "ref" source first so $ref/... value files can be found.
   refs='{}'
@@ -200,10 +232,11 @@ jq -c '.items[]' "$APPS_JSON" | while IFS= read -r app; do
       continue  # pure ref source, only used for value files
     fi
 
-    chart_dir=""
+    repo_dir=""
     if [ -z "$(jq -r '.chart // ""' <<<"$s")" ]; then
       if ! repo_dir=$(checkout "$(jq -r .repoURL <<<"$s")" "$(jq -r '.targetRevision // ""' <<<"$s")"); then
-        printf '%s\tgit\tCLONE-FAIL\t%s\n' "$label" "$(jq -r .repoURL <<<"$s")" >>"$SUMMARY"; continue
+        printf '%s\tgit\t%s\t%s\n' "$label" "$([ -n "$argo_error" ] && echo ALREADY-BROKEN || echo CLONE-FAIL)" \
+          "clone failed: $(jq -r .repoURL <<<"$s")" >>"$SUMMARY"; continue
       fi
       chart_dir="$repo_dir/$(jq -r '.path // "."' <<<"$s")"
       if [ ! -f "$chart_dir/Chart.yaml" ]; then
@@ -213,11 +246,13 @@ jq -c '.items[]' "$APPS_JSON" | while IFS= read -r app; do
 
     release=$(jq -r --arg n "$name" '.helm.releaseName // $n' <<<"$s")
     rns=$(jq -r --arg n "$ns" '.helm.namespace // $n' <<<"$s")
-    render "$HELM_OLD" old "$chart_dir" "$adir/work-old" "$release" "$rns" "$s" "$refs" "$adir"; r_old=$?
-    render "$HELM_NEW" new "$chart_dir" "$adir/work-new" "$release" "$rns" "$s" "$refs" "$adir"; r_new=$?
+    render "$HELM_OLD" old "$repo_dir" "$adir/work-old" "$release" "$rns" "$s" "$refs" "$adir"; r_old=$?
+    render "$HELM_NEW" new "$repo_dir" "$adir/work-new" "$release" "$rns" "$s" "$refs" "$adir"; r_new=$?
     rm -rf "$adir/work-old" "$adir/work-new"
 
-    if [ $r_old -ne 0 ] && [ $r_new -ne 0 ]; then
+    if [ $r_old -ne 0 ] && [ $r_new -ne 0 ] && [ -n "$argo_error" ]; then
+      res="ALREADY-BROKEN"; detail="Argo CD already reports ComparisonError for this app, see $adir/old.err or old.dep.log"
+    elif [ $r_old -ne 0 ] && [ $r_new -ne 0 ]; then
       res="BOTH-FAIL"; detail="$adir/old.err or old.dep.log (fails with the old Helm too)"
     elif [ $r_new -ne 0 ]; then
       res="NEW-FAIL"; detail="$adir/new.err or new.dep.log  <-- breaks after the upgrade"
@@ -227,7 +262,7 @@ jq -c '.items[]' "$APPS_JSON" | while IFS= read -r app; do
       res="SAME"; detail=""; rm -f "$adir/diff.patch"
     else
       # Render with the old Helm a second time: charts that generate certs/passwords differ on every run.
-      render "$HELM_OLD" old2 "$chart_dir" "$adir/work-old2" "$release" "$rns" "$s" "$refs" "$adir"
+      render "$HELM_OLD" old2 "$repo_dir" "$adir/work-old2" "$release" "$rns" "$s" "$refs" "$adir"
       rm -rf "$adir/work-old2"
       if diff -u "$adir/old.yaml" "$adir/old2.yaml" >"$adir/noise.patch"; then
         rm -f "$adir/noise.patch"

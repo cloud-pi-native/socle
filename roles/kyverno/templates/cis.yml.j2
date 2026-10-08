@@ -303,6 +303,7 @@ spec:
             spec:
               securityContext:
                 +(runAsNonRoot): true
+                runAsUser: 1000
               containers:
               - name: '*'
                 securityContext:
@@ -313,6 +314,7 @@ spec:
                   +(runAsNonRoot): true
                   +(seccompProfile):
                     type: RuntimeDefault
+                  runAsUser: 1000
               initContainers:
               - name: '*'
                 securityContext:
@@ -323,6 +325,7 @@ spec:
                   +(runAsNonRoot): true
                   +(seccompProfile):
                     type: RuntimeDefault
+                  runAsUser: 1000
 ---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy

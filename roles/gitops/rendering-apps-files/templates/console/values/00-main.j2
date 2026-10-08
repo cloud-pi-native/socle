@@ -21,8 +21,8 @@ console:
       HARBOR_RULE_COUNT: "100"
 {% endif %}
       KEYCLOAK_ADMIN: "dsoadmin"
-      KEYCLOAK_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#auth| jsonPath {.adminPassword}>
-      KEYCLOAK_URL: "http://{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local/realms/{{ dsc.keycloak.applicationRealm }}/.well-known/openid-configuration"
+      KEYCLOAK_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#auth| jsonPath {.adminPassword}>
+      KEYCLOAK_URL: "http://{{ dsc.keycloakx.subDomain }}-http.{{ dsc.keycloakx.namespace }}.svc.cluster.local/realms/{{ dsc.keycloakx.applicationRealm }}/.well-known/openid-configuration"
       NEXUS_ADMIN: admin
       NEXUS_ADMIN_PASSWORD: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/nexus/values#auth| jsonPath {.adminPassword}>
       NEXUS_URL: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.nexus}>/"
@@ -38,14 +38,14 @@ console:
       NODE_ENV: "production"
     keycloak:
       domain:
-        backend: "{{ dsc.keycloak.subDomain }}.{{ dsc.keycloak.namespace }}.svc.cluster.local"
+        backend: "{{ dsc.keycloakx.subDomain }}-http.{{ dsc.keycloakx.namespace }}.svc.cluster.local"
         frontend: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.keycloak}>"
-      realm: {{ dsc.keycloak.applicationRealm }} 
+      realm: {{ dsc.keycloakx.applicationRealm }} 
       clientIds:
         backend: "console-backend"
         frontend: "console-frontend"
       clientSecrets:
-        backend: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client| jsonPath {.consoleBackend.secret}>"
+        backend: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#client| jsonPath {.consoleBackend.secret}>"
       redirectUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain| jsonPath {.console}>"
       sessionSecret: "a-very-strong-secret-with-more-than-32-char"
       devRealm: false

@@ -1,0 +1,13 @@
+{% if dsc.keycloakx.subDomain != "keycloakx" %}
+# Temporary alias after cutover: the codecentric chart always names its Service
+# "<fullname>-http", while in-cluster consumers still target the bare legacy name.
+# Remove once every consumer points at "<subDomain>-http" (runbook §5/§9).
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ dsc.keycloakx.subDomain }}
+  namespace: {{ dsc.keycloakx.namespace }}
+spec:
+  type: ExternalName
+  externalName: {{ dsc.keycloakx.subDomain }}-http.{{ dsc.keycloakx.namespace }}.svc.cluster.local
+{% endif %}

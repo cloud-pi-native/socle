@@ -15,7 +15,7 @@
 - name: Get harbor client secret
   kubernetes.core.k8s_info:
     kind: Secret
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakx.namespace }}"
     name: keycloak-client-secret-harbor-client
   register: harbor_secret
   failed_when: harbor_secret.resources | length == 0
@@ -28,7 +28,7 @@
       oidc_admin_group: /admin
       oidc_auto_onboard: true
       oidc_client_id: "{{ harbor_secret.resources[0].data.CLIENT_ID | b64decode }}"
-      oidc_endpoint: https://{{ keycloak_domain }}/realms/{{ dsc.keycloak.applicationRealm }}
+      oidc_endpoint: https://{{ keycloak_domain }}/realms/{{ dsc.keycloakx.applicationRealm }}
       oidc_extra_redirect_parms: "{}"
       oidc_group_filter: ""
       oidc_groups_claim: groups

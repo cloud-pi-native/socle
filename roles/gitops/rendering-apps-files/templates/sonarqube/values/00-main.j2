@@ -59,9 +59,9 @@ sonarqube:
     sonar.auth.oidc.groupsSync: "true"
     sonar.auth.oidc.scopes: "openid generic"
     sonar.auth.oidc.loginStrategy.customClaim.name: "upn"
-    sonar.auth.oidc.clientId.secured: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.sonar.id}>
-    sonar.auth.oidc.clientSecret.secured: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.sonar.secret}>
-    sonar.auth.oidc.issuerUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}"
+    sonar.auth.oidc.clientId.secured: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#client | jsonPath {.sonar.id}>
+    sonar.auth.oidc.clientSecret.secured: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#client | jsonPath {.sonar.secret}>
+    sonar.auth.oidc.issuerUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloakx.applicationRealm }}"
     sonar.core.serverBaseURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.sonarqube}>
     sonar.plugins.risk.consent: "ACCEPTED"
   

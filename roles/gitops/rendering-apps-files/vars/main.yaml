@@ -67,11 +67,11 @@ values:
         return hs
       # We need this to be last so rootCA_block will be a sublevel of oidc.config
       oidc.config: |
-        issuer: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloak.applicationRealm }}
+        issuer: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloak}>/realms/{{ dsc.keycloakx.applicationRealm }}
         requestedScopes: ["openid", "generic"]
         name: Keycloak
-        clientID: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.argo.id}>
-        clientSecret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloak/values#client | jsonPath {.argo.secret}>
+        clientID: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#client | jsonPath {.argo.id}>
+        clientSecret: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/keycloakx/values#client | jsonPath {.argo.secret}>
 
     rootCA_block: |
       rootCA: |

@@ -26,17 +26,20 @@
         kind: Namespace
         state: present
 
-    - name: Add CloudNativePG helm repo
+    - name: Set path and repo type facts
+      ansible.builtin.set_fact:
+        path: "{{ role_path + '/templates/values' }}"
+        is_oci_repo: "{{ dsc.cloudnativepg.operator.helmRepoUrl.startswith('oci://') }}"
+        repo_name: "cnpg" # for HTTP repositories
+
+    - name: Add CloudNativePG operator Helm repo (HTTP repo only)
+      when: not is_oci_repo
       kubernetes.core.helm_repository:
-        name: cnpg
+        name: "{{ repo_name }}"
         repo_url: "{{ dsc.cloudnativepg.operator.helmRepoUrl }}"
         force_update: true
 
-    - name: Set path fact
-      ansible.builtin.set_fact:
-        path: "{{ role_path + '/templates/values' }}"
-
-    - name: Compute Gitlab Helm values
+    - name: Compute GitLab Helm values
       ansible.builtin.include_role:
         name: combine
       vars:
@@ -44,10 +47,10 @@
         combine_user_values: "{{ dsc.cloudnativepg.operator['values'] }}"
         combine_dest_var: "cnpg_values"
 
-    - name: Deploy CloudNativePG helm
+    - name: Deploy CloudNativePG operator Helm chart
       kubernetes.core.helm:
         name: cloudnative-pg
-        chart_ref: cnpg/cloudnative-pg
+        chart_ref: "{{ is_oci_repo | ternary(dsc.cloudnativepg.operator.helmRepoUrl, repo_name) }}/cloudnative-pg"
         chart_version: "{{ dsc.cloudnativepg.operator.chartVersion }}"
         release_namespace: "{{ dsc.cloudnativepg.namespace }}"
         values: "{{ cnpg_values }}"

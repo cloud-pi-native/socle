@@ -98,6 +98,11 @@
 - name: Values rendering
   when: install_enabled
   block:
+    - name: Check for cpin-ansible-job template file existence
+      ansible.builtin.stat:
+        path: "{{ source_path }}/values/200-ansible-job.j2"
+      register: ansible_job_template
+
     - name: Compute "{{ item.1.argocd_app }}" Helm values
       ansible.builtin.include_role:
         name: combine
@@ -105,19 +110,27 @@
         combine_path: "{{ source_path }}/values"
         combine_user_values: >-
           {%- set app_name = item.1.argocd_app -%}
+          {%- set app_values = dsc[app_name].get('values', {}) -%}
+          {%- set cnpg_values = dsc[app_name].get('cnpg', {}).get('values', {}) -%}
+          {%- set cluster_values = {} -%}
           {%- if app_name == 'gitlab' -%}
-            {%- if 'cnpg' in dsc.gitlab and 'values' in dsc.gitlab['cnpg'] -%}
-          {{ {} | combine({app_name: dsc.gitlabOperator['values'], 'cluster': dsc[app_name]['cnpg']['values']}) }}
-            {%- else -%}
-          {{ {} | combine({app_name: dsc.gitlabOperator['values']}) }}
-            {%- endif -%}
+            {%- set app_values = dsc.gitlabOperator.get('values', {}) -%}
+            {%- set cluster_values = dsc.gitlab.get('cnpg', {}).get('values', {}) -%}
           {%- elif app_name == 'cloudnativepg' -%}
-          {{ {} | combine({app_name: dsc[app_name]['operator']['values']}) }}
-          {%- elif 'cnpg' in dsc[app_name] and 'values' in dsc[app_name]['cnpg'] -%}
-          {{ {} | combine({app_name: dsc[app_name]['values'], 'cluster': dsc[app_name]['cnpg']['values']}) }}
-          {%- else -%}
-          {{ {} | combine({app_name: dsc[app_name]['values']}) }}
+            {%- set app_values = dsc[app_name].get('operator', {}).get('values', {}) -%}
           {%- endif -%}
+
+          {%- set result = {} -%}
+          {%- if app_values -%}
+            {%- set _ = result.update({app_name: app_values}) -%}
+          {%- endif -%}
+          {%- if cnpg_values or cluster_values -%}
+            {%- set _ = result.update({'cluster': cnpg_values | combine(cluster_values)}) -%}
+          {%- endif -%}
+          {%- if dsc.get('cpnAnsibleJob', {}).get('values') is defined and ansible_job_template.stat.exists -%}
+            {%- set _ = result.update({'cpn-ansible-job': dsc.cpnAnsibleJob['values']}) -%}
+          {%- endif -%}
+          {{ result }}
         combine_dest_var: "{{ item.1.argocd_app }}_values"
 
     - name: Render "{{ item.1.argocd_app }}" values and write values.yaml to destination

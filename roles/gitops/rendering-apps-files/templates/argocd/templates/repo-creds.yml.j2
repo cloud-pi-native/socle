@@ -5,6 +5,7 @@ metadata:
   labels:
     argocd.argoproj.io/secret-type: repo-creds
   name: gitlab
+  namespace: {{ '{{ .Release.Namespace }}' }}
 type: Opaque
 stringData:
   password: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/gitlab/values#gitlabToken>
@@ -17,6 +18,7 @@ metadata:
   labels:
     argocd.argoproj.io/secret-type: repo-creds
   name: oci-dockerhub-creds
+  namespace: {{ '{{ .Release.Namespace }}' }}
 stringData:
   url: registry-1.docker.io
   name: bitnamicharts
@@ -34,6 +36,7 @@ metadata:
   labels:
     argocd.argoproj.io/secret-type: repo-creds
   name: oci-harbor-creds
+  namespace: {{ '{{ .Release.Namespace }}' }}
 stringData:
   url: "oci://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.harbor}>"
   name: harbor

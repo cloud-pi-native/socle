@@ -175,7 +175,9 @@ kubectl wait --for condition=established --timeout=60s crd -l "app.kubernetes.io
 echo "Applying full manifest..."
 echo ""
 # No -n here: the manifest spans several namespaces (e.g. dso-backup targets
-# infra-velero), and 'helm template --namespace' already sets metadata.namespace.
+# infra-velero). 'helm template --namespace' does NOT inject metadata.namespace:
+# every template must set it explicitly (e.g. {{ .Release.Namespace }}), or the
+# object lands in the kubeconfig's current namespace.
 if kubectl apply -f "$FINAL_MANIFEST" --server-side; then
     echo "🎉 Deployment of $SELECTED_ZONE zone completed successfully!"
 else

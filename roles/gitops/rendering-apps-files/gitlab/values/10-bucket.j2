@@ -1,0 +1,32 @@
+{% if dsc.global.bucketPrefix | default('', true) | trim %}
+global:
+  minio:
+    enabled: false
+  appConfig:
+    object_store:
+      enabled: true
+      proxy_download: true
+      allowed_download_modes: []
+      storage_options:
+          server_side_encryption: AES256
+      connection:
+        secret: gitlab-object-storage
+        key: config
+    artifacts:
+      bucket: {{ dsc.global.bucketPrefix }}-gitlab-artifacts
+    lfs:
+      bucket: {{ dsc.global.bucketPrefix }}-gitlab-lfs
+    uploads:
+      bucket: {{ dsc.global.bucketPrefix }}-gitlab-uploads
+    packages:
+      bucket: {{ dsc.global.bucketPrefix }}-gitlab-packages
+    externalDiffs:
+      enabled: true
+      bucket: {{ dsc.global.bucketPrefix }}-gitlab-mr-diffs
+    terraformState:
+      enabled: true
+      bucket: {{ dsc.global.bucketPrefix }}-gitlab-terraform-state
+    ciSecureFiles:
+      enabled: true
+      bucket: {{ dsc.global.bucketPrefix }}-gitlab-ci-secure-files
+{% endif %}

@@ -115,8 +115,11 @@ global:
     domain: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#rootDomain>
     registry:
       name: gitlab-registry.example.com
+{# TODO: remove minio once external S3 buckets are available on all platforms #}
+{% if not (dsc.global.bucketPrefix | default('', true) | trim) %}
     minio:
       name: "{{ dsc_name }}-minio.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#rootDomain>"
+{% endif %}
     kas:
       name: "{{ dsc_name }}-kas.<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#rootDomain>"
 {% if gitlab_domain %}

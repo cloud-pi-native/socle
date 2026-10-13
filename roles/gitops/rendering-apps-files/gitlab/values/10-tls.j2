@@ -28,16 +28,22 @@ gitlab:
     ingress:
       tls:
         secretName: gitlab-webservice
+{# TODO: remove minio once external S3 buckets are available on all platforms #}
+{% if not (dsc.global.bucketPrefix | default('', true) | trim) %}
 minio:
   ingress:
     tls:
       secretName: gitlab-minio-secret
+{% endif %}
 {% else %}
 gitlab:
   webservice:
     ingress:
       tls: {}
+{# TODO: remove minio once external S3 buckets are available on all platforms #}
+{% if not (dsc.global.bucketPrefix | default('', true) | trim) %}
 minio:
   ingress:
     tls: {}
+{% endif %}
 {% endif %}

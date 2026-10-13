@@ -59,10 +59,13 @@ shared-secrets:
     image:
       repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/cfssl-self-sign"
 
+{# TODO: remove minio once external S3 buckets are available on all platforms #}
+{% if not (dsc.global.bucketPrefix | default('', true) | trim) %}
 minio:
   image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.minio}>/minio"
   minioMc:
     image: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.minio}>/mc"
+{% endif %}
 
 postgresql:
   image:

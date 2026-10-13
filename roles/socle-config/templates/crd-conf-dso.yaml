@@ -715,6 +715,10 @@ spec:
                 global:
                   description: Global configuration not specific to one service.
                   properties:
+                    bucketPrefix:
+                      description: The prefix for S3 buckets.
+                      type: string
+                      default: ""
                     installEnabled:
                       default: true
                       description: Specifies whether we should install Global instance.
@@ -821,6 +825,10 @@ spec:
                             endpointURL:
                               description: Defines the s3 endpoint for vault backups.
                               type: string
+                            region:
+                              description: Defines the s3 region.
+                              type: string
+                              default: ""
                             bucketName:
                               description: Defines the globally shared s3 bucket name for backups.
                               type: string

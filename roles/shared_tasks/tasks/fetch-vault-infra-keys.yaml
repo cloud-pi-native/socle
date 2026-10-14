@@ -27,8 +27,8 @@
           | map(attribute='metadata.name')
           | first | default('') }}"
 
-    - name: Fail when Vault infra keys secret not found (unless vault-infra role is executed)
-      when: vault_infra_keys_secret_name | length == 0 and (get_credentials_playbook | default(false) or 'vault-infra' not in ansible_run_tags or not dsc.vaultInfra.installEnabled)
+    - name: Fail when Vault infra keys secret not found
+      when: vault_infra_keys_secret_name | length == 0
       ansible.builtin.fail:
         msg: "Vault infra keys secret not found. Please ensure Vault infra is initialized and unsealed."
       ignore_errors: "{{ get_credentials_playbook | default(omit) }}" # needed to display error and continue playbook execution if secret is not found

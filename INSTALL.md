@@ -49,6 +49,8 @@ Nous appellerons ces instances **Vault d'infrastructure** et **Argo CD d'infrast
 
 Argo CD d'infrastructure utilise des `applicationSet` pour déployer des `applications` du Socle dans le cluster cible.
 
+Ces instances ne sont pas installées par le présent dépôt. Leur installation (ainsi que celle de Kyverno) est assurée par le dépôt [socle-infra](https://github.com/cloud-pi-native/socle-infra).
+
 #### Prérequis cluster cible (cluster socle DSO)
 
 Vous devez disposer d'un cluster cible Kubernetes ou OpenShift fonctionnel ou nous installerons le socle de la plateforme Cloud Pi Native.
@@ -387,13 +389,11 @@ watch "kubectl get ns | grep '\-mynamespace'"
   - **Cert-manager** déployé dans le namespace `cert-manager`.
   - **CloudNativePG** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
   - **GitLab Operator** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
-  - **Kyverno** déployé dans le namespace spécifié par le fichier « config.yaml » du role `socle-config`, déclaré lors de l'installation avec la `dsc` par défaut `conf-dso`.
-- Les cinq composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces outils, vous pourrez le faire via l'utilisation des tags correspondants :
+- Les composants en question pourraient en effet être utilisés par une autre instance de la chaîne DSO, voire par d'autres ressources dans le cluster. Si vous avez conscience des risques et que vous voulez malgré tout désinstaller l'un de ces outils, vous pourrez le faire via l'utilisation des tags correspondants :
   - Pour Cert-manager : `-t cert-manager`
   - Pour CloudNativePG : `-t cnpg` (ou bien `-t cloudnativepg`)
   - Pour GitLab Operator : `-t gitlab-operator`
-  - Pour Kyverno : `-t kyverno`
-- La fonctionnalité actuellement remplie par le role Kyverno était auparavant gérée par un role kubed. C'est la raison pour laquelle la désinstallation de kubed est toujours disponible. Si kubed est encore présent dans votre cluster hébergeant le socle DSO, nous vous recommandons sa désinstallation via l'utilisation du tag `-t kubed` (ou `-t confSyncer`).
+- La fonctionnalité actuellement remplie par Kyverno (installé via le dépôt [socle-infra](https://github.com/cloud-pi-native/socle-infra)) était auparavant gérée par un role kubed. C'est la raison pour laquelle la désinstallation de kubed est toujours disponible. Si kubed est encore présent dans votre cluster hébergeant le socle DSO, nous vous recommandons sa désinstallation via l'utilisation du tag `-t kubed` (ou `-t confSyncer`).
 
 ### Installation d'un Argo CD dans une nouvelle zone
 

@@ -27,11 +27,6 @@
         - prom
       when: dsc.prometheus.crd.type == 'managed'
 
-    - role: kyverno
-      tags:
-        - kyverno
-        - never
-
     - role: cloudnativepg
       tags:
         - cloudnativepg
@@ -43,28 +38,6 @@
         - cert-manager
         - cm
         - never
-
-    - role: infra/keycloak-infra
-      tags:
-        - keycloak-infra
-        - sso-infra
-      when: dsc.keycloakInfra.installEnabled
-
-    - role: infra/vault-infra
-      tags:
-        - vault-infra
-      when: |
-        dsc.keycloakInfra.installEnabled and
-        dsc.vaultInfra.installEnabled
-
-    - role: infra/argocd-infra
-      tags:
-        - gitops-infra
-        - argocd-infra
-        - argo-infra
-      when: |
-        dsc.keycloakInfra.installEnabled and
-        dsc.argocdInfra.installEnabled
 
     - role: gitops/vault-secrets
       tags:

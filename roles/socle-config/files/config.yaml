@@ -167,12 +167,6 @@ spec:
     cnpg:
       imageName: ghcr.io/cloudnative-pg/postgresql:16.1
     values: {}
-  kyverno:
-    installEnabled: false
-    namespace: dso-kyverno
-    helmRepoUrl: https://kyverno.github.io/kyverno
-    forcedInstall: false
-    values: {}
   observatorium:
     installEnabled: false
     namespace: dso-observatorium

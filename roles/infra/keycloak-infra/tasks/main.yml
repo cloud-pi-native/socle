@@ -148,9 +148,19 @@
 
 # Deploy Keycloak
 
-- name: Set path fact
+- name: Set path and repo type facts
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
+    is_oci_repo: "{{ dsc.keycloakInfra.helmRepoUrl.startswith('oci://') }}"
+    repo_name: "hashicorp" # for HTTP repositories
+
+- name: Add Keycloak Helm repo (HTTP repo only)
+  when: not is_oci_repo
+  changed_when: false
+  kubernetes.core.helm_repository:
+    name: "{{ repo_name }}"
+    repo_url: "{{ dsc.keycloakInfra.helmRepoUrl }}"
+    force_update: true
 
 - name: Compute Keycloak Helm values
   ansible.builtin.include_role:
@@ -160,9 +170,9 @@
     combine_user_values: "{{ dsc.keycloakInfra['values'] }}"
     combine_dest_var: "kc_values"
 
-- name: Deploy helm
+- name: Deploy Keycloak Helm chart
   kubernetes.core.helm:
-    chart_ref: "{{ dsc.keycloakInfra.helmRepoUrl }}/keycloak"
+    chart_ref: "{{ is_oci_repo | ternary(dsc.keycloakInfra.helmRepoUrl, repo_name) }}/keycloak"
     chart_version: "{{ dsc.keycloakInfra.chartVersion }}"
     release_namespace: "{{ dsc.keycloakInfra.namespace }}"
     release_name: keycloak

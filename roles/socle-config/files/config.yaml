@@ -85,7 +85,6 @@ spec:
     repoSocle:
       url: https://github.com/cloud-pi-native/socle.git
       revision: main
-    values: {}
     backup:
       s3:
         enabled: false

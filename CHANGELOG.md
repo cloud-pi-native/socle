@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.13.0](https://github.com/cloud-pi-native/socle/compare/v4.12.1...v4.13.0) (2026-10-15)
+
+
+### Features
+
+* **gitlab:** upgrade chart 9.5.5 (18.5.5), operator 2.7.1, runner 0.82.0 ([c163680](https://github.com/cloud-pi-native/socle/commit/c16368073396d04b7b40dbd3d9798aac29ee1601))
+
+
+### Bug Fixes
+
+* **argocd:** set metadata.namespace on repo-creds secrets so they land in the ArgoCD namespace ([df5d0cd](https://github.com/cloud-pi-native/socle/commit/df5d0cdf34ba42807b9175af8e4f1b4c504b4051))
+* **gitlab:** replace minio mc with rclone in backup helper ([ec5a344](https://github.com/cloud-pi-native/socle/commit/ec5a3447b65c0bdd2b0a7da474acd074b1b96d3a))
+
 ## [4.12.1](https://github.com/cloud-pi-native/socle/compare/v4.12.0...v4.12.1) (2026-10-05)
 
 

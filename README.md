@@ -27,7 +27,6 @@
     - [GitLab Runner](#gitlab-runner)
     - [Harbor](#harbor)
     - [Keycloak](#keycloak)
-    - [Kyverno](#kyverno-1)
     - [Sonatype Nexus Repository](#sonatype-nexus-repository)
     - [SonarQube Community Edition](#sonarqube-community-edition)
     - [Vault](#vault)
@@ -476,7 +475,7 @@ Si l'un ou l'autre de ces éléments sont absents du cluster, cela signifie que 
 
 ### Kyverno
 
-Kyverno est installé en GitOps. Il est utilisé pour déployer une ClusterPolicy qui automatise la réplication des secrets et configmaps portant le label `ns.kyverno.io/all-sync: ""` dans tous les namespaces de la chaîne DSO.
+Kyverno n'est plus installé par le socle : son installation est assurée par le dépôt [socle-infra](https://github.com/cloud-pi-native/socle-infra). Il est utilisé pour déployer une ClusterPolicy qui automatise la réplication des secrets et configmaps portant le label `ns.kyverno.io/all-sync: ""` dans tous les namespaces de la chaîne DSO.
 
 Pour l'instant, seuls les secrets et configmaps présents dans le namespace `{{ dsc.global.namespace }}` et portant ce label sont ainsi répliqués.
 
@@ -586,7 +585,6 @@ Les sections suivantes détaillent la façon de procéder au gel de version d'im
   - [GitLab Runner](#gitlab-runner)
   - [Harbor](#harbor)
   - [Keycloak](#keycloak)
-  - [Kyverno](#kyverno-1)
   - [Sonatype Nexus Repository](#sonatype-nexus-repository)
   - [SonarQube Community Edition](#sonarqube-community-edition)
   - [Vault](#vault)
@@ -771,12 +769,6 @@ keycloak:
 Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml>
 
 Les release notes de Keycloak se trouvent ici : <https://github.com/keycloak/keycloak/releases>
-
-#### Kyverno
-
-La version d'image utilisée par Kyverno est directement liée à la version de chart déployée. Elle est donc déjà gelée par défaut.
-
-Il est recommandé de ne pas modifier cette version de chart, sauf si vous savez ce que vous faites.
 
 #### Sonatype Nexus Repository
 

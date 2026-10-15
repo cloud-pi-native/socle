@@ -283,7 +283,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for Argo CD infrastructure instance, they will be merged with roles/infra/argocd-infra/templates/values/
+                        You can add custom values for Argo CD infrastructure instance, they will be merged with roles/infra/argocd-infra/templates/values/ of https://github.com/cloud-pi-native/socle-infra
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
                         https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd/values.yaml
                       type: object
@@ -1437,7 +1437,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for keycloakInfra, they will be merged with roles/infra/keycloak-infra/templates/values/
+                        You can add custom values for keycloakInfra, they will be merged with roles/infra/keycloak-infra/templates/values/ of https://github.com/cloud-pi-native/socle-infra
                         https://github.com/bitnami/charts/tree/main/bitnami/keycloak
                         https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml
                       type: object
@@ -1477,7 +1477,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for Kyverno, they will be merged with roles/kyverno/templates/values/
+                        You can add custom values for Kyverno, they will be merged with roles/kyverno/templates/values/ of https://github.com/cloud-pi-native/socle-infra
                         https://github.com/kyverno/kyverno/blob/main/charts/kyverno
                         https://github.com/kyverno/kyverno/blob/main/charts/kyverno/values.yaml
                       type: object
@@ -1808,7 +1808,7 @@ spec:
                       type: string
                     values:
                       description: |
-                        You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/
+                        You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/ of https://github.com/cloud-pi-native/socle-infra
                         https://developer.hashicorp.com/vault/docs/platform/k8s/helm
                         https://github.com/hashicorp/vault-helm/blob/main/values.yaml
                       type: object

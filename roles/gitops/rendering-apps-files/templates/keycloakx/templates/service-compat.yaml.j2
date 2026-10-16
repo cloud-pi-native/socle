@@ -1,0 +1,9 @@
+# Bare-name alias of "<subDomain>-http" for in-cluster consumers still using it.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ dsc.keycloakx.subDomain }}
+  namespace: {{ dsc.keycloakx.namespace }}
+spec:
+  type: ExternalName
+  externalName: {{ dsc.keycloakx.subDomain }}-http.{{ dsc.keycloakx.namespace }}.svc.cluster.local

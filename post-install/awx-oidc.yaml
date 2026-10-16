@@ -14,7 +14,7 @@
     - name: Get awx client secret
       kubernetes.core.k8s_info:
         kind: Secret
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
         name: keycloak-client-secret-awx-client
       register: awx_secret
       failed_when: awx_secret.resources | length == 0
@@ -39,7 +39,7 @@
         follow_redirects: "all"
         body:
           "SOCIAL_AUTH_OIDC_KEY": "{{ awx_secret.resources[0].data.CLIENT_ID | b64decode }}"
-          "SOCIAL_AUTH_OIDC_OIDC_ENDPOINT": "https://{{ keycloak_domain }}/realms/dso"
+          "SOCIAL_AUTH_OIDC_OIDC_ENDPOINT": "https://{{ keycloakx_domain }}/realms/dso"
           "SOCIAL_AUTH_OIDC_SECRET": "{{ awx_secret.resources[0].data.CLIENT_SECRET | b64decode }}"
           "SOCIAL_AUTH_OIDC_VERIFY_SSL": false
         body_format: "json"

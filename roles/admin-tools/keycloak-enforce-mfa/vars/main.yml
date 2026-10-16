@@ -1,2 +1,2 @@
 ---
-keycloak_auth_url: "https://{{ keycloak_domain }}"
+keycloak_auth_url: "https://{{ keycloakx_domain }}"

@@ -749,26 +749,20 @@ Pour mémoire, les values utilisables sont disponibles et documentées ici : <ht
 
 #### Keycloak
 
-Le composant Keycloak est installé à l'aide du chart Helm Bitnami.
+Le composant Keycloak est installé à l'aide du chart Helm [codecentric keycloakx](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx), avec l'image officielle `quay.io/keycloak/keycloak`.
 
-Nous utiliserons un tag dit "[immutable](https://docs.bitnami.com/kubernetes/apps/keycloak/configuration/understand-rolling-immutable-tags/)" (**recommandé en production**).
-
-Les différents tags utilisables pour l'image de Keycloak sont disponibles ici : <https://hub.docker.com/r/bitnami/keycloak/tags>
-
-Les _immutable tags_ sont ceux qui possèdent un suffixe de type rXX, lequel correspond au numéro de révision. Ils pointent toujours vers la même image. Par exemple, `19.0.3-debian-11-r22` est un _immutable tag_.
-
-Pour spécifier un tel tag, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple :
+La version d'image est gelée via le paramètre `keycloakx.imageVersion` (valeur par défaut dans le fichier `releases.yaml` du rôle `socle-config`). Pour la surcharger, éditez la ressource `dsc` de configuration (par défaut, la `dsc` nommée `conf-dso`). Exemple :
 
 ```yaml
-keycloak:
-  values:
-    image:
-      registry: docker.io
-      repository: bitnami/keycloak
-      tag: 26.1.3-debian-12-r0
+keycloakx:
+  imageVersion: "26.7.2"
 ```
 
-Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/bitnami/charts/blob/main/bitnami/keycloak/values.yaml>
+**Attention** : depuis une version 26.6 ou antérieure, ne passez pas directement en 26.7.x ([keycloak/keycloak#51304](https://github.com/keycloak/keycloak/issues/51304)). Montez d'abord en 26.6.4, puis en 26.7.x.
+
+Les tags disponibles sont listés ici : <https://quay.io/repository/keycloak/keycloak?tab=tags>
+
+Pour mémoire, les values utilisables sont disponibles ici : <https://github.com/codecentric/helm-charts/blob/master/charts/keycloakx/values.yaml>
 
 Les release notes de Keycloak se trouvent ici : <https://github.com/keycloak/keycloak/releases>
 
@@ -885,7 +879,7 @@ kubectl explain dsc.spec.global.backup.cnpg
 En mode air gap ou déconnecté d'internet, positionnez `global.offline` à `true` dans la `dsc`.
 Certaines valeurs devront également être adaptées.
 - `dsc.sonarqube.pluginDownloadUrl` et `dsc.sonarqube.prometheusJavaagentVersion`
-- `dsc.keycloak.pluginDownloadUrl` et `dsc.keycloak.providerDownloadUrl`
+- `dsc.keycloakx.pluginDownloadUrl` et `dsc.keycloakx.providerDownloadUrl`
 - `dsc.gitlabCatalog.catalogRepoUrl`
 - `dsc.argocd.privateGitlabDomain`
 - `helmRepoUrl` pour chaque service concerné
@@ -935,16 +929,16 @@ Si vous constatez que les secrets ne sont pas correctement propagés ou reconnus
 
 ## Gestion des users Keycloak
 
-Il est possible de gérer la création des users dans le realm applicatif (dso) en spécifiant le paramètre `dsc.keycloak.usersGitOpsEnabled` à `true`.
+Il est possible de gérer la création des users dans le realm applicatif (dso) en spécifiant le paramètre `dsc.keycloakx.usersGitOpsEnabled` à `true`.
 Pour migrer vers ce mode de gestion, il est possible d'extraire la liste des utilisateurs existant via un playbook, il suffit de lancer la commande suivante :
 ```shell
 ansible-playbook admin-tools/keycloak-extract-users.yml
 ```
-Vous pourrez ensuite mettre le contenu de l'extraction dans le fichier, du dépôt des values, généré à l'emplacement suivant `"{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/keycloak/templates/users.yaml"`.
+Vous pourrez ensuite mettre le contenu de l'extraction dans le fichier, du dépôt des values, généré à l'emplacement suivant `"{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/keycloakx/templates/users.yaml"`.
 
 ## MFA pour les utilisateurs Keycloak
 
-Le MFA est activé par défaut si le paramètre `dsc.keycloak.usersGitOpsEnabled` est positionné à `true`.
+Le MFA est activé par défaut si le paramètre `dsc.keycloakx.usersGitOpsEnabled` est positionné à `true`.
 Il sera nécessaire pour activer le MFA sur les utilisateurs existants, de lancer en one-shot le playbook suivant :
 ```shell
 ansible-playbook admin-tools/keycloak-enforce-mfa.yml

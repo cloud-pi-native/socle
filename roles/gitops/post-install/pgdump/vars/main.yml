@@ -1,6 +1,6 @@
 pgdump_cnpg_clusters:
   - name: keycloak
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakx.namespace }}"
     db: keycloak
   - name: sonar
     namespace: "{{ dsc.sonarqube.namespace }}"

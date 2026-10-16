@@ -57,10 +57,10 @@
 
     - name: Get Keycloak pods
       kubernetes.core.k8s_info:
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
         kind: Pod
         label_selectors:
-          - app.kubernetes.io/name=keycloak
+          - app.kubernetes.io/name=keycloakx
       register: kc_pods
 
     - name: Set kc_pod fact
@@ -75,16 +75,16 @@
     - name: Create temporary admin user
       kubernetes.core.k8s_exec:
         pod: "{{ kc_pod }}"
-        namespace: "{{ dsc.keycloak.namespace }}"
+        namespace: "{{ dsc.keycloakx.namespace }}"
         command: >
-          bash -c "JAVA_OPTS_APPEND='-Djgroups.dns.query=keycloak-headless.{{ dsc.keycloak.namespace }}.svc.cluster.local -Djgroups.bind.port=7900';
+          bash -c "JAVA_OPTS_APPEND='-Djgroups.dns.query=keycloak-headless.{{ dsc.keycloakx.namespace }}.svc.cluster.local -Djgroups.bind.port=7900';
           export PASS_VAR='{{ tmp_admin_pass }}';
-          kc.sh bootstrap-admin user --username {{ tmp_admin }} --password:env PASS_VAR"
+          /opt/keycloak/bin/kc.sh bootstrap-admin user --username {{ tmp_admin }} --password:env PASS_VAR"
       register: tmp_adm
 
     - name: Get Keycloak API token
       ansible.builtin.uri:
-        url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}/realms/master/protocol/openid-connect/token
+        url: https://{{ dsc.keycloakx.subDomain }}{{ dsc.global.rootDomain }}/realms/master/protocol/openid-connect/token
         method: POST
         status_code: [200, 202]
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -99,7 +99,7 @@
 
     - name: Retrieve users from API
       ansible.builtin.uri:
-        url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}/admin/realms/master/users
+        url: https://{{ dsc.keycloakx.subDomain }}{{ dsc.global.rootDomain }}/admin/realms/master/users
         method: GET
         status_code: [200, 204]
         return_content: true
@@ -118,7 +118,7 @@
 
     - name: Unlock user
       ansible.builtin.uri:
-        url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}/admin/realms/master/attack-detection/brute-force/users/{{ user_id }}
+        url: https://{{ dsc.keycloakx.subDomain }}{{ dsc.global.rootDomain }}/admin/realms/master/attack-detection/brute-force/users/{{ user_id }}
         method: DELETE
         status_code: [200, 204]
         return_content: true
@@ -131,7 +131,7 @@
       community.general.keycloak_user:
         validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
         auth_client_id: admin-cli
-        auth_keycloak_url: https://{{ dsc.keycloak.subDomain }}{{ dsc.global.rootDomain }}
+        auth_keycloak_url: https://{{ dsc.keycloakx.subDomain }}{{ dsc.global.rootDomain }}
         auth_realm: master
         auth_username: "{{ tmp_admin }}"
         auth_password: "{{ tmp_admin_pass }}"

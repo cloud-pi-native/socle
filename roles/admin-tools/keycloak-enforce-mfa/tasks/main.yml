@@ -1,19 +1,19 @@
 ---
 - name: Get Keycloak admin password
   kubernetes.core.k8s_info:
-    namespace: "{{ dsc.keycloak.namespace }}"
+    namespace: "{{ dsc.keycloakx.namespace }}"
     kind: Secret
-    name: keycloak
+    name: keycloakx-admin-secret
   register: kc_adm_pass
 
 - name: Set Keycloak admin facts
   ansible.builtin.set_fact:
-    keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['admin-password'] | b64decode }}"
+    keycloak_admin_password: "{{ kc_adm_pass.resources[0].data['KEYCLOAK_ADMIN_PASSWORD'] | b64decode }}"
     keycloak_admin: admin
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloakx.managementRealm }}/protocol/openid-connect/token"
     method: POST
     status_code: [200, 202]
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -29,7 +29,7 @@
 
 - name: Get Keycloak API token
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloak.managementRealm }}/protocol/openid-connect/token"
+    url: "{{ keycloak_auth_url }}/realms/{{ dsc.keycloakx.managementRealm }}/protocol/openid-connect/token"
     method: POST
     status_code: [200, 202]
     validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
@@ -50,7 +50,7 @@
     page_size: 100
     first_index: "{{ item }}"
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/users?first={{ first_index }}&max={{ page_size }}"
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloakx.applicationRealm }}/users?first={{ first_index }}&max={{ page_size }}"
     method: GET
     headers:
       Authorization: "Bearer {{ kc_access_token }}"
@@ -67,7 +67,7 @@
 
 - name: Force CONFIGURE_TOTP for all users except admin
   ansible.builtin.uri:
-    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloak.applicationRealm }}/users/{{ item.id }}"
+    url: "{{ keycloak_auth_url }}/admin/realms/{{ dsc.keycloakx.applicationRealm }}/users/{{ item.id }}"
     method: PUT
     status_code: [200, 204]
     body_format: json

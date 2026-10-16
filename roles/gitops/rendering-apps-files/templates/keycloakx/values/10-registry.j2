@@ -1,0 +1,4 @@
+keycloakx:
+  image:
+    repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/keycloak/keycloak
+    tag: "{{ dsc.keycloakx.imageVersion }}"

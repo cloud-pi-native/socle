@@ -205,7 +205,7 @@ Pour cela, allez dans la page `Clusters` dans la section `Administration` et sui
 
 ### 13. Ajout d'utilisateurs à la plateforme Cloud Pi Native
 
-Sur le dépôt GitOps, effectuez une modification du fichier `gitops/envs/conf-dso/apps/keycloak/templates/users.yaml` pour ajouter des utilisateurs au Keycloak de la plateforme Cloud Pi Native. Une fois le fichier modifié, poussez-le dans le dépôt GitOps.
+Sur le dépôt GitOps, effectuez une modification du fichier `gitops/envs/conf-dso/apps/keycloakx/templates/users.yaml` pour ajouter des utilisateurs au Keycloak de la plateforme Cloud Pi Native. Une fois le fichier modifié, poussez-le dans le dépôt GitOps.
 
 ```bash
 git add .
@@ -281,7 +281,7 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [Console Cloud π Native](https://github.com/cloud-pi-native/console#readme)
 - [GitLab](https://gitlab.com/gitlab-org/charts/gitlab)
 - [Harbor](https://github.com/goharbor/harbor-helm)
-- [Keycloak](https://github.com/bitnami/charts/tree/main/bitnami/keycloak)
+- [Keycloak](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)
 - [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 

@@ -1,7 +1,8 @@
 {% if dsc.global.backup.velero.enabled | default(false) %}
 dso-backup:
+  enabled: false
   global:
-    appName: keycloak
+    appName: keycloakx
   strategy: cnpg
   velero:
     backupNamePrefix: socle
@@ -10,11 +11,10 @@ dso-backup:
   application:
     workloads:
       - type: statefulset
-        name: {{ dsc.keycloak.subDomain }}
-        replicas: 3
+        name: {{ dsc.keycloakx.subDomain }}
+        replicas: {{ dsc.keycloakx.replicas }}
         podLabelSelector:
-          app.kubernetes.io/component: keycloak
-          app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.keycloak.namespace }}
-          app.kubernetes.io/name: keycloak
+          app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.keycloakx.namespace }}
+          app.kubernetes.io/name: keycloakx
         shutdownTimeout: 300
 {% endif %}

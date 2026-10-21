@@ -36,7 +36,8 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$GitopsRepoPath,
 
-  [string]$SocleRepoPath = (Split-Path -Parent $PSScriptRoot),
+  # Defaults to the repo containing this script
+  [string]$SocleRepoPath,
 
   [string]$Context,
 
@@ -55,7 +56,7 @@ param(
   [string]$HelmTarball,
 
   # Folder containing ansible_collections (the one installed by "uv sync" by default), used if the image lacks the collections
-  [string]$CollectionsPath = (Join-Path (Split-Path -Parent $PSScriptRoot) ".venv\Lib\site-packages"),
+  [string]$CollectionsPath,
 
   [switch]$KeepResources,
 
@@ -63,6 +64,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+# Windows PowerShell 5.1 may leave $PSScriptRoot empty in param() defaults, so defaults are set here
+$scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $SocleRepoPath) { $SocleRepoPath = Split-Path -Parent $scriptDir }
+if (-not $CollectionsPath) { $CollectionsPath = Join-Path $SocleRepoPath ".venv\Lib\site-packages" }
 
 $PodName = "socle-render"
 $CrbName = "socle-render-$Namespace"

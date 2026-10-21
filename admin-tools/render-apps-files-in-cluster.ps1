@@ -310,7 +310,8 @@ tar -czf /tmp/gitops-out.tgz -C "`$W/gitops" .
   Invoke-Kubectl cp run.sh "${Namespace}/${PodName}:/tmp/run.sh"
 
   Write-Step "Running ansible-playbook in the pod"
-  Invoke-Kubectl -n $Namespace exec $PodName -- sh /tmp/run.sh
+  # '--' must be quoted, otherwise PowerShell consumes it as its own end-of-parameters marker
+  Invoke-Kubectl -n $Namespace exec $PodName '--' sh /tmp/run.sh
 
   # --- Fetch results -----------------------------------------------------------
 

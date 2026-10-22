@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.14.0](https://github.com/cloud-pi-native/socle/compare/v4.13.0...v4.14.0) (2026-10-22)
+
+
+### Features
+
+* **gitlab:** use external S3 storage when bucketPrefix is set ([3c96ddb](https://github.com/cloud-pi-native/socle/commit/3c96ddba59009094f10fca92ab0f961e2ad17261))
+* upgrade gitlab 18.11.13 ([f74b021](https://github.com/cloud-pi-native/socle/commit/f74b021089ec34e14fb5beb5e7df8f25c40ce827))
+* upgrade gitlab 18.8.10 ([5458f72](https://github.com/cloud-pi-native/socle/commit/5458f72da8612a109eeaf3c366cc063e06d6b9dc))
+
 ## [4.13.0](https://github.com/cloud-pi-native/socle/compare/v4.12.1...v4.13.0) (2026-10-15)
 
 

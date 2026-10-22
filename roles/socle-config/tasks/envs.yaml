@@ -70,6 +70,7 @@
                 s3BucketName: "{{ dsc.global.backup.s3.bucketName | default('') }}"
                 s3BucketPrefix: "{{ dsc.global.backup.vault.pathPrefix | default('') }}"
                 s3Endpoint: "{{ dsc.global.backup.s3.endpointURL | default('') }}"
+                s3Region: "{{ dsc.global.backup.s3.region | default('') }}"
                 s3AccessKey: ""
                 s3SecretKey: ""
                 gitlab:

@@ -34,16 +34,16 @@ spec:
     chartVersion: "1.1.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "9.5.5"
+    chartVersion: "9.8.10"
   glexporter:
     # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
     chartVersion: "0.3.5"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "2.7.1"
+    chartVersion: "2.10.2"
   gitlabrunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
-    chartVersion: "0.82.0"
+    chartVersion: "0.85.0"
   global:
     backup:
       vault:

@@ -357,6 +357,26 @@
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
 
+# Enable audit events on master realm
+
+- name: Enable audit events on master realm
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://{{ keycloakinfra_domain }}
+    auth_realm: master
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    id: master
+    realm: master
+    events_enabled: true
+    events_listeners:
+      - jboss-logging
+    events_expiration: 2592000
+    admin_events_enabled: true
+    admin_events_details_enabled: true
+
 # Create and setup infra realm
 
 - name: Create infra realm
@@ -386,6 +406,12 @@
       length(15) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
       passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)
     enabled: true
+    events_enabled: true
+    events_listeners:
+      - jboss-logging
+    events_expiration: 2592000
+    admin_events_enabled: true
+    admin_events_details_enabled: true
 
 - name: Create base admins groups
   community.general.keycloak_group:

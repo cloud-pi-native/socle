@@ -175,6 +175,26 @@
   ansible.builtin.set_fact:
     kc_access_token: "{{ kc_token.json.access_token }}"
 
+# Enable audit events on management realm
+
+- name: Enable audit events on management realm
+  community.general.keycloak_realm:
+    validate_certs: "{{ dsc.exposedCA.type == 'none' }}"
+    auth_client_id: admin-cli
+    auth_keycloak_url: "{{ keycloak_auth_url }}"
+    auth_realm: "{{ dsc.keycloakx.managementRealm }}"
+    auth_username: "{{ keycloak_admin }}"
+    auth_password: "{{ keycloak_admin_password }}"
+    state: present
+    id: "{{ dsc.keycloakx.managementRealm }}"
+    realm: "{{ dsc.keycloakx.managementRealm }}"
+    events_enabled: true
+    events_listeners:
+      - jboss-logging
+    events_expiration: 2592000
+    admin_events_enabled: true
+    admin_events_details_enabled: true
+
 # Create and setup dso realm
 
 - name: Get SMTP user and password from infra Vault
@@ -235,6 +255,12 @@
       length(15) and lowerCase(1) and upperCase(1) and specialChars(1) and digits(1) and
       passwordHistory(2) and notUsername() and forceExpiredPasswordChange(183)
     enabled: true
+    events_enabled: true
+    events_listeners:
+      - jboss-logging
+    events_expiration: 2592000
+    admin_events_enabled: true
+    admin_events_details_enabled: true
     otp_policy_algorithm: "HmacSHA1"
     reset_password_allowed: true
     action_token_generated_by_user_lifespan: 900

@@ -55,6 +55,26 @@ Vous devez disposer d'un cluster cible Kubernetes ou OpenShift fonctionnel ou no
 
 Nous appellerons ce cluster **cluster socle**.
 
+Il doit disposer d'un **contrôleur d'ingress** : le Socle n'en installe pas. Installez-le avant tout run Ansible, par exemple ingress-nginx :
+
+```yaml
+# values-ingress.yaml
+controller:
+  ingressClassResource:
+    default: true
+```
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx   --namespace ingress-nginx --create-namespace   -f values-ingress.yaml
+kubectl -n ingress-nginx get svc ingress-nginx-controller   # attendre EXTERNAL-IP
+```
+
+- `default: true` est **obligatoire** avec `spec.ingress.tls.type: acme` : le solver HTTP-01 du `ClusterIssuer` ne précise aucune classe d'ingress. Sans `IngressClass` par défaut, le certificat n'est pas émis et le contrôleur sert son certificat auto-signé.
+- **DNS** : faire pointer le wildcard du domaine racine (`global.rootDomain`) vers l'`EXTERNAL-IP`.
+- **Vérification** : `curl -k https://<EXTERNAL-IP>/` doit retourner un `404` servi par nginx (le contrôleur est joignable), et `curl --resolve <hôte>:443:<EXTERNAL-IP> https://<hôte>/` teste un hôte sans attendre la propagation DNS.
+
 ## Installation
 
 L'installation de la plateforme Cloud Pi Native se fait de manière automatisée via Ansible.

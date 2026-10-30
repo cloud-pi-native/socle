@@ -1,0 +1,6 @@
+{# One grafana-operator per DSC, in dsc.grafana.namespace next to the Grafana CRs it manages. Without this the operator #}
+{# watches every namespace (WATCH_NAMESPACE empty), so on a shared cluster each DSC operator would also reconcile the #}
+{# Grafana CRs of the other DSCs. namespaceScope sets WATCH_NAMESPACE to the release namespace (grafana-operator chart). #}
+grafana:
+  grafana-operator:
+    namespaceScope: true

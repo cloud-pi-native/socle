@@ -284,6 +284,7 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [Keycloak](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)
 - [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
+- [Observatorium](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/observatorium), [Grafana](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/dso-grafana) et [kube-state-metrics](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics) (options du socle : [docs/observability.md](docs/observability.md))
 
 S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.
 

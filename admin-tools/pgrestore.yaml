@@ -14,23 +14,10 @@
       prompt: "This will DROP and overwrite the application database. Type 'yes' to continue"
       private: false
 
-  vars:
-    pgdump_cnpg_clusters:
-      - name: "{{ dsc.keycloakx.subDomain }}"
-        namespace: "{{ dsc.keycloakx.namespace }}"
-        db: keycloak
-      - name: "{{ dsc.sonarqube.subDomain }}"
-        namespace: "{{ dsc.sonarqube.namespace }}"
-        db: sonardb
-      - name: "{{ dsc.gitlab.subDomain }}"
-        namespace: "{{ dsc.gitlab.namespace }}"
-        db: gitlabhq_production
-      - name: "{{ dsc.harbor.subDomain }}"
-        namespace: "{{ dsc.harbor.namespace }}"
-        db: registry
-      - name: "{{ dsc.console.subDomain }}"
-        namespace: "{{ dsc.console.namespace }}"
-        db: dso-console-db
+  # Same cluster list as the producer (post-install/pgdump.yaml): the names
+  # must match the object keys pgdump/<name>/app.dump-<n> written by the dump.
+  vars_files:
+    - ../roles/gitops/post-install/pgdump/vars/main.yml
 
   tasks:
     - name: Ensure confirmation
@@ -84,36 +71,57 @@
           - role=primary
       register: cnpg_primary_pod
 
-- name: Get s3AccessKey and s3SecretKey from infra Vault
-  block:
-    - name: Retrieve global values from infra Vault
-      community.hashi_vault.vault_kv2_get:
-        url: "https://{{ vaultinfra_domain }}"
-        auth_method: token
-        token: "{{ vault_infra_token }}"
-        engine_mount_point: "{{ vaultinfra_kv_name }}"
-        path: "env/{{ dsc_name }}/apps/global/values"
-        validate_certs: "{{ vaultinfra_cert_valid }}"
-      register: global_vault_values
-      ignore_errors: true
+    - name: Fail if no primary pod found
+      ansible.builtin.fail:
+        msg: "No primary pod found for pg-cluster-{{ target_cluster.name }} in {{ target_cluster.namespace }}!"
+      when: cnpg_primary_pod.resources | length == 0
 
-    - name: Set retrieved_s3AccessKey fact
-      ansible.builtin.set_fact:
-        retrieved_s3AccessKey: >-
-          {{
-            (global_vault_values.data.data.backup.s3AccessKey)if global_vault_values.data.data.backup.s3AccessKey is defined and
-            global_vault_values.data.data.backup.s3AccessKey | length > 0
-            else ''
-          }}
+    - name: Set vault_infra_token from ansible-secret
+      block:
+        - name: Retrieve ansible-secret
+          kubernetes.core.k8s_info:
+            namespace: "{{ dsc.global.namespace }}"
+            kind: Secret
+            name: ansible-secret
+          register: ansible_secret
 
-    - name: Set retrieved_s3SecretKey fact
-      ansible.builtin.set_fact:
-        retrieved_s3SecretKey: >-
-          {{
-            (global_vault_values.data.data.backup.s3SecretKey)if global_vault_values.data.data.backup.s3SecretKey is defined and
-            global_vault_values.data.data.backup.s3SecretKey | length > 0
-            else ''
-          }}
+        - name: Set vault_infra_token
+          ansible.builtin.set_fact:
+            vault_infra_token: "{{ ansible_secret.resources[0].data.VAULT_INFRA_TOKEN | b64decode }}"
+          no_log: true
+
+    - name: Get s3AccessKey and s3SecretKey from infra Vault
+      block:
+        - name: Retrieve global values from infra Vault
+          community.hashi_vault.vault_kv2_get:
+            url: "https://{{ vaultinfra_domain }}"
+            auth_method: token
+            token: "{{ vault_infra_token }}"
+            engine_mount_point: "{{ vaultinfra_kv_name }}"
+            path: "env/{{ dsc_name }}/apps/global/values"
+            validate_certs: "{{ vaultinfra_cert_valid }}"
+          register: global_vault_values
+          no_log: true
+
+        - name: Set retrieved_s3AccessKey fact
+          ansible.builtin.set_fact:
+            retrieved_s3AccessKey: >-
+              {{
+                (global_vault_values.data.data.backup.s3AccessKey)if global_vault_values.data.data.backup.s3AccessKey is defined and
+                global_vault_values.data.data.backup.s3AccessKey | length > 0
+                else ''
+              }}
+          no_log: true
+
+        - name: Set retrieved_s3SecretKey fact
+          ansible.builtin.set_fact:
+            retrieved_s3SecretKey: >-
+              {{
+                (global_vault_values.data.data.backup.s3SecretKey)if global_vault_values.data.data.backup.s3SecretKey is defined and
+                global_vault_values.data.data.backup.s3SecretKey | length > 0
+                else ''
+              }}
+          no_log: true
 
     - name: Download dump from S3 for {{ app_name }}
       amazon.aws.s3_object:

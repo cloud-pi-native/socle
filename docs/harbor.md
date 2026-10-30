@@ -35,3 +35,7 @@ harbor:
 ```
 
 Les clés d'accès (`accesskey`, `secretkey`) sont saisies dans le Vault d'infrastructure. La migration depuis `harbor.values.persistence.imageChartStorage` est décrite dans [Harbor GitOps](../README.md#harbor-gitops).
+
+## Sécurité
+
+Le CronJob `trivy-cleaner` s'exécute avec un `securityContext` restreint : non-root (uid/gid 65534), profil seccomp `RuntimeDefault`, pas d'élévation de privilèges et toutes les capabilities retirées.

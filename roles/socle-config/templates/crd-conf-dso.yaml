@@ -218,6 +218,13 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres' pvc
                       type: string
@@ -413,6 +420,13 @@ spec:
                       description: Extra helm values for console.
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -531,6 +545,13 @@ spec:
                         required:
                           - name
                           - value
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1209,6 +1230,13 @@ spec:
                         https://github.com/goharbor/harbor-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1421,6 +1449,13 @@ spec:
                         revision:
                           type: string
                           description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1697,6 +1732,13 @@ spec:
                         revision:
                           type: string
                           description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string

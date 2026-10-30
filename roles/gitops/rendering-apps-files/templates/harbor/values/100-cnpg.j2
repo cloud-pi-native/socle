@@ -42,7 +42,7 @@ cluster:
 
 {% if dsc.global.backup.cnpg.enabled %}
   backups:       
-    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg{{ dsc.harbor.postgresBackupPathSuffix | default('') }}
     enabled: true
     endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
     retentionPolicy: 14d

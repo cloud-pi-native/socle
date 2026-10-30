@@ -271,6 +271,19 @@ Une fois le projet créé, veuillez synchroniser le dépôt du projet avec la fo
 
 Cette synchronisation va dupliquer le dépôt dans le GitLab de la plateforme. Le dépôt contient des pipelines de test de la plateforme Cloud Pi Native pour confirmer le bon fonctionnement de la plateforme DSO
 
+### Restauration d'une base CNPG depuis un dump
+
+Lorsque `global.backup.cnpg.enabled` est actif, le job `pgdump` dépose un dump logique de chaque base dans le bucket S3 de sauvegarde (`pgdump/<application>/app.dump-<n>`, `<n>` étant le jour du mois modulo 10). Le playbook `admin-tools/pgrestore.yaml` restaure l'un de ces dumps :
+
+```bash
+ansible-playbook admin-tools/pgrestore.yaml
+```
+
+- Le playbook demande l'application (`keycloak`, `sonar`, `gitlab`, `harbor` ou `console`), l'indice du dump (0 à 9) et une confirmation : la base cible est supprimée puis recréée avant la restauration.
+- La liste des applications est celle du job `pgdump` (`roles/gitops/post-install/pgdump/vars/main.yml`) : les noms correspondent donc aux clés des dumps.
+- Le job `pgdump` ignore les applications dont `installEnabled` est à `false` dans la DSC : un cluster qui n'héberge pas toutes les applications ne fait plus échouer le job.
+- Le token du Vault d'infrastructure est lu dans le secret `ansible-secret` du namespace de la plateforme.
+
 ## Configuration DSC
 
 Pour configurer la ressource `dsc` nommée `conf-dso`, vous pouvez soit la modifier directement via la commande suivante :

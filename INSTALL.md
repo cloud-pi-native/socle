@@ -209,6 +209,17 @@ Cette commande va créer l'`applicationSet` `<envName>-dso-install-manager` dans
 
 Si le paramètre `global.gitOps.watchpointEnabled` est désactivé, l'`applicationSet` `<envName>-dso-install-manager` sera automatiquement créée, vous pouvez lancer la synchronisation manuellement sur l'Argo CD d'infrastructure.
 
+Si `argocdInfra.projectName` diffère de `default`, l'`AppProject` correspondant est créé dans l'Argo CD d'infrastructure avant l'`Application` (le projet `default` est natif d'Argo CD et n'est pas créé).
+
+L'`Application` pointe sur le répertoire `applicationSets/<dsc>/` du dépôt GitOps (`<dsc>` = nom de la DSC), qui contient les `ApplicationSet` (une par sync wave). Un sous-répertoire par DSC permet à plusieurs clusters de partager le même dépôt et la même branche :
+
+- Le plugin AVP lit le chemin de l'`Application` de façon récursive : chaque `Application` ne doit pointer que sur son propre sous-répertoire.
+- Migration d'un environnement déployé avec l'ancien chemin (`applicationSets/` à la racine) :
+  - Relancer `-t dso-app` : rend `applicationSets/<dsc>/` et met à jour le chemin de l'`Application`.
+  - Supprimer les anciens fichiers à la racine de `applicationSets/` (le rôle ne les supprime pas), puis pousser.
+  - Synchroniser `<envName>-dso-install-manager` : les `ApplicationSet` gardent les mêmes noms, rien n'est supprimé. Ne pas synchroniser avec prune avant le push.
+  - Migrer tous les environnements existants du dépôt avant d'en ajouter un nouveau : une `Application` encore sur `applicationSets/` lirait aussi les sous-répertoires des autres DSC.
+
 ### 11. Acceptation des conditions de service
 
 Une fois la plateforme Cloud Pi Native installée, vous devez accepter les conditions de service de certains outils de la plateforme. Pour le moment, il ne s'agit que de l'outil Nexus.

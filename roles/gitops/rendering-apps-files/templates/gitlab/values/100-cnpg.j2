@@ -47,7 +47,7 @@ cluster:
     destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg{{ dsc.gitlab.postgresBackupPathSuffix | default('') }}
     enabled: true
     endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
-    retentionPolicy: 14d
+    retentionPolicy: {{ dsc.global.backup.cnpg.retentionPolicy | default('14d') | quote }}
     s3:          
       accessKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
       secretKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>

@@ -965,6 +965,10 @@ spec:
                               description: Defines the globally shared s3 destination path for cnpg backups.
                               type: string
                               default: "cnpg"
+                            retentionPolicy:
+                              description: Defines retention policy for cnpg backups (barman retentionPolicy, e.g. "14d").
+                              type: string
+                              default: "14d"
                             cron:
                               description: Defines the cron rule used for cnpg backups. By default it runs every 6 hours.
                               type: string

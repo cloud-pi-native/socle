@@ -87,6 +87,7 @@ spec:
       type: none
   keycloakx: {}
   keycloakInfra: {}
+  kubeStateMetrics: {}
   kyverno: {}
   nexus: {}
   observatorium:

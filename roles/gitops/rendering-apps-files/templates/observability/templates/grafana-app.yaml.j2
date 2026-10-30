@@ -1,3 +1,5 @@
+{# The umbrella is also enabled for kube-state-metrics alone. #}
+{% if dsc.observatorium.installEnabled %}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -33,3 +35,4 @@ spec:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
       - ServerSideApply=true
+{% endif %}

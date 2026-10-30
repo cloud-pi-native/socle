@@ -1469,6 +1469,30 @@ spec:
                   required:
                     - installEnabled
                   type: object
+                kubeStateMetrics:
+                  description: Configuration for kube-state-metrics (Kubernetes object metrics exporter).
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install kube-state-metrics.
+                      type: boolean
+                    namespace:
+                      description: The namespace for kube-state-metrics.
+                      type: string
+                    helmRepoUrl:
+                      description: kube-state-metrics helm repository url.
+                      type: string
+                    chartVersion:
+                      description: kube-state-metrics helm chart version (e.g., "8.4.2").
+                      type: string
+                    values:
+                      description: |
+                        Custom values for kube-state-metrics, merged with roles/gitops/rendering-apps-files/templates/observability/values/.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 kyverno:
                   description: Configuration for Kyverno.
                   properties:

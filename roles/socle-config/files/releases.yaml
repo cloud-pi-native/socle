@@ -56,7 +56,7 @@ spec:
     # https://github.com/grafana/grafana/tags
     imageVersion: "10.4.3"
     # https://github.com/cloud-pi-native/helm-charts/tags
-    chartVersion: "1.8.1"
+    chartVersion: "1.9.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.17.1
@@ -67,6 +67,9 @@ spec:
   keycloakInfra:
     # https://artifacthub.io/packages/helm/bitnami/keycloak
     chartVersion: 24.4.11
+  kubeStateMetrics:
+    # https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics
+    chartVersion: 8.4.2
   kyverno:
     # https://artifacthub.io/packages/helm/kyverno/kyverno
     chartVersion: 3.1.4
@@ -75,7 +78,7 @@ spec:
     chartVersion: 5.23.1
   observatorium:
     # https://github.com/cloud-pi-native/helm-charts/tags
-    chartVersion: "0.5.4"
+    chartVersion: "0.6.0"
     # https://github.com/cloud-pi-native/helm-charts/tags
     observabilityChartVersion: "0.1.8"
     # https://github.com/cloud-pi-native/helm-charts/tags

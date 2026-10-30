@@ -1,0 +1,40 @@
+{# Restricted Pod Security Standard. securityContext values need observatorium >= 0.6.0 and dso-grafana >= 1.9.0 (ignored by older charts). #}
+observatorium:
+  # Applied to the api and gubernator pods. The api image runs as 10000:10000 but the gubernator image sets no USER,
+  # so the numeric uid is set explicitly (runAsNonRoot alone would reject it).
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    runAsGroup: 10000
+    seccompProfile:
+      type: RuntimeDefault
+  # Applied to the api and gubernator containers.
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  # nginx-unprivileged writes under /var/cache and /tmp, so the root filesystem stays writable.
+  reverseProxy:
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+grafana:
+  grafana-operator:
+    # Merged by Helm with the chart defaults.
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault

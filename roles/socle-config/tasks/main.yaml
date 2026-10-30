@@ -256,6 +256,14 @@
   ansible.builtin.set_fact:
     vaultinfra_kv_name: "dso-{{ dsc.global.gitOps.envName }}"
 
+# "observability" is an umbrella ArgoCD app (observatorium, grafana, kube-state-metrics):
+# enabled as soon as one child is, e.g. kube-state-metrics alone.
+- name: Set observability_install_enabled fact
+  ansible.builtin.set_fact:
+    observability_install_enabled: >-
+      {{ (dsc.observatorium.installEnabled | default(false))
+         or (dsc.kubeStateMetrics.installEnabled | default(false)) }}
+
 - name: Set keycloak_reset_password fact
   ansible.builtin.set_fact:
     keycloak_reset_password: false

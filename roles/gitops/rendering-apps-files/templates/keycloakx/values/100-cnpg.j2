@@ -19,10 +19,16 @@ cluster:
 
     storage:
       size: {{ dsc.keycloakx.postgresPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% if dsc.keycloakx.postgresWalPvcSize is defined %}
     walStorage:
       enabled: true
       size: {{ dsc.keycloakx.postgresWalPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% endif %}
 
     postgresql:

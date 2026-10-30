@@ -774,6 +774,10 @@ spec:
                       type: string
                       default: .infra.example.com
                       pattern: "^\\..*$"
+                    storageClass:
+                      description: |
+                        Default StorageClass for every PVC/CNPG Cluster created by the socle. Unset: uses the cluster's default StorageClass.
+                      type: string
                     logs:
                       description: Configuration for logs feature.
                       properties:

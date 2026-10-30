@@ -15,10 +15,16 @@ cluster:
     # Require 1Gi of space per instance using default storage class
     storage:
       size: {{ dsc.gitlab.postgresPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% if dsc.gitlab.postgresWalPvcSize is defined %}
     walStorage:
       enabled: true
       size: {{ dsc.gitlab.postgresWalPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% endif %}
   
     postgresql:

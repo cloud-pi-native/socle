@@ -15,10 +15,16 @@ cluster:
     # Require 1Gi of space per instance using default storage class
     storage:
       size: {{ dsc.harbor.postgresPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% if dsc.harbor.postgresWalPvcSize is defined %}
     walStorage:
       enabled: true
       size: {{ dsc.harbor.postgresWalPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% endif %}
   
     postgresql:

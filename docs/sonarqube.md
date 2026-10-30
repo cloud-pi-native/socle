@@ -33,7 +33,7 @@ Le miroir indiqué par `sonarqube.pluginDownloadUrl` doit contenir les trois jar
 
 ### Avant
 
-- Vérifier le chemin de montée dans les notes de version SonarQube pour 25.12 : le saut depuis 10.8 est un changement de schéma de version (numérotation par année). ⚠️ Hypothèse : la montée directe 10.8 → 25.12 est supportée ; à confirmer dans les notes de version avant de lancer.
+- Chemin de montée : la montée directe de la 10.8.1 vers la 25.12 est supportée (changement de numérotation des versions, par année).
 - Vérifier les versions de PostgreSQL et de Java (serveur et scanners) supportées par 25.12 ; les scanners doivent passer en Java 21 (voir plus bas).
 - Hors-ligne : déposer sur le miroir `sonarqube.pluginDownloadUrl` les trois jars de plugins et `sonarqube-webapp-<version>.zip` (voir plus haut), et rendre `busybox:1.37` disponible dans le registre d'images.
 - **Sauvegarder la base** (cluster CNPG de SonarQube) : la migration du schéma n'est pas réversible. Vérifier que la sauvegarde est restaurable.

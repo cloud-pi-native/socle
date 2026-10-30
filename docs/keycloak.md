@@ -38,3 +38,7 @@ keycloakx:
 ## SMTP désactivé
 
 Avec `global.smtp.enabled: false`, un `smtpServer` vide est envoyé au realm. Keycloak 26.6 refuse un `smtpServer` partiel (adresse d'expéditeur invalide) ; en l'omettant, celui enregistré par une version précédente serait renvoyé tel quel.
+
+## Sécurité
+
+Sur Kubernetes (hors OpenShift, où la SCC attribue l'uid), le pod, le conteneur Keycloak et l'init container `realm-ext-provider` s'exécutent avec un `securityContext` restreint : non-root (uid 1000), profil seccomp `RuntimeDefault`, pas d'élévation de privilèges et toutes les capabilities retirées.

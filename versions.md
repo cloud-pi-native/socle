@@ -12,7 +12,7 @@
 | gitlabOperator            | 2.7.1           | 2.7.1        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |
 | gitlabrunner              | 18.5.0          | 0.82.0        | [gitlabrunner](https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags)                                            |
 | grafana                   | 10.4.3           | N/A           | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
-| harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
+| harbor                    | 2.15.4           | 1.19.4        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
 | keycloakx                 | 26.7.2           | 7.2.3         | [keycloakx](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)                                 |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                                                      |
 | observatorium             | main-2025-02-10-1bcf722 | 0.\*.\*  | [observatorium](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/observatorium)                                                                   |

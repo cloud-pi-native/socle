@@ -12,7 +12,7 @@ Options de configuration Harbor de la `dsc`. Installation générale : [INSTALL.
 - chart `< 1.19` : `goharbor/redis-photon` ;
 - chart `>= 1.19` : `goharbor/valkey-photon`.
 
-Aucun paramètre à ajouter dans la `dsc`, la sélection suit la version du chart. L'image est tirée du registre `global.registry` s'il est défini, comme les autres composants Harbor.
+Le chart par défaut du socle est `1.19.4` : une nouvelle installation utilise donc Valkey. Une installation existante dont `harbor.chartVersion` est figé en `< 1.19` garde Redis jusqu'à ce que la version soit relevée. Aucun paramètre à ajouter dans la `dsc`, la sélection suit la version du chart. L'image est tirée du registre `global.registry` s'il est défini, comme les autres composants Harbor.
 
 Points d'attention :
 

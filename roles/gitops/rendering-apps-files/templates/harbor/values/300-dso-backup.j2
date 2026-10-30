@@ -12,6 +12,11 @@ dso-backup:
 {% endif %}
     backupNamePrefix: socle
     ttl: {{ ((velero_retention[:-1] | int) * 24 ~ 'h' if velero_retention.endswith('d') else velero_retention) | quote }}
+{% if dsc.velero.installEnabled | default(false) and dsc.velero.volumeSnapshots.enabled | default(false) %}
+    volumes:
+      snapshotVolumes: true
+      defaultVolumesToFsBackup: false
+{% endif %}
   cnpg:
     clusterName: pg-cluster-harbor
   application:

@@ -71,3 +71,12 @@
         that:
           - dsc.velero.region | default('') | length > 0
         fail_msg: "dsc.velero.region must be set when dsc.velero.installEnabled is true"
+
+    - name: Check the CSI driver is set when the VolumeSnapshotClass is created
+      ansible.builtin.assert:
+        that:
+          - dsc.velero.volumeSnapshots.driver | default('') | length > 0
+        fail_msg: "dsc.velero.volumeSnapshots.driver must be set (CSI driver of the StorageClass) to create the VolumeSnapshotClass"
+      when:
+        - dsc.velero.volumeSnapshots.enabled | default(false)
+        - dsc.velero.volumeSnapshots.createClass | default(true)

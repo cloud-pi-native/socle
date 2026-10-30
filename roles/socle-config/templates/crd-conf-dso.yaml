@@ -393,6 +393,34 @@ spec:
                           description: Deploy the node agent DaemonSet. Required for file system backups of volumes.
                           type: boolean
                       type: object
+                    volumeSnapshots:
+                      description: |
+                        Back up PersistentVolumeClaims with CSI snapshots (Velero built-in CSI plugin).
+                        Works at PVC level, without running pods and without the node agent. Sets
+                        snapshotVolumes=true and defaultVolumesToFsBackup=false on the per-app dso-backup
+                        Backups, and creates a dedicated VolumeSnapshotClass labelled for Velero.
+                        Requires a CSI driver with snapshot support and a snapshot controller.
+                      properties:
+                        enabled:
+                          description: Enable CSI snapshots for PVC backups.
+                          default: false
+                          type: boolean
+                        driver:
+                          description: CSI driver of the VolumeSnapshotClass (must match the StorageClass provisioner). Required when createClass is true.
+                          default: ""
+                          type: string
+                        createClass:
+                          description: |
+                            Create the dedicated VolumeSnapshotClass. Set to false to reuse an existing class,
+                            which must then carry the label velero.io/csi-volumesnapshot-class=true:
+                            Velero accepts a single labelled class per driver.
+                          default: true
+                          type: boolean
+                        className:
+                          description: Name of the VolumeSnapshotClass created for Velero (ignored when createClass is false).
+                          default: velero-csi-snapshot
+                          type: string
+                      type: object
                     values:
                       description: |
                         Custom values for the Velero chart, merged with roles/gitops/rendering-apps-files/templates/velero/values/

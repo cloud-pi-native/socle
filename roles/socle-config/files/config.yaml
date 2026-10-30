@@ -46,6 +46,11 @@ spec:
     pathPrefix: velero
     nodeAgent:
       enabled: false
+    volumeSnapshots:
+      enabled: false
+      createClass: true
+      className: velero-csi-snapshot
+      driver: ""
     values: {}
   cloudnativepg:
     installEnabled: true

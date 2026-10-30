@@ -33,6 +33,11 @@ velero:
     existingSecret: velero-s3-credentials
   configuration:
     defaultVolumesToFsBackup: {{ dsc.velero.nodeAgent.enabled | default(false) | lower }}
+{% if dsc.velero.volumeSnapshots.enabled | default(false) %}
+    # The CSI plugin is built into Velero >= 1.14 but stays inactive without this flag:
+    # Backups then complete with "no applicable volumesnapshotter found" and no snapshot.
+    features: EnableCSI
+{% endif %}
     backupStorageLocation:
       - name: {{ dsc.velero.storageLocationName | default('default') }}
         provider: {{ dsc.velero.provider | default('aws') }}
@@ -44,7 +49,7 @@ velero:
           region: {{ dsc.velero.region | default('') | quote }}
           s3ForcePathStyle: {{ dsc.velero.s3ForcePathStyle | default(true) | lower | quote }}
           s3Url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
-    # No volumeSnapshotLocation configured: only node-agent file system backup is wired here.
+    # No volumeSnapshotLocation: CSI snapshots use a VolumeSnapshotClass (see volumeSnapshots), not this.
     volumeSnapshotLocation: []
   metrics:
     enabled: true

@@ -1,0 +1,22 @@
+{# Rendered and applied by tasks/main.yaml through roles/gitops/rendering-apps-files/tasks/apply_netpol.yml (needed
+   for the _common/ imports), in the cert-manager namespace of the helm release of this role (the macros emit no
+   metadata.namespace). #}
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.flag() and not gate.installed('certmanager') %}
+{# Direct path of cert-manager (helm release "cert-manager" of this role). Double path rule: when
+   dsc.certmanager.installEnabled is true cert-manager is deployed by the Argo CD certmanager app, whose template
+   (gitops/rendering-apps-files/templates/certmanager/templates/networkpolicy.yaml.j2) emits the policies: nothing
+   here. The role applies these policies only when its own release exists (tasks/main.yaml).
+   App name 'certmanager-direct' for the policy names and the netpol-app label: the prune of apply_netpol.yml never
+   selects the policies of the Argo CD app and the two paths never share a policy name.
+   Same flows as the Argo CD app: webhook 10250, controller metrics 9402. The egress of controller, cainjector and
+   webhook cannot be listed (ACME directory, HTTP-01 self-check, HTTP proxy, Issuers created by tenants), so they
+   only get policies without egress side. #}
+{% set app = 'certmanager-direct' %}
+{{ np.intra(app, egress=false) }}
+{{ np.webhook(app, {'app.kubernetes.io/component': 'webhook'}, [10250]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [9402]) }}
+{% endif %}
+{% endif %}

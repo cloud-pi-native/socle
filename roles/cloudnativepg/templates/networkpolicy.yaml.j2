@@ -1,0 +1,21 @@
+{# Rendered and applied by tasks/main.yml through roles/gitops/rendering-apps-files/tasks/apply_netpol.yml (needed
+   for the _common/ imports), in dsc.cloudnativepg.namespace (the macros emit no metadata.namespace). #}
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.flag() and not gate.installed('cloudnativepg') %}
+{# Direct path of the CloudNativePG operator (helm release "cloudnative-pg" of this role). Double path rule: when
+   dsc.cloudnativepg.installEnabled is true the operator is deployed by the Argo CD cloudnativepg app, whose template
+   (gitops/rendering-apps-files/templates/cloudnativepg/templates/networkpolicy.yaml.j2) emits the policies: nothing
+   here. The role applies these policies only when its own release exists (tasks/main.yml).
+   App name 'cloudnativepg-direct' for the policy names and the netpol-app label: the prune of apply_netpol.yml
+   never selects the policies of the Argo CD app (netpol-app=cloudnativepg) and the two paths never share a name.
+   Same flows as the Argo CD app: webhook 9443 (operator pods app.kubernetes.io/name=cloudnative-pg), metrics 8080.
+   Ingress-only: the operator egress cannot be listed (kube-apiserver plus the instance status endpoint of every
+   PostgreSQL pod, in every namespace hosting a Cluster), so no DNS policy and no Egress side. #}
+{% set app = 'cloudnativepg-direct' %}
+{{ np.intra(app, egress=false) }}
+{{ np.webhook(app, {'app.kubernetes.io/name': 'cloudnative-pg'}, [9443]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [8080]) }}
+{% endif %}
+{% endif %}

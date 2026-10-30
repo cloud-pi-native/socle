@@ -6,7 +6,7 @@ observatorium:
           podAffinityTerm:
             labelSelector:
               matchLabels:
-                app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-{{ dsc.observatorium.namespace }}
+                app.kubernetes.io/instance: {{ dsc.global.gitOps.envName }}-dso-observatorium
                 app.kubernetes.io/name: observatorium
                 app.kubernetes.io/component: api
             topologyKey: kubernetes.io/hostname

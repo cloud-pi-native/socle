@@ -220,6 +220,13 @@ L'`Application` pointe sur le répertoire `applicationSets/<dsc>/` du dépôt Gi
   - Synchroniser `<envName>-dso-install-manager` : les `ApplicationSet` gardent les mêmes noms, rien n'est supprimé. Ne pas synchroniser avec prune avant le push.
   - Migrer tous les environnements existants du dépôt avant d'en ajouter un nouveau : une `Application` encore sur `applicationSets/` lirait aussi les sous-répertoires des autres DSC.
 
+Les `ClusterRole` partagés générés par la DSC (`dsc-access-role`, `cpn-ansible-job-role`, `pgdump-role`, `access-cnpg-s3-ca-secret`) sont préfixés par le nom de la DSC, ce qui permet à plusieurs DSC de cohabiter sur un même cluster. Pour un environnement déjà déployé avec les anciens noms :
+
+- Après la synchronisation, les anciens `ClusterRole` et `ClusterRoleBinding` sans préfixe restent présents sur le cluster : Argo CD ne les supprime pas s'il n'a pas le prune activé sur ces ressources.
+- Vérifier que les nouveaux rôles sont bien utilisés (les `roleRef` des jobs et des bindings sont mis à jour), puis supprimer manuellement les anciens :
+  `kubectl delete clusterrole dsc-access-role cpn-ansible-job-role pgdump-role access-cnpg-s3-ca-secret`
+  (ainsi que les `ClusterRoleBinding` / `RoleBinding` associés qui ne portent pas le préfixe).
+
 ### 11. Acceptation des conditions de service
 
 Une fois la plateforme Cloud Pi Native installée, vous devez accepter les conditions de service de certains outils de la plateforme. Pour le moment, il ne s'agit que de l'outil Nexus.

@@ -1,0 +1,9 @@
+{% if dsc.kubeStateMetrics.installEnabled %}
+{% set ksm_values = dsc['kubeStateMetrics']['values'] %}
+{# ServiceMonitor is off by default in the chart; honorLabels keeps the namespace of the scraped object. dsc values still win. #}
+{% if dsc.global.metrics.enabled %}
+{% set ksm_values = {'prometheus': {'monitor': {'enabled': true, 'http': {'honorLabels': true}}}} | combine(ksm_values, recursive=True) %}
+{% endif %}
+kubestatemetrics:
+{{ ksm_values | to_nice_yaml | indent(2, True) }}
+{% endif %}

@@ -1,0 +1,30 @@
+{% if dsc.kubeStateMetrics.installEnabled %}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ dsc.global.gitOps.envName }}-dso-kubestatemetrics"
+  namespace: {{ dsc.argocdInfra.namespace }}
+spec:
+  destination:
+    namespace: {{ dsc.kubeStateMetrics.namespace }}
+    name: {% raw %}{{ .Values.destinationClusterName }}
+{% endraw %}
+  project: {{ dsc.argocdInfra.projectName }}
+  sources:
+  - chart: kube-state-metrics
+    repoURL: {{ dsc.kubeStateMetrics.helmRepoUrl }}
+    targetRevision: {{ dsc.kubeStateMetrics.chartVersion | quote }}
+    helm:
+      values: {% raw %}|
+        {{ .Values.kubestatemetrics | toYaml | nindent 8 }}
+{% endraw %}
+      valueFiles:
+      - ./values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+{% endif %}

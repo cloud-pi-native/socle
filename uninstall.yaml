@@ -144,6 +144,15 @@
       tags:
         - keycloak
 
+    - name: "Suppression du namespace kube-state-metrics"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.kubeStateMetrics.namespace }}"
+      tags:
+        - never
+        - kubestatemetrics
+
     - name: "Suppression de la ClusterPolicy replace-kubed"
       kubernetes.core.k8s:
         state: absent

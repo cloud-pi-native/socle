@@ -23,7 +23,7 @@
       {{ dsc | dict2items | selectattr('value.installEnabled','defined')
          | selectattr('value.installEnabled','truthy')
          | map(attribute='key') | reject('equalto','observability') | list
-         + (['observability'] if dsc.observatorium.installEnabled | default(false) else []) }}
+         + (['observability'] if observability_install_enabled | bool else []) }}
 
 - name: Calculate all distinct configured sync waves
   ansible.builtin.set_fact:

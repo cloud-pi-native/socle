@@ -14,9 +14,9 @@
     install_enabled: "{{ dsc[item.1.argocd_app].installEnabled }}"
 
 - name: Set install_enabled fact when observability
-  when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app == "observability")
+  when: item.1.argocd_app == "observability"
   ansible.builtin.set_fact:
-    install_enabled: "{{ dsc.observatorium.installEnabled }}"
+    install_enabled: "{{ observability_install_enabled | bool }}"
 
 - name: Create chart and values destination dir
   ansible.builtin.file:
@@ -115,6 +115,8 @@
             {%- endif -%}
           {%- elif app_name == 'cloudnativepg' -%}
           {{ {} | combine({app_name: dsc[app_name]['operator']['values']}) }}
+          {%- elif app_name == 'observability' -%}
+          {{ {} }}
           {%- elif 'cnpg' in dsc[app_name] and 'values' in dsc[app_name]['cnpg'] -%}
           {{ {} | combine({app_name: dsc[app_name]['values'], 'cluster': dsc[app_name]['cnpg']['values']}) }}
           {%- else -%}

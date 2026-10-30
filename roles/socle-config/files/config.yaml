@@ -171,6 +171,11 @@ spec:
     cnpg:
       imageName: ghcr.io/cloudnative-pg/postgresql:16.1
     values: {}
+  kubeStateMetrics:
+    installEnabled: false
+    namespace: dso-ksm
+    helmRepoUrl: https://prometheus-community.github.io/helm-charts
+    values: {}
   kyverno:
     installEnabled: false
     namespace: dso-kyverno

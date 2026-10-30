@@ -14,6 +14,7 @@
 | grafana                   | 10.4.3           | 1.9.0         | [grafana](https://github.com/grafana/grafana/tags)                                                                   |
 | harbor                    | 2.12.0           | 1.16.0        | [harbor](https://artifacthub.io/packages/helm/harbor/harbor)                                                         |
 | keycloakx                 | 26.7.2           | 7.2.3         | [keycloakx](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)                                 |
+| kubeStateMetrics          | N/A              | 8.4.2         | [kube-state-metrics](https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics)                   |
 | kyverno                   | v1.11.4          | 3.1.4         | [kyverno](https://artifacthub.io/packages/helm/kyverno/kyverno)                                                      |
 | observatorium             | main-2025-02-10-1bcf722 | 0.6.0    | [observatorium](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/observatorium)                                                                   |
 | nexus                     | 3.84.0           | 5.14.0        | [nexus](https://artifacthub.io/packages/helm/stevehipwell/nexus3)                                                    |

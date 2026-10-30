@@ -52,6 +52,17 @@ spec:
   cpnAnsibleJob:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     values: {}
+  falco:
+    installEnabled: false
+    helmRepoUrl: https://falcosecurity.github.io/charts
+    namespace: dso-falco
+    forcedInstall: false
+    driver:
+      kind: modern_ebpf
+      leastPrivileged: true
+    falcosidekick:
+      enabled: true
+    values: {}
   gitlab:
     installEnabled: true
     namespace: dso-gitlab

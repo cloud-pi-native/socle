@@ -20,6 +20,7 @@
           - "glexporter (or gitlab-ci-pipelines-exporter)"
           - "gitlabOperator (or gitlab-operator)"
           - "gitlabrunner (or gitlab-runner)"
+          - "falco (or falcosidekick)"
           - "vault"
           - "argo (or argocd)"
           - "harbor"
@@ -196,6 +197,51 @@
             msg:
               - "Version de Kyverno : {{ kyverno_infos.status.app_version }}"
               - "Version de chart Helm Kyverno : {{ kyverno_infos.status.chart }}"
+
+    - name: Get Falco app and chart versions
+      tags:
+        - falco
+        - falcosidekick
+      block:
+        - name: Get Falco namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.falco.namespace }}"
+          register: falco_ns
+
+        - name: Warning message
+          when: falco_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Le namespace {{ dsc.falco.namespace }} n'existe pas."
+              - "Cela signifie que Falco est probablement installé dans un namespace indépendant du Socle."
+
+        - name: Retrieve Falco infos
+          when: falco_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: falco
+            namespace: "{{ dsc.falco.namespace }}"
+          register: falco_infos
+
+        - name: Warning message
+          when: >
+            falco_ns.resources | length > 0 and
+            falco_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Falco n'est pas installé en tant que chart Helm dans le namespace {{ dsc.falco.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
+        - name: Display Falco version
+          when: >
+            falco_ns.resources | length > 0 and
+            falco_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version de Falco : {{ falco_infos.status.app_version }}"
+              - "Version de chart Helm Falco : {{ falco_infos.status.chart }}"
+              - "Falcosidekick est un sous-chart de ce même chart Helm (falco.falcosidekick.enabled) : il n'a pas de version propre à afficher."
 
     - name: Get CNPG Operator app and chart versions
       tags:

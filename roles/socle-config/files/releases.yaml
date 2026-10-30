@@ -32,6 +32,9 @@ spec:
   cpnAnsibleJob:
     # https://github.com/cloud-pi-native/helm-charts/releases
     chartVersion: "1.1.0"
+  falco:
+    # https://artifacthub.io/packages/helm/falcosecurity/falco
+    chartVersion: 9.1.0
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "9.11.14"

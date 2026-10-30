@@ -1,0 +1,14 @@
+falco:
+  image:
+    registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>
+    repository: falcosecurity/falco
+  driver:
+    loader:
+      initContainer:
+        image:
+          registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>
+          repository: falcosecurity/falco-driver-loader
+  falcosidekick:
+    image:
+      registry: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>
+      repository: falcosecurity/falcosidekick

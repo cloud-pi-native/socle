@@ -88,6 +88,11 @@ grafana:
   server:
     certManager:
       enabled: true
+{# dso-grafana >= 1.9.0: ClusterIssuer of the platform (dso-grafana < 1.9.0 hardcodes "letsencrypt-prod", which this socle never creates; the key is then ignored). #}
+{% set grafana_cluster_issuer = (dsc.ingress.annotations | default({}))['cert-manager.io/cluster-issuer'] | default('acme-issuer' if dsc.ingress.tls.type == 'acme' else ('ca-issuer' if dsc.ingress.tls.type == 'ca' else '')) %}
+{% if grafana_cluster_issuer %}
+      clusterIssuer: {{ grafana_cluster_issuer }}
+{% endif %}
     ingressClassName: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.grafana}>
   grafana:

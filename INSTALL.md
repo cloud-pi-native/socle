@@ -121,6 +121,12 @@ kubectl edit dsc conf-dso
 
 Veuillez consulter la section [Configuration DSC](#configuration-dsc) pour plus de détails.
 
+Stockage et sauvegardes CNPG (optionnel) :
+
+- `global.storageClass` : `StorageClass` appliquée aux PVC et aux clusters CNPG créés par le socle (`storage` et `walStorage` inclus). Non défini : `StorageClass` par défaut du cluster, sans changement.
+- `<app>.postgresBackupPathSuffix` (awx, console, gitlab, harbor, keycloakx, sonarqube) : suffixe ajouté au chemin de sauvegarde CNPG (`s3://<bucket>/cnpg<suffixe>`). À renseigner quand plusieurs DSC partagent le même bucket, sinon leurs archives entrent en collision. Vide par défaut : chemin inchangé. Le modifier sur un environnement existant crée une nouvelle archive : les sauvegardes précédentes restent à l'ancien chemin.
+- `global.backup.cnpg.retentionPolicy` : rétention des sauvegardes CNPG (`14d` par défaut).
+
 Une fois la configuration créée, nous allons pouvoir passer aux étapes suivantes.
 
 ### 5. Variables d'environnement

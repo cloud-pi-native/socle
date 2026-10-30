@@ -16,7 +16,7 @@
       | from_json
       | dict2items
       | selectattr('key', 'eq', 'initialized')
-      | map(attribute='value') | first | default('false') }}"
+      | map(attribute='value') | first | default(false) | bool }}"
 
 - name: Set vault_sealed fact
   ansible.builtin.set_fact:
@@ -24,7 +24,7 @@
       | from_json
       | dict2items
       | selectattr('key', 'eq', 'sealed')
-      | map(attribute='value') | first | default('true') }}"
+      | map(attribute='value') | first | default(true) | bool }}"
 
 - name: Set vault_status to "not init"
   when: not vault_initialized

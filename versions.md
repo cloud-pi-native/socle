@@ -19,3 +19,4 @@
 | nexus                     | 3.84.0           | 5.14.0        | [nexus](https://artifacthub.io/packages/helm/stevehipwell/nexus3)                                                    |
 | sonarqube                 | 10.8.1-community | 10.8.1        | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube)                                                |
 | vault                     | 1.18.1           | 0.29.1        | [vault](https://artifacthub.io/packages/helm/hashicorp/vault)                                                        |
+| vso                       | 1.5.1            | 1.5.1         | [vault-secrets-operator](https://artifacthub.io/packages/helm/hashicorp/vault-secrets-operator)                      |

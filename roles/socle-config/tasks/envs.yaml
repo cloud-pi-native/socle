@@ -231,6 +231,15 @@
                 metrics: "{{ dsc.observatorium.reverseProxy.metricsHost | default('') }}"
               grafana:
                 adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
+          - argocd_app: vso
+            clusterName: ""
+            nameSpace: "vso"
+            customNamespacePrefix: ""
+            syncWave: 10
+            vault_values:
+              vault:
+                roleId: ""
+                secretId: ""
           - argocd_app: nexus
             clusterName: ""
             nameSpace: "nexus"

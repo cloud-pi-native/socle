@@ -679,7 +679,8 @@ Les différents tags utilisables sont disponibles ici :
 - notary (server) : <https://hub.docker.com/r/goharbor/notary-server-photon/tags>
 - notary (signer) : <https://hub.docker.com/r/goharbor/notary-signer-photon/tags>
 - database : <https://hub.docker.com/r/goharbor/harbor-db/tags>
-- redis : <https://hub.docker.com/r/goharbor/redis-photon/tags>
+- redis (chart < 1.19) : <https://hub.docker.com/r/goharbor/redis-photon/tags>
+- valkey (chart >= 1.19, remplace redis) : <https://hub.docker.com/r/goharbor/valkey-photon/tags>
 - exporter : <https://hub.docker.com/r/goharbor/harbor-exporter/tags>
 
 **Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est-à-dire d'utiliser le numéro `APP VERSION` retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.

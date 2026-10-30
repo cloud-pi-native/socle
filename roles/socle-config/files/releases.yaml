@@ -75,7 +75,7 @@ spec:
     chartVersion: 5.23.1
   observatorium:
     # https://github.com/cloud-pi-native/helm-charts/tags
-    chartVersion: "0.5.4"
+    chartVersion: "0.6.0"
     # https://github.com/cloud-pi-native/helm-charts/tags
     observabilityChartVersion: "0.1.8"
     # https://github.com/cloud-pi-native/helm-charts/tags

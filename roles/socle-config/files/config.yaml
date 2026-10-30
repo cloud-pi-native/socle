@@ -83,6 +83,8 @@ spec:
     helmRepoUrl: https://charts.gitlab.io
     taint:
       enabled: false
+    userNamespaces:
+      enabled: false
     values: {}
   global:
     installEnabled: true

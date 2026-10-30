@@ -33,6 +33,12 @@ gitlabrunner:
     create: true
     name: gitlab-runner
 
+  # Pod Security Standard "restricted": the chart default container context is already compliant
+  # except for the seccomp profile. Values are merged with the chart defaults (runAsUser, fsGroup).
+  podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
+
   resources:
     requests:
       ephemeral-storage: "500Mi"
@@ -95,7 +101,14 @@ gitlabrunner:
           [runners.kubernetes.node_tolerations]
             "role=gitlab-runner" = "NoSchedule"
 {% endif %}
-  
+{% if dsc.gitlabrunner.userNamespaces.enabled | default(false) %}
+          # job pods in their own user namespace (root in the pod is not root on the node)
+          [[runners.kubernetes.pod_spec]]
+            name = "user-namespace"
+            patch = '{"hostUsers": false}'
+            patch_type = "strategic"
+{% endif %}
+
     ## Specify the name for the runner.
     name: gitlab-runner
   

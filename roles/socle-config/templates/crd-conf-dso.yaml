@@ -774,6 +774,18 @@ spec:
                           default: false
                           description: Specifies whether taint should be enabled.
                           type: boolean
+                    userNamespaces:
+                      description: |
+                        Run every CI job pod in its own Kubernetes user namespace (hostUsers: false).
+                        Lets the build container run as root inside the pod (e.g. kaniko with RUN steps)
+                        without being root on the node. Requires Kubernetes >= 1.33 and a user-namespace
+                        capable runtime.
+                      type: object
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether job pods should use a user namespace.
+                          type: boolean
                     values:
                       description: |
                         You can add custom values for GitLab Runner, they will be merged with roles/gitlab-runner/templates/values/

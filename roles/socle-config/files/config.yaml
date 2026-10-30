@@ -64,6 +64,8 @@ spec:
     s3ObjectStorage:
       enabled: false
       pathStyle: true
+    pages:
+      enabled: false
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
     values: {}

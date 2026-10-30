@@ -534,6 +534,29 @@ spec:
                           description: Use path-style bucket addressing instead of virtual-host style.
                           default: true
                           type: boolean
+                    pages:
+                      description: |
+                        GitLab Pages (static sites served on a wildcard domain). Opt-in. Requires a wildcard DNS
+                        record and a TLS certificate covering *.<domain>; the domain must not be a subdomain of
+                        the GitLab host (e.g. GitLab at gitlab.example.com: pages.example.com is valid, pages.gitlab.example.com is not). Site content is stored in the
+                        object storage (bundled MinIO, or the external S3 when s3ObjectStorage is enabled: bucket
+                        <bucketPrefix>-pages must exist).
+                      type: object
+                      properties:
+                        enabled:
+                          description: Specifies whether GitLab Pages is deployed.
+                          default: false
+                          type: boolean
+                        domain:
+                          description: Base domain of the Pages sites (e.g. pages.example.com). Required when enabled.
+                          type: string
+                        tlsSecretName:
+                          description: |
+                            Name of the TLS secret of the Pages ingress (certificate for <domain> and *.<domain>).
+                            Defaults to ingress.tls.tlsSecret.name when ingress.tls.type is tlsSecret, else to
+                            "gitlab-pages" (secret issued by cert-manager from the ingress annotation, wildcard
+                            then requires DNS-01).
+                          type: string
                     values:
                       description: |
                         You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/

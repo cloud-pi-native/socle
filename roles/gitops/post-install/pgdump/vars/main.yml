@@ -1,16 +1,21 @@
 pgdump_cnpg_clusters:
   - name: keycloak
+    dsc_key: keycloakx
     namespace: "{{ dsc.keycloakx.namespace }}"
     db: keycloak
   - name: sonar
+    dsc_key: sonarqube
     namespace: "{{ dsc.sonarqube.namespace }}"
     db: sonardb
   - name: gitlab
+    dsc_key: gitlab
     namespace: "{{ dsc.gitlab.namespace }}"
     db: gitlabhq_production
   - name: harbor
+    dsc_key: harbor
     namespace: "{{ dsc.harbor.namespace }}"
     db: registry
   - name: console
+    dsc_key: console
     namespace: "{{ dsc.console.namespace }}"
     db: dso-console-db

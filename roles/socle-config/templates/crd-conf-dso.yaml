@@ -1761,6 +1761,38 @@ spec:
                         You can add custom values for tests, they will be merged with roles/gitops/rendering-apps-files/templates/tests/values/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                trivyOperator:
+                  description: Configuration for the Trivy Operator (cluster-wide vulnerability scanning).
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install the Trivy Operator.
+                      type: boolean
+                    namespace:
+                      description: The namespace for the Trivy Operator.
+                      type: string
+                    helmRepoUrl:
+                      description: Trivy Operator helm repository url (e.g., "https://aquasecurity.github.io/helm-charts/").
+                      type: string
+                    chartVersion:
+                      description: Trivy Operator helm chart version (e.g., "0.36.0").
+                      type: string
+                    forcedInstall:
+                      description: |
+                        Forces Trivy Operator install/reinstall in the target namespace regardless of
+                        its existing state. Default false: no forced installation.
+                      default: false
+                      type: boolean
+                    values:
+                      description: |
+                        Custom values for the Trivy Operator, merged with
+                        roles/gitops/rendering-apps-files/templates/trivyOperator/values/.
+                        See https://github.com/aquasecurity/trivy-operator/blob/main/deploy/helm/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 vault:
                   description: Configuration for Vault.
                   properties:

@@ -18,4 +18,5 @@
 | observatorium             | main-2025-02-10-1bcf722 | 0.\*.\*  | [observatorium](https://github.com/cloud-pi-native/helm-charts/tree/main/charts/observatorium)                                                                   |
 | nexus                     | 3.84.0           | 5.14.0        | [nexus](https://artifacthub.io/packages/helm/stevehipwell/nexus3)                                                    |
 | sonarqube                 | 10.8.1-community | 10.8.1        | [sonarqube](https://artifacthub.io/packages/helm/sonarqube/sonarqube)                                                |
+| trivyOperator             | N/A              | 0.36.0        | [trivy-operator](https://artifacthub.io/packages/helm/trivy-operator/trivy-operator)                                 |
 | vault                     | 1.18.1           | 0.29.1        | [vault](https://artifacthub.io/packages/helm/hashicorp/vault)                                                        |

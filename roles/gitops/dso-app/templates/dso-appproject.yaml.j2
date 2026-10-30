@@ -1,0 +1,19 @@
+---
+# Same permissions as the built-in "default" project: DSO apps pull from the
+# GitOps repo, DSC-defined Helm repos and Vault-templated GitLab URLs, and
+# deploy to clusters resolved at runtime, so sources/destinations stay open.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ dsc.argocdInfra.projectName }}
+  namespace: {{ dsc.argocdInfra.namespace }}
+spec:
+  description: "Project of the Socle install Applications ({{ dsc.global.gitOps.envName }})"
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

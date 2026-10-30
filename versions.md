@@ -7,6 +7,7 @@
 | cloudnativepg.operator    | 1.28.0           | 0.27.0        | [cloudnative-pg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                 |
 | console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | cpn-job                   | 1.\*.\*          | 1.\*.\*       | [cpn-job](https://github.com/cloud-pi-native/helm-charts)                                                            |
+| falco                     | 0.44.1           | 9.1.0         | [falco](https://artifacthub.io/packages/helm/falcosecurity/falco)                                                    |
 | gitlab                    | 18.5.5         | 9.5.5       | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
 | glexporter | 0.5.10           | 0.3.5         | [glexporter](https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter) |
 | gitlabOperator            | 2.7.1           | 2.7.1        | [gitlabOperator](https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags)                                  |

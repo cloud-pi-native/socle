@@ -1,0 +1,30 @@
+{% set falco_driver_kind = dsc.falco.driver.kind | default('modern_ebpf') %}
+falco:
+  driver:
+    kind: {{ falco_driver_kind }}
+{% if falco_driver_kind == 'modern_ebpf' and dsc.falco.driver.leastPrivileged | default(true) %}
+    modernEbpf:
+      # Specific capabilities instead of a privileged container.
+      leastPrivileged: true
+{% endif %}
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+  serviceMonitor:
+    create: true
+{% endif %}
+  falcosidekick:
+    enabled: {{ dsc.falco.falcosidekick.enabled | default(true) }}
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+{% if dsc.global.metrics.enabled %}
+    serviceMonitor:
+      enabled: true
+{% endif %}

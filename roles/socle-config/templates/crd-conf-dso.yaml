@@ -460,6 +460,58 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
+                falco:
+                  description: Configuration for Falco runtime security (with Falcosidekick).
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Falco.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Falco.
+                      type: string
+                    helmRepoUrl:
+                      description: Falco helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Falco helm chart version (e.g., "9.1.0").
+                      type: string
+                    forcedInstall:
+                      description: |
+                        Forces Falco install/reinstall in the target namespace regardless of its
+                        existing state. Default false: no forced installation.
+                      default: false
+                      type: boolean
+                    driver:
+                      description: Falco kernel driver configuration.
+                      properties:
+                        kind:
+                          description: Falco driver kind (modern_ebpf, kmod or auto).
+                          default: modern_ebpf
+                          type: string
+                        leastPrivileged:
+                          description: |
+                            With the modern_ebpf driver, run Falco with specific capabilities instead of a
+                            privileged container. Ignored for the other driver kinds, which stay privileged.
+                          default: true
+                          type: boolean
+                      type: object
+                    falcosidekick:
+                      description: Configuration for Falcosidekick, the Falco events forwarder.
+                      properties:
+                        enabled:
+                          default: true
+                          description: Specifies whether Falcosidekick should be enabled.
+                          type: boolean
+                      type: object
+                    values:
+                      description: |
+                        Custom values for Falco, merged with roles/gitops/rendering-apps-files/templates/falco/values/.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 gitlab:
                   description: Configuration for GitLab.
                   properties:

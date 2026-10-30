@@ -158,6 +158,7 @@ spec:
     managementRealm: master
     applicationRealm: dso
     usersGitOpsEnabled: false
+    portailClientEnabled: false
     replicas: 3
     ansibleJobEnabled: true
     values: {}

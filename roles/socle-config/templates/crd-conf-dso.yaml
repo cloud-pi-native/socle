@@ -1442,6 +1442,12 @@ spec:
                     usersGitOpsEnabled:
                       description: Specifies whether we should manage users with GitOps.
                       type: boolean
+                    portailClientEnabled:
+                      default: false
+                      description: |
+                        Create the "portail-client" client in the application realm (external portal, not deployed by the socle).
+                        Its redirectUris and webOrigins are "*": restrict them before enabling it.
+                      type: boolean
                     ansibleJobEnabled:
                       description: Specifies whether the post-install Ansible job (realm/users config) is enabled.
                       type: boolean

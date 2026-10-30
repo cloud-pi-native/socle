@@ -399,6 +399,9 @@
   ansible.builtin.include_tasks:
     file: client.yaml
   loop: "{{ keycloak_clients }}"
+  loop_control:
+    label: "{{ item.clientId }}"
+  when: item.enabled | default(true) | bool
 
 - name: Enable brute force detection
   community.general.keycloak_realm:

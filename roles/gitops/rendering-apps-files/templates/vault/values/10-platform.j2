@@ -14,6 +14,8 @@ cpn-ansible-job:
         runAsGroup: 1000
         runAsUser: 100
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       container:
         allowPrivilegeEscalation: false
         capabilities:
@@ -28,6 +30,12 @@ cpn-ansible-job:
           runAsGroup: 1000
           runAsUser: 100
           fsGroup: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        # No IPC_LOCK needed: the chart forces disable_mlock = true in the rendered server config
         container:
           allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
 {% endif %}

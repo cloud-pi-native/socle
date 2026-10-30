@@ -49,6 +49,8 @@ gitlab:
         memory: 2Gi
     securityContext:
       fsGroupChangePolicy: OnRootMismatch
+      seccompProfile:
+        type: RuntimeDefault
 {% if dsc.global.metrics.enabled %}
     metrics:
       serviceMonitor:
@@ -62,6 +64,9 @@ gitlab:
 {% endif %}
     persistence:
       size: "{{ dsc.gitlab.pvcGitalySize }}"
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
   gitlab-exporter:
 {% if dsc.global.metrics.enabled %}
     metrics:

@@ -21,6 +21,7 @@
           - "gitlabOperator (or gitlab-operator)"
           - "gitlabrunner (or gitlab-runner)"
           - "vault"
+          - "vso (or vault-secrets-operator)"
           - "argo (or argocd)"
           - "harbor"
           - "console (or console-dso)"
@@ -409,6 +410,50 @@
             msg:
               - "Version de Vault : {{ vault_infos.status.app_version }}"
               - "Version de chart Helm Vault : {{ vault_infos.status.chart }}"
+
+    - name: Get Vault Secrets Operator app and chart versions
+      tags:
+        - vso
+        - vault-secrets-operator
+      block:
+        - name: Get Vault Secrets Operator namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.vso.namespace }}"
+          register: vso_ns
+
+        - name: Warning message
+          when: vso_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Le namespace {{ dsc.vso.namespace }} n'existe pas."
+              - "Cela signifie que Vault Secrets Operator est probablement installé dans un namespace indépendant du Socle."
+
+        - name: Retrieve Vault Secrets Operator infos
+          when: vso_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: vault-secrets-operator
+            namespace: "{{ dsc.vso.namespace }}"
+          register: vso_infos
+
+        - name: Warning message
+          when: >
+            vso_ns.resources | length > 0 and
+            vso_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Vault Secrets Operator n'est pas installé en tant que chart Helm dans le namespace {{ dsc.vso.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
+        - name: Display Vault Secrets Operator version
+          when: >
+            vso_ns.resources | length > 0 and
+            vso_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version de Vault Secrets Operator : {{ vso_infos.status.app_version }}"
+              - "Version de chart Helm Vault Secrets Operator : {{ vso_infos.status.chart }}"
 
     - name: Get Argo CD app and chart versions
       tags:

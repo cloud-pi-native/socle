@@ -34,3 +34,34 @@
             dsc.certmanager.forcedInstall is truthy
         fail_msg: " Certmanager is already installed in your cluster"
       ignore_errors: true
+
+- name: Validate Vault Secrets Operator is first install
+  when: dsc.vso.installEnabled
+  block:
+    - name: Get cluster infos
+      kubernetes.core.k8s_cluster_info:
+      register: vso_cluster_infos
+
+    - name: Check if secrets.hashicorp.com api exists
+      ansible.builtin.set_fact:
+        vso_api: "{{ vso_cluster_infos.apis['secrets.hashicorp.com/v1beta1'] | default('absent') }}"
+
+    - name: Check if a vault-secrets-operator deployment already exists cluster-wide
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        label_selectors:
+          - "app.kubernetes.io/name=vault-secrets-operator"
+      register: vso_deployments
+
+    - name: Check if Vault Secrets Operator is absent
+      ansible.builtin.assert:
+        that:
+          - >
+            vso_api == 'absent' or
+            vso_deployments.resources | length == 0 or
+            dsc.vso.forcedInstall is truthy
+        fail_msg: >-
+          Vault Secrets Operator is already installed in your cluster (possibly in another
+          namespace): installing a second instance is a known source of conflicts, set
+          dsc.vso.forcedInstall to true only if this is intentional.
+      ignore_errors: true

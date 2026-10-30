@@ -215,6 +215,12 @@ spec:
   tests:
     installEnabled: false
     values: {}
+  trivyOperator:
+    installEnabled: false
+    helmRepoUrl: https://aquasecurity.github.io/helm-charts/
+    namespace: dso-trivy-operator
+    forcedInstall: false
+    values: {}
   vault:
     installEnabled: true
     namespace: dso-vault

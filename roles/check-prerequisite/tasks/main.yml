@@ -34,3 +34,25 @@
             dsc.certmanager.forcedInstall is truthy
         fail_msg: " Certmanager is already installed in your cluster"
       ignore_errors: true
+
+- name: Validate Trivy Operator is first install
+  when: dsc.trivyOperator.installEnabled
+  block:
+    - name: Check if a trivy-operator deployment already exists cluster-wide
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        label_selectors:
+          - "app.kubernetes.io/name=trivy-operator"
+      register: trivy_operator_deployments
+
+    - name: Check if Trivy Operator is absent
+      ansible.builtin.assert:
+        that:
+          - >
+            trivy_operator_deployments.resources | length == 0 or
+            dsc.trivyOperator.forcedInstall is truthy
+        fail_msg: >-
+          The Trivy Operator is already installed in your cluster (possibly in another namespace):
+          a second instance would duplicate scans and reports for the same resources, set
+          dsc.trivyOperator.forcedInstall to true only if this is intentional.
+      ignore_errors: true

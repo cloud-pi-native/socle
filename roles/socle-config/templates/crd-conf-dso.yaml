@@ -492,6 +492,7 @@ spec:
                     pvcGitalySize:
                       description: Size for Gitaly persistent volume.
                       type: string
+                      default: 50Gi
                     values:
                       description: |
                         You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/
@@ -1117,6 +1118,7 @@ spec:
                     grafanaPvcSize:
                       description: Size for grafana persistent volume.
                       type: string
+                      default: 5Gi
                     imageVersion:
                       description: Grafana release version (e.g., "9.5.5").
                       type: string
@@ -1162,18 +1164,23 @@ spec:
                     pvcRegistrySize:
                       description: Size for registry persistent volume.
                       type: string
+                      default: 50Gi
                     pvcJobLogSize:
                       description: Size for jobLog persistent volume.
                       type: string
+                      default: 5Gi
                     pvcDatabaseSize:
                       description: Size for database persistent volume.
                       type: string
+                      default: 10Gi
                     pvcRedisSize:
                       description: Size for redis persistent volume.
                       type: string
+                      default: 5Gi
                     pvcTrivySize:
                       description: Size for trivy persistent volume.
                       type: string
+                      default: 10Gi
                     s3ImageChartStorage:
                       description: Define s3 storage backend used for registry to store images and charts.
                       type: object
@@ -1226,7 +1233,6 @@ spec:
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
-                    - pvcRegistrySize
                     - installEnabled
                   type: object
                 ingress:
@@ -1536,12 +1542,14 @@ spec:
                     storageSize:
                       description: Size for nexus persistent volume.
                       type: string
+                      default: 25Gi
                     proxyEnabled:
                       description: Whether or not to enable the nexus docker proxy cache.
                       type: boolean
                     proxyCacheSize:
                       description: Size for nexus proxy cache persistent volume.
                       type: string
+                      default: 25Gi
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
@@ -1753,6 +1761,38 @@ spec:
                         You can add custom values for tests, they will be merged with roles/gitops/rendering-apps-files/templates/tests/values/
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                trivyOperator:
+                  description: Configuration for the Trivy Operator (cluster-wide vulnerability scanning).
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install the Trivy Operator.
+                      type: boolean
+                    namespace:
+                      description: The namespace for the Trivy Operator.
+                      type: string
+                    helmRepoUrl:
+                      description: Trivy Operator helm repository url (e.g., "https://aquasecurity.github.io/helm-charts/").
+                      type: string
+                    chartVersion:
+                      description: Trivy Operator helm chart version (e.g., "0.36.0").
+                      type: string
+                    forcedInstall:
+                      description: |
+                        Forces Trivy Operator install/reinstall in the target namespace regardless of
+                        its existing state. Default false: no forced installation.
+                      default: false
+                      type: boolean
+                    values:
+                      description: |
+                        Custom values for the Trivy Operator, merged with
+                        roles/gitops/rendering-apps-files/templates/trivyOperator/values/.
+                        See https://github.com/aquasecurity/trivy-operator/blob/main/deploy/helm/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 vault:
                   description: Configuration for Vault.
                   properties:
@@ -1788,6 +1828,7 @@ spec:
                     pvcSize:
                       description: Size for Vault persistent volume.
                       type: string
+                      default: 23Gi
                     values:
                       description: |
                         You can add custom values for vault, they will be merged with roles/vault/templates/values/
@@ -1823,6 +1864,7 @@ spec:
                     pvcSize:
                       description: Size for Vault infrastructure instance persistent volume.
                       type: string
+                      default: 23Gi
                     values:
                       description: |
                         You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/

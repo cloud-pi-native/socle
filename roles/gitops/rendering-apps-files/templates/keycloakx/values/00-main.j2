@@ -28,6 +28,24 @@ keycloakx:
       memory: "1024Mi"
   networkPolicy:
     enabled: false
+{% if dsc.global.platform == "kubernetes" %}
+  # The official image runs as uid 1000.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    runAsUser: 1000
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+{% endif %}
 
   database:
     vendor: postgres
@@ -72,6 +90,18 @@ keycloakx:
       volumeMounts:
         - name: providers
           mountPath: /providers
+{% if dsc.global.platform == "kubernetes" %}
+      # The chart does not apply securityContext to extraInitContainers.
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+        runAsUser: 1000
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+{% endif %}
 {% if dsc.proxy.enabled %}
       env:
         - name: HTTP_PROXY

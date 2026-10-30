@@ -213,6 +213,8 @@ git commit -m "feat: add users"
 git push
 ```
 
+Options de configuration de Keycloak (clients du realm, Ingress public, SMTP) : [docs/keycloak.md](docs/keycloak.md).
+
 ### 14. Initialisation avec le projet Test
 
 Une fois le cluster mutualisé créé, connectez vous en tant qu'utilisateur et initialisez un premier projet test avec le projet GitHub suivant :

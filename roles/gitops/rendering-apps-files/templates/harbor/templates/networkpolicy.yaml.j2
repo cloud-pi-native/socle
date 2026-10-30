@@ -1,0 +1,28 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.active('harbor') %}
+{# Harbor. Ingress-only: the namespace egress cannot be listed (S3 image storage endpoint, proxy-cache and
+   replication registries, Trivy DB download, OIDC, HTTP proxy, Barman backups of pg-cluster-harbor to S3), so no
+   DNS policy and no Egress side.
+   Ingress sources (app=harbor): ingress controller to harbor-core and harbor-portal 8080 (Ingress targets port
+   80 -> 8080), console to harbor-core 8080, CNPG operator to the pg-cluster-harbor status port 8000, metrics
+   scraper to the metrics port 8001 (core, jobservice, registry, exporter) and to the pg-cluster-harbor metrics
+   port 9187. Registry 5000, registryctl, jobservice, trivy and redis are only reached from inside the namespace
+   (intra). 8000 / 9187 are the ports of the CNPG chart pg-cluster-* in general.
+   The CNPG operator peer is np.cnpg_operator_peer (local namespace, else global.networkpolicies.cnpgOperatorNamespace,
+   else any namespace with the operator pod labels); the scrape rule follows np.scrape_on; ACME HTTP-01 solver pods
+   are opened by np.acme_solver. #}
+{% set app = 'harbor' %}
+{% set core = {'app': 'harbor', 'component': 'core'} %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller('harbor-core', core, [8080]) }}
+{{ np.ingress_controller('harbor-portal', {'app': 'harbor', 'component': 'portal'}, [8080]) }}
+{% if gate.installed('console') %}
+{{ np.from_namespaces(app, 'console', core, [{'namespace': np.ns('console'), 'selector': {}}], [8080]) }}
+{% endif %}
+{{ np.from_namespaces(app, 'cnpg-operator', {'cnpg.io/cluster': 'pg-cluster-harbor'}, [np.cnpg_operator_peer() | from_json], [8000]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [8001, 9187]) }}
+{% endif %}
+{% endif %}

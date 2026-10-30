@@ -1,0 +1,12 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% if dsc.global.networkpolicies.enabled | default(false) | bool and (dsc.certmanager | default({})).installEnabled | default(false) | bool %}
+{# Policies of the cert-manager namespace. Ports: webhook 10250, controller metrics 9402. The egress of
+   controller, cainjector and webhook cannot be listed (ACME directory, HTTP-01 self-check, proxy, Issuers
+   created by tenants), so the namespace only gets policies without egress side. #}
+{% set app = 'certmanager' %}
+{{ np.intra(app, egress=false) }}
+{{ np.webhook(app, {'app.kubernetes.io/component': 'webhook'}, [10250]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [9402]) }}
+{% endif %}
+{% endif %}

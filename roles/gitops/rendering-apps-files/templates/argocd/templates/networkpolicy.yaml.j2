@@ -1,0 +1,25 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.active('argocd') %}
+{# Argo CD of the DSC. Ingress-only: the namespace egress cannot be listed (API servers of the destination
+   clusters, Git repositories, Helm and OCI registries, OIDC provider through its public URL, HTTP proxy), so no
+   DNS policy and no Egress side.
+   Ingress sources: ingress controller to argocd-server 8080 (Ingress 80/443 -> 8080) and to the
+   argocd-applicationset-controller webhook 7000 (dedicated Ingress), console to argocd-server 8080
+   (Service 80 -> 8080), metrics scraper to the metrics ports: server 8083, repo-server 8084, applicationset 8080,
+   application-controller 8082, Redis exporter 9121, HAProxy 9101 (np.scrape_on, see global.networkpolicies).
+   repo-server 8081 and Redis HA (6379, 26379, 8888) are only reached from inside the namespace (intra). ACME
+   HTTP-01 solver pods are opened by np.acme_solver. #}
+{% set app = 'argocd' %}
+{% set server = {'app.kubernetes.io/name': 'argocd-server'} %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller('argocd-server', server, [8080]) }}
+{{ np.ingress_controller('argocd-applicationset', {'app.kubernetes.io/name': 'argocd-applicationset-controller'}, [7000]) }}
+{% if gate.installed('console') %}
+{{ np.from_namespaces(app, 'console', server, [{'namespace': np.ns('console'), 'selector': {}}], [8080]) }}
+{% endif %}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [8083, 8084, 8080, 8082, 9121, 9101]) }}
+{% endif %}
+{% endif %}

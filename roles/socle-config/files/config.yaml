@@ -232,3 +232,12 @@ spec:
     helmRepoUrl: https://helm.releases.hashicorp.com
     pvcSize: 23Gi
     values: {}
+  vso:
+    installEnabled: false
+    helmRepoUrl: https://helm.releases.hashicorp.com
+    namespace: dso-vso
+    forcedInstall: false
+    vault:
+      skipTLSVerify: false
+      approleMountPath: approle
+    values: {}

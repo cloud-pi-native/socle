@@ -256,6 +256,14 @@
   ansible.builtin.set_fact:
     vaultinfra_kv_name: "dso-{{ dsc.global.gitOps.envName }}"
 
+- name: Set vso facts
+  ansible.builtin.set_fact:
+    vso_connection_enabled: >-
+      {{ dsc.vso.vault.connectionEnabled | default(dsc.vso.installEnabled | default(false)) }}
+    vso_app_enabled: >-
+      {{ (dsc.vso.installEnabled | default(false))
+         or (dsc.vso.vault.connectionEnabled | default(dsc.vso.installEnabled | default(false))) }}
+
 - name: Set keycloak_reset_password fact
   ansible.builtin.set_fact:
     keycloak_reset_password: false

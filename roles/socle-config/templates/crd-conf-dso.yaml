@@ -1833,6 +1833,82 @@ spec:
                   required:
                     - installEnabled
                   type: object
+                vso:
+                  description: Configuration for Vault Secrets Operator (VSO).
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: |
+                        Specifies whether we should install the Vault Secrets Operator. One operator per
+                        cluster: a dsc that reuses the operator deployed by another dsc keeps it false and
+                        sets vault.connectionEnabled to true.
+                      type: boolean
+                    namespace:
+                      description: |
+                        The namespace for Vault Secrets Operator and for the VaultConnection / VaultAuth of
+                        this dsc. Must be unique per dsc on a given cluster (e.g. "my-dsc-vso"), the
+                        resource names being fixed.
+                      type: string
+                    helmRepoUrl:
+                      description: Vault Secrets Operator helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Vault Secrets Operator helm chart version (e.g., "1.5.1").
+                      type: string
+                    forcedInstall:
+                      description: |
+                        Forces VSO install/reinstall in the target namespace regardless of its
+                        existing state. Default false: no forced installation.
+                      default: false
+                      type: boolean
+                    vault:
+                      description: Configuration for the Vault instance VSO authenticates against (AppRole).
+                      properties:
+                        connectionEnabled:
+                          description: |
+                            Renders the VaultConnection, the VaultAuth and the AppRole Secret of this dsc in
+                            vso.namespace, independently of the operator. Defaults to installEnabled. Set it
+                            to true with installEnabled false to reach the Vault of this dsc through the
+                            operator of another dsc, and to false with installEnabled true when the dsc
+                            consumes no secret through VSO.
+                          type: boolean
+                        allowedNamespaces:
+                          description: |
+                            Extra namespaces allowed to reference the VaultAuth of this dsc, on top of the
+                            namespaces of its installed components starting with
+                            global.gitOps.namespacePrefix. Exact names (a lone "*" allows all).
+                          items:
+                            type: string
+                          type: array
+                        address:
+                          description: |
+                            Vault URL VSO authenticates against. Optional: defaults to the in-cluster
+                            Vault Service (http, the listener has no TLS) when vault.installEnabled
+                            is true, otherwise to Vault's external URL (https, needed when tools and
+                            apps run on separate clusters).
+                          type: string
+                        skipTLSVerify:
+                          description: Skip TLS verification when connecting to Vault.
+                          default: false
+                          type: boolean
+                        caCertSecretName:
+                          description: |
+                            Optional Kubernetes Secret (in the VSO namespace) holding the CA certificate
+                            to trust, if Vault's certificate is not from a publicly trusted CA.
+                          type: string
+                        approleMountPath:
+                          description: Mount path of the AppRole auth method on the target Vault.
+                          default: approle
+                          type: string
+                      type: object
+                    values:
+                      description: |
+                        Custom values for vault-secrets-operator, merged with roles/gitops/rendering-apps-files/templates/vso/values/.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
               required:
                 - global
                 - ingress

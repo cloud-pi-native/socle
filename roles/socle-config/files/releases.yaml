@@ -93,3 +93,6 @@ spec:
     chartVersion: 0.34.1
     # https://github.com/hashicorp/vault/releases
     imageVersion: "2.0.4"
+  vso:
+    # https://artifacthub.io/packages/helm/hashicorp/vault-secrets-operator
+    chartVersion: 1.5.1

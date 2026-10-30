@@ -15,10 +15,16 @@ cluster:
     # Require 1Gi of space per instance using default storage class
     storage:
       size: {{ dsc.harbor.postgresPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% if dsc.harbor.postgresWalPvcSize is defined %}
     walStorage:
       enabled: true
       size: {{ dsc.harbor.postgresWalPvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% endif %}
   
     postgresql:
@@ -36,10 +42,10 @@ cluster:
 
 {% if dsc.global.backup.cnpg.enabled %}
   backups:       
-    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg{{ dsc.harbor.postgresBackupPathSuffix | default('') }}
     enabled: true
     endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
-    retentionPolicy: 14d
+    retentionPolicy: {{ dsc.global.backup.cnpg.retentionPolicy | default('14d') | quote }}
     s3:          
       accessKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3AccessKey}>
       secretKey: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3SecretKey}>

@@ -218,6 +218,13 @@ spec:
                       type: object
                       default: {}
                       x-kubernetes-preserve-unknown-fields: true
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres' pvc
                       type: string
@@ -413,6 +420,13 @@ spec:
                       description: Extra helm values for console.
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -492,6 +506,57 @@ spec:
                     pvcGitalySize:
                       description: Size for Gitaly persistent volume.
                       type: string
+                      default: 50Gi
+                    s3ObjectStorage:
+                      description: |
+                        External S3-compatible object storage for GitLab non-Git data (artifacts, LFS, uploads,
+                        packages, external diffs, terraform state, CI secure files, dependency proxy).
+                        Replaces the bundled MinIO. Gitaly (Git repositories) stays on persistent volume.
+                        Buckets must be created beforehand, without lifecycle rules. Access and secret keys are
+                        read from Vault (app gitlab, keys gitlab.s3ObjectStorage.accesskey/secretkey).
+                        No data migration from MinIO is performed.
+                      type: object
+                      properties:
+                        enabled:
+                          description: Specifies whether GitLab uses the external S3 object storage instead of the bundled MinIO.
+                          default: false
+                          type: boolean
+                        bucketPrefix:
+                          description: Prefix of the bucket names. Each bucket is named <bucketPrefix>-<type> (e.g. <bucketPrefix>-artifacts).
+                          type: string
+                        region:
+                          description: S3 region (e.g. eu-west-1).
+                          type: string
+                        endpoint:
+                          description: Full S3 endpoint URL, including the scheme (e.g. https://s3.eu-west-1.example.com).
+                          type: string
+                        pathStyle:
+                          description: Use path-style bucket addressing instead of virtual-host style.
+                          default: true
+                          type: boolean
+                    pages:
+                      description: |
+                        GitLab Pages (static sites served on a wildcard domain). Opt-in. Requires a wildcard DNS
+                        record and a TLS certificate covering *.<domain>; the domain must not be a subdomain of
+                        the GitLab host (e.g. GitLab at gitlab.example.com: pages.example.com is valid, pages.gitlab.example.com is not). Site content is stored in the
+                        object storage (bundled MinIO, or the external S3 when s3ObjectStorage is enabled: bucket
+                        <bucketPrefix>-pages must exist).
+                      type: object
+                      properties:
+                        enabled:
+                          description: Specifies whether GitLab Pages is deployed.
+                          default: false
+                          type: boolean
+                        domain:
+                          description: Base domain of the Pages sites (e.g. pages.example.com). Required when enabled.
+                          type: string
+                        tlsSecretName:
+                          description: |
+                            Name of the TLS secret of the Pages ingress (certificate for <domain> and *.<domain>).
+                            Defaults to ingress.tls.tlsSecret.name when ingress.tls.type is tlsSecret, else to
+                            "gitlab-pages" (secret issued by cert-manager from the ingress annotation, wildcard
+                            then requires DNS-01).
+                          type: string
                     values:
                       description: |
                         You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/
@@ -530,6 +595,13 @@ spec:
                         required:
                           - name
                           - value
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -702,6 +774,18 @@ spec:
                           default: false
                           description: Specifies whether taint should be enabled.
                           type: boolean
+                    userNamespaces:
+                      description: |
+                        Run every CI job pod in its own Kubernetes user namespace (hostUsers: false).
+                        Lets the build container run as root inside the pod (e.g. kaniko with RUN steps)
+                        without being root on the node. Requires Kubernetes >= 1.33 and a user-namespace
+                        capable runtime.
+                      type: object
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether job pods should use a user namespace.
+                          type: boolean
                     values:
                       description: |
                         You can add custom values for GitLab Runner, they will be merged with roles/gitlab-runner/templates/values/
@@ -773,6 +857,10 @@ spec:
                       type: string
                       default: .infra.example.com
                       pattern: "^\\..*$"
+                    storageClass:
+                      description: |
+                        Default StorageClass for every PVC/CNPG Cluster created by the socle. Unset: uses the cluster's default StorageClass.
+                      type: string
                     logs:
                       description: Configuration for logs feature.
                       properties:
@@ -939,6 +1027,10 @@ spec:
                               description: Defines the globally shared s3 destination path for cnpg backups.
                               type: string
                               default: "cnpg"
+                            retentionPolicy:
+                              description: Defines retention policy for cnpg backups (barman retentionPolicy, e.g. "14d").
+                              type: string
+                              default: "14d"
                             cron:
                               description: Defines the cron rule used for cnpg backups. By default it runs every 6 hours.
                               type: string
@@ -1117,6 +1209,7 @@ spec:
                     grafanaPvcSize:
                       description: Size for grafana persistent volume.
                       type: string
+                      default: 5Gi
                     imageVersion:
                       description: Grafana release version (e.g., "9.5.5").
                       type: string
@@ -1162,18 +1255,23 @@ spec:
                     pvcRegistrySize:
                       description: Size for registry persistent volume.
                       type: string
+                      default: 50Gi
                     pvcJobLogSize:
                       description: Size for jobLog persistent volume.
                       type: string
+                      default: 5Gi
                     pvcDatabaseSize:
                       description: Size for database persistent volume.
                       type: string
+                      default: 10Gi
                     pvcRedisSize:
                       description: Size for redis persistent volume.
                       type: string
+                      default: 5Gi
                     pvcTrivySize:
                       description: Size for trivy persistent volume.
                       type: string
+                      default: 10Gi
                     s3ImageChartStorage:
                       description: Define s3 storage backend used for registry to store images and charts.
                       type: object
@@ -1198,6 +1296,13 @@ spec:
                         https://github.com/goharbor/harbor-helm/blob/main/values.yaml
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1226,7 +1331,6 @@ spec:
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
-                    - pvcRegistrySize
                     - installEnabled
                   type: object
                 ingress:
@@ -1411,6 +1515,13 @@ spec:
                         revision:
                           type: string
                           description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1536,12 +1647,14 @@ spec:
                     storageSize:
                       description: Size for nexus persistent volume.
                       type: string
+                      default: 25Gi
                     proxyEnabled:
                       description: Whether or not to enable the nexus docker proxy cache.
                       type: boolean
                     proxyCacheSize:
                       description: Size for nexus proxy cache persistent volume.
                       type: string
+                      default: 25Gi
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
@@ -1685,6 +1798,13 @@ spec:
                         revision:
                           type: string
                           description: Branch, tag, or commit hash of the Git repository to clone for Ansible jobs.
+                    postgresBackupPathSuffix:
+                      description: |
+                        Suffix appended to the CNPG backup destination path ("s3://<bucket>/cnpg<suffix>", e.g. "/dsc2").
+                        Required when several DSC share the same bucket and deploy this app: the Cluster name is fixed,
+                        so two DSC archiving to the same path collide (barman-cloud-wal-archive fails, WAL piles up).
+                        Leave empty on the first DSC to keep its existing archive path.
+                      type: string
                     postgresPvcSize:
                       description: Size for postgres data pvc.
                       type: string
@@ -1788,6 +1908,7 @@ spec:
                     pvcSize:
                       description: Size for Vault persistent volume.
                       type: string
+                      default: 23Gi
                     values:
                       description: |
                         You can add custom values for vault, they will be merged with roles/vault/templates/values/
@@ -1823,6 +1944,7 @@ spec:
                     pvcSize:
                       description: Size for Vault infrastructure instance persistent volume.
                       type: string
+                      default: 23Gi
                     values:
                       description: |
                         You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/

@@ -6,7 +6,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: dsc-access-role
+  name: {{ dsc_name }}-dsc-access-role
 subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
@@ -38,7 +38,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: pgdump-role
+  name: {{ dsc_name }}-pgdump-role
 subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job
@@ -51,7 +51,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cpn-ansible-job-role
+  name: {{ dsc_name }}-cpn-ansible-job-role
 subjects:
   - kind: ServiceAccount
     name: cpn-ansible-job

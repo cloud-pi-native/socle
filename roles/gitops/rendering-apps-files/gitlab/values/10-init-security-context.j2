@@ -1,0 +1,20 @@
+# The gitlab-shell, gitaly and gitlab-exporter charts leave
+# init.containerSecurityContext.runAsUser unset, unlike webservice, sidekiq and
+# toolbox. When an admission policy defaults the user of containers without one,
+# their "configure" init container copies secrets under another UID than the
+# main container (UID 1000), which then cannot read them (gitlab-shell: SSH host
+# keys in 0600, CrashLoopBackOff).
+# Pin the init containers to the chart pod UID, as the other components do.
+gitlab:
+  gitlab-shell:
+    init:
+      containerSecurityContext:
+        runAsUser: 1000
+  gitaly:
+    init:
+      containerSecurityContext:
+        runAsUser: 1000
+  gitlab-exporter:
+    init:
+      containerSecurityContext:
+        runAsUser: 1000

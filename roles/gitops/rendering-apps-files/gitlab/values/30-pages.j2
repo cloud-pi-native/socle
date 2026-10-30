@@ -1,0 +1,50 @@
+{# GitLab Pages (opt-in, dsc.gitlab.pages). Served on a wildcard domain: the TLS certificate must cover
+   <pages.domain> and *.<pages.domain>. The domain must NOT be a subdomain of the GitLab host (Pages sites would
+   read the GitLab session cookies). Rendered after 20-object-storage.j2: Pages is not
+   part of the consolidated object_store form, so its bucket and connection are set here. #}
+{% if dsc.gitlab.pages.enabled | default(false) %}
+{# Same naming as webservice (10-tls.j2): explicit secret, else the tlsSecret one, else a chart-named secret that
+   the ingress cert-manager annotation (acme) fills. #}
+{% set pages_tls_secret = dsc.gitlab.pages.tlsSecretName | default((dsc.ingress.tls.tlsSecret.name if dsc.ingress.tls.type == 'tlsSecret' else 'gitlab-pages'), true) %}
+global:
+  hosts:
+    pages:
+      name: "{{ dsc.gitlab.pages.domain | mandatory('gitlab.pages.enabled requires gitlab.pages.domain') }}"
+  pages:
+    enabled: true
+    # Behind the ingress controller (externalHttp/externalHttps are lists of external IPs: left empty).
+    https: {{ (dsc.ingress.tls.type != 'none') | lower }}
+    objectStore:
+      enabled: true
+{% if dsc.gitlab.s3ObjectStorage.enabled | default(false) %}
+      bucket: "{{ dsc.gitlab.s3ObjectStorage.bucketPrefix }}-pages"
+      connection:
+        secret: gitlab-object-storage
+        key: connection
+{% endif %}
+gitlab:
+  gitlab-pages:
+    image:
+      repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.gitlab}>/gitlab-org/build/cng/gitlab-pages"
+    # Same as gitlab-shell/gitaly (10-init-security-context.j2): pin the init container UID
+    init:
+      containerSecurityContext:
+        runAsUser: 1000
+{% if dsc.ingress.tls.type != 'none' %}
+    ingress:
+      tls:
+        secretName: {{ pages_tls_secret }}
+{% endif %}
+{% if dsc.global.metrics.enabled %}
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+{% if dsc.global.metrics.additionalLabels is defined %}
+        additionalLabels:
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+          {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endif %}

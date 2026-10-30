@@ -1,10 +1,16 @@
 {% if dsc.global.backup.velero.enabled | default(false) %}
+{% set velero_retention = dsc.global.backup.velero.retentionPolicy | default('14d') %}
 {% set argocd_release = dsc.global.gitOps.envName ~ '-' ~ dsc.argocd.namespace %}
 dso-backup:
   global:
     appName: argocd
   velero:
+{% if dsc.velero.installEnabled | default(false) %}
+    namespace: {{ dsc.velero.namespace }}
+    storageLocation: {{ dsc.velero.storageLocationName | default('default') }}
+{% endif %}
     backupNamePrefix: socle
+    ttl: {{ ((velero_retention[:-1] | int) * 24 ~ 'h' if velero_retention.endswith('d') else velero_retention) | quote }}
   application:
     workloads:
       - type: deployment

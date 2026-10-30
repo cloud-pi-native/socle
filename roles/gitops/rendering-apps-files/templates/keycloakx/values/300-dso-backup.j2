@@ -1,11 +1,17 @@
 {% if dsc.global.backup.velero.enabled | default(false) %}
+{% set velero_retention = dsc.global.backup.velero.retentionPolicy | default('14d') %}
 dso-backup:
   enabled: false
   global:
     appName: keycloakx
   strategy: cnpg
   velero:
+{% if dsc.velero.installEnabled | default(false) %}
+    namespace: {{ dsc.velero.namespace }}
+    storageLocation: {{ dsc.velero.storageLocationName | default('default') }}
+{% endif %}
     backupNamePrefix: socle
+    ttl: {{ ((velero_retention[:-1] | int) * 24 ~ 'h' if velero_retention.endswith('d') else velero_retention) | quote }}
   cnpg:
     clusterName: pg-cluster-keycloak
   application:

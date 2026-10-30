@@ -338,7 +338,10 @@ spec:
                     - installEnabled
                   type: object
                 velero:
-                  description: Configuration for the Velero server used by dso-backup.
+                  description: |
+                    Velero backup server (controller, CRDs, optional node agent).
+                    Separate from dsc.global.backup.velero.enabled, which only enables the
+                    per-app dso-backup dependency: enable both for an end-to-end backup pipeline.
                   properties:
                     installEnabled:
                       default: false
@@ -929,11 +932,18 @@ spec:
                               type: object
                           type: object
                         velero:
+                          description: |
+                            Enables the per-app dso-backup Helm dependency.
+                            Does not deploy the Velero server itself: see dsc.velero.installEnabled.
                           properties:
                             enabled:
                               description: Enable Velero backups.
                               default: false
                               type: boolean
+                            retentionPolicy:
+                              description: Retention of the Velero backups (Backup TTL of the per-app dso-backup CronJobs). Same format as the other backups; a value in days is converted to hours for Velero.
+                              type: string
+                              default: "14d"
                           type: object
                         vault:
                           properties:

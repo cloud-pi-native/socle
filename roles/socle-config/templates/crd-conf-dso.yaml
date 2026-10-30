@@ -507,6 +507,33 @@ spec:
                       description: Size for Gitaly persistent volume.
                       type: string
                       default: 50Gi
+                    s3ObjectStorage:
+                      description: |
+                        External S3-compatible object storage for GitLab non-Git data (artifacts, LFS, uploads,
+                        packages, external diffs, terraform state, CI secure files, dependency proxy).
+                        Replaces the bundled MinIO. Gitaly (Git repositories) stays on persistent volume.
+                        Buckets must be created beforehand, without lifecycle rules. Access and secret keys are
+                        read from Vault (app gitlab, keys gitlab.s3ObjectStorage.accesskey/secretkey).
+                        No data migration from MinIO is performed.
+                      type: object
+                      properties:
+                        enabled:
+                          description: Specifies whether GitLab uses the external S3 object storage instead of the bundled MinIO.
+                          default: false
+                          type: boolean
+                        bucketPrefix:
+                          description: Prefix of the bucket names. Each bucket is named <bucketPrefix>-<type> (e.g. <bucketPrefix>-artifacts).
+                          type: string
+                        region:
+                          description: S3 region (e.g. eu-west-1).
+                          type: string
+                        endpoint:
+                          description: Full S3 endpoint URL, including the scheme (e.g. https://s3.eu-west-1.example.com).
+                          type: string
+                        pathStyle:
+                          description: Use path-style bucket addressing instead of virtual-host style.
+                          default: true
+                          type: boolean
                     values:
                       description: |
                         You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/

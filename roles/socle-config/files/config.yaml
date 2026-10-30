@@ -61,6 +61,9 @@ spec:
       revision: main
     insecureCI: false
     pvcGitalySize: 50Gi
+    s3ObjectStorage:
+      enabled: false
+      pathStyle: true
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
     values: {}

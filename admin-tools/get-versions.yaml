@@ -11,6 +11,7 @@
           - "(Can also be retrieved with the --list-tags option on ansible-playbook run) :"
           - ""
           - "cert-manager"
+          - "velero"
           - "kyverno"
           - "cnpg (or cloudNativePG)"
           - "keycloak"
@@ -153,6 +154,49 @@
             msg:
               - "Version de cert-manager : {{ cert_manager_infos.status.app_version }}"
               - "Version de chart Helm cert-manager : {{ cert_manager_infos.status.chart }}"
+
+    - name: Get Velero app and chart versions
+      tags:
+        - velero
+      block:
+        - name: Get Velero namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.velero.namespace }}"
+          register: velero_ns
+
+        - name: Warning message
+          when: velero_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Le namespace {{ dsc.velero.namespace }} n'existe pas."
+              - "Cela signifie que Velero est probablement installé dans un namespace indépendant du Socle, ou pas installé du tout."
+
+        - name: Retrieve Velero infos
+          when: velero_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: velero
+            namespace: "{{ dsc.velero.namespace }}"
+          register: velero_infos
+
+        - name: Warning message
+          when: >
+            velero_ns.resources | length > 0 and
+            velero_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Velero n'est pas installé en tant que chart Helm dans le namespace {{ dsc.velero.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
+        - name: Display Velero version
+          when: >
+            velero_ns.resources | length > 0 and
+            velero_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version de Velero : {{ velero_infos.status.app_version }}"
+              - "Version de chart Helm Velero : {{ velero_infos.status.chart }}"
 
     - name: Get Kyverno app and chart versions
       tags:

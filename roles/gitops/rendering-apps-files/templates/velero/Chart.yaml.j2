@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: velero
+type: application
+version: {{ dsc.velero.chartVersion }}
+dependencies:
+- name: velero
+  alias: velero
+  version: {{ dsc.velero.chartVersion }}
+  repository: {{ dsc.velero.helmRepoUrl }}

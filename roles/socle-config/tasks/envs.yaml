@@ -94,6 +94,11 @@
             nameSpace: "certmanager"
             customNamespacePrefix: ""
             syncWave: 10
+          - argocd_app: velero
+            clusterName: ""
+            nameSpace: "backup"
+            customNamespacePrefix: ""
+            syncWave: 10
           - argocd_app: kyverno
             clusterName: ""
             nameSpace: "kyverno"

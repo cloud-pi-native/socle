@@ -337,6 +337,99 @@ spec:
                   required:
                     - installEnabled
                   type: object
+                velero:
+                  description: |
+                    Velero backup server (controller, CRDs, optional node agent).
+                    Separate from dsc.global.backup.velero.enabled, which only enables the
+                    per-app dso-backup dependency: enable both for an end-to-end backup pipeline.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether the platform installs the Velero server. When false, an existing Velero is expected.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Velero (also used by dso-backup for Backup and Schedule objects).
+                      default: dso-backup
+                      type: string
+                    helmRepoUrl:
+                      description: Velero helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Velero helm chart version.
+                      type: string
+                    forcedInstall:
+                      description: |
+                        If set to true, Velero will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                      default: false
+                      type: boolean
+                    provider:
+                      description: Velero object storage plugin provider (S3-compatible storage uses "aws").
+                      default: aws
+                      type: string
+                    pluginImage:
+                      description: Image of the Velero object storage plugin, run as an init container.
+                      type: string
+                    region:
+                      description: Region of the S3 bucket. Required when installEnabled is true.
+                      type: string
+                    s3ForcePathStyle:
+                      description: Use path-style S3 URLs, required by most S3-compatible storages.
+                      default: true
+                      type: boolean
+                    storageLocationName:
+                      description: Name of the default BackupStorageLocation.
+                      default: default
+                      type: string
+                    pathPrefix:
+                      description: Prefix inside the bucket under which Velero stores its data.
+                      default: velero
+                      type: string
+                    nodeAgent:
+                      description: Node agent (file system backup of volumes).
+                      properties:
+                        enabled:
+                          default: false
+                          description: Deploy the node agent DaemonSet. Required for file system backups of volumes.
+                          type: boolean
+                      type: object
+                    volumeSnapshots:
+                      description: |
+                        Back up PersistentVolumeClaims with CSI snapshots (Velero built-in CSI plugin).
+                        Works at PVC level, without running pods and without the node agent. Sets
+                        snapshotVolumes=true and defaultVolumesToFsBackup=false on the per-app dso-backup
+                        Backups, and creates a dedicated VolumeSnapshotClass labelled for Velero.
+                        Requires a CSI driver with snapshot support and a snapshot controller.
+                      properties:
+                        enabled:
+                          description: Enable CSI snapshots for PVC backups.
+                          default: false
+                          type: boolean
+                        driver:
+                          description: CSI driver of the VolumeSnapshotClass (must match the StorageClass provisioner). Required when createClass is true.
+                          default: ""
+                          type: string
+                        createClass:
+                          description: |
+                            Create the dedicated VolumeSnapshotClass. Set to false to reuse an existing class,
+                            which must then carry the label velero.io/csi-volumesnapshot-class=true:
+                            Velero accepts a single labelled class per driver.
+                          default: true
+                          type: boolean
+                        className:
+                          description: Name of the VolumeSnapshotClass created for Velero (ignored when createClass is false).
+                          default: velero-csi-snapshot
+                          type: string
+                      type: object
+                    values:
+                      description: |
+                        Custom values for the Velero chart, merged with roles/gitops/rendering-apps-files/templates/velero/values/
+                        https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 cloudnativepg:
                   description: Configuration for CloudNativePG.
                   type: object
@@ -867,11 +960,18 @@ spec:
                               type: object
                           type: object
                         velero:
+                          description: |
+                            Enables the per-app dso-backup Helm dependency.
+                            Does not deploy the Velero server itself: see dsc.velero.installEnabled.
                           properties:
                             enabled:
                               description: Enable Velero backups.
                               default: false
                               type: boolean
+                            retentionPolicy:
+                              description: Retention of the Velero backups (Backup TTL of the per-app dso-backup CronJobs). Same format as the other backups; a value in days is converted to hours for Velero.
+                              type: string
+                              default: "14d"
                           type: object
                         vault:
                           properties:

@@ -34,3 +34,49 @@
             dsc.certmanager.forcedInstall is truthy
         fail_msg: " Certmanager is already installed in your cluster"
       ignore_errors: true
+
+- name: Validate Velero is first install
+  when: dsc.velero.installEnabled
+  block:
+    - name: Get cluster infos
+      kubernetes.core.k8s_cluster_info:
+      register: velero_cluster_infos
+
+    - name: Check if velero.io api exists
+      ansible.builtin.set_fact:
+        velero_api: "{{ velero_cluster_infos.apis['velero.io/v1'] | default('absent') }}"
+
+    - name: Check if a velero deployment already exists cluster-wide
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        label_selectors:
+          - "app.kubernetes.io/name=velero"
+      register: velero_deployments
+
+    - name: Check if Velero is absent
+      ansible.builtin.assert:
+        that:
+          - >
+            velero_api == 'absent' or
+            velero_deployments.resources | length == 0 or
+            dsc.velero.forcedInstall is truthy
+        fail_msg: >-
+          Velero is already installed in your cluster (possibly in another namespace):
+          a second instance would compete for the same Backup, Restore and Schedule
+          resources. Set dsc.velero.forcedInstall to true only if this is intentional.
+      ignore_errors: true
+
+    - name: Check the S3 region is set
+      ansible.builtin.assert:
+        that:
+          - dsc.velero.region | default('') | length > 0
+        fail_msg: "dsc.velero.region must be set when dsc.velero.installEnabled is true"
+
+    - name: Check the CSI driver is set when the VolumeSnapshotClass is created
+      ansible.builtin.assert:
+        that:
+          - dsc.velero.volumeSnapshots.driver | default('') | length > 0
+        fail_msg: "dsc.velero.volumeSnapshots.driver must be set (CSI driver of the StorageClass) to create the VolumeSnapshotClass"
+      when:
+        - dsc.velero.volumeSnapshots.enabled | default(false)
+        - dsc.velero.volumeSnapshots.createClass | default(true)

@@ -106,6 +106,25 @@
         - never
         - cert-manager
 
+    - name: Suppression de Velero
+      kubernetes.core.helm:
+        name: velero
+        release_namespace: "{{ dsc.velero.namespace }}"
+        state: absent
+        wait: true
+      tags:
+        - never
+        - velero
+
+    - name: "Suppression du namespace Velero"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.velero.namespace }}"
+      tags:
+        - never
+        - velero
+
     - name: "Suppression de l'instance CloudNativePG"
       kubernetes.core.helm:
         name: cloudnative-pg

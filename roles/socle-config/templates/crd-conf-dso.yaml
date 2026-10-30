@@ -337,6 +337,68 @@ spec:
                   required:
                     - installEnabled
                   type: object
+                velero:
+                  description: Configuration for the Velero server used by dso-backup.
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether the platform installs the Velero server. When false, an existing Velero is expected.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Velero (also used by dso-backup for Backup and Schedule objects).
+                      default: dso-backup
+                      type: string
+                    helmRepoUrl:
+                      description: Velero helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Velero helm chart version.
+                      type: string
+                    forcedInstall:
+                      description: |
+                        If set to true, Velero will be installed (or reinstalled) in the
+                        desired namespace regardless of its existing state.
+                      default: false
+                      type: boolean
+                    provider:
+                      description: Velero object storage plugin provider (S3-compatible storage uses "aws").
+                      default: aws
+                      type: string
+                    pluginImage:
+                      description: Image of the Velero object storage plugin, run as an init container.
+                      type: string
+                    region:
+                      description: Region of the S3 bucket. Required when installEnabled is true.
+                      type: string
+                    s3ForcePathStyle:
+                      description: Use path-style S3 URLs, required by most S3-compatible storages.
+                      default: true
+                      type: boolean
+                    storageLocationName:
+                      description: Name of the default BackupStorageLocation.
+                      default: default
+                      type: string
+                    pathPrefix:
+                      description: Prefix inside the bucket under which Velero stores its data.
+                      default: velero
+                      type: string
+                    nodeAgent:
+                      description: Node agent (file system backup of volumes).
+                      properties:
+                        enabled:
+                          default: false
+                          description: Deploy the node agent DaemonSet. Required for file system backups of volumes.
+                          type: boolean
+                      type: object
+                    values:
+                      description: |
+                        Custom values for the Velero chart, merged with roles/gitops/rendering-apps-files/templates/velero/values/
+                        https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 cloudnativepg:
                   description: Configuration for CloudNativePG.
                   type: object

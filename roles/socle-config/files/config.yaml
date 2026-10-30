@@ -33,6 +33,20 @@ spec:
     namespace: cert-manager
     forcedInstall: false
     values: {}
+  velero:
+    installEnabled: false
+    namespace: dso-backup
+    helmRepoUrl: https://vmware-tanzu.github.io/helm-charts
+    forcedInstall: false
+    provider: aws
+    pluginImage: "velero/velero-plugin-for-aws:v1.13.1"
+    region: ""
+    s3ForcePathStyle: true
+    storageLocationName: default
+    pathPrefix: velero
+    nodeAgent:
+      enabled: false
+    values: {}
   cloudnativepg:
     installEnabled: true
     namespace: dso-cloudnativepg

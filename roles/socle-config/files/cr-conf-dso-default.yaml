@@ -61,6 +61,7 @@ spec:
     projectName: default
   awx: {}
   certmanager: {}
+  velero: {}
   cloudnativepg: {}
   console: {}
   cpnAnsibleJob: {}

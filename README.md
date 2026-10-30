@@ -812,7 +812,7 @@ sonarqube:
       registry: docker.io
       repository: sonarqube
       edition: community
-      tag: 10.8.1-{{ .Values.edition }}
+      tag: 25.12.0-{{ .Values.edition }}
 ```
 
 #### Vault

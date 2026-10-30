@@ -82,7 +82,7 @@ spec:
     observabilityPluginVersion: "v1.2.1"
   sonarqube:
     # https://artifacthub.io/packages/helm/sonarqube/sonarqube
-    chartVersion: 10.8.1
+    chartVersion: 2025.6.0
   vault:
     # https://artifacthub.io/packages/helm/hashicorp/vault
     chartVersion: 0.34.1

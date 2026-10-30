@@ -189,6 +189,11 @@ Cette commande va créer l'`applicationSet` `<envName>-dso-install-manager` dans
 
 Si le paramètre `global.gitOps.watchpointEnabled` est désactivé, l'`applicationSet` `<envName>-dso-install-manager` sera automatiquement créée, vous pouvez lancer la synchronisation manuellement sur l'Argo CD d'infrastructure.
 
+Si `certmanager.installEnabled` est à `true`, cert-manager est déployé par l'application Argo CD `certmanager` :
+
+- Les CRD sont posées par le rôle `cert-manager-crds`, exécuté par `ansible-playbook install-gitops.yaml` : relancer `-t cert-manager-crds` après un changement de `certmanager.chartVersion`.
+- Ne pas lancer le tag `cert-manager` : le rôle `cert-manager` échoue dans ce cas, car sa release Helm et l'application Argo CD n'ont pas les mêmes labels de sélecteur.
+
 ### 11. Acceptation des conditions de service
 
 Une fois la plateforme Cloud Pi Native installée, vous devez accepter les conditions de service de certains outils de la plateforme. Pour le moment, il ne s'agit que de l'outil Nexus.

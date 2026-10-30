@@ -27,6 +27,12 @@
         - prom
       when: dsc.prometheus.crd.type == 'managed'
 
+    - role: cert-manager-crds
+      tags:
+        - cert-manager-crds
+        - cm-crds
+      when: dsc.certmanager.installEnabled
+
     - role: kyverno
       tags:
         - kyverno

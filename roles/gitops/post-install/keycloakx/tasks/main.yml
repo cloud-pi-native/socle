@@ -238,15 +238,21 @@
     otp_policy_algorithm: "HmacSHA1"
     reset_password_allowed: true
     action_token_generated_by_user_lifespan: 900
-    smtp_server:
-      host: "{{ (dsc.global.smtp | default({})).host | default(omit) }}"
-      port: "{{ (dsc.global.smtp | default({})).port | default(omit) }}"
-      from: "{{ (dsc.global.smtp | default({})).from | default(omit) }}"
-      user: "{{ retrieved_smtp_user | default(omit, true) }}"
-      password: "{{ retrieved_smtp_user_password | default(omit, true) }}"
-      auth: "{{ dsc.global.smtp.authentication.enabled }}"
-      starttls: "{{ dsc.global.smtp.starttlsEnabled }}"
-      ssl: "{{ dsc.global.smtp.sslEnabled }}"
+    # Keycloak >= 26.6 validates the sender address of any stored smtpServer: send an empty one when SMTP is disabled
+    # (omitting it keeps the partial smtpServer saved by older versions, which the module sends back).
+    smtp_server: >-
+      {{
+        {
+          'host': (dsc.global.smtp | default({})).host | default(omit),
+          'port': (dsc.global.smtp | default({})).port | default(omit),
+          'from': (dsc.global.smtp | default({})).from | default(omit),
+          'user': retrieved_smtp_user | default(omit, true),
+          'password': retrieved_smtp_user_password | default(omit, true),
+          'auth': dsc.global.smtp.authentication.enabled,
+          'starttls': dsc.global.smtp.starttlsEnabled,
+          'ssl': dsc.global.smtp.sslEnabled
+        } if (dsc.global.smtp.enabled | default(false)) else {}
+      }}
 
 - name: Create base admins groups
   community.general.keycloak_group:

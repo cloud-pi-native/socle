@@ -1,0 +1,47 @@
+{% if (dsc.keycloakx.publicIngress | default({})).enabled | default(false) %}
+{# Second Ingress "keycloakx-public", same host, TLS Secret, labels and annotations as the chart Ingress, on its own
+   IngressClass (a second controller behind a public load balancer). Only the OIDC paths of the application realm are
+   routed: admin console, management realm, account console and everything else get the controller default backend.
+   The cert-manager.io/* annotations are dropped: the chart Ingress already owns the Certificate and its Secret, a
+   second owner of the same Secret would make the two fight. Disabled by default (keycloakx.publicIngress.enabled). #}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloakx-public
+  namespace: {{ dsc.keycloakx.namespace }}
+  annotations:
+{% for key, val in dsc.ingress.annotations.items() %}
+{% if not key.startswith('cert-manager.io/') %}
+    {{ key }}: "{{ val }}"
+{% endif %}
+{% endfor %}
+    route.openshift.io/termination: "edge"
+  labels:
+    app: "keycloakx"
+{% for key, val in dsc.ingress.labels.items() %}
+    {{ key }}: "{{ val }}"
+{% endfor %}
+spec:
+  ingressClassName: {{ (dsc.keycloakx.publicIngress | default({})).className | default('nginx-public') }}
+  rules:
+    - host: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+      http:
+        paths:
+{% for p in ['/realms/' ~ dsc.keycloakx.applicationRealm ~ '/protocol/openid-connect/',
+             '/realms/' ~ dsc.keycloakx.applicationRealm ~ '/login-actions/',
+             '/realms/' ~ dsc.keycloakx.applicationRealm ~ '/.well-known/',
+             '/realms/' ~ dsc.keycloakx.applicationRealm ~ '/device',
+             '/resources/'] %}
+          - path: {{ p }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ dsc.keycloakx.subDomain }}-http
+                port:
+                  name: http
+{% endfor %}
+  tls:
+    - hosts:
+        - <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>
+      secretName: "{{ dsc.ingress.tls.tlsSecret.name if dsc.ingress.tls.type == 'tlsSecret' else '<path:' ~ vaultinfra_kv_name ~ '/data/env/' ~ dsc_name ~ '/apps/global/values#domain | jsonPath {.keycloakx}>-tls' }}"
+{% endif %}

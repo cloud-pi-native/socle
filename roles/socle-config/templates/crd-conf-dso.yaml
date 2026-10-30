@@ -1448,6 +1448,23 @@ spec:
                         Create the "portail-client" client in the application realm (external portal, not deployed by the socle).
                         Its redirectUris and webOrigins are "*": restrict them before enabling it.
                       type: boolean
+                    publicIngress:
+                      description: |
+                        Second Ingress "keycloakx-public" for an Internet-facing Keycloak on the same URL (split-horizon DNS).
+                        Same host, TLS Secret, labels and annotations (minus cert-manager.io/*) as the chart Ingress, on its own
+                        IngressClass. Only the OIDC paths of the application realm are routed (protocol/openid-connect, login-actions,
+                        .well-known, device, /resources); admin, management realm and account console are not.
+                      type: object
+                      default: {}
+                      properties:
+                        enabled:
+                          default: false
+                          description: Specifies whether the public Ingress is created.
+                          type: boolean
+                        className:
+                          default: nginx-public
+                          description: IngressClass of the controller exposed publicly.
+                          type: string
                     ansibleJobEnabled:
                       description: Specifies whether the post-install Ansible job (realm/users config) is enabled.
                       type: boolean

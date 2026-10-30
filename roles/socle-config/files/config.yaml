@@ -159,6 +159,10 @@ spec:
     applicationRealm: dso
     usersGitOpsEnabled: false
     portailClientEnabled: false
+    # Ingress "keycloakx-public" (OIDC paths of the application realm only) on a dedicated IngressClass.
+    publicIngress:
+      enabled: false
+      className: nginx-public
     replicas: 3
     ansibleJobEnabled: true
     values: {}

@@ -168,6 +168,7 @@ Afin d'apporter les informations d'authentification nécessaires pour les connex
 
 - `dso-<envName>/env/conf-dso/apps/global/values`
 - `dso-<envName>/env/conf-dso/apps/harbor/values`
+- `dso-<envName>/env/conf-dso/apps/gitlab/values` (seulement si `gitlab.s3ObjectStorage.enabled` vaut `true`, voir [GitLab sur stockage objet S3 externe](docs/gitlab.md#gitlab-sur-stockage-objet-s3-externe))
 
 Afin de vous faciliter cette étape, nous proposons le playbook `credentials-to-vault.yaml` situé dans le répertoire `admin-tools`.
 
@@ -384,6 +385,10 @@ spec:
         method: in-namespace
         name: wildcard-tls
 ```
+
+### GitLab
+
+Options GitLab de la `dsc` (stockage objet S3 externe, Pages, user namespaces du runner) : voir [docs/gitlab.md](docs/gitlab.md).
 
 ## Désinstallation
 

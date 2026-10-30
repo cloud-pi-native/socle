@@ -35,7 +35,7 @@ harbor:
   redis:
     internal:
       image:
-        repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/goharbor/redis-photon"
+        repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/goharbor/{{ 'valkey-photon' if dsc.harbor.chartVersion | string is version('1.19.0', '>=') else 'redis-photon' }}"
   
   exporter:
     image:

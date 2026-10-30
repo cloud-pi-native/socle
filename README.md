@@ -679,12 +679,13 @@ Les différents tags utilisables sont disponibles ici :
 - notary (server) : <https://hub.docker.com/r/goharbor/notary-server-photon/tags>
 - notary (signer) : <https://hub.docker.com/r/goharbor/notary-signer-photon/tags>
 - database : <https://hub.docker.com/r/goharbor/harbor-db/tags>
-- redis : <https://hub.docker.com/r/goharbor/redis-photon/tags>
+- redis (chart < 1.19) : <https://hub.docker.com/r/goharbor/redis-photon/tags>
+- valkey (chart >= 1.19, remplace redis) : <https://hub.docker.com/r/goharbor/valkey-photon/tags>
 - exporter : <https://hub.docker.com/r/goharbor/harbor-exporter/tags>
 
 **Rappel** : Il est néanmoins recommandé de positionner des tags d'images en adéquation avec la version du chart Helm utilisée et documentée dans le fichier [versions.md](versions.md), situé à la racine du socle, c'est-à-dire d'utiliser le numéro `APP VERSION` retourné par la commande `helm search repo -l harbor/harbor --version numero-de-version-de-chart`.
 
-Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.14.1 du chart :
+Pour spécifier nos tags, il nous suffira d'éditer la ressource `dsc` de configuration (par défaut, ce sera la `dsc` nommée `conf-dso`) et de surcharger les "values" correspondantes du chart Helm, en ajoutant celles dont nous avons besoin. Exemple, pour la version 1.19.4 du chart :
 
 ```yaml
 harbor:
@@ -694,55 +695,55 @@ harbor:
     nginx:
       image:
         repository: docker.io/goharbor/nginx-photon
-        tag: v2.10.1
+        tag: v2.15.4
     portal:
       image:
         repository: docker.io/goharbor/harbor-portal
-        tag: v2.10.1
+        tag: v2.15.4
     core:
       image:
         repository: docker.io/goharbor/harbor-core
-        tag: v2.10.1
+        tag: v2.15.4
     jobservice:
       image:
         repository: docker.io/goharbor/harbor-jobservice
-        tag: v2.10.1
+        tag: v2.15.4
     registry:
       registry:
         image:
           repository: docker.io/goharbor/registry-photon
-          tag: v2.10.1
+          tag: v2.15.4
       controller:
         image:
           repository: docker.io/goharbor/harbor-registryctl
-          tag: v2.10.1
+          tag: v2.15.4
     trivy:
       image:
         repository: docker.io/goharbor/trivy-adapter-photon
-        tag: v2.10.1
+        tag: v2.15.4
     notary:
       server:
         image:
           repository: docker.io/goharbor/notary-server-photon
-          tag: v2.10.1
+          tag: v2.15.4
       signer:
         image:
           repository: docker.io/goharbor/notary-signer-photon
-          tag: v2.10.1
+          tag: v2.15.4
     database:
       internal:
         image:
           repository: docker.io/goharbor/harbor-db
-          tag: v2.10.1
+          tag: v2.15.4
     redis:
       internal:
         image:
-          repository: docker.io/goharbor/redis-photon
-          tag: v2.10.1
+          repository: docker.io/goharbor/valkey-photon
+          tag: v2.15.4
     exporter:
       image:
         repository: docker.io/goharbor/harbor-exporter
-        tag: v2.10.1
+        tag: v2.15.4
 ```
 
 Pour mémoire, les values utilisables sont disponibles et documentées ici : <https://github.com/goharbor/harbor-helm/tree/master>

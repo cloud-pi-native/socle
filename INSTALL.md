@@ -280,7 +280,7 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [Argo CD](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd)
 - [Console Cloud π Native](https://github.com/cloud-pi-native/console#readme)
 - [GitLab](https://gitlab.com/gitlab-org/charts/gitlab)
-- [Harbor](https://github.com/goharbor/harbor-helm)
+- [Harbor](https://github.com/goharbor/harbor-helm) (options du socle : [docs/harbor.md](docs/harbor.md))
 - [Keycloak](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)
 - [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)

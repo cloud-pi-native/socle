@@ -282,7 +282,7 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [GitLab](https://gitlab.com/gitlab-org/charts/gitlab)
 - [Harbor](https://github.com/goharbor/harbor-helm)
 - [Keycloak](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)
-- [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
+- [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube) (options du socle : [docs/sonarqube.md](docs/sonarqube.md))
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
 
 S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.

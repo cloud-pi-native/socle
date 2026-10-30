@@ -1,0 +1,12 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/gitlab-family-netpol.j2' as gf with context %}
+{% if gf.companion_active('glexporter') %}
+{# Companion of gitlab in its namespace: the namespace-wide policies come from gitlab, this template only adds
+   the glexporter authorizations. glexporter-redis is covered by the intra-namespace policy of gitlab (the native
+   NetworkPolicy of the bitnami redis subchart, open to the whole cluster, is disabled in the glexporter values).
+   glexporter egress (webservice 8181, its redis 6379) stays inside the namespace, which is not
+   egress-isolated. #}
+{% if gf.scrape_on() %}
+{{ np.scrape('glexporter', {'app.kubernetes.io/name': 'glexporter'}, [8080]) }}
+{% endif %}
+{% endif %}

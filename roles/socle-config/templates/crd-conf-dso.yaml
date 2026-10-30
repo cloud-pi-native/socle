@@ -802,6 +802,58 @@ spec:
                       required:
                         - enabled
                       type: object
+                    networkpolicies:
+                      description: Configuration for the NetworkPolicies of the platform applications (requires Cilium).
+                      properties:
+                        enabled:
+                          default: false
+                          description: >-
+                            Specifies whether the NetworkPolicies should be rendered. Requires global.platform: kubernetes.
+                            Never adds the cluster-wide default deny (see clusterDefaultDeny).
+                          type: boolean
+                        ingressNamespaces:
+                          default:
+                            - ingress-nginx
+                          description: >-
+                            Namespaces of the ingress controller, allowed to reach the exposed applications.
+                            The controller pods must carry the label app.kubernetes.io/name=ingress-nginx.
+                          items:
+                            type: string
+                          type: array
+                        clusterDefaultDeny:
+                          default: false
+                          description: >-
+                            Adds a cluster-wide default deny (CiliumClusterwideNetworkPolicy) when enabled is true.
+                            Last activation step: every namespace whose flows are not covered must be listed in excludedNamespaces.
+                          type: boolean
+                        excludedNamespaces:
+                          default:
+                            - kube-system
+                          description: >-
+                            Namespaces excluded from the cluster-wide default deny. kube-system and ingressNamespaces
+                            are always excluded.
+                          items:
+                            type: string
+                          type: array
+                        cnpgOperatorNamespace:
+                          default: ''
+                          description: >-
+                            Namespace of the CloudNativePG operator when it runs outside this DSC.
+                            Empty: the namespace of dsc.cloudnativepg.
+                          type: string
+                        scrapeNamespace:
+                          default: ''
+                          description: >-
+                            Namespace of the metrics scraper, used as the peer of the scrape policies.
+                            Required when global.metrics.enabled and networkpolicies.enabled are both true.
+                          type: string
+                        scrapePodLabels:
+                          description: >-
+                            Pod labels restricting the scraper peer within scrapeNamespace.
+                            Empty: every pod of that namespace.
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                      type: object
                     alerting:
                       description: Configuration for alerting feature.
                       properties:

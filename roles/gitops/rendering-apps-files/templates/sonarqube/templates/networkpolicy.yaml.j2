@@ -1,0 +1,30 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.active('sonarqube') %}
+{# SonarQube. Ingress-only: the namespace egress cannot be listed (plugin downloads, OIDC issuer on the public
+   Keycloak domain, prometheus javaagent download, update center, HTTP proxy, Barman backups of pg-cluster-sonar
+   to S3), so no DNS policy and no Egress side.
+   Ingress sources (app=sonar): ingress controller to http 9000, console to 9000, GitLab CI jobs to 9000 (the
+   runner spawns them in the gitlab namespace, any pod of it is allowed), CNPG operator to the pg-cluster-sonar
+   status port 8000, metrics scraper to http 9000 (/api/monitoring/metrics), monitoring-web 8000, monitoring-ce
+   8001 and the pg-cluster-sonar metrics port 9187. 8000 / 9187 on the CNPG cluster are the ports of the CNPG
+   chart pg-cluster-* in general.
+   The CNPG operator peer is np.cnpg_operator_peer (local namespace, else global.networkpolicies.cnpgOperatorNamespace,
+   else any namespace with the operator pod labels); the scrape rule follows np.scrape_on; ACME HTTP-01 solver pods
+   are opened by np.acme_solver. #}
+{% set app = 'sonarqube' %}
+{% set sonar = {'app': 'sonar'} %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller(app, sonar, [9000]) }}
+{% if gate.installed('console') %}
+{{ np.from_namespaces(app, 'console', sonar, [{'namespace': np.ns('console'), 'selector': {}}], [9000]) }}
+{% endif %}
+{% if gate.installed('gitlabrunner') %}
+{{ np.from_namespaces(app, 'ci-jobs', sonar, [{'namespace': np.ns('gitlab'), 'selector': {}}], [9000]) }}
+{% endif %}
+{{ np.from_namespaces(app, 'cnpg-operator', {'cnpg.io/cluster': 'pg-cluster-sonar'}, [np.cnpg_operator_peer() | from_json], [8000]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [9000, 8000, 8001, 9187]) }}
+{% endif %}
+{% endif %}

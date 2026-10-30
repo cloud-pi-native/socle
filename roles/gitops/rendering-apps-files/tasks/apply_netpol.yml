@@ -1,0 +1,79 @@
+---
+# Render, apply and prune the NetworkPolicies of a role OUTSIDE rendering-apps-files (direct, non GitOps roles).
+# Run through include_role, so the template can import _common/ (see render_netpol_to_fact.yml).
+# Not used by the GitOps rendering (tasks/main.yml does not include it): existing behavior is unchanged.
+#
+# Inputs:
+#   netpol_template   ABSOLUTE path of the role template (set it as a fact in the caller first: include_role vars
+#                     are evaluated lazily inside this role, where role_path is the rendering-apps-files one);
+#   netpol_namespace  namespace of the component (the macros emit no metadata.namespace);
+#   netpol_app        app name given to np.labels in the template (label cloud-pi-native.fr/netpol-app);
+#   netpol_enabled    flag / skip expression of the caller, usually
+#                     "{{ dsc.global.networkpolicies.enabled | default(false) | bool }}".
+# The template reads dsc, dsc_name (and envs when it calls np.ns): socle-config must have run.
+#
+# Behavior: netpol_enabled true => apply the rendered policies (none when the template gate is closed), then delete
+# the policies of this app that are no longer rendered; netpol_enabled false => delete every policy of this app
+# (explicit rollback). Lookup and pruning select by the np.labels selectors and compare (kind, name). The
+# CiliumNetworkPolicy kind is looked up as well; k8s_info reports api_found false without its CRD.
+#
+# Call from the role:
+#   - name: Set networkpolicy template path
+#     ansible.builtin.set_fact:
+#       <prefix>_netpol_template: "{{ role_path }}/templates/networkpolicy.yaml.j2"
+#   - name: Apply networkpolicy
+#     ansible.builtin.include_role:
+#       name: gitops/rendering-apps-files
+#       tasks_from: apply_netpol.yml
+#     vars:
+#       netpol_template: "{{ <prefix>_netpol_template }}"
+#       netpol_namespace: "{{ dsc.<component>.namespace }}"
+#       netpol_app: <app>
+#       netpol_enabled: "{{ dsc.global.networkpolicies.enabled | default(false) | bool }}"
+- name: Render networkpolicy
+  ansible.builtin.include_tasks: render_netpol_to_fact.yml
+  vars:
+    netpol_fact: netpol_rendered
+
+- name: Compute networkpolicy documents and selectors
+  ansible.builtin.set_fact:
+    netpol_docs: "{{ netpol_rendered | from_yaml_all | select | list }}"
+    netpol_selectors: "{{ lookup('ansible.builtin.template', role_path ~ '/templates/_common/networkpolicy-label-selectors.j2') | from_yaml }}"
+
+# kind/name of the rendered policies: what pruning keeps (empty when netpol_enabled is false or the gate is closed).
+- name: Compute networkpolicy keep list
+  ansible.builtin.set_fact:
+    netpol_keep: "{{ (netpol_docs | map(attribute='kind') | zip(netpol_docs | map(attribute='metadata.name')) | map('join', '/') | list) if (netpol_enabled | bool) else [] }}"
+
+- name: Apply networkpolicy
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    namespace: "{{ netpol_namespace }}"
+    definition: "{{ netpol_docs }}"
+  when:
+    - netpol_enabled | bool
+    - netpol_docs | length > 0
+
+- name: Find networkpolicy
+  kubernetes.core.k8s_info:
+    api_version: "{{ item.api_version }}"
+    kind: "{{ item.kind }}"
+    namespace: "{{ netpol_namespace }}"
+    label_selectors: "{{ netpol_selectors }}"
+  loop:
+    - {api_version: networking.k8s.io/v1, kind: NetworkPolicy}
+    - {api_version: cilium.io/v2, kind: CiliumNetworkPolicy}
+  register: netpol_found
+
+- name: Remove networkpolicy
+  kubernetes.core.k8s:
+    state: absent
+    api_version: "{{ item.apiVersion }}"
+    kind: "{{ item.kind }}"
+    namespace: "{{ netpol_namespace }}"
+    name: "{{ item.metadata.name }}"
+  loop: "{{ netpol_found.results | map(attribute='resources', default=[]) | flatten }}"
+  loop_control:
+    label: "{{ item.kind }}/{{ item.metadata.name }}"
+  when: not (netpol_enabled | bool) or (item.kind ~ '/' ~ item.metadata.name) not in netpol_keep

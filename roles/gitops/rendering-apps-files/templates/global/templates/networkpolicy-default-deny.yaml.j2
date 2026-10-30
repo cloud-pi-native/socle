@@ -1,0 +1,31 @@
+{# Clusterwide default-deny, one per DSC, only when networkpolicies.enabled AND clusterDefaultDeny (default false:
+   an explicit opt-in, the last activation step, so enabled alone never renders it).
+   The empty ingress/egress rule selects every pod of the cluster outside the excluded namespaces and allows
+   nothing (kubelet probes still pass through the host identity). It also isolates the EGRESS of every selected
+   pod, including the apps whose own policies are ingress-only: every namespace whose egress is not fully covered
+   (e.g. the GitOps controller namespace) must be listed in excludedNamespaces before enabling it.
+   Excluded namespaces: kube-system and the ingress controller namespaces (ingressNamespaces) are always excluded, plus
+   excludedNamespaces (union, never a replacement), deduplicated, order kept. #}
+{% set np_conf = dsc.global.networkpolicies | default({}) %}
+{% if np_conf.enabled | default(false) | bool and np_conf.clusterDefaultDeny | default(false) | bool %}
+{% set np_excluded = (['kube-system'] + (np_conf.excludedNamespaces | default([], true)) + (np_conf.ingressNamespaces | default(['ingress-nginx'], true))) | unique | list %}
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: {{ dsc_name }}-default-deny
+  labels:
+    app.kubernetes.io/managed-by: socle-networkpolicies
+    cloud-pi-native.fr/dsc: {{ dsc_name | to_json }}
+    cloud-pi-native.fr/netpol-app: global
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: NotIn
+        values: {{ np_excluded | to_json }}
+  ingress:
+    - {}
+  egress:
+    - {}
+{% endif %}

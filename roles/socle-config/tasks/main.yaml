@@ -256,6 +256,19 @@
   ansible.builtin.set_fact:
     vaultinfra_kv_name: "dso-{{ dsc.global.gitOps.envName }}"
 
+# NetworkPolicies are only supported on plain Kubernetes: the Openshift flavour has its own SCC/SDN
+# model. platform defaults to openshift in the CRD, so an unset platform is refused too.
+- name: Assert networkpolicies platform
+  ansible.builtin.assert:
+    that:
+      - >-
+        not (dsc.global.networkpolicies.enabled | default(false) | bool)
+        or (dsc.global.platform | default('openshift')) == 'kubernetes'
+    fail_msg: >-
+      global.networkpolicies.enabled requires global.platform: kubernetes
+      (got {{ dsc.global.platform | default('openshift') }}).
+    quiet: true
+
 - name: Set keycloak_reset_password fact
   ansible.builtin.set_fact:
     keycloak_reset_password: false

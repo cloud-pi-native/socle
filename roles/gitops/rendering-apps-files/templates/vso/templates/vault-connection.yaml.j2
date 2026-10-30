@@ -1,0 +1,22 @@
+{% if vso_connection_enabled | bool %}
+{# dsc.vso.vault.address, when set, overrides the target.
+   Falls back to the in-cluster Vault URL (http: the Vault listener has tls_disable = 1, TLS is
+   terminated at the ingress), or the external domain (https) when on another cluster. #}
+{% set vso_vault_incluster_base = "http://" ~ dsc_name ~ "-vault" ~ ("-active" if dsc.vault['values'].server.ha.enabled | default(true) else "") ~ "." ~ dsc.vault.namespace ~ ".svc.cluster.local:8200" %}
+{% set vso_vault_external_domain = dsc.vault.domain | default(dsc.vault.subDomain ~ dsc.global.infraRootDomain) %}
+{% set vso_vault_external_base = "https://" ~ vso_vault_external_domain %}
+{% set vso_vault_default_address = vso_vault_incluster_base if dsc.vault.installEnabled else vso_vault_external_base %}
+{% set vso_vault_address = dsc.vso.vault.address | default('') %}
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: vault-connection
+  namespace: {{ dsc.vso.namespace }}
+spec:
+  address: {{ vso_vault_address if vso_vault_address else vso_vault_default_address }}
+  skipTLSVerify: {{ dsc.vso.vault.skipTLSVerify | default(false) }}
+{% if dsc.vso.vault.caCertSecretName is defined and dsc.vso.vault.caCertSecretName %}
+  caCertSecretRef: {{ dsc.vso.vault.caCertSecretName }}
+{% endif %}
+{% endif %}

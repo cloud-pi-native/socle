@@ -1,0 +1,12 @@
+{% if dsc.vso.installEnabled | default(false) %}
+vso:
+  controller:
+    manager:
+      image:
+        repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/hashicorp/vault-secrets-operator"
+    kubeRbacProxy:
+      image:
+        repository: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>/brancz/kube-rbac-proxy"
+{% else %}
+{}
+{% endif %}

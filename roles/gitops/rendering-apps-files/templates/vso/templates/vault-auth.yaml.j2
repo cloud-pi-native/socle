@@ -1,0 +1,38 @@
+{% if vso_connection_enabled | bool %}
+{# Other namespaces allowed to reference this VaultAuth (vaultAuthRef: <vso namespace>/vault-auth): the
+   namespaces of the components this dsc installs, i.e. the ones starting with
+   dsc.global.gitOps.namespacePrefix, plus dsc.vso.vault.allowedNamespaces. VSO matches the list
+   exactly (only a lone "*" is a wildcard), hence an explicit list rather than "<prefix>*".
+   The namespaces of the projects created by the Console are not listed: each one gets its own
+   VaultAuth and a VaultAuth shared with them would expose the platform AppRole to tenants. #}
+{% set vso_ns_prefix = dsc.global.gitOps.namespacePrefix | default('') %}
+{% set vso_allowed = [] %}
+{% for vso_key, vso_cfg in dsc.items() %}
+{% if vso_cfg is mapping and (vso_cfg.installEnabled | default(false)) %}
+{% set vso_cfg_ns = vso_cfg.namespace | default('') %}
+{% if vso_cfg_ns and vso_cfg_ns.startswith(vso_ns_prefix) and vso_cfg_ns != dsc.vso.namespace %}
+{% set _ = vso_allowed.append(vso_cfg_ns) %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% set vso_allowed = (vso_allowed + (dsc.vso.vault.allowedNamespaces | default([]))) | unique | sort %}
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: vault-auth
+  namespace: {{ dsc.vso.namespace }}
+spec:
+  vaultConnectionRef: vault-connection
+  method: appRole
+  mount: {{ dsc.vso.vault.approleMountPath | default('approle') }}
+  appRole:
+    roleId: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/vso/values#vault | jsonPath {.roleId}>
+    secretRef: vso-approle-secret
+{% if vso_allowed %}
+  allowedNamespaces:
+{% for vso_ns in vso_allowed %}
+    - {{ vso_ns }}
+{% endfor %}
+{% endif %}
+{% endif %}

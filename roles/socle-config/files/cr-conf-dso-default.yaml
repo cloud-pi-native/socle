@@ -80,6 +80,11 @@ spec:
   harbor:
     adminPassword: anotherGreatPassword
     pvcRegistrySize: 50Gi
+    s3ImageChartStorage:
+      enabled: false
+  #    bucket: my-harbor
+  #    region: eu-west-1
+  #    regionendpoint: https://s3.example.com
   ingress:
     annotations:
       route.openshift.io/termination: edge

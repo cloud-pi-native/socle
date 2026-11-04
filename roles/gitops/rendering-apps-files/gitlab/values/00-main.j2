@@ -49,6 +49,8 @@ gitlab:
         memory: 2Gi
     securityContext:
       fsGroupChangePolicy: OnRootMismatch
+      seccompProfile:
+        type: RuntimeDefault
 {% if dsc.global.metrics.enabled %}
     metrics:
       serviceMonitor:
@@ -62,6 +64,9 @@ gitlab:
 {% endif %}
     persistence:
       size: "{{ dsc.gitlab.pvcGitalySize }}"
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
   gitlab-exporter:
 {% if dsc.global.metrics.enabled %}
     metrics:
@@ -90,7 +95,10 @@ gitlab:
   toolbox:
     backups:
       cron:
-        enabled: {{ dsc.global.backup.gitlab.enabled }}
+        # Rendered as a YAML boolean, not through Vault: AVP substitution yields
+        # the string "true"/"false" (both truthy for Helm), and no toolbox
+        # CronJob was created from the string value.
+        enabled: {{ (dsc.global.backup.gitlab.enabled | default(false) | bool) | lower }}
 {% if dsc.global.backup.gitlab.enabled %}
         schedule: "{{ dsc.global.backup.gitlab.cron }}"
         extraArgs: "{{ dsc.global.backup.gitlab.extraArgs | default('') }}"

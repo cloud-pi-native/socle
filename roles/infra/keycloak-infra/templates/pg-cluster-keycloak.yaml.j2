@@ -50,9 +50,15 @@ spec:
   # Require 1Gi of space per instance using default storage class
   storage:
     size: {{ dsc.keycloakInfra.postgresPvcSize }}
+{% if dsc.global.storageClass is defined %}
+    storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% if dsc.keycloakInfra.postgresWalPvcSize is defined %}
   walStorage:
     size: {{ dsc.keycloakInfra.postgresWalPvcSize }}
+{% if dsc.global.storageClass is defined %}
+    storageClass: {{ dsc.global.storageClass }}
+{% endif %}
 {% endif %}
   monitoring:
     enablePodMonitor: {{ dsc.global.metrics.enabled }}

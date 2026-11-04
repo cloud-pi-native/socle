@@ -134,6 +134,9 @@ nexus:
     annotations: {}
     accessMode: ReadWriteOnce
     size: {{ dsc.nexus.storageSize }}
+{% if dsc.global.storageClass is defined %}
+    storageClass: {{ dsc.global.storageClass }}
+{% endif %}
     retainDeleted: true
     retainScaled: true
 

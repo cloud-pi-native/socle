@@ -1,4 +1,15 @@
 ---
+- name: Create dso-install-manager AppProject in infrastructure Argo CD cluster/namespace
+  when:
+    - argo_infra_ns_check.resources is defined and not (argo_infra_ns_check.resources | length == 0)
+    - dsc.argocdInfra.projectName != 'default'
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_infra }}"
+    proxy: "{{ kubeconfig_proxy_infra | default(omit) }}"
+    namespace: "{{ dsc.argocdInfra.namespace }}"
+    definition: "{{ lookup('ansible.builtin.template', role_path + '/templates/dso-appproject.yaml.j2') | from_yaml }}"
+    state: present
+
 - name: Create dso-install-manager application in infrastructure Argo CD cluster/namespace
   when: argo_infra_ns_check.resources is defined and not (argo_infra_ns_check.resources | length == 0)
   kubernetes.core.k8s:
@@ -15,7 +26,7 @@
     mode: "0775"
   loop:
     - "{{ dsc.global.gitOps.repo.path }}"
-    - applicationSets
+    - "applicationSets/{{ dsc_name }}"  # one dir per DSC: AVP reads the install-manager path recursively
 
 - name: Get install-enabled ArgoCD apps
   ansible.builtin.set_fact:
@@ -39,7 +50,7 @@
     rendered_content: "{{ lookup('ansible.builtin.template', role_path + '/templates/dso-appset.yaml.j2') }}"
   ansible.builtin.copy:
     content: "{{ rendered_content }}"
-    dest: "{{ gitops_local_repo }}/applicationSets/dso-appset-wave-{{ sync_wave }}.yaml"
+    dest: "{{ gitops_local_repo }}/applicationSets/{{ dsc_name }}/dso-appset-wave-{{ sync_wave }}.yaml"
     mode: "0644"
   loop: "{{ distinct_waves }}"
   loop_control:
@@ -48,5 +59,5 @@
 - name: Create dummy secret to tell Argo CD to use avp plugin # We need to check if we can improve this
   ansible.builtin.template:
     src: avp-plugin-trigger.yaml.j2
-    dest: "{{ gitops_local_repo }}/applicationSets/avp-plugin-trigger.yaml"
+    dest: "{{ gitops_local_repo }}/applicationSets/{{ dsc_name }}/avp-plugin-trigger.yaml"
     mode: "0644"

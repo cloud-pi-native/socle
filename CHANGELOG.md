@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.14.0](https://github.com/cloud-pi-native/socle/compare/v4.13.0...v4.14.0) (2026-11-04)
+
+
+### Features
+
+* **console:** upgrade dso-ns chart 1.1.6 ([2a6ec79](https://github.com/cloud-pi-native/socle/commit/2a6ec79a9b152519a0b2fca88b1a5e70ef3c5162))
+* **gitlab:** use external S3 storage when bucketPrefix is set ([3c96ddb](https://github.com/cloud-pi-native/socle/commit/3c96ddba59009094f10fca92ab0f961e2ad17261))
+* upgrade gitlab 18.11.13 ([f74b021](https://github.com/cloud-pi-native/socle/commit/f74b021089ec34e14fb5beb5e7df8f25c40ce827))
+* upgrade gitlab 18.11.14 ([b85217f](https://github.com/cloud-pi-native/socle/commit/b85217f483e55b56bb3c3f3167b3610fe87f2ffa))
+* upgrade gitlab 18.8.10 ([5458f72](https://github.com/cloud-pi-native/socle/commit/5458f72da8612a109eeaf3c366cc063e06d6b9dc))
+
 ## [4.13.0](https://github.com/cloud-pi-native/socle/compare/v4.12.1...v4.13.0) (2026-10-15)
 
 

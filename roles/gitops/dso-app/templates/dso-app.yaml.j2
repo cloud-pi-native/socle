@@ -9,7 +9,7 @@ spec:
   sources:
     - repoURL: {{ dsc.global.gitOps.repo.url }}
       targetRevision: {{ dsc.global.gitOps.repo.revision }}
-      path: applicationSets/
+      path: applicationSets/{{ dsc_name }}/
       plugin:
         env:
           - name: AVP_SECRET

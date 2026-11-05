@@ -36,7 +36,7 @@ spec:
                   values: ["{{ sync_wave }}"]
   template:
     metadata:
-      name: "{{ dsc.global.gitOps.envName }}-{{"{{"}}.namespacePrefix{{"}}"}}{{"{{"}}.app{{"}}"}}"
+      name: "{{ dsc.global.gitOps.envName }}-{{"{{"}}.namespacePrefix{{"}}"}}{{"{{"}}.app | lower{{"}}"}}"
 {%- raw %}
       annotations:
         argocd.argoproj.io/compare-options: ServerSideDiff=true
@@ -71,6 +71,12 @@ spec:
         automated:
           prune: true
         #  selfHeal: true
+        retry:
+          limit: 5
+          backoff:
+            duration: 10s
+            factor: 2
+            maxDuration: 3m
         syncOptions:
           - CreateNamespace=true
           - ApplyOutOfSyncOnly=true

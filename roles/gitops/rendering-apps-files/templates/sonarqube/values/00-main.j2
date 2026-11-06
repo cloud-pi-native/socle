@@ -42,9 +42,55 @@ sonarqube:
       labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
   
+{% if dsc.sonarqube.chartVersion | string is version('2025.6.0', '>=') %}
+{% set branch_plugin_version = '26.1.0' if dsc.sonarqube.chartVersion | string is version('2026.1.0', '>=') else '25.12.0' %}
+  # SonarQube Community Build (chart >= 2025.x: disabled by default, otherwise the image tag is a Server edition)
+  community:
+    enabled: true
+
+  # Branch plugin (not supported by SonarSource): javaagent + webapp replaced at /opt/sonarqube/web
+  # (init container below). Same version for the jar (10-offline.j2), the javaagent and the webapp.
+  # javaAdditionalOpts appends to the defaults, unlike jvmOpts/jvmCeOpts (deprecated, replace the heap defaults).
+  extraVolumes:
+    - name: webapp
+      emptyDir:
+        sizeLimit: 50Mi
+  extraVolumeMounts:
+    - name: webapp
+      mountPath: /opt/sonarqube/web
+  extraInitContainers:
+    - name: download-webapp
+      image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/busybox:1.37
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 0
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 200m
+          memory: 64Mi
+      volumeMounts:
+        - name: webapp
+          mountPath: /web
+      command:
+        - sh
+        - -c
+        - >-
+          wget -O /web/.sonarqube-webapp.zip {% if dsc.global.offline %}{{ dsc.sonarqube.pluginDownloadUrl }}/sonarqube-webapp-{{ branch_plugin_version }}.zip{% else %}https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/{{ branch_plugin_version }}/sonarqube-webapp.zip{% endif %} &&
+          unzip -o /web/.sonarqube-webapp.zip -d /web &&
+          rm -f /web/.sonarqube-webapp.zip
+{% else %}
   jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=web"
   jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=ce"
-  
+{% endif %}
+
   ## a monitoring passcode needs to be defined in order to get reasonable probe results
   # not setting the monitoring passcode will result in a deployment that will never be ready
   monitoringPasscodeSecretName: "sonar-monitoring-password"
@@ -64,6 +110,11 @@ sonarqube:
     sonar.auth.oidc.issuerUri: "https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.keycloakx}>/realms/{{ dsc.keycloakx.applicationRealm }}"
     sonar.core.serverBaseURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.sonarqube}>
     sonar.plugins.risk.consent: "ACCEPTED"
+{% if dsc.sonarqube.chartVersion | string is version('2025.6.0', '>=') %}
+{% set branch_plugin_version = '26.1.0' if dsc.sonarqube.chartVersion | string is version('2026.1.0', '>=') else '25.12.0' %}
+    sonar.web.javaAdditionalOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-{{ branch_plugin_version }}.jar=web"
+    sonar.ce.javaAdditionalOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-{{ branch_plugin_version }}.jar=ce"
+{% endif %}
   
   ## Override JDBC values
   ## for external Databases

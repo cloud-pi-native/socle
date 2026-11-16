@@ -23,6 +23,9 @@ cluster:
   
     postgresql:
       parameters:
+        # JIT off: the PostgreSQL 16.2 binaries used by pg_upgrade during the CNPG major
+        # upgrade need libLLVM-13, absent from the PostgreSQL 17 images. Negligible for GitLab (OLTP).
+        jit: "off"
         max_connections: "300"
         superuser_reserved_connections: "5"
         max_worker_processes: "60"

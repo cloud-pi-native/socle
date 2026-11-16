@@ -64,9 +64,15 @@ server:
 {% endif %}
   auditStorage:
     enable: true
+{% if dsc.global.storageClass is defined %}
+    storageClass: {{ dsc.global.storageClass }}
+{% endif %}
   dataStorage:
     enable: true
     size: {{ dsc.vaultInfra.pvcSize }}
+{% if dsc.global.storageClass is defined %}
+    storageClass: {{ dsc.global.storageClass }}
+{% endif %}
   image:
     repository: docker.io/hashicorp/vault
 csi:

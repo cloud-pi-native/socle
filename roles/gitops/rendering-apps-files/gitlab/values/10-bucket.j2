@@ -1,4 +1,4 @@
-{% if dsc.global.bucketPrefix | default('', true) | trim %}
+{% if dsc.global.bucketPrefix | default('', true) | trim and not (dsc.gitlab.s3ObjectStorage.enabled | default(false)) %}
 global:
   minio:
     enabled: false

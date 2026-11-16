@@ -9,8 +9,19 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
           containers:
           - name: gitlab-backup-helper
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
             image: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/rclone/rclone:latest
             env:
             - name: RCLONE_CONFIG
@@ -20,6 +31,8 @@ spec:
             - name: RCLONE_CONFIG_BACKUP_PROVIDER
               value: "Other"
             - name: RCLONE_CONFIG_BACKUP_FORCE_PATH_STYLE
+              value: "true"
+            - name: RCLONE_CONFIG_BACKUP_NO_CHECK_BUCKET
               value: "true"
             - name: RCLONE_CONFIG_BACKUP_ENDPOINT
               value: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>"

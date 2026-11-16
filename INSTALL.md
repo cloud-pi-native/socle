@@ -55,6 +55,26 @@ Vous devez disposer d'un cluster cible Kubernetes ou OpenShift fonctionnel ou no
 
 Nous appellerons ce cluster **cluster socle**.
 
+Il doit disposer d'un **contrôleur d'ingress** : le Socle n'en installe pas. Installez-le avant tout run Ansible, par exemple ingress-nginx :
+
+```yaml
+# values-ingress.yaml
+controller:
+  ingressClassResource:
+    default: true
+```
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx   --namespace ingress-nginx --create-namespace   -f values-ingress.yaml
+kubectl -n ingress-nginx get svc ingress-nginx-controller   # attendre EXTERNAL-IP
+```
+
+- `default: true` est **obligatoire** avec `spec.ingress.tls.type: acme` : le solver HTTP-01 du `ClusterIssuer` ne précise aucune classe d'ingress. Sans `IngressClass` par défaut, le certificat n'est pas émis et le contrôleur sert son certificat auto-signé.
+- **DNS** : faire pointer le wildcard du domaine racine (`global.rootDomain`) vers l'`EXTERNAL-IP`.
+- **Vérification** : `curl -k https://<EXTERNAL-IP>/` doit retourner un `404` servi par nginx (le contrôleur est joignable), et `curl --resolve <hôte>:443:<EXTERNAL-IP> https://<hôte>/` teste un hôte sans attendre la propagation DNS.
+
 ## Installation
 
 L'installation de la plateforme Cloud Pi Native se fait de manière automatisée via Ansible.
@@ -101,6 +121,12 @@ kubectl edit dsc conf-dso
 
 Veuillez consulter la section [Configuration DSC](#configuration-dsc) pour plus de détails.
 
+Stockage et sauvegardes CNPG (optionnel) :
+
+- `global.storageClass` : `StorageClass` appliquée aux PVC et aux clusters CNPG créés par le socle (`storage` et `walStorage` inclus). Non défini : `StorageClass` par défaut du cluster, sans changement.
+- `<app>.postgresBackupPathSuffix` (awx, console, gitlab, harbor, keycloakx, sonarqube) : suffixe ajouté au chemin de sauvegarde CNPG (`s3://<bucket>/cnpg<suffixe>`). À renseigner quand plusieurs DSC partagent le même bucket, sinon leurs archives entrent en collision. Vide par défaut : chemin inchangé. Le modifier sur un environnement existant crée une nouvelle archive : les sauvegardes précédentes restent à l'ancien chemin.
+- `global.backup.cnpg.retentionPolicy` : rétention des sauvegardes CNPG (`14d` par défaut).
+
 Une fois la configuration créée, nous allons pouvoir passer aux étapes suivantes.
 
 ### 5. Variables d'environnement
@@ -142,6 +168,7 @@ Afin d'apporter les informations d'authentification nécessaires pour les connex
 
 - `dso-<envName>/env/conf-dso/apps/global/values`
 - `dso-<envName>/env/conf-dso/apps/harbor/values`
+- `dso-<envName>/env/conf-dso/apps/gitlab/values` (seulement si `gitlab.s3ObjectStorage.enabled` vaut `true`, voir [GitLab sur stockage objet S3 externe](docs/gitlab.md#gitlab-sur-stockage-objet-s3-externe))
 
 Afin de vous faciliter cette étape, nous proposons le playbook `credentials-to-vault.yaml` situé dans le répertoire `admin-tools`.
 
@@ -188,6 +215,24 @@ ansible-playbook install-gitops.yaml -t dso-app
 Cette commande va créer l'`applicationSet` `<envName>-dso-install-manager` dans l'Argo CD d'infrastructure et la synchronisation installera les applications du Socle dans le cluster cible.
 
 Si le paramètre `global.gitOps.watchpointEnabled` est désactivé, l'`applicationSet` `<envName>-dso-install-manager` sera automatiquement créée, vous pouvez lancer la synchronisation manuellement sur l'Argo CD d'infrastructure.
+
+Si `argocdInfra.projectName` diffère de `default`, l'`AppProject` correspondant est créé dans l'Argo CD d'infrastructure avant l'`Application` (le projet `default` est natif d'Argo CD et n'est pas créé).
+
+L'`Application` pointe sur le répertoire `applicationSets/<dsc>/` du dépôt GitOps (`<dsc>` = nom de la DSC), qui contient les `ApplicationSet` (une par sync wave). Un sous-répertoire par DSC permet à plusieurs clusters de partager le même dépôt et la même branche :
+
+- Le plugin AVP lit le chemin de l'`Application` de façon récursive : chaque `Application` ne doit pointer que sur son propre sous-répertoire.
+- Migration d'un environnement déployé avec l'ancien chemin (`applicationSets/` à la racine) :
+  - Relancer `-t dso-app` : rend `applicationSets/<dsc>/` et met à jour le chemin de l'`Application`.
+  - Supprimer les anciens fichiers à la racine de `applicationSets/` (le rôle ne les supprime pas), puis pousser.
+  - Synchroniser `<envName>-dso-install-manager` : les `ApplicationSet` gardent les mêmes noms, rien n'est supprimé. Ne pas synchroniser avec prune avant le push.
+  - Migrer tous les environnements existants du dépôt avant d'en ajouter un nouveau : une `Application` encore sur `applicationSets/` lirait aussi les sous-répertoires des autres DSC.
+
+Les `ClusterRole` partagés générés par la DSC (`dsc-access-role`, `cpn-ansible-job-role`, `pgdump-role`, `access-cnpg-s3-ca-secret`) sont préfixés par le nom de la DSC, ce qui permet à plusieurs DSC de cohabiter sur un même cluster. Pour un environnement déjà déployé avec les anciens noms :
+
+- Après la synchronisation, les anciens `ClusterRole` et `ClusterRoleBinding` sans préfixe restent présents sur le cluster : Argo CD ne les supprime pas s'il n'a pas le prune activé sur ces ressources.
+- Vérifier que les nouveaux rôles sont bien utilisés (les `roleRef` des jobs et des bindings sont mis à jour), puis supprimer manuellement les anciens :
+  `kubectl delete clusterrole dsc-access-role cpn-ansible-job-role pgdump-role access-cnpg-s3-ca-secret`
+  (ainsi que les `ClusterRoleBinding` / `RoleBinding` associés qui ne portent pas le préfixe).
 
 ### 11. Acceptation des conditions de service
 
@@ -340,6 +385,10 @@ spec:
         method: in-namespace
         name: wildcard-tls
 ```
+
+### GitLab
+
+Options GitLab de la `dsc` (stockage objet S3 externe, Pages, user namespaces du runner) : voir [docs/gitlab.md](docs/gitlab.md).
 
 ## Désinstallation
 

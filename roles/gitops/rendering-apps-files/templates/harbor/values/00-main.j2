@@ -54,15 +54,30 @@ harbor:
     persistentVolumeClaim:
       registry:
         size: "{{ dsc.harbor.pvcRegistrySize }}"
+{% if dsc.global.storageClass is defined %}
+        storageClass: "{{ dsc.global.storageClass }}"
+{% endif %}
       jobservice:
         jobLog:
           size: "{{ dsc.harbor.pvcJobLogSize }}"
+{% if dsc.global.storageClass is defined %}
+          storageClass: "{{ dsc.global.storageClass }}"
+{% endif %}
       database:
         size: "{{ dsc.harbor.pvcDatabaseSize }}"
+{% if dsc.global.storageClass is defined %}
+        storageClass: "{{ dsc.global.storageClass }}"
+{% endif %}
       redis:
         size: "{{ dsc.harbor.pvcRedisSize }}"
+{% if dsc.global.storageClass is defined %}
+        storageClass: "{{ dsc.global.storageClass }}"
+{% endif %}
       trivy:
         size: "{{ dsc.harbor.pvcTrivySize }}"
+{% if dsc.global.storageClass is defined %}
+        storageClass: "{{ dsc.global.storageClass }}"
+{% endif %}
   harborAdminPassword: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/harbor/values#global | jsonPath {.harborAdminPassword}>
   nginx:
     replicas: 2

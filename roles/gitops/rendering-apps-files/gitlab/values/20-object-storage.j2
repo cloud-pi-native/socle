@@ -1,0 +1,50 @@
+{# External S3 object storage for GitLab non-Git data (dsc.gitlab.s3ObjectStorage).
+   Replaces the bundled MinIO. Gitaly (Git repositories) is not affected.
+   Uses the chart consolidated form: one connection Secret, one bucket per type.
+   Rendered after 00-main.j2 so it can override the backups settings. #}
+{% if dsc.gitlab.s3ObjectStorage.enabled | default(false) %}
+{% set gitlab_s3_prefix = dsc.gitlab.s3ObjectStorage.bucketPrefix %}
+global:
+  minio:
+    enabled: false
+  appConfig:
+    object_store:
+      enabled: true
+      proxy_download: true
+      connection:
+        secret: gitlab-object-storage
+        key: connection
+    artifacts:
+      bucket: "{{ gitlab_s3_prefix }}-artifacts"
+    lfs:
+      bucket: "{{ gitlab_s3_prefix }}-lfs"
+    uploads:
+      bucket: "{{ gitlab_s3_prefix }}-uploads"
+    packages:
+      bucket: "{{ gitlab_s3_prefix }}-packages"
+    externalDiffs:
+      bucket: "{{ gitlab_s3_prefix }}-mr-diffs"
+    terraformState:
+      bucket: "{{ gitlab_s3_prefix }}-terraform-state"
+    ciSecureFiles:
+      bucket: "{{ gitlab_s3_prefix }}-ci-secure-files"
+    dependencyProxy:
+      bucket: "{{ gitlab_s3_prefix }}-dependency-proxy"
+    backups:
+      # Restore moves existing objects aside into this bucket.
+      tmpBucket: "{{ gitlab_s3_prefix }}-tmp"
+{% if not dsc.global.backup.gitlab.enabled %}
+      # Without dsc.global.backup.gitlab, the toolbox has no s3cmd config
+      # (the bundled MinIO one is gone): use the object storage credentials
+      # and a dedicated backups bucket on the same endpoint.
+      bucket: "{{ gitlab_s3_prefix }}-backups"
+
+gitlab:
+  toolbox:
+    backups:
+      objectStorage:
+        config:
+          secret: gitlab-object-storage-s3cfg
+          key: config
+{% endif %}
+{% endif %}

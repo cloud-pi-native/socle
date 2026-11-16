@@ -64,7 +64,13 @@ spec:
   cloudnativepg: {}
   console: {}
   cpnAnsibleJob: {}
-  gitlab: {}
+  gitlab:
+    s3ObjectStorage:
+      enabled: false
+  #    bucketPrefix: my-gitlab
+  #    region: eu-west-1
+  #    endpoint: https://s3.eu-west-1.example.com
+  #    pathStyle: true
   glexporter: {}
   gitlabOperator: {}
   gitlabrunner: {}

@@ -11,6 +11,9 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+{% if dsc.global.storageClass is defined %}
+  storageClassName: {{ dsc.global.storageClass }}
+{% endif %}
   resources:
     requests:
       storage: {{ dsc.nexus.proxyCacheSize }}

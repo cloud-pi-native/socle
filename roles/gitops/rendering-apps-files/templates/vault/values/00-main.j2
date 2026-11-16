@@ -23,6 +23,12 @@ vault:
       enabled: false
     auditStorage:
       enable: true
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}
     dataStorage:
       enable: true
       size: {{ dsc.vault.pvcSize }}
+{% if dsc.global.storageClass is defined %}
+      storageClass: {{ dsc.global.storageClass }}
+{% endif %}

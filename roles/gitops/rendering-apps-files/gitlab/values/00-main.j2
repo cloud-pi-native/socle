@@ -94,6 +94,9 @@ gitlab:
 {% if dsc.global.backup.gitlab.enabled %}
         schedule: "{{ dsc.global.backup.gitlab.cron }}"
         extraArgs: "{{ dsc.global.backup.gitlab.extraArgs | default('') }}"
+{% endif %}
+{# Chart 10 requires a backup object storage config for the toolbox, even when backups are disabled #}
+{% if dsc.global.backup.gitlab.enabled or (dsc.global.bucketPrefix | default('', true) | trim) %}
       objectStorage:
         config:
           secret: gitlab-backup
@@ -101,8 +104,17 @@ gitlab:
 {% endif %}
 
 global:
+  redis:
+    host: gitlab-valkey
+    port: 6379
+    auth:
+      enabled: true
+      secret: gitlab-valkey
+      key: password
   psql:
-    serviceName: pooler-pg-cluster-gitlab-rw
+    # Chart 10 requires global.psql.host (serviceName was only used for the bundled PostgreSQL).
+    # Same resolved host as before: <serviceName>.<release namespace>.svc
+    host: pooler-pg-cluster-gitlab-rw.{{ dsc.gitlab.namespace }}.svc
     port: 5432
     database: gitlabhq_production
     username: gitlab
@@ -155,4 +167,7 @@ prometheus:
   install: false
 
 postgresql:
+  install: false
+
+redis:
   install: false

@@ -40,8 +40,11 @@ cluster:
       enabled: {{ dsc.global.metrics.enabled }}
 
 {% if dsc.global.backup.cnpg.enabled %}
-  backups:       
-    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg
+  backups:
+    # Fresh WAL archive for PostgreSQL 17: after the CNPG major upgrade the cluster restarts on timeline 1,
+    # and the PG16 timeline history files left under /cnpg make new replicas fail
+    # ("requested timeline N is not a child of this server's history").
+    destinationPath: s3://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>/cnpg-pg17
     enabled: true
     endpointURL: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
     retentionPolicy: 14d

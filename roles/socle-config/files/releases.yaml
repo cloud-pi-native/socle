@@ -35,6 +35,9 @@ spec:
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
     chartVersion: "9.11.16"
+    valkey:
+      # https://github.com/valkey-io/valkey-helm/releases
+      chartVersion: "0.12.1"
   glexporter:
     # https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter
     chartVersion: "0.3.5"

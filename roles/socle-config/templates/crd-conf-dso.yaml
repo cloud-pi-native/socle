@@ -557,6 +557,26 @@ spec:
                           description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
+                    valkey:
+                      description: |
+                        Valkey (Redis-compatible store) deployed as a dependency of the GitLab app.
+                        The bundled Redis was removed from the GitLab chart 10 (GitLab 19).
+                      type: object
+                      properties:
+                        chartVersion:
+                          description: Valkey chart version (https://github.com/valkey-io/valkey-helm).
+                          type: string
+                        helmRepoUrl:
+                          description: Valkey Helm repository URL.
+                          type: string
+                        pvcSize:
+                          description: Size for Valkey persistent volume.
+                          type: string
+                        values:
+                          description: |
+                            Extra helm values for Valkey. See https://github.com/valkey-io/valkey-helm/blob/main/valkey/values.yaml
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
                   required:
                     - installEnabled
                   type: object

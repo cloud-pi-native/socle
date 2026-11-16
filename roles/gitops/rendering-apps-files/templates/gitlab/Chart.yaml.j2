@@ -8,6 +8,10 @@ dependencies:
   alias: cluster
   version: {{ dsc.cloudnativepg.cluster.chartVersion }}
   repository: {{ dsc.cloudnativepg.cluster.helmRepoUrl }}
+- name: valkey
+  alias: valkey
+  version: {{ dsc.gitlab.valkey.chartVersion | quote }}
+  repository: {{ dsc.gitlab.valkey.helmRepoUrl }}
 - name: gitlab-operator
   alias: gitlab
   version: {{ dsc.gitlabOperator.chartVersion }}

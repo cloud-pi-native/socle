@@ -37,6 +37,16 @@
 
 # GitLab instance template generation
 
+- name: Check GitLab external object storage
+  when: dsc.gitlab.installEnabled
+  ansible.builtin.assert:
+    that:
+      - dsc.global.bucketPrefix | default('', true) | trim | length > 0
+    fail_msg: >-
+      GitLab chart 10 (GitLab 19) no longer bundles MinIO: set dsc.global.bucketPrefix
+      and migrate the MinIO data to the external S3 buckets before upgrading.
+    quiet: true
+
 - name: Set path fact
   ansible.builtin.set_fact:
     path: "{{ role_path + '/gitlab/values' }}"
@@ -61,6 +71,8 @@
         namespace: "{{ dsc.gitlab.namespace }}"
         annotations:
           argocd.argoproj.io/sync-wave: "5"
+          # The operator webhook otherwise only allows one chart minor at a time (9.11 -> 10.0 -> 10.1 -> 10.2...)
+          gitlab.io/disable-zero-downtime-upgrade: "true"
       spec:
         chart:
           version: "{{ dsc.gitlab.chartVersion }}"

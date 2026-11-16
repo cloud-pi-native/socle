@@ -62,7 +62,16 @@ spec:
     insecureCI: false
     pvcGitalySize: 50Gi
     cnpg:
-      imageName: cloudnative-pg/postgresql:16.2
+      # GitLab 19 requires PostgreSQL 17 (CNPG in-place major upgrade on imageName change).
+      # Same distribution and flavor as the former 16.2 image (bullseye, with barman-cloud):
+      # CNPG major upgrades require the same OS. Sync the JIT-off change before this one.
+      imageName: cloudnative-pg/postgresql:17.11-system-bullseye
+    valkey:
+      # External Redis-compatible store: the bundled Redis was removed from GitLab chart 10 (GitLab 19)
+      # https://github.com/valkey-io/valkey-helm
+      helmRepoUrl: https://valkey.io/valkey-helm/
+      pvcSize: 5Gi
+      values: {}
     values: {}
   gitlabCatalog:
     catalogRepoUrl: https://github.com/cloud-pi-native/gitlab-ci-catalog.git

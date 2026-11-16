@@ -279,6 +279,21 @@
   ignore_errors: true
   no_log: true
 
+# Reused by envs.yaml: the GitLab Valkey password must stay stable across runs.
+- name: Get current gitlab values from Vault
+  when: post_conf_job is not defined
+  community.hashi_vault.vault_kv2_get:
+    url: "https://{{ vaultinfra_domain }}"
+    namespace: "{{ dsc.vaultInfra.namespace }}"
+    engine_mount_point: "{{ vaultinfra_kv_name }}"
+    path: "env/{{ dsc_name }}/apps/gitlab/values"
+    validate_certs: "{{ vaultinfra_cert_valid }}"
+  environment:
+    VAULT_TOKEN: "{{ vault_infra_token }}"
+  register: current_gitlab_vault_values
+  ignore_errors: true
+  no_log: true
+
 - name: Set envs fact
   when: post_conf_job is not defined
   ansible.builtin.include_tasks:

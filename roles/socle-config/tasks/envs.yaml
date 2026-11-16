@@ -134,6 +134,12 @@
                       enabled: "{{ dsc.global.backup.gitlab.enabled | default('false') }}"
                       schedule: "{{ dsc.global.backup.gitlab.cron | default('0 */6 * * *') }}"
                       extraArgs: "{{ dsc.global.backup.gitlab.extraArgs | default('') }}"
+              # Valkey password: generated once, then kept from Vault.
+              valkeyPassword: >-
+                {{
+                  ((current_gitlab_vault_values.secret | default({})).valkeyPassword | default(''))
+                  or lookup('ansible.builtin.password', '/dev/null', length=32, chars=['ascii_letters', 'digits'])
+                }}
               gitlabToken: ""
               runnerToken: ""
           - argocd_app: glexporter

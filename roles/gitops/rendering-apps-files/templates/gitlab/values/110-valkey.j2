@@ -1,0 +1,54 @@
+{# Valkey replaces the Redis bundled in the GitLab chart (removed in chart 10 / GitLab 19). #}
+{# Service name gitlab-valkey is used by the GitLab CR (global.redis.host). #}
+valkey:
+  fullnameOverride: gitlab-valkey
+  image:
+    registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>"
+{% if dsc.global.imagePullSecrets is defined %}
+  imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}
+{% endif %}
+{% if dsc.global.platform == "openshift" %}
+  # Let OpenShift assign the UID/GID (restricted SCC)
+  podSecurityContext:
+    fsGroup: null
+    runAsUser: null
+    runAsGroup: null
+  securityContext:
+    runAsUser: null
+{% endif %}
+  deploymentStrategy: Recreate
+  dataStorage:
+    enabled: true
+    requestedSize: "{{ dsc.gitlab.valkey.pvcSize }}"
+    keepPvc: true
+  valkeyConfig: |
+    appendonly yes
+    maxmemory-policy noeviction
+  auth:
+    enabled: true
+    usersExistingSecret: gitlab-valkey
+    aclUsers:
+      default:
+        permissions: "~* &* +@all"
+        passwordKey: password
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+{% if dsc.global.metrics.enabled %}
+  metrics:
+    enabled: true
+    exporter:
+      image:
+        registry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>"
+    serviceMonitor:
+      enabled: true
+{% if dsc.global.metrics.additionalLabels is defined %}
+      extraLabels:
+{% for key, value in dsc.global.metrics.additionalLabels.items() %}
+        {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
+{% endif %}

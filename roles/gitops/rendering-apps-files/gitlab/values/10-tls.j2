@@ -1,5 +1,12 @@
 global:
+  # GitLab chart 10 (GitLab 19) defaults to Gateway API + bundled Envoy Gateway
+  # and disables Ingress: keep the external ingress controller.
+  gatewayApi:
+    enabled: false
+    installEnvoy: false
+    configureCertmanager: false
   ingress:
+    enabled: true
     class: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#ingressClassName>
     annotations:
 {% for key, val in dsc.ingress.annotations.items() %}

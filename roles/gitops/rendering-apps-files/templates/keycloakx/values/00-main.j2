@@ -44,6 +44,9 @@ keycloakx:
         name: keycloakx-admin-secret
 
   extraEnv: |
+    # CVE-2026-114938 (Java4Shell): disable the AVX-512 Base64 intrinsic until the JDK is patched
+    - name: JAVA_OPTS_APPEND
+      value: "-XX:-UseBASE64Intrinsics"
     - name: KC_LOG_LEVEL
       value: INFO
     - name: KC_HOSTNAME

@@ -42,8 +42,9 @@ sonarqube:
       labels: {{ dsc.global.metrics.additionalLabels }}
 {% endif %}
   
-  jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=web"
-  jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=ce"
+  # -XX:-UseBASE64Intrinsics: CVE-2026-114938 (Java4Shell) mitigation until the JDK is patched
+  jvmOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=web -XX:-UseBASE64Intrinsics"
+  jvmCeOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-1.23.0.jar=ce -XX:-UseBASE64Intrinsics"
   
   ## a monitoring passcode needs to be defined in order to get reasonable probe results
   # not setting the monitoring passcode will result in a deployment that will never be ready
@@ -51,6 +52,7 @@ sonarqube:
   monitoringPasscodeSecretKey: "monitoring-password"
   
   sonarProperties:
+    sonar.search.javaAdditionalOpts: "-XX:-UseBASE64Intrinsics"
     sonar.auth.oidc.enabled: "true"
     sonar.auth.oidc.allowUsersToSignUp: "true"
     sonar.auth.oidc.autoLogin: "false"

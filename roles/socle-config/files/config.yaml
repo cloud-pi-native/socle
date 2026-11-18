@@ -155,6 +155,7 @@ spec:
     providerDownloadUrl: https://github.com/InseeFr/Keycloak-FranceConnect/releases/download/7.5.0/keycloak-franceconnect-7.5.0.jar
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
+      backupPath: cnpg
     managementRealm: master
     applicationRealm: dso
     usersGitOpsEnabled: false

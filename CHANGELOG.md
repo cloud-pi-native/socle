@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.14.1](https://github.com/cloud-pi-native/socle/compare/v4.14.0...v4.14.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **security:** mitigate CVE-2026-114938 (Java4Shell) on Keycloak, Nexus and SonarQube ([d8b26c5](https://github.com/cloud-pi-native/socle/commit/d8b26c58957bf8edf86f8809879d819a5b9da9e8))
+
 ## [4.14.0](https://github.com/cloud-pi-native/socle/compare/v4.13.0...v4.14.0) (2026-11-04)
 
 

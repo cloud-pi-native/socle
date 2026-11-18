@@ -2,6 +2,8 @@ nexus:
   fullnameOverride: nexus
   nameOverride: nexus3
   chownDataDir: false
+  # Chart default + CVE-2026-114938 (Java4Shell) mitigation until the JDK is patched
+  install4jAddVmParams: "-Xms1024m -Xmx1024m -XX:MaxDirectMemorySize=2048m -XX:-UseBASE64Intrinsics"
   config:
     enabled: true
     cleanup:

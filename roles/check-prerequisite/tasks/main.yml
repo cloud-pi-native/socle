@@ -34,3 +34,26 @@
             dsc.certmanager.forcedInstall is truthy
         fail_msg: " Certmanager is already installed in your cluster"
       ignore_errors: true
+
+- name: Validate Falco is first install
+  when: dsc.falco.installEnabled
+  block:
+    - name: Check if a falco daemonset already exists cluster-wide
+      kubernetes.core.k8s_info:
+        kind: DaemonSet
+        label_selectors:
+          - "app.kubernetes.io/name=falco"
+      register: falco_daemonsets
+
+    - name: Check if Falco is absent
+      ansible.builtin.assert:
+        that:
+          - >
+            falco_daemonsets.resources | length == 0 or
+            dsc.falco.forcedInstall is truthy
+        fail_msg: >-
+          Falco is already installed in your cluster (possibly in another namespace):
+          installing a second instance means two kernel drivers (eBPF/kmod) competing for
+          the same syscall events, set dsc.falco.forcedInstall to true only if this is
+          intentional.
+      ignore_errors: true

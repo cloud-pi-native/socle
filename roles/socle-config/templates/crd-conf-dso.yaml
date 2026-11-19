@@ -460,6 +460,58 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
+                falco:
+                  description: Configuration for Falco runtime security (with Falcosidekick).
+                  properties:
+                    installEnabled:
+                      default: false
+                      description: Specifies whether we should install Falco.
+                      type: boolean
+                    namespace:
+                      description: The namespace for Falco.
+                      type: string
+                    helmRepoUrl:
+                      description: Falco helm repository url.
+                      type: string
+                    chartVersion:
+                      description: Falco helm chart version (e.g., "9.1.0").
+                      type: string
+                    forcedInstall:
+                      description: |
+                        Forces Falco install/reinstall in the target namespace regardless of its
+                        existing state. Default false: no forced installation.
+                      default: false
+                      type: boolean
+                    driver:
+                      description: Falco kernel driver configuration.
+                      properties:
+                        kind:
+                          description: Falco driver kind (modern_ebpf, kmod or auto).
+                          default: modern_ebpf
+                          type: string
+                        leastPrivileged:
+                          description: |
+                            With the modern_ebpf driver, run Falco with specific capabilities instead of a
+                            privileged container. Ignored for the other driver kinds, which stay privileged.
+                          default: true
+                          type: boolean
+                      type: object
+                    falcosidekick:
+                      description: Configuration for Falcosidekick, the Falco events forwarder.
+                      properties:
+                        enabled:
+                          default: true
+                          description: Specifies whether Falcosidekick should be enabled.
+                          type: boolean
+                      type: object
+                    values:
+                      description: |
+                        Custom values for Falco, merged with roles/gitops/rendering-apps-files/templates/falco/values/.
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                    - installEnabled
+                  type: object
                 gitlab:
                   description: Configuration for GitLab.
                   properties:
@@ -492,6 +544,7 @@ spec:
                     pvcGitalySize:
                       description: Size for Gitaly persistent volume.
                       type: string
+                      default: 50Gi
                     values:
                       description: |
                         You can add custom values for gitlab, they will be merged with roles/gitlab/templates/values/
@@ -1117,6 +1170,7 @@ spec:
                     grafanaPvcSize:
                       description: Size for grafana persistent volume.
                       type: string
+                      default: 5Gi
                     imageVersion:
                       description: Grafana release version (e.g., "9.5.5").
                       type: string
@@ -1162,18 +1216,23 @@ spec:
                     pvcRegistrySize:
                       description: Size for registry persistent volume.
                       type: string
+                      default: 50Gi
                     pvcJobLogSize:
                       description: Size for jobLog persistent volume.
                       type: string
+                      default: 5Gi
                     pvcDatabaseSize:
                       description: Size for database persistent volume.
                       type: string
+                      default: 10Gi
                     pvcRedisSize:
                       description: Size for redis persistent volume.
                       type: string
+                      default: 5Gi
                     pvcTrivySize:
                       description: Size for trivy persistent volume.
                       type: string
+                      default: 10Gi
                     s3ImageChartStorage:
                       description: Define s3 storage backend used for registry to store images and charts.
                       type: object
@@ -1226,7 +1285,6 @@ spec:
                           type: object
                           x-kubernetes-preserve-unknown-fields: true
                   required:
-                    - pvcRegistrySize
                     - installEnabled
                   type: object
                 ingress:
@@ -1536,12 +1594,14 @@ spec:
                     storageSize:
                       description: Size for nexus persistent volume.
                       type: string
+                      default: 25Gi
                     proxyEnabled:
                       description: Whether or not to enable the nexus docker proxy cache.
                       type: boolean
                     proxyCacheSize:
                       description: Size for nexus proxy cache persistent volume.
                       type: string
+                      default: 25Gi
                     imageTag:
                       description: Nexus version based on image tag (e.g., "3.56.0").
                       type: string
@@ -1788,6 +1848,7 @@ spec:
                     pvcSize:
                       description: Size for Vault persistent volume.
                       type: string
+                      default: 23Gi
                     values:
                       description: |
                         You can add custom values for vault, they will be merged with roles/vault/templates/values/
@@ -1823,6 +1884,7 @@ spec:
                     pvcSize:
                       description: Size for Vault infrastructure instance persistent volume.
                       type: string
+                      default: 23Gi
                     values:
                       description: |
                         You can add custom values for vaultInfra, they will be merged with roles/infra/vault-infra/templates/values/

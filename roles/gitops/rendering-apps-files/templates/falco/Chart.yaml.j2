@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: falco
+type: application
+version: {{ dsc.falco.chartVersion }}
+dependencies:
+- name: falco
+  alias: falco
+  version: {{ dsc.falco.chartVersion }}
+  repository: {{ dsc.falco.helmRepoUrl }}

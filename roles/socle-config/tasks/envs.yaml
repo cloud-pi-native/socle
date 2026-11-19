@@ -99,6 +99,11 @@
             nameSpace: "kyverno"
             customNamespacePrefix: ""
             syncWave: 10
+          - argocd_app: falco
+            clusterName: ""
+            nameSpace: "falco"
+            customNamespacePrefix: ""
+            syncWave: 10
           - argocd_app: cloudnativepg
             clusterName: ""
             nameSpace: "cloudnativepg"

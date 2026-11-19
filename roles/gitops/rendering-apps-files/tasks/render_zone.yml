@@ -1,0 +1,9 @@
+- name: Render {{ zone.name }} zone files
+  ansible.builtin.template:
+    src: "{{ file }}"
+    dest: "{{ dest_path }}/zone-{{ zone.name }}-{{ file | basename | regex_replace('\\.j2$', '') }}"
+    mode: "0644"
+  loop: "{{ query('fileglob', zone_source_dir + '/*') }}"
+  loop_control:
+    label: "{{ file | basename }}"
+    loop_var: file

@@ -173,6 +173,12 @@ spec:
                           domain:
                             description: The fully qualified domain name of the Argo CD of the zone.
                             type: string
+                          gitlabDomain:
+                            description: The Gitlab server FQDN if different from the default one
+                            type: string
+                        required:
+                          - name
+                          - domain
                   required:
                     - admin
                     - installEnabled

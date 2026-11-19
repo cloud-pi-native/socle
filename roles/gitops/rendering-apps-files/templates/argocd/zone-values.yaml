@@ -1,0 +1,22 @@
+# Repository GitLab DSO de la zone
+{% set gdomain = zone.gitlabDomain | default gitlab_domain }
+{% set dsoZoneRepo = 'https://' + gdomain + '/' + dsc.global.projectsRootDir | join('/') + '/infra/' + zone.name + '.git' %}
+
+dsoZoneRepo: {{ dsoZoneRepo }}
+# Nom court de la zone
+zoneName: {{ zone.name }}
+
+# Les valeurs suivantes correspondent à la configuration de l'instance Argo CD dans la nouvelle zone.
+# Veuillez consulter la documentation Argo CD pour les valeurs possibles (https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/README.md)
+argocd:
+  configs:
+    cm:
+      url: "https://{{ zone.domain }}"
+  
+  server:
+    ingress:
+      hostname: "{{ zone.domain }}"
+
+  applicationSet:
+    ingress:
+      hostname: "appset.{{ zone.domain }}

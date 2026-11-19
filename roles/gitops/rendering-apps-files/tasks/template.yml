@@ -72,6 +72,7 @@
       when: not (my_template | basename == 'users.yaml.j2' and app_users_file_stat.stat.exists)
       vars:
         rendered_content: "{{ lookup('ansible.builtin.template', my_template) }}"
+        dest_dir: "{{ dest_path }}/templates"
         dest_filename: "{{ my_template | basename | regex_replace('\\.j2$', '') }}"
       ansible.builtin.include_tasks: render_or_delete.yml
       with_fileglob: "{{ source_path }}/templates/*"
@@ -130,3 +131,31 @@
 
     - name: Special parsing for pipe after colon
       ansible.builtin.include_tasks: ./parsing.yml
+
+# Handle secondary zones
+
+- name: Set zone facts
+  ansible.builtin.set_fact:
+    zv_source: "{{ source_path }}/zone-values.yaml"
+    zones: "{{ dsc[item.1.argocd_app].secondaryZones | default([]) }}"
+
+- name: check if zone values file exists
+  ansible.builtin.stat:
+    path: zv_source
+  register: zv_source_check
+
+- name: debug
+  ansible.builtin.debug:
+    msg: "{{ item.1.argocd_app }} zones : {{ zones | to_json }}"
+
+- name: Render zone values files
+  when: install_enabled and zv_source_check.stat.exists
+  ansible.builtin.include_tasks: render_or_delete.yml 
+  vars:
+    rendered_content: "{{ lookup('ansible.builtin.template', zv_source) }}"
+    dest_dir: "{{ dest_path }}"
+    dest_filename: "zone-{{ zone.name }}-values.yaml"
+  loop: "{{ zones }}"
+  loop_control:
+    label: "{{ zone.name }}"
+    loop_var: zone

@@ -44,7 +44,10 @@ keycloak_clients:
       - generic
     publicClient: false
 
+  # Client for an external portal, not deployed by the socle. Created only with keycloakx.portailClientEnabled;
+  # its redirectUris/webOrigins are "*", restrict them before enabling it.
   - clientId: portail-client
+    enabled: "{{ dsc.keycloakx.portailClientEnabled | default(false) | bool }}"
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     redirectUris:
@@ -110,13 +113,14 @@ keycloak_clients:
       - generic
     publicClient: false
 
+  # Only created when AWX is installed; the callback is the only accepted redirection.
   - clientId: awx-client
+    enabled: "{{ dsc.awx.installEnabled | default(false) | bool }}"
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true
     directAccessGrantsEnabled: true
     redirectUris:
       - https://{{ awx_domain }}/auth/callback
-      - "*"
     webOrigins:
       - https://{{ awx_domain }}
     defaultClientScopes:

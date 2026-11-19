@@ -13,10 +13,12 @@
     clientAuthenticatorType: "{{ item.clientAuthenticatorType | default(omit) }}"
     standardFlowEnabled: "{{ item.standardFlowEnabled }}"
     directAccessGrantsEnabled: "{{ item.directAccessGrantsEnabled | default(omit) }}"
+    serviceAccountsEnabled: "{{ item.serviceAccountsEnabled | default(omit) }}"
     publicClient: "{{ item.publicClient | default(omit) }}"
     redirectUris: "{{ item.redirectUris }}"
     webOrigins: "{{ item.webOrigins }}"
     defaultClientScopes: "{{ item.defaultClientScopes }}"
+    protocolMappers: "{{ item.protocolMappers | default(omit) }}"
 
 - name: Get clients secrets from Keycloak
   when: item.clientAuthenticatorType is defined and item.clientAuthenticatorType == 'client-secret'

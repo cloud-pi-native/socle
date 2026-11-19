@@ -92,8 +92,28 @@ gitlab:
       cron:
         enabled: {{ dsc.global.backup.gitlab.enabled }}
 {% if dsc.global.backup.gitlab.enabled %}
+{#
+  With external object storage (bucketPrefix), backup-utility copies every bucket object by object
+  before building the tar. The artifacts bucket is too large and changes too fast for that
+  (objects expiring mid-copy make s3cmd fail with NoSuchKey): skip it by default.
+#}
+{% set gitlab_backup_external_storage = (dsc.global.bucketPrefix | default('', true) | trim) != '' %}
         schedule: "{{ dsc.global.backup.gitlab.cron }}"
-        extraArgs: "{{ dsc.global.backup.gitlab.extraArgs | default('') }}"
+{% if dsc.global.backup.gitlab.extraArgs is defined %}
+        extraArgs: "{{ dsc.global.backup.gitlab.extraArgs }}"
+{% else %}
+        extraArgs: "{{ '--skip artifacts' if gitlab_backup_external_storage else '' }}"
+{% endif %}
+        # A long backup must not be killed by the next schedule, nor retried from scratch in a loop.
+        concurrencyPolicy: Forbid
+        backoffLimit: {{ dsc.global.backup.gitlab.backoffLimit | default(1) }}
+{% if gitlab_backup_external_storage %}
+        # Backup temporary data on a dedicated ephemeral volume instead of the node disk (emptyDir).
+        persistence:
+          enabled: true
+          useGenericEphemeralVolume: true
+          size: {{ dsc.global.backup.gitlab.tmpVolumeSize | default('30Gi') }}
+{% endif %}
 {% endif %}
 {# Chart 10 requires a backup object storage config for the toolbox, even when backups are disabled #}
 {% if dsc.global.backup.gitlab.enabled or (dsc.global.bucketPrefix | default('', true) | trim) %}

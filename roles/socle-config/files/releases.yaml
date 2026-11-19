@@ -57,9 +57,10 @@ spec:
         chartVersion: "1.0.5"
   grafana:
     # https://github.com/grafana/grafana/tags
-    imageVersion: "10.4.3"
+    imageVersion: "13.3.1"
     # https://github.com/cloud-pi-native/helm-charts/tags
-    chartVersion: "1.8.1"
+    # dso-grafana 2.0.0 embeds grafana-operator 5.26.0
+    chartVersion: "2.0.0"
   harbor:
     # https://artifacthub.io/packages/helm/harbor/harbor
     chartVersion: 1.17.1

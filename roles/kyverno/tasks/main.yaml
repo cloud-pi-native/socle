@@ -6,9 +6,11 @@
       - "app.kubernetes.io/part-of=kyverno"
   register: kyverno_pods
 
-- name: Set path fact
+- name: Set path and repo type facts
   ansible.builtin.set_fact:
     path: "{{ role_path + '/templates/values' }}"
+    is_oci_repo: "{{ dsc.kyverno.helmRepoUrl.startswith('oci://') }}"
+    repo_name: kyverno # for HTTP repositories
 
 - name: Compute Kyverno Helm values
   ansible.builtin.include_role:
@@ -23,16 +25,17 @@
     kyverno_pods.resources | length == 0 or
     dsc.kyverno.forcedInstall
   block:
-    - name: Add helm repo
+    - name: Add Kyverno Helm repo (HTTP repo only)
+      when: not is_oci_repo
       kubernetes.core.helm_repository:
-        name: kyverno
+        name: "{{ repo_name }}"
         repo_url: "{{ dsc.kyverno.helmRepoUrl }}"
         force_update: true
 
-    - name: Deploy helm
+    - name: Deploy Kyverno Helm chart
       kubernetes.core.helm:
         name: kyverno
-        chart_ref: kyverno/kyverno
+        chart_ref: "{{ is_oci_repo | ternary(dsc.kyverno.helmRepoUrl, repo_name) }}/kyverno"
         chart_version: "{{ dsc.kyverno.chartVersion }}"
         release_namespace: "{{ dsc.kyverno.namespace }}"
         create_namespace: true

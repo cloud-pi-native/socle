@@ -926,7 +926,18 @@ spec:
                               type: string
                               default: "30d"
                             extraArgs:
-                              description: String of arguments to pass to the backup utility.
+                              description: |
+                                String of arguments to pass to the backup utility.
+                                When unset and the object storage is external (global.bucketPrefix), defaults to "--skip artifacts":
+                                the artifacts bucket is too large and changes too fast to be copied by the toolbox. Set it to "" to include artifacts.
+                              type: string
+                            backoffLimit:
+                              description: Number of retries of a failed toolbox backup job (default 1).
+                              type: integer
+                            tmpVolumeSize:
+                              description: |
+                                Size of the ephemeral volume holding the toolbox backup temporary data, used when the object storage
+                                is external (global.bucketPrefix). Defaults to 30Gi.
                               type: string
                           type: object
                         dsoBackup:

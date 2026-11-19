@@ -43,10 +43,11 @@ sonarqube:
 {% endif %}
   
 {% if dsc.sonarqube.chartVersion | string is version('2025.6.0', '>=') %}
-{% set branch_plugin_version = '26.1.0' if dsc.sonarqube.chartVersion | string is version('2026.1.0', '>=') else '25.12.0' %}
   # SonarQube Community Build (chart >= 2025.x: disabled by default, otherwise the image tag is a Server edition)
+  # buildNumber pinned by the socle (vars/main.yaml): the branch plugin must match the SonarQube version exactly
   community:
     enabled: true
+    buildNumber: "{{ sonarqube_build.buildNumber }}"
 
   # Branch plugin (not supported by SonarSource): javaagent + webapp replaced at /opt/sonarqube/web
   # (init container below). Same version for the jar (10-offline.j2), the javaagent and the webapp.
@@ -83,7 +84,7 @@ sonarqube:
         - sh
         - -c
         - >-
-          wget -O /web/.sonarqube-webapp.zip {% if dsc.global.offline %}{{ dsc.sonarqube.pluginDownloadUrl }}/sonarqube-webapp-{{ branch_plugin_version }}.zip{% else %}https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/{{ branch_plugin_version }}/sonarqube-webapp.zip{% endif %} &&
+          wget -O /web/.sonarqube-webapp.zip {% if dsc.global.offline %}{{ dsc.sonarqube.pluginDownloadUrl }}/sonarqube-webapp-{{ sonarqube_build.branchPluginVersion }}.zip{% else %}https://github.com/mc1arke/sonarqube-community-branch-plugin/releases/download/{{ sonarqube_build.branchPluginVersion }}/sonarqube-webapp.zip{% endif %} &&
           unzip -o /web/.sonarqube-webapp.zip -d /web &&
           rm -f /web/.sonarqube-webapp.zip
 {% else %}
@@ -113,9 +114,9 @@ sonarqube:
     sonar.core.serverBaseURL: https://<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#domain | jsonPath {.sonarqube}>
     sonar.plugins.risk.consent: "ACCEPTED"
 {% if dsc.sonarqube.chartVersion | string is version('2025.6.0', '>=') %}
-{% set branch_plugin_version = '26.1.0' if dsc.sonarqube.chartVersion | string is version('2026.1.0', '>=') else '25.12.0' %}
-    sonar.web.javaAdditionalOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-{{ branch_plugin_version }}.jar=web"
-    sonar.ce.javaAdditionalOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-{{ branch_plugin_version }}.jar=ce"
+    # -XX:-UseBASE64Intrinsics: CVE-2026-114938 (Java4Shell) mitigation until the JDK is patched
+    sonar.web.javaAdditionalOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-{{ sonarqube_build.branchPluginVersion }}.jar=web -XX:-UseBASE64Intrinsics"
+    sonar.ce.javaAdditionalOpts: "-javaagent:/opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-{{ sonarqube_build.branchPluginVersion }}.jar=ce -XX:-UseBASE64Intrinsics"
 {% endif %}
   
   ## Override JDBC values

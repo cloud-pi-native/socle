@@ -117,3 +117,25 @@ values:
               name: {{ dsc_name }}-vault-keys
               key: root_token
           selectors: {{ dsc.global.metrics.additionalLabels | default ('{}', true) }}
+
+# SonarQube Community Build deployed for each supported chart series (sonarqube.chartVersion >= 2025.6.0).
+# The branch plugin (jar, -javaagent and webapp) must have exactly the same version as SonarQube,
+# so the SonarQube version is pinned here (community.buildNumber) rather than left to the chart default.
+# A chart series missing from this table makes the rendering fail (see tasks/preliminary.yml).
+sonarqube_community_builds:
+  "2025.6":
+    buildNumber: "25.12.0.117093"
+    branchPluginVersion: "25.12.0"
+    oidcPluginVersion: "3.0.0"
+    cnesReportVersion: "5.0.4"
+  "2026.1":
+    buildNumber: "26.1.0.118079"
+    branchPluginVersion: "26.1.0"
+    oidcPluginVersion: "3.0.0"
+    cnesReportVersion: "5.0.4"
+  # Chart 2026.5.x defaults to 26.9.0: pinned to 26.10.0 (latest version supported by the branch plugin).
+  "2026.5":
+    buildNumber: "26.10.0.133078"
+    branchPluginVersion: "26.10.0"
+    oidcPluginVersion: "3.0.0"
+    cnesReportVersion: "5.0.5"

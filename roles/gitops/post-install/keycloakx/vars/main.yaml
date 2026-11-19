@@ -68,6 +68,18 @@ keycloak_clients:
       - generic
     publicClient: false
 
+  - clientId: nexus-client
+    clientAuthenticatorType: client-secret
+    standardFlowEnabled: true
+    redirectUris:
+      - https://{{ nexus_domain }}/oauth2/callback
+    webOrigins:
+      - https://{{ nexus_domain }}
+    defaultClientScopes:
+      - basic
+      - generic
+    publicClient: false
+
   - clientId: harbor-client
     clientAuthenticatorType: client-secret
     standardFlowEnabled: true

@@ -45,9 +45,20 @@ spec:
         spec:
           serviceAccountName: trivy-cleaner-sa
           restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
           containers:
           - name: trivy-cleaner
             image: "alpine/k8s:1.36.2"
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
             command:
               - /bin/sh
               - -c

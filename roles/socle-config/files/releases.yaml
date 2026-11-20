@@ -30,7 +30,7 @@ spec:
     chartVersion: "1.1.0"
   gitlab:
     # https://artifacthub.io/packages/helm/gitlab/gitlab
-    chartVersion: "10.5.7"
+    chartVersion: "10.6.1"
     valkey:
       # https://github.com/valkey-io/valkey-helm/releases
       chartVersion: "0.12.1"
@@ -39,7 +39,7 @@ spec:
     chartVersion: "0.3.5"
   gitlabOperator:
     # https://gitlab.com/gitlab-org/cloud-native/gitlab-operator/-/tags
-    chartVersion: "3.5.6"
+    chartVersion: "3.6.1"
   gitlabrunner:
     # https://gitlab.com/gitlab-org/charts/gitlab-runner/-/tags
     chartVersion: "0.94.3"

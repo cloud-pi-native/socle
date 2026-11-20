@@ -35,6 +35,27 @@
           'meta.helm.sh/release-namespace' in argocd_crd.resources[0].metadata.annotations and
           argocd_crd.resources[0].metadata.annotations['meta.helm.sh/release-namespace'] == "{{ dsc.argocdInfra.namespace }}") | bool }}
 
+# SonarQube Community Build versions (chart >= 2025.6.0)
+
+- name: Set SonarQube Community Build facts
+  when: dsc.sonarqube.chartVersion | string is version('2025.6.0', '>=')
+  vars:
+    sonarqube_chart_series: "{{ (dsc.sonarqube.chartVersion | string).split('.')[:2] | join('.') }}"
+  block:
+    - name: Check that the SonarQube chart series is supported
+      ansible.builtin.assert:
+        that: sonarqube_chart_series in sonarqube_community_builds
+        fail_msg: >-
+          sonarqube.chartVersion {{ dsc.sonarqube.chartVersion }} is not supported: the SonarQube
+          and branch plugin versions are only known for chart series
+          {{ sonarqube_community_builds.keys() | list | join(', ') }}
+          (roles/gitops/rendering-apps-files/vars/main.yaml).
+        quiet: true
+
+    - name: Set sonarqube_build fact
+      ansible.builtin.set_fact:
+        sonarqube_build: "{{ sonarqube_community_builds[sonarqube_chart_series] }}"
+
 # GitLab instance template generation
 
 - name: Check GitLab external object storage

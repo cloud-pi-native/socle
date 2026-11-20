@@ -1,0 +1,57 @@
+velero:
+  deployNodeAgent: {{ dsc.velero.nodeAgent.enabled | default(false) | lower }}
+  # Provider plugin (initContainers) is defined in 10-registry.j2 with the mirrored
+  # registry image; not redefined here to avoid list merge ambiguity between values files.
+  # Restricted Pod Security Standard: seccomp, privilege escalation, capabilities, non-root.
+  # podSecurityContext also covers the plugin initContainer and the upgrade-crds hook Job;
+  # containerSecurityContext applies to the velero container and to that Job (same image).
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+{% if dsc.global.platform | default('') != "openshift" %}
+    # The velero image declares the non-numeric user "cnb", which kubelet cannot verify against
+    # runAsNonRoot: pin its numeric uid/gid (1002:1000 in the image).
+    runAsUser: 1002
+    runAsGroup: 1000
+{% endif %}
+  nodeAgent:
+    # The node-agent reads the pod volumes on the host, so it keeps the chart default root user
+    # (nodeAgent.podSecurityContext). Capabilities are left as is: dropping them would remove
+    # the ability to read volume files owned by other uids.
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      seccompProfile:
+        type: RuntimeDefault
+  credentials:
+    useSecret: true
+    existingSecret: velero-s3-credentials
+  configuration:
+    defaultVolumesToFsBackup: {{ dsc.velero.nodeAgent.enabled | default(false) | lower }}
+{% if dsc.velero.volumeSnapshots.enabled | default(false) %}
+    # The CSI plugin is built into Velero >= 1.14 but stays inactive without this flag:
+    # Backups then complete with "no applicable volumesnapshotter found" and no snapshot.
+    features: EnableCSI
+{% endif %}
+    backupStorageLocation:
+      - name: {{ dsc.velero.storageLocationName | default('default') }}
+        provider: {{ dsc.velero.provider | default('aws') }}
+        bucket: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3BucketName}>
+        # Bucket is shared with cnpg/vault backups: Velero marks a store Unavailable
+        # when its root holds foreign top-level directories, so it needs its own prefix.
+        prefix: {{ dsc.velero.pathPrefix | default('velero') | quote }}
+        config:
+          region: {{ dsc.velero.region | default('') | quote }}
+          s3ForcePathStyle: {{ dsc.velero.s3ForcePathStyle | default(true) | lower | quote }}
+          s3Url: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#backup | jsonPath {.s3Endpoint}>
+    # No volumeSnapshotLocation: CSI snapshots use a VolumeSnapshotClass (see volumeSnapshots), not this.
+    volumeSnapshotLocation: []
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true

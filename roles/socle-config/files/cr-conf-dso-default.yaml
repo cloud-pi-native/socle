@@ -60,6 +60,7 @@ spec:
     namespace: infra-argocd
     projectName: default
   certmanager: {}
+  velero: {}
   cloudnativepg: {}
   console: {}
   cpnAnsibleJob: {}

@@ -1,0 +1,14 @@
+{% if dsc.velero.volumeSnapshots.enabled | default(false) and dsc.velero.volumeSnapshots.createClass | default(true) %}
+# Dedicated class for Velero CSI snapshots. Classes shipped by the cluster are left untouched:
+# Velero accepts exactly one class per driver carrying the label below, and a GitOps-managed
+# copy of a cluster class could be pruned. deletionPolicy Retain is what Velero expects: it
+# manages the snapshot content lifecycle itself, from the Backup TTL.
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: {{ dsc.velero.volumeSnapshots.className | default('velero-csi-snapshot') }}
+  labels:
+    velero.io/csi-volumesnapshot-class: "true"
+driver: {{ dsc.velero.volumeSnapshots.driver }}
+deletionPolicy: Retain
+{% endif %}

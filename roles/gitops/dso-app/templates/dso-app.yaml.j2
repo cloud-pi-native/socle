@@ -18,8 +18,8 @@ spec:
     name: in-cluster
     namespace: {{ dsc.argocdInfra.namespace }}
   syncPolicy:
-    # automated: {}
-    #   selfHeal: true
+    automated: {}
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true

@@ -25,6 +25,7 @@
           - "harbor"
           - "console (or console-dso)"
           - "grafana"
+          - "trivyOperator (or trivy-operator)"
       tags:
         - always
 
@@ -196,6 +197,50 @@
             msg:
               - "Version de Kyverno : {{ kyverno_infos.status.app_version }}"
               - "Version de chart Helm Kyverno : {{ kyverno_infos.status.chart }}"
+
+    - name: Get Trivy Operator app and chart versions
+      tags:
+        - trivyOperator
+        - trivy-operator
+      block:
+        - name: Get Trivy Operator namespace
+          kubernetes.core.k8s_info:
+            kind: Namespace
+            name: "{{ dsc.trivyOperator.namespace }}"
+          register: trivy_operator_ns
+
+        - name: Warning message
+          when: trivy_operator_ns.resources | length == 0
+          ansible.builtin.debug:
+            msg:
+              - "Le namespace {{ dsc.trivyOperator.namespace }} n'existe pas."
+              - "Cela signifie que le Trivy Operator est probablement installé dans un namespace indépendant du Socle, ou absent."
+
+        - name: Retrieve Trivy Operator infos
+          when: trivy_operator_ns.resources | length > 0
+          kubernetes.core.helm_info:
+            name: trivy-operator
+            namespace: "{{ dsc.trivyOperator.namespace }}"
+          register: trivy_operator_infos
+
+        - name: Warning message
+          when: >
+            trivy_operator_ns.resources | length > 0 and
+            trivy_operator_infos.status is not defined
+          ansible.builtin.debug:
+            msg:
+              - "Le Trivy Operator n'est pas installé en tant que chart Helm dans le namespace {{ dsc.trivyOperator.namespace }}."
+              - "Cela signifie notamment qu'il n'a pas été installé via les roles du Socle."
+              - "Nous ne pouvons en déterminer la version de manière fiable."
+
+        - name: Display Trivy Operator version
+          when: >
+            trivy_operator_ns.resources | length > 0 and
+            trivy_operator_infos.status is defined
+          ansible.builtin.debug:
+            msg:
+              - "Version du Trivy Operator : {{ trivy_operator_infos.status.app_version }}"
+              - "Version de chart Helm Trivy Operator : {{ trivy_operator_infos.status.chart }}"
 
     - name: Get CNPG Operator app and chart versions
       tags:

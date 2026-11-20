@@ -253,6 +253,7 @@ Pour vous aider à démarrer, le fichier [cr-conf-dso-default.yaml](roles/socle-
 - du paramètre `global.offline` en mode air gap,
 - de la taille de certains PVCs,
 - de l'activation ou non des métriques,
+- de l'activation ou non des NetworkPolicies (`global.networkpolicies`, voir [docs/network-policies.md](docs/network-policies.md)),
 - du proxy si besoin ainsi que des sections CA et ingress.
 
 Les champs utilisables dans cette ressource de type **dsc** peuvent être décrits pour chaque outil à l'aide de la commande `kubectl explain`. Exemple avec Argo CD :

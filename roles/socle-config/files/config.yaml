@@ -106,6 +106,18 @@ spec:
       enabled: false
     alerting:
       enabled: false
+    networkpolicies:
+      enabled: false
+      ingressNamespaces:
+        - ingress-nginx
+      # Cluster-wide default deny: explicit opt-in, last activation step (enabled alone never adds it).
+      clusterDefaultDeny: false
+      excludedNamespaces:
+        - kube-system
+      # Namespace of the CloudNativePG operator / of the metrics scraper when they run outside this DSC.
+      cnpgOperatorNamespace: ''
+      scrapeNamespace: ''
+      scrapePodLabels: {}
     gitOps:
       namespacePrefix: dso-
       watchpointEnabled: true

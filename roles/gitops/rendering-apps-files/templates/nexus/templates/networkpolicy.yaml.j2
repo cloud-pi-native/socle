@@ -1,0 +1,24 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.active('nexus') %}
+{# Nexus, no CNPG cluster. Ingress-only: the namespace egress cannot be listed (proxy repositories on arbitrary
+   remote hosts, HTTP proxy), so no DNS policy and no Egress side.
+   Ingress sources (app.kubernetes.io/name=nexus3, component=repository): ingress controller to http 8081 and
+   dockerproxy 5000 (two Ingresses), console to 8081, GitLab CI jobs to 8081 (the runner spawns them in the gitlab
+   namespace, any pod of it is allowed), metrics scraper to 8081 (the only HTTP port of the pod).
+   The scrape rule follows np.scrape_on; ACME HTTP-01 solver pods are opened by np.acme_solver. #}
+{% set app = 'nexus' %}
+{% set nexus = {'app.kubernetes.io/name': 'nexus3', 'app.kubernetes.io/component': 'repository'} %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller(app, nexus, [8081, 5000]) }}
+{% if gate.installed('console') %}
+{{ np.from_namespaces(app, 'console', nexus, [{'namespace': np.ns('console'), 'selector': {}}], [8081]) }}
+{% endif %}
+{% if gate.installed('gitlabrunner') %}
+{{ np.from_namespaces(app, 'ci-jobs', nexus, [{'namespace': np.ns('gitlab'), 'selector': {}}], [8081]) }}
+{% endif %}
+{% if np.scrape_on() %}
+{{ np.scrape(app, nexus, [8081]) }}
+{% endif %}
+{% endif %}

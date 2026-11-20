@@ -1,0 +1,29 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/gitlab-family-netpol.j2' as gf with context %}
+{% if gf.owner_active() %}
+{# gitlab owns the namespace shared with glexporter and gitlabrunner: it alone emits the namespace-wide policy.
+   Ingress-only: the namespace egress cannot be listed (CI build pods of the runner run here with arbitrary egress;
+   sidekiq webhooks, mirrors and email; S3 and OIDC endpoints; HTTP proxy), so no DNS policy and no Egress side.
+   Ingress sources (release=gitlab): ingress controller to workhorse 8181 and KAS 8150 / 8154, API server to the
+   GitLab operator webhook 9443, console to workhorse 8181, CNPG operator to the pg-cluster-gitlab status port
+   8000, metrics scraper to the metrics ports.
+   The CNPG operator peer is np.cnpg_operator_peer (local namespace, else global.networkpolicies.cnpgOperatorNamespace,
+   else any namespace with the operator pod labels); the scrape rule follows np.scrape_on; ACME HTTP-01 solver pods
+   are opened by np.acme_solver. #}
+{% set app = 'gitlab' %}
+{% set webservice = {'app': 'webservice', 'gitlab.com/webservice-name': 'default', 'release': 'gitlab'} %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller('gitlab-webservice', webservice, [8181]) }}
+{{ np.ingress_controller('gitlab-kas', {'app': 'kas', 'release': 'gitlab'}, [8150, 8154]) }}
+{{ np.webhook(app, {'control-plane': 'controller-manager'}, [9443]) }}
+{% if gf.console() %}
+{{ np.from_namespaces(app, 'console', webservice, [{'namespace': np.ns('console'), 'selector': {}}], [8181]) }}
+{% endif %}
+{{ np.from_namespaces(app, 'cnpg-operator', {'cnpg.io/cluster': 'pg-cluster-gitlab'}, [np.cnpg_operator_peer() | from_json], [8000]) }}
+{% if gf.scrape_on() %}
+{# webservice 8083, KAS 8151, gitaly 9236, sidekiq 3807, gitlab-exporter 9168, redis 9121, pg-cluster-gitlab
+   9187, pooler 9127, GitLab operator 8443 #}
+{{ np.scrape(app, {}, [8083, 8151, 9236, 3807, 9168, 9121, 9187, 9127, 8443]) }}
+{% endif %}
+{% endif %}

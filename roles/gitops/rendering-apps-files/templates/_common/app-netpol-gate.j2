@@ -1,0 +1,24 @@
+{# Shared gate of the per-app NetworkPolicy templates that emit a namespace-wide ingress isolation, imported with:
+   {% import '_common/app-netpol-gate.j2' as gate with context %}
+   Used by _common/gitlab-family-netpol.j2 and by
+   {harbor,nexus,sonarqube,keycloakx,vault,console,argocd}/templates/networkpolicy.yaml.j2.
+   Predicates return 'true' / ''. #}
+
+{# 'true' when dsc.<key>.installEnabled is set (the real install flag of the app in this DSC). #}
+{% macro installed(key) -%}
+{{ 'true' if (dsc[key] | default({})).installEnabled | default(false) | bool else '' }}
+{%- endmacro %}
+
+{# 'true' when the networkpolicies flag is on. #}
+{% macro flag() -%}
+{{ 'true' if (dsc.global.networkpolicies | default({})).enabled | default(false) | bool else '' }}
+{%- endmacro %}
+
+{# 'true' when the app emits its policies: flag on and the app installed. The peers that cannot be local to this
+   DSC (CNPG operator, metrics scraper) are named from the DSC settings global.networkpolicies.cnpgOperatorNamespace
+   / scrapeNamespace, or opened to any namespace by pod labels (see np.cnpg_operator_peer and np.scrape in
+   networkpolicy-macros.j2), and the ACME HTTP-01 solver pods get their own policy (np.acme_solver). Apps with
+   their own specific conditions add them next to this call. #}
+{% macro active(app) -%}
+{{ 'true' if flag() and installed(app) else '' }}
+{%- endmacro %}

@@ -1,0 +1,7 @@
+{# Label selectors ("key=value", YAML list) matching every policy that np.labels(netpol_app) labels, for the
+   direct roles that look up and remove their own policies (tasks/apply_netpol.yml). Built from np.labels itself,
+   so the selectors cannot drift from the labels the templates put on the policies. #}
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% for k, v in (np.labels(netpol_app, '') | from_yaml).items() %}
+- {{ (k ~ '=' ~ v) | to_json }}
+{% endfor %}

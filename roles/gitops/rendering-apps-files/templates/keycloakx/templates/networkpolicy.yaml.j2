@@ -1,0 +1,30 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.active('keycloakx') %}
+{# Keycloak (keycloakx chart). Ingress-only: the namespace egress cannot be listed (identity providers and
+   federation endpoints chosen per realm, provider / theme downloads of the init container, HTTP proxy, SMTP,
+   Barman backups of pg-cluster-keycloak to S3), so no DNS policy and no Egress side.
+   The chart-native NetworkPolicy of the keycloakx chart stays disabled (values/00-main.j2, keycloakx.networkPolicy):
+   both sets would add up on the same pods.
+   Ingress sources (pods labeled app.kubernetes.io/name=keycloakx by the chart): ingress controller to the http
+   port 8080 (Ingress targets the <subDomain>-http Service 80 -> 8080), console to 8080 (in-cluster Service), CNPG
+   operator to the pg-cluster-keycloak status port 8000, metrics scraper to the management port 9000, the http
+   port 8080 and the pg-cluster-keycloak metrics port 9187. JGroups discovery 7800, PostgreSQL 5432 and the
+   post-install job are inside the namespace (intra). Every other client (applications, GitLab, Harbor, SonarQube,
+   Argo CD, Vault OIDC, other clusters) uses the public URL through the ingress controller.
+   The CNPG operator peer is np.cnpg_operator_peer (local namespace, else global.networkpolicies.cnpgOperatorNamespace,
+   else any namespace with the operator pod labels); the scrape rule follows np.scrape_on; ACME HTTP-01 solver pods
+   are opened by np.acme_solver. #}
+{% set app = 'keycloakx' %}
+{% set kc = {'app.kubernetes.io/name': 'keycloakx'} %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller(app, kc, [8080]) }}
+{% if gate.installed('console') %}
+{{ np.from_namespaces(app, 'console', kc, [{'namespace': np.ns('console'), 'selector': {}}], [8080]) }}
+{% endif %}
+{{ np.from_namespaces(app, 'cnpg-operator', {'cnpg.io/cluster': 'pg-cluster-keycloak'}, [np.cnpg_operator_peer() | from_json], [8000]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [8080, 9000, 9187]) }}
+{% endif %}
+{% endif %}

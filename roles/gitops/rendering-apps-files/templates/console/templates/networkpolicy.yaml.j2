@@ -1,0 +1,25 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% if gate.active('console') %}
+{# Console. Ingress-only: the namespace egress cannot be listed (GitLab, Harbor, Nexus, SonarQube, Vault, Argo CD
+   and Keycloak of this DSC, Kubernetes API of the project clusters, S3, HTTP proxy, plugin downloads from public
+   hosts, Barman backups of pg-cluster-console to S3), so no DNS policy and no Egress side.
+   Ingress sources (chart dso-console, nameOverride <dsc>-cpn-console, pods
+   app.kubernetes.io/name=<dsc>-cpn-console-<part>): ingress controller to the client (/) and the strangler (/api,
+   swagger), both 8080 (Services 80 -> 8080), CNPG operator to the pg-cluster-console status port 8000, metrics
+   scraper to the pg-cluster-console metrics port 9187 (the chart has no ServiceMonitor). Server 8080 and backend
+   3001 are only reached from the strangler, inside the namespace (intra), as is PostgreSQL 5432.
+   The CNPG operator peer is np.cnpg_operator_peer (local namespace, else global.networkpolicies.cnpgOperatorNamespace,
+   else any namespace with the operator pod labels); the scrape rule follows np.scrape_on; ACME HTTP-01 solver pods
+   are opened by np.acme_solver. #}
+{% set app = 'console' %}
+{% set name = dsc_name ~ '-cpn-console' %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller('console-client', {'app.kubernetes.io/name': name ~ '-client'}, [8080]) }}
+{{ np.ingress_controller('console-strangler', {'app.kubernetes.io/name': name ~ '-strangler'}, [8080]) }}
+{{ np.from_namespaces(app, 'cnpg-operator', {'cnpg.io/cluster': 'pg-cluster-console'}, [np.cnpg_operator_peer() | from_json], [8000]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [9187]) }}
+{% endif %}
+{% endif %}

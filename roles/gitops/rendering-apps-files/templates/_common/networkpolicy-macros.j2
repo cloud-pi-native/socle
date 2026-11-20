@@ -1,0 +1,227 @@
+{# Shared NetworkPolicy macros, imported by the per-app templates with:
+   {% import '_common/networkpolicy-macros.j2' as np with context %}
+   "with context" is required: the macros read dsc, envs and dsc_name.
+   Each policy macro emits ONE YAML document that starts with "---" and has no metadata.namespace (the
+   ArgoCD destination namespace is applied by the Application). "selector" arguments are matchLabels maps.
+   The admission webhook ingress uses the Cilium remote-node entity (CiliumNetworkPolicy): it is the only
+   way to name the API server side of a webhook call, which NetworkPolicy cannot express. #}
+
+{# --- private helpers ------------------------------------------------------------------------------- #}
+{# Fail the render with a message (mandatory raises on an undefined value). #}
+{% macro _fail(msg) -%}
+{{ _np_undefined_on_purpose | mandatory(msg) }}
+{%- endmacro %}
+
+{# Refuse an empty ports list (it would open every port) and anything but a numeric port (no named ports, no junk). #}
+{% macro _check_ports(who, ports) -%}
+{%- if not ports -%}
+{{ _fail('np.' ~ who ~ ': ports must not be empty (an empty list opens every port)') }}
+{%- else -%}
+{%- for p in ports -%}
+{%- if not (p is integer and 0 < p and p < 65536) -%}
+{{ _fail('np.' ~ who ~ ': invalid port ' ~ (p | string) ~ ' (a number from 1 to 65535 is expected, named ports are not supported)') }}
+{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{%- endmacro %}
+
+{# Standard NetworkPolicy ports as a YAML flow list, TCP. #}
+{% macro _tcp_ports(ports) -%}
+[{%- for p in ports -%}{port: {{ p | int }}, protocol: TCP}{{ ', ' if not loop.last }}{%- endfor -%}]
+{%- endmacro %}
+
+{# Cilium toPorts entry, TCP, ports quoted as strings. #}
+{% macro _cilium_tcp_ports(ports) -%}
+[{ports: [{%- for p in ports -%}{port: {{ (p | string) | to_json }}, protocol: TCP}{{ ', ' if not loop.last }}{%- endfor -%}]}]
+{%- endmacro %}
+
+{# Namespaces of the ingress controllers (dsc.global.networkpolicies.ingressNamespaces, default ingress-nginx),
+   deduplicated, order kept. Returned as a JSON list. #}
+{% macro _ingress_namespaces() -%}
+{{ ((dsc.global.networkpolicies | default({})).ingressNamespaces | default(['ingress-nginx'], true)) | unique | list | to_json }}
+{%- endmacro %}
+
+{# --- public macros --------------------------------------------------------------------------------- #}
+
+{# Real destination namespace of an ArgoCD app (rule of dso-appset.yaml.j2: namespace prefix + envs nameSpace),
+   the single source of it. Takes the first match across envs (one env per DSC). #}
+{% macro ns(argocd_app) -%}
+{%- set found = envs | map(attribute='apps') | flatten | selectattr('argocd_app', 'equalto', argocd_app) | list -%}
+{%- set a = (found | first) | mandatory('np.ns: no app ' ~ argocd_app ~ ' in envs') -%}
+{{ ((a.customNamespacePrefix | default('')) or dsc.global.gitOps.namespacePrefix) ~ a.nameSpace }}
+{%- endmacro %}
+
+{# Labels carried by every generated policy, as a YAML flow mapping (role is reserved, not emitted yet). #}
+{% macro labels(app, role) -%}
+{app.kubernetes.io/managed-by: socle-networkpolicies, cloud-pi-native.fr/dsc: {{ dsc_name | to_json }}, cloud-pi-native.fr/netpol-app: {{ app | to_json }}}
+{%- endmacro %}
+
+{# Free traffic inside the namespace, both directions. egress=false keeps only the ingress side, for a namespace
+   whose egress cannot be listed yet (no egress isolation). #}
+{% macro intra(app, egress=true) %}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ app }}-intra-namespace
+  labels: {{ labels(app, 'intra') }}
+spec:
+  podSelector: {}
+  policyTypes: {{ '[Ingress, Egress]' if egress else '[Ingress]' }}
+  ingress:
+    - from:
+        - podSelector: {}
+{% if egress %}
+  egress:
+    - to:
+        - podSelector: {}
+{% endif %}
+{% endmacro %}
+
+{# Ingress from the ingress controller pods to the selected pods. #}
+{% macro ingress_controller(app, selector, ports) %}
+{{ _check_ports('ingress_controller', ports) }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ app }}-ingress
+  labels: {{ labels(app, 'ingress') }}
+spec:
+  podSelector: {matchLabels: {{ selector | to_json }}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+{% for ing_ns in _ingress_namespaces() | from_json %}
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ ing_ns | to_json }}}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: ingress-nginx}}
+{% endfor %}
+      ports: {{ _tcp_ports(ports) }}
+{% endmacro %}
+
+{# 'true' when the scrape policies are emitted: global.metrics.enabled (the ServiceMonitors / PodMonitors exist and
+   a scraper reads them). Otherwise nothing scrapes, no scrape policy. #}
+{% macro scrape_on() -%}
+{{ 'true' if (dsc.global.metrics | default({})).enabled | default(false) | bool else '' }}
+{%- endmacro %}
+
+{# Ingress from the metrics scraper to the selected pods. The scraper namespace is
+   global.networkpolicies.scrapeNamespace, mandatory when metrics are enabled (an unrestricted source would open
+   the metrics ports to the whole cluster); global.networkpolicies.scrapePodLabels optionally narrows it to the
+   scraper pods (empty: every pod of that namespace). Callers gate it with scrape_on(). #}
+{% macro scrape(app, selector, ports) %}
+{{ _check_ports('scrape', ports) }}
+{% set conf = dsc.global.networkpolicies | default({}) %}
+{% set scrape_ns = conf.scrapeNamespace | default('', true) %}
+{% set scrape_pods = conf.scrapePodLabels | default({}, true) %}
+{% if not scrape_ns %}{{ _fail('np.scrape: global.metrics.enabled requires global.networkpolicies.scrapeNamespace (namespace of the metrics scraper)') }}{% endif %}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ app }}-scrape
+  labels: {{ labels(app, 'scrape') }}
+spec:
+  podSelector: {matchLabels: {{ selector | to_json }}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ scrape_ns | to_json }}}}
+          podSelector: {{ ('{matchLabels: ' ~ (scrape_pods | to_json) ~ '}') if scrape_pods else '{}' }}
+      ports: {{ _tcp_ports(ports) }}
+{% endmacro %}
+
+{# Admission webhook ingress: the API server calls the webhook from outside the pod network, which Cilium
+   identifies as the remote-node entity. Without it, the ingress isolation of the namespace rejects the admission
+   requests. #}
+{% macro webhook(app, selector, ports) %}
+{{ _check_ports('webhook', ports) }}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ app }}-webhook
+  labels: {{ labels(app, 'webhook') }}
+spec:
+  endpointSelector: {matchLabels: {{ selector | to_json }}}
+  ingress:
+    - fromEntities: [remote-node]
+      toPorts: {{ _cilium_tcp_ports(ports) }}
+{% endmacro %}
+
+{# Ingress to the selected pods from a list of {namespace, selector} peers (selector {} = every pod of that
+   namespace). A peer {'any_namespace': true, 'selector': {...}} (no namespace) matches the pods of that selector in
+   every namespace (namespaceSelector {}); its selector must not be empty. Policy name <app>-<name>. Empty peers are
+   refused: a rule without "from" would allow every source. #}
+{% macro from_namespaces(app, name, selector, peers, ports) %}
+{{ _check_ports('from_namespaces', ports) }}
+{% if not peers %}{{ _fail('np.from_namespaces: peers must not be empty (an empty from allows every source)') }}{% endif %}
+{% for p in peers %}{% if not p.namespace | default('') %}{% if not (p.any_namespace | default(false) and p.selector | default({})) %}{{ _fail('np.from_namespaces: empty namespace in peers') }}{% endif %}{% endif %}{% endfor %}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ app }}-{{ name }}
+  labels: {{ labels(app, name) }}
+spec:
+  podSelector: {matchLabels: {{ selector | to_json }}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+{% for p in peers %}
+{% if p.namespace | default('') %}
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ p.namespace | to_json }}}}
+{% else %}
+        - namespaceSelector: {}
+{% endif %}
+          podSelector: {{ ('{matchLabels: ' ~ (p.selector | to_json) ~ '}') if p.selector | default({}) else '{}' }}
+{% endfor %}
+      ports: {{ _tcp_ports(ports) }}
+{% endmacro %}
+
+{# Peer of the CNPG operator for np.from_namespaces (use it as [np.cnpg_operator_peer() | from_json]): the operator
+   reaches the status port of every pg-cluster-*. Namespace: the local one (np.ns('cloudnativepg')) when the CNPG app
+   is installed in this DSC, else global.networkpolicies.cnpgOperatorNamespace (operator deployed outside this DSC,
+   for instance by the cloudnativepg role), else no namespace restriction (any namespace, operator pod labels
+   only). Returned as a JSON object. #}
+{% macro cnpg_operator_peer() -%}
+{%- set selector = {'app.kubernetes.io/name': 'cloudnative-pg'} -%}
+{%- if (dsc.cloudnativepg | default({})).installEnabled | default(false) | bool -%}
+{{ {'namespace': ns('cloudnativepg'), 'selector': selector} | to_json }}
+{%- else -%}
+{%- set configured = (dsc.global.networkpolicies | default({})).cnpgOperatorNamespace | default('', true) -%}
+{{ ({'namespace': configured, 'selector': selector} if configured else {'any_namespace': true, 'selector': selector}) | to_json }}
+{%- endif -%}
+{%- endmacro %}
+
+{# 'true' when the ACME ClusterIssuer solves challenges over HTTP-01 (dsc.ingress.tls.type acme), '' otherwise.
+   In HTTP-01 mode cert-manager creates solver pods (and their Service / Ingress) in the namespace of each
+   Certificate, reached by the ingress controller: np.acme_solver opens them. #}
+{% macro acme_http01() -%}
+{{ 'true' if ((dsc.ingress | default({})).tls | default({})).type | default('') == 'acme' else '' }}
+{%- endmacro %}
+
+{# Ingress to the cert-manager HTTP-01 solver pods of the namespace, from the ingress controllers; emits NOTHING
+   unless acme_http01(). Policy <app>-acme-solver. WARNING not verified on a cluster: the pod label
+   acme.cert-manager.io/http01-solver="true" and the port 8089 are the cert-manager defaults (solver container
+   port, no --acme-http01-solver-* override assumed). Call it from every app template that has an Ingress. #}
+{% macro acme_solver(app) %}
+{% if acme_http01() %}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ app }}-acme-solver
+  labels: {{ labels(app, 'acme-solver') }}
+spec:
+  podSelector: {matchLabels: {acme.cert-manager.io/http01-solver: "true"}}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+{% for ing_ns in _ingress_namespaces() | from_json %}
+        - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: {{ ing_ns | to_json }}}}
+          podSelector: {matchLabels: {app.kubernetes.io/name: ingress-nginx}}
+{% endfor %}
+      ports: {{ _tcp_ports([8089]) }}
+{% endif %}
+{% endmacro %}

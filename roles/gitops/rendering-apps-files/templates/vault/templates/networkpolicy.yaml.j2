@@ -1,0 +1,32 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+{% set injector = ((dsc.vault | default({}))['values'] | default({})).injector | default({}) %}
+{% set injector_off = (injector.enabled | default('-') | string | lower) == 'false' %}
+{% if gate.active('vault') and injector_off %}
+{# Vault. Ingress-only: the namespace egress cannot be listed (OIDC and JWT auth backends, S3 snapshot backups,
+   HTTP proxy), so no DNS policy and no Egress side.
+   Vault is consumed from other clusters and namespaces, no consumer may be cut:
+   - external consumers (other clusters, project VaultConnections built on the public URL) come through the
+     ingress controller (Ingress to <dsc>-vault-active:8200);
+   - in-cluster consumers derivable from this DSC: the console and the CI jobs of the GitLab runner; the backup
+     CronJob, the post-install job and raft 8201 / replication 8202 are inside the namespace (intra).
+   Server pods: app.kubernetes.io/name=vault, component=server, http 8200; the server telemetry ServiceMonitor
+   scrapes 8200.
+   Documented skip (nothing rendered): agent injector not explicitly disabled (dsc.vault.values.injector.enabled,
+   chart default true): the agent sidecars run in arbitrary namespaces and reach the in-cluster Service, so the
+   consumer path is not derivable. #}
+{% set app = 'vault' %}
+{% set srv = {'app.kubernetes.io/name': 'vault', 'component': 'server'} %}
+{{ np.intra(app, egress=false) }}
+{{ np.acme_solver(app) }}
+{{ np.ingress_controller(app, srv, [8200]) }}
+{% if gate.installed('console') %}
+{{ np.from_namespaces(app, 'console', srv, [{'namespace': np.ns('console'), 'selector': {}}], [8200]) }}
+{% endif %}
+{% if gate.installed('gitlabrunner') %}
+{{ np.from_namespaces(app, 'ci-jobs', srv, [{'namespace': np.ns('gitlab'), 'selector': {}}], [8200]) }}
+{% endif %}
+{% if np.scrape_on() %}
+{{ np.scrape(app, srv, [8200]) }}
+{% endif %}
+{% endif %}

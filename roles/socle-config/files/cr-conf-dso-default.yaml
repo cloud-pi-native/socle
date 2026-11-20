@@ -59,7 +59,6 @@ spec:
       enabled: false
     namespace: infra-argocd
     projectName: default
-  awx: {}
   certmanager: {}
   cloudnativepg: {}
   console: {}

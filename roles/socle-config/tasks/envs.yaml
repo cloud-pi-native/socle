@@ -40,7 +40,6 @@
               rootDomain: "{{ root_domain[1:] }}"
               domain:
                 argocd: "{{ argocd_domain }}"
-                awx: "{{ awx_domain }}"
                 console: "{{ console_domain }}"
                 gitlab: "{{ gitlab_domain }}"
                 grafana: "{{ grafana_domain }}"
@@ -81,14 +80,6 @@
                 authentication:
                   user: ""
                   password: ""
-          - argocd_app: awx
-            clusterName: "in-cluster"
-            nameSpace: "awx"
-            customNamespacePrefix: ""
-            syncWave: 20
-            vault_values:
-              auth:
-                adminPassword: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_letters', 'digits']) }}"
           - argocd_app: certmanager
             clusterName: ""
             nameSpace: "certmanager"

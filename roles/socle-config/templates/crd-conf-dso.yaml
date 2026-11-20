@@ -229,11 +229,6 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        backupPath:
-                          description: |
-                            Path, inside the backup S3 bucket, of the CNPG WAL archive and base backups (default "cnpg").
-                            Must point to an empty or same-timeline archive: change it after a restore (recovery) or a PostgreSQL major upgrade.
-                          type: string
                         mode:
                           description: Determines whether cnpg clusters should be deployed with as a primary cluster (initb from scratch) or replica cluster (initdb from external source).
                           default: primary

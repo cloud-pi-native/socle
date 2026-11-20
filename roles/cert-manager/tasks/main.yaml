@@ -1,4 +1,14 @@
 ---
+# The Helm release installed here uses other selector labels than the GitOps
+# certmanager app: Argo CD cannot take over its Deployments (immutable selector).
+- name: Fail if cert-manager is deployed by Argo CD
+  ansible.builtin.fail:
+    msg: >-
+      dsc.certmanager.installEnabled is true: cert-manager is deployed by the
+      Argo CD certmanager app. Its CRDs are applied by the cert-manager-crds
+      role (default install-gitops.yaml run), do not run the cert-manager tag.
+  when: dsc.certmanager.installEnabled
+
 - name: Get cluster infos
   kubernetes.core.k8s_cluster_info:
   register: cluster_infos
@@ -25,19 +35,9 @@
         repo_url: "{{ dsc.certmanager.helmRepoUrl }}"
         force_update: true
 
-    # Installation des CRDs indépendamment du chart helm.
-    # Recommandé en production.
-    # Voir : https://cert-manager.io/docs/installation/helm
-    - name: Download cert-manager CRDs
-      ansible.builtin.uri:
-        url: https://github.com/cert-manager/cert-manager/releases/download/{{ dsc.certmanager.chartVersion }}/cert-manager.crds.yaml
-        return_content: true
-      register: cert_manager_crds
-
-    - name: Apply CRDs
-      kubernetes.core.k8s:
-        state: present
-        definition: "{{ cert_manager_crds.content | from_yaml_all }}"
+    - name: Apply cert-manager CRDs
+      ansible.builtin.include_role:
+        name: cert-manager-crds
 
     - name: Set path fact
       ansible.builtin.set_fact:

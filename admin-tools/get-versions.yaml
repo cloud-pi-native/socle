@@ -452,7 +452,7 @@
           kubernetes.core.k8s_info:
             namespace: "{{ dsc.console.namespace }}"
             kind: Deployment
-            name: dso-cpn-console-server
+            name: dso-cpn-console-backend
           register: console_deploy
 
         - name: Get Console Pi Native version

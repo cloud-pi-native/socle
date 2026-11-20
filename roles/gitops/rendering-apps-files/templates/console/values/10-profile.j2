@@ -23,28 +23,4 @@ console:
         runAsUser: 1000
         seccompProfile:
           type: RuntimeDefault
-
-  server:
-    container:
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-          - ALL
-        runAsNonRoot: true
-        runAsUser: 1000
-        seccompProfile:
-          type: RuntimeDefault
-
-  strangler:
-    container:
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-          - ALL
-        runAsNonRoot: true
-        runAsUser: 101
-        seccompProfile:
-          type: RuntimeDefault
 {% endif %}

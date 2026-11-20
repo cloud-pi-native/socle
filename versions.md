@@ -5,7 +5,7 @@
 | certmanager               | 1.14.3           | 1.14.3        | [certmanager](https://github.com/cert-manager/cert-manager/releases)                                                 |
 | cloudnativepg.cluster     | N/A              | 0.3.1         | [cluster](https://artifacthub.io/packages/helm/cloudnative-pg/cluster)                                               |
 | cloudnativepg.operator    | 1.28.0           | 0.27.0        | [cloudnative-pg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                 |
-| console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
+| console                   | 9.\*.\*          | 3.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | cpn-job                   | 1.\*.\*          | 1.\*.\*       | [cpn-job](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | gitlab                    | 19.5.6         | 10.5.7      | [gitlab](https://artifacthub.io/packages/helm/gitlab/gitlab)                                                         |
 | glexporter | 0.5.10           | 0.3.5         | [glexporter](https://github.com/mvisonneau/helm-charts/tree/main/charts/gitlab-ci-pipelines-exporter) |

@@ -433,6 +433,11 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
+                        backupPath:
+                          description: |
+                            Path, inside the backup S3 bucket, of the CNPG WAL archive and base backups (default "cnpg").
+                            Must point to an empty or same-timeline archive: change it after a restore (recovery) or a PostgreSQL major upgrade.
+                          type: string
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
@@ -550,6 +555,11 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
+                        backupPath:
+                          description: |
+                            Path, inside the backup S3 bucket, of the CNPG WAL archive and base backups (default "cnpg-pg17").
+                            Must point to an empty or same-timeline archive: change it after a restore (recovery) or a PostgreSQL major upgrade.
+                          type: string
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
@@ -1238,6 +1248,11 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
+                        backupPath:
+                          description: |
+                            Path, inside the backup S3 bucket, of the CNPG WAL archive and base backups (default "cnpg").
+                            Must point to an empty or same-timeline archive: change it after a restore (recovery) or a PostgreSQL major upgrade.
+                          type: string
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
@@ -1479,13 +1494,13 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
-                        imageName:
-                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
-                          type: string
                         backupPath:
                           description: |
-                            Path, inside the backup S3 bucket, of the Keycloak CNPG WAL archive and base backups (default "cnpg").
+                            Path, inside the backup S3 bucket, of the CNPG WAL archive and base backups (default "cnpg").
                             Must point to an empty or same-timeline archive: change it after a restore (recovery) or a PostgreSQL major upgrade.
+                          type: string
+                        imageName:
+                          description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string
                         values:
                           description: Extra helm values for CNPG cluster. See https://github.com/cloudnative-pg/charts/blob/main/charts/cluster/values.yaml
@@ -1743,6 +1758,11 @@ spec:
                       description: Configuration for cnpg clusters.
                       type: object
                       properties:
+                        backupPath:
+                          description: |
+                            Path, inside the backup S3 bucket, of the CNPG WAL archive and base backups (default "cnpg").
+                            Must point to an empty or same-timeline archive: change it after a restore (recovery) or a PostgreSQL major upgrade.
+                          type: string
                         imageName:
                           description: Name of the container image, supporting both tags (`<image>:<tag>`) and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`). See. https://cloudnative-pg.io/documentation/1.24/operator_capability_levels/#override-of-operand-images-through-the-crd
                           type: string

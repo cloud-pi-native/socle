@@ -48,6 +48,7 @@ spec:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
+      backupPath: cnpg
     values: {}
   cpnAnsibleJob:
     helmRepoUrl: https://cloud-pi-native.github.io/helm-charts
@@ -66,6 +67,8 @@ spec:
       # Same distribution and flavor as the former 16.2 image (bullseye, with barman-cloud):
       # CNPG major upgrades require the same OS. Sync the JIT-off change before this one.
       imageName: cloudnative-pg/postgresql:17.11-system-bullseye
+      # PostgreSQL 17 archive: the PG16 timelines in /cnpg are incompatible with the upgraded cluster
+      backupPath: cnpg-pg17
     valkey:
       # External Redis-compatible store: the bundled Redis was removed from GitLab chart 10 (GitLab 19)
       # https://github.com/valkey-io/valkey-helm
@@ -148,6 +151,7 @@ spec:
       enabled: false
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
+      backupPath: cnpg
     values: {}
   keycloakx:
     installEnabled: true
@@ -221,6 +225,7 @@ spec:
     postgresPvcSize: 5Gi
     cnpg:
       imageName: cloudnative-pg/postgresql:16.2
+      backupPath: cnpg
     values: {}
   tests:
     installEnabled: false

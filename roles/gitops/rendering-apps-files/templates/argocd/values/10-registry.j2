@@ -1,16 +1,16 @@
 argocd:
   image:
     repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.quay}>
-  
   redis:
     image:
       repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>
-
   redis-ha:
     image:
       repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/library/redis
       tag: 7.4.1-alpine
-
+    haproxy:
+      image:
+        repository: <path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>/haproxy
 {% if dsc.global.imagePullSecrets is defined %}
 argocd:
   global:

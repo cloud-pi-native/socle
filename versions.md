@@ -2,7 +2,7 @@
 | ------------------------- | ---------------- | ------------- | -------------------------------------------------------------------------------------------------------------------- |
 | argocd                    | 3.1.7            | 8.5.6         | [argocd](https://artifacthub.io/packages/helm/argo/argo-cd)                                                          |
 | certmanager               | 1.14.3           | 1.14.3        | [certmanager](https://github.com/cert-manager/cert-manager/releases)                                                 |
-| cloudnativepg.cluster     | N/A              | 0.3.1         | [cluster](https://artifacthub.io/packages/helm/cloudnative-pg/cluster)                                               |
+| cloudnativepg.cluster     | N/A              | 0.4.0         | [cluster](https://artifacthub.io/packages/helm/cloudnative-pg/cluster)                                               |
 | cloudnativepg.operator    | 1.28.0           | 0.27.0        | [cloudnative-pg](https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg)                                 |
 | console                   | 9.\*.\*          | 2.\*.\*       | [console](https://github.com/cloud-pi-native/helm-charts)                                                            |
 | cpn-job                   | 1.\*.\*          | 1.\*.\*       | [cpn-job](https://github.com/cloud-pi-native/helm-charts)                                                            |

@@ -1,5 +1,25 @@
 # Changelog
 
+## [4.15.0](https://github.com/cloud-pi-native/socle/compare/v4.14.1...v4.15.0) (2026-11-24)
+
+
+### Features
+
+* **cnpg:** make the CNPG backup path configurable for every application ([8ab42e2](https://github.com/cloud-pi-native/socle/commit/8ab42e2c3b6ac60572ed892bd78aabf5f1dd5333))
+* **gitlab:** prepare GitLab 19 prerequisites on 18.11 ([8229fc8](https://github.com/cloud-pi-native/socle/commit/8229fc80e9a23fe00dac93fa8882d5f031b252e8))
+* **gitlabrunner:** upgrade chart 0.94.3 (runner 19.5.3) ([65a2e13](https://github.com/cloud-pi-native/socle/commit/65a2e136c7fc4fbc5e14abf33c3957585b676a4f))
+* **gitlab:** upgrade to GitLab 19.6.1 (chart 10.6.1, operator 3.6.1) ([99966e9](https://github.com/cloud-pi-native/socle/commit/99966e9f60ebfe79a15cf9014936355b52d2989a))
+* **keycloakx:** make the CNPG backup path configurable ([1c868c5](https://github.com/cloud-pi-native/socle/commit/1c868c525ac5af4522be0cc4d40b0c410f570141))
+* upgrade gitlab 19.2.8 ([88999be](https://github.com/cloud-pi-native/socle/commit/88999beff422a21ecfbfc02e4829ab498307c9f2))
+* upgrade gitlab 19.5.6 ([c18d473](https://github.com/cloud-pi-native/socle/commit/c18d4734a10e5cb8a297f02f89f2173f90c9add5))
+
+
+### Bug Fixes
+
+* **gitlab:** disable PostgreSQL JIT before the PostgreSQL 17 major upgrade ([3ce8b46](https://github.com/cloud-pi-native/socle/commit/3ce8b46287dc342c74a12c9cddc6efbf070f2581))
+* **gitlab:** make the toolbox backup succeed with external object storage ([d927fbf](https://github.com/cloud-pi-native/socle/commit/d927fbfd78d5191f1ca64efc8c4154c678f4057b)), closes [#1188](https://github.com/cloud-pi-native/socle/issues/1188)
+* **gitlab:** really disable KAS with global.kas.enabled ([0181a0e](https://github.com/cloud-pi-native/socle/commit/0181a0ec902cff34076f869a86da6e85790bc202))
+
 ## [4.14.1](https://github.com/cloud-pi-native/socle/compare/v4.14.0...v4.14.1) (2026-11-18)
 
 

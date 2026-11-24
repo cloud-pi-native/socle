@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.15.1](https://github.com/cloud-pi-native/socle/compare/v4.15.0...v4.15.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* **cnpg:** disable default S3 checksums for barman-cloud (cluster chart 0.4.0) ([02f7391](https://github.com/cloud-pi-native/socle/commit/02f7391afcbc4023e07628ca9ab14bcbab2a7d9c))
+
 ## [4.15.0](https://github.com/cloud-pi-native/socle/compare/v4.14.1...v4.15.0) (2026-11-24)
 
 

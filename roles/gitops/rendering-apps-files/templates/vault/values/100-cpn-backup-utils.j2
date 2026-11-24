@@ -16,4 +16,19 @@ cpn-backup-utils:
       MC_EXTRA_ARGS: "{{ dsc.global.backup.vault.mcExtraArgs }}"
     job:
       schedule: '"{{ dsc.global.backup.vault.cron }}"'
+{% if dsc.global.platform == "kubernetes" %}
+    # Image USER is the non-numeric "vault" (uid 100, gid 1000): runAsNonRoot needs a numeric uid
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 100
+      runAsGroup: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    container:
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+{% endif %}
 {% endif %}

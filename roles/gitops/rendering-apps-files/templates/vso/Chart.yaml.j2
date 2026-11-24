@@ -1,0 +1,14 @@
+---
+apiVersion: v2
+name: vso
+type: application
+version: {{ dsc.vso.chartVersion }}
+{# The operator chart is a dependency only when this dsc installs the operator. Otherwise the app
+   only carries the VaultConnection + VaultAuth of this dsc, towards the VSO of the cluster. #}
+{% if dsc.vso.installEnabled | default(false) %}
+dependencies:
+- name: vault-secrets-operator
+  alias: vso
+  version: {{ dsc.vso.chartVersion }}
+  repository: {{ dsc.vso.helmRepoUrl }}
+{% endif %}

@@ -77,6 +77,19 @@
         s3_secret_key: "{{ s3_backup_secret.resources[0].data.secretAccessKey | b64decode }}"
 
     - name: Deploy Helm chart
+      vars:
+        # Image USER is the non-numeric "vault" (uid 100, gid 1000): runAsNonRoot needs a numeric uid
+        vault_backup_pod_security_context:
+          runAsNonRoot: true
+          runAsUser: 100
+          runAsGroup: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        vault_backup_container_security_context:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
       kubernetes.core.helm:
         name: "{{ dsc_name }}-vault-backup"
         chart_ref: dso/cpn-backup-utils
@@ -98,6 +111,9 @@
               MC_EXTRA_ARGS: "{{ dsc.global.backup.vaultInfra.mcExtraArgs }}"
             job:
               schedule: '"{{ dsc.global.backup.vaultInfra.cron }}"'
+            podSecurityContext: "{{ vault_backup_pod_security_context if dsc.global.platform == 'kubernetes' else {} }}"
+            container:
+              securityContext: "{{ vault_backup_container_security_context if dsc.global.platform == 'kubernetes' else {} }}"
         state: "{{ dsc.global.backup.vaultInfra.enabled | ternary('present', 'absent') }}"
 
 - name: Patch serviceMonitors

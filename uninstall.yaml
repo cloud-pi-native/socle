@@ -271,6 +271,25 @@
         - never
         - gitlab-operator
 
+    - name: Suppression de Vault Secrets Operator
+      kubernetes.core.helm:
+        name: vault-secrets-operator
+        release_namespace: "{{ dsc.vso.namespace }}"
+        release_state: absent
+        wait: true
+      tags:
+        - never
+        - vso
+
+    - name: "Suppression du namespace Vault Secrets Operator"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.vso.namespace }}"
+      tags:
+        - never
+        - vso
+
     - name: "Suppression du namespace Vault"
       kubernetes.core.k8s:
         state: absent

@@ -104,3 +104,4 @@ spec:
   tests: {}
   vault: {}
   vaultInfra: {}
+  vso: {}

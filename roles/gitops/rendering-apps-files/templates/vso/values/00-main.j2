@@ -1,0 +1,20 @@
+{% if dsc.vso.installEnabled | default(false) %}
+vso:
+  controller:
+    # Pod Security Standard "restricted": the chart applies these contexts to both the manager and the kube-rbac-proxy containers.
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+  defaultVaultConnection:
+    enabled: false
+  defaultAuthMethod:
+    enabled: false
+{% else %}
+{}
+{% endif %}

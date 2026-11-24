@@ -9,7 +9,7 @@
     dest_path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
 
 - name: Set install_enabled fact when not observability
-  when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app != "observability")
+  when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app not in ["observability", "vso"])
   ansible.builtin.set_fact:
     install_enabled: "{{ dsc[item.1.argocd_app].installEnabled }}"
 
@@ -17,6 +17,11 @@
   when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app == "observability")
   ansible.builtin.set_fact:
     install_enabled: "{{ dsc.observatorium.installEnabled }}"
+
+- name: Set install_enabled fact when vso (operator and/or connection of this dsc)
+  when: item.1.argocd_app == "vso"
+  ansible.builtin.set_fact:
+    install_enabled: "{{ vso_app_enabled | bool }}"
 
 - name: Create chart and values destination dir
   ansible.builtin.file:

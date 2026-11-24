@@ -284,6 +284,7 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [Keycloak](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)
 - [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
+- [Velero](https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero) (options du socle : [docs/velero.md](docs/velero.md))
 
 S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.
 

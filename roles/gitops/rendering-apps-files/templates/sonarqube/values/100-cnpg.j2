@@ -4,6 +4,11 @@ cluster:
   cluster:
     primaryUpdateMethod: restart
     enablePDB: false
+    env:
+      - name: AWS_REQUEST_CHECKSUM_CALCULATION
+        value: when_required
+      - name: AWS_RESPONSE_CHECKSUM_VALIDATION
+        value: when_required
     imageName: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.ghcr}>/{{ dsc.sonarqube.cnpg.imageName }}"
 {% if dsc.global.imagePullSecrets is defined %}
     imagePullSecrets: {{ dsc.global.imagePullSecrets | to_json }}

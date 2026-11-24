@@ -76,6 +76,27 @@
       kubernetes.core.k8s:
         template: prometheusrule.yml.j2
 
+- name: Get cert-manager namespace
+  kubernetes.core.k8s_info:
+    kind: Namespace
+    name: cert-manager
+  register: cm_ns
+
+- name: Set networkpolicy template path
+  ansible.builtin.set_fact:
+    cm_netpol_template: "{{ role_path }}/templates/networkpolicy.yaml.j2"
+
+# Direct path only: when certmanager is deployed by the Argo CD app, its own template emits the policies.
+- name: Apply networkpolicy
+  ansible.builtin.include_role:
+    name: gitops/rendering-apps-files
+    tasks_from: apply_netpol.yml
+  vars:
+    netpol_template: "{{ cm_netpol_template }}"
+    netpol_namespace: cert-manager
+    netpol_app: certmanager-direct
+    netpol_enabled: "{{ (dsc.global.networkpolicies.enabled | default(false) | bool) and (cm_ns.resources | length > 0) }}"
+
 - name: Create Let's Encrypt ClusterIssuer
   kubernetes.core.k8s:
     state: present

@@ -1,0 +1,13 @@
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% if dsc.global.networkpolicies.enabled | default(false) | bool and (dsc.cloudnativepg | default({})).installEnabled | default(false) | bool %}
+{# Policies of the CloudNativePG operator namespace. Ports: webhook 9443, metrics 8080.
+   The operator egress cannot be listed (kube-apiserver plus the instance status endpoint of every PostgreSQL
+   pod, in every namespace hosting a Cluster), so only policies without egress side are emitted. S3 (Barman) and
+   database clients are flows of the instance pods, in the consumer namespaces. #}
+{% set app = 'cloudnativepg' %}
+{{ np.intra(app, egress=false) }}
+{{ np.webhook(app, {'app.kubernetes.io/name': 'cloudnative-pg'}, [9443]) }}
+{% if np.scrape_on() %}
+{{ np.scrape(app, {}, [8080]) }}
+{% endif %}
+{% endif %}

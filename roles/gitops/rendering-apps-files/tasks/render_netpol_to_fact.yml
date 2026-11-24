@@ -1,0 +1,17 @@
+---
+# Render the NetworkPolicy template of a role OUTSIDE rendering-apps-files (direct, non GitOps roles) into a fact. Run through include_role, this task belongs to the rendering-apps-files role, so the role directory
+# is in ansible_search_path and the template can import the shared macros like the GitOps templates do:
+#   {% import '_common/networkpolicy-macros.j2' as np with context %}
+#   {% import '_common/app-netpol-gate.j2' as gate with context %}
+# Not used by the GitOps rendering (tasks/main.yml does not include it): existing behavior is unchanged.
+#
+# Inputs: netpol_template (ABSOLUTE path of the template), netpol_fact (name of the fact to set). The template
+# reads dsc, dsc_name (and envs when it calls np.ns): socle-config must have run. Output: the fact holds the
+# rendered text, a string that is empty (or whitespace only) when the template's gate is closed.
+#
+# Roles do not call this file directly: tasks/apply_netpol.yml includes it and then applies and prunes the
+# policies (see its header for the call from a role).
+- name: Render networkpolicy template to fact
+  ansible.builtin.set_fact:
+    # default('', true): ansible-core 2.19+ turns a whitespace-only render (gate closed) into None.
+    "{{ netpol_fact }}": "{{ lookup('ansible.builtin.template', netpol_template) | default('', true) }}"

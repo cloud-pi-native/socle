@@ -16,6 +16,10 @@ glexporter:
         path: /metrics
   redis:
     fullnameOverride: "glexporter-redis"
+    # The subchart NetworkPolicy opens 6379 to the whole cluster; the namespace-scoped policy of the
+    # platform (networkpolicies) already covers glexporter-redis.
+    networkPolicy:
+      enabled: false
     global:
       imageRegistry: "<path:{{ vaultinfra_kv_name }}/data/env/{{ dsc_name }}/apps/global/values#image | jsonPath {.repository.docker}>"
     image:

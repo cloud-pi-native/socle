@@ -1,0 +1,46 @@
+{# Shared logic of the GitLab family NetworkPolicies, imported by
+   {gitlab,glexporter,gitlabrunner}/templates/networkpolicy.yaml.j2:
+   {% import '_common/gitlab-family-netpol.j2' as gf with context %}
+   gitlab, glexporter and gitlabrunner are deployed in one namespace (envs nameSpace "gitlab"). gitlab owns it
+   (it alone emits the namespace-wide policies), the companions only emit their own authorizations.
+   Predicates return 'true' / ''. The generic gate lives in _common/app-netpol-gate.j2. #}
+{% import '_common/networkpolicy-macros.j2' as np with context %}
+{% import '_common/app-netpol-gate.j2' as gate with context %}
+
+{% macro _installed(key) -%}
+{{ gate.installed(key) }}
+{%- endmacro %}
+
+{# 'true' when the networkpolicies flag is on. #}
+{% macro flag() -%}
+{{ gate.flag() }}
+{%- endmacro %}
+
+{# 'true' when the owner emits its policies: gate.active('gitlab'), i.e. flag on and gitlab installed (no skip). #}
+{% macro owner_active() -%}
+{{ gate.active('gitlab') }}
+{%- endmacro %}
+
+{# Companion gate: '' when the companion emits nothing. Fails the render when the companion is installed (flag
+   on) without gitlab, the owner of the namespace, or outside the gitlab namespace. #}
+{% macro companion_active(app) -%}
+{%- if flag() and _installed(app) -%}
+{%- if not _installed('gitlab') -%}
+{{ _gf_undefined_on_purpose | mandatory('networkpolicies: ' ~ app ~ ' is installed without gitlab, the owner of their shared namespace (set gitlab.installEnabled, or ' ~ app ~ '.installEnabled false)') }}
+{%- elif np.ns(app) != np.ns('gitlab') -%}
+{{ _gf_undefined_on_purpose | mandatory('networkpolicies: ' ~ app ~ ' namespace ' ~ np.ns(app) ~ ' is not the gitlab namespace ' ~ np.ns('gitlab')) }}
+{%- elif owner_active() -%}
+true
+{%- endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+{# 'true' when the scrape policies are emitted: global.metrics.enabled (np.scrape_on). #}
+{% macro scrape_on() -%}
+{{ np.scrape_on() }}
+{%- endmacro %}
+
+{# 'true' when the console is installed in this DSC (it calls the webservice from its own namespace). #}
+{% macro console() -%}
+{{ _installed('console') }}
+{%- endmacro %}

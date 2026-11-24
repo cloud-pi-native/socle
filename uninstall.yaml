@@ -106,6 +106,25 @@
         - never
         - cert-manager
 
+    - name: "Suppression du Trivy Operator"
+      kubernetes.core.helm:
+        name: trivy-operator
+        release_namespace: "{{ dsc.trivyOperator.namespace }}"
+        state: absent
+        wait: true
+      tags:
+        - never
+        - trivy-operator
+
+    - name: "Suppression du namespace Trivy Operator"
+      kubernetes.core.k8s:
+        state: absent
+        kind: Namespace
+        name: "{{ dsc.trivyOperator.namespace }}"
+      tags:
+        - never
+        - trivy-operator
+
     - name: "Suppression de l'instance CloudNativePG"
       kubernetes.core.helm:
         name: cloudnative-pg

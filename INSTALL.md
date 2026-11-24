@@ -55,6 +55,26 @@ Vous devez disposer d'un cluster cible Kubernetes ou OpenShift fonctionnel ou no
 
 Nous appellerons ce cluster **cluster socle**.
 
+Il doit disposer d'un **contrôleur d'ingress** : le Socle n'en installe pas. Installez-le avant tout run Ansible, par exemple ingress-nginx :
+
+```yaml
+# values-ingress.yaml
+controller:
+  ingressClassResource:
+    default: true
+```
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx   --namespace ingress-nginx --create-namespace   -f values-ingress.yaml
+kubectl -n ingress-nginx get svc ingress-nginx-controller   # attendre EXTERNAL-IP
+```
+
+- `default: true` est **obligatoire** avec `spec.ingress.tls.type: acme` : le solver HTTP-01 du `ClusterIssuer` ne précise aucune classe d'ingress. Sans `IngressClass` par défaut, le certificat n'est pas émis et le contrôleur sert son certificat auto-signé.
+- **DNS** : faire pointer le wildcard du domaine racine (`global.rootDomain`) vers l'`EXTERNAL-IP`.
+- **Vérification** : `curl -k https://<EXTERNAL-IP>/` doit retourner un `404` servi par nginx (le contrôleur est joignable), et `curl --resolve <hôte>:443:<EXTERNAL-IP> https://<hôte>/` teste un hôte sans attendre la propagation DNS.
+
 ## Installation
 
 L'installation de la plateforme Cloud Pi Native se fait de manière automatisée via Ansible.
@@ -189,6 +209,24 @@ Cette commande va créer l'`applicationSet` `<envName>-dso-install-manager` dans
 
 Si le paramètre `global.gitOps.watchpointEnabled` est désactivé, l'`applicationSet` `<envName>-dso-install-manager` sera automatiquement créée, vous pouvez lancer la synchronisation manuellement sur l'Argo CD d'infrastructure.
 
+Si `argocdInfra.projectName` diffère de `default`, l'`AppProject` correspondant est créé dans l'Argo CD d'infrastructure avant l'`Application` (le projet `default` est natif d'Argo CD et n'est pas créé).
+
+L'`Application` pointe sur le répertoire `applicationSets/<dsc>/` du dépôt GitOps (`<dsc>` = nom de la DSC), qui contient les `ApplicationSet` (une par sync wave). Un sous-répertoire par DSC permet à plusieurs clusters de partager le même dépôt et la même branche :
+
+- Le plugin AVP lit le chemin de l'`Application` de façon récursive : chaque `Application` ne doit pointer que sur son propre sous-répertoire.
+- Migration d'un environnement déployé avec l'ancien chemin (`applicationSets/` à la racine) :
+  - Relancer `-t dso-app` : rend `applicationSets/<dsc>/` et met à jour le chemin de l'`Application`.
+  - Supprimer les anciens fichiers à la racine de `applicationSets/` (le rôle ne les supprime pas), puis pousser.
+  - Synchroniser `<envName>-dso-install-manager` : les `ApplicationSet` gardent les mêmes noms, rien n'est supprimé. Ne pas synchroniser avec prune avant le push.
+  - Migrer tous les environnements existants du dépôt avant d'en ajouter un nouveau : une `Application` encore sur `applicationSets/` lirait aussi les sous-répertoires des autres DSC.
+
+Les `ClusterRole` partagés générés par la DSC (`dsc-access-role`, `cpn-ansible-job-role`, `pgdump-role`, `access-cnpg-s3-ca-secret`) sont préfixés par le nom de la DSC, ce qui permet à plusieurs DSC de cohabiter sur un même cluster. Pour un environnement déjà déployé avec les anciens noms :
+
+- Après la synchronisation, les anciens `ClusterRole` et `ClusterRoleBinding` sans préfixe restent présents sur le cluster : Argo CD ne les supprime pas s'il n'a pas le prune activé sur ces ressources.
+- Vérifier que les nouveaux rôles sont bien utilisés (les `roleRef` des jobs et des bindings sont mis à jour), puis supprimer manuellement les anciens :
+  `kubectl delete clusterrole dsc-access-role cpn-ansible-job-role pgdump-role access-cnpg-s3-ca-secret`
+  (ainsi que les `ClusterRoleBinding` / `RoleBinding` associés qui ne portent pas le préfixe).
+
 ### 11. Acceptation des conditions de service
 
 Une fois la plateforme Cloud Pi Native installée, vous devez accepter les conditions de service de certains outils de la plateforme. Pour le moment, il ne s'agit que de l'outil Nexus.
@@ -284,6 +322,7 @@ Voici les liens vers les documentations de chart Helm pour les outils concernés
 - [Keycloak](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx)
 - [SonarQube](https://github.com/SonarSource/helm-chart-sonarqube)
 - [HashiCorp Vault](https://github.com/hashicorp/vault-helm)
+- [Trivy Operator](https://github.com/aquasecurity/trivy-operator/tree/main/deploy/helm) (options du socle : [docs/trivy-operator.md](docs/trivy-operator.md))
 
 S'agissant du gel des versions de charts ou d'images pour les outils en question, **nous vous invitons fortement à consulter la section détaillée [Gel des versions](#gel-des-versions)** située plus bas dans le présent document.
 

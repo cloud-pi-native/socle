@@ -102,5 +102,6 @@ spec:
   #  port: "3128"
   sonarqube: {}
   tests: {}
+  trivyOperator: {}
   vault: {}
   vaultInfra: {}

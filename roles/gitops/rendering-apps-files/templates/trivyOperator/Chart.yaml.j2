@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: trivy-operator
+type: application
+version: {{ dsc.trivyOperator.chartVersion }}
+dependencies:
+- name: trivy-operator
+  alias: trivy-operator
+  version: {{ dsc.trivyOperator.chartVersion }}
+  repository: {{ dsc.trivyOperator.helmRepoUrl }}

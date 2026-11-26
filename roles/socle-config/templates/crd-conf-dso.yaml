@@ -173,6 +173,32 @@ spec:
                           domain:
                             description: The fully qualified domain name of the Argo CD of the zone.
                             type: string
+                          destination:
+                            description: destination injected into Application/AppProject
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              server:
+                                type: string
+                              namespace:
+                                type: string
+                            required:
+                              - namespace
+                          infra:
+                            description: infra-related configuration
+                            type: object
+                            properties:
+                              namespace:
+                                description: Namespace for infra resources
+                                type: string
+                              project:
+                                description: Name of infra AppProject
+                                type: string
+                        required:
+                          - name
+                          - domain
+                          - destination
                   required:
                     - admin
                     - installEnabled

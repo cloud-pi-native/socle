@@ -3,10 +3,14 @@
   ansible.builtin.debug:
     msg: "Traitement du templating de l'app {{ item.1.argocd_app }}"
 
-- name: Set source and destination path facts
+- name: Set source and dest (relative) path facts
   ansible.builtin.set_fact:
     source_path: "{{ role_path }}/templates/{{ item.1.argocd_app }}"
-    dest_path: "{{ gitops_local_repo }}/{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
+    dest_rel_path: "{{ dsc.global.gitOps.repo.path }}/envs/{{ item.0.name }}/apps/{{ item.1.argocd_app }}"
+
+- name: Set destination path fact
+  ansible.builtin.set_fact:
+    dest_path: "{{ gitops_local_repo }}/{{ dest_rel_path }}"
 
 - name: Set install_enabled fact when not observability
   when: (dsc[item.1.argocd_app].installEnabled is defined) and (item.1.argocd_app != "observability")
@@ -131,3 +135,23 @@
 
     - name: Special parsing for pipe after colon
       ansible.builtin.include_tasks: ./parsing.yml
+
+# Handle secondary zones
+
+- name: Set zones fact
+  ansible.builtin.set_fact:
+    zones: "{{ dsc[item.1.argocd_app].secondaryZones | default([]) }}"
+    zone_source_dir: "{{ source_path }}/zone"
+
+- name: Check zone source dir
+  ansible.builtin.stat:
+    path: "{{ zone_source_dir }}"
+  register: zone_source_dir_check
+
+- name: Render secondary zones
+  when: install_enabled and (zones | length > 0) and zone_source_dir_check.stat.exists
+  include_tasks: render_zone.yml
+  loop: "{{ zones }}"
+  loop_control:
+    label: zone.name
+    loop_var: zone

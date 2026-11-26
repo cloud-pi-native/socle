@@ -1,0 +1,66 @@
+{% set infra = zone.infra | default({}) %}
+{% set infra_namespace = infra.namespace | default('default') %}
+{% set infra_project = infra.project | default(dsc.argocdInfra.projectName) %}
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ infra_namespace }}
+
+---
+
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: avp-plugin-trigger-{{ dsc.global.gitOps.envName }}
+  namespace: {{ infra_namespace }}
+  annotations:
+    avp.kubernetes.io/remove-missing: "true"
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ infra_project }}
+  namespace: {{ infra_namespace }}
+spec:
+  description: "Projet de déploiement des composants DSO"
+  clusterResourceWhitelist:
+  - group: 'argoproj.io'
+    kind: '*'
+  sourceRepos:
+    - {{ dsc.global.gitOps.repo.url }}
+  destinations:
+    - {{ zone.destination | to_nice_yaml | indent(width=6) }}
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "{{ dsc.global.gitOps.envName }}-{{ zone.name }}-zone"
+  namespace: {{ infra_namespace }}
+spec:
+  project: {{ infra_project }}
+  revisionHistoryLimit: 3
+  source:
+    repoURL: {{ dsc.global.gitOps.repo.url }}
+    targetRevision: {{ dsc.global.gitOps.repo.revision }}
+    path: "{{ dest_rel_path }}"
+    plugin:
+      env:
+        - name: AVP_SECRET
+          value: vault-plugin-secret
+        - name: HELM_ARGS
+          value: -f values.yaml -f zone-{{ zone.name }}-values.yaml
+  destination:
+    {{ zone.destination | to_nice_yaml | indent(width=4) }}
+  syncPolicy:
+    # automated: {}
+    #   selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true

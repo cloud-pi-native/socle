@@ -142,7 +142,7 @@ flowchart LR
       %% console
       subgraph dso-console["Ns: dso-console"]
         Socle_Console_Client["Console - Client"]
-        Socle_Console_Server["Console - Server"]
+        Socle_Console_Backend["Console - Backend"]
         Socle_CNPG_cluster_console["CNPG cluster"]
       end
 
@@ -224,9 +224,9 @@ flowchart LR
     Socle_CNPG -->|Manages| Socle_CNPG_cluster_console
 
     %% Console
-    Socle_Console_Client -->|Interact| Socle_Console_Server
-    Socle_Console_Server -->|R/W| Socle_CNPG_cluster_console
-    Socle_Console_Server --> Socle_Apps_Hub
+    Socle_Console_Client -->|Interact| Socle_Console_Backend
+    Socle_Console_Backend -->|R/W| Socle_CNPG_cluster_console
+    Socle_Console_Backend --> Socle_Apps_Hub
 
     %% Observabilité
     Socle_Observatorium -->|Scrapes/Reads| Graf_console
